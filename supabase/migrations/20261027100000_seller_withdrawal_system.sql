@@ -60,12 +60,16 @@ ON CONFLICT DO NOTHING;
 -- ---------------------------------------------------------------------------
 -- 2. Kebijakan: minimum penarikan Rp5.000 pada key existing, fee 1500 bps
 -- ---------------------------------------------------------------------------
--- Nilai lama 50000 hanya ditimpa bila masih persis di default lama; bila Owner
--- sudah mengubahnya sendiri, nilainya dihormati.
-UPDATE public.system_settings
-   SET value = '5000'::jsonb,
-       description = 'Minimum nominal penarikan bruto (Rp). Juga menjadi syarat minimum saldo tersedia.'
- WHERE key = 'marketplace_min_payout' AND value #>> '{}' = '50000';
+-- Kebijakan baru: minimum penarikan bruto Rp5.000. Barisnya bisa belum ada di
+-- system_settings (default registry tidak otomatis tersimpan), jadi pakai upsert.
+-- Nilai yang sudah dikustomisasi Owner (≠ 50000) dihormati.
+INSERT INTO public.system_settings (key, value, description, is_public)
+VALUES ('marketplace_min_payout', '5000'::jsonb,
+        'Minimum nominal penarikan bruto (Rp). Juga menjadi syarat minimum saldo tersedia.', true)
+ON CONFLICT (key) DO UPDATE
+  SET value = '5000'::jsonb,
+      description = EXCLUDED.description
+ WHERE public.system_settings.value #>> '{}' = '50000';
 
 INSERT INTO public.system_settings (key, value, description, is_public)
 VALUES ('marketplace_withdrawal_fee_bps', '1500'::jsonb,

@@ -55,10 +55,12 @@ describe("withdrawal SQL contract — atomicity", () => {
 
 describe("withdrawal SQL contract — policy & fee", () => {
   it("moves the existing minimum setting to Rp5.000 without creating a duplicate key", () => {
-    expect(sql).toContain("WHERE key = 'marketplace_min_payout' AND value #>> '{}' = '50000'");
-    expect(sql).toContain("'5000'::jsonb");
-    // Hanya satu UPDATE yang menyentuh key ini; sisanya pembacaan setting_int.
-    expect(sql.match(/UPDATE public\.system_settings[\s\S]*?marketplace_min_payout/g)?.length).toBe(1);
+    // Upsert: baris setting bisa belum ada di system_settings; nilai kustom
+    // Owner (≠ 50000) tidak ditimpa berkat guard WHERE pada DO UPDATE.
+    expect(sql).toContain("VALUES ('marketplace_min_payout', '5000'::jsonb");
+    expect(sql).toContain("WHERE public.system_settings.value #>> '{}' = '50000'");
+    // Hanya satu upsert yang menyentuh key ini; sisanya pembacaan setting_int.
+    expect(sql.match(/'marketplace_min_payout', '5000'::jsonb/g)?.length).toBe(1);
     expect(sql.match(/setting_int\('marketplace_min_payout'/g)?.length).toBe(2);
   });
 
