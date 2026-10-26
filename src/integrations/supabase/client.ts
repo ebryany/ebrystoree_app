@@ -52,6 +52,11 @@ function createSupabaseClient() {
       storage: brokeredPreviewStorage(),
       persistSession: true,
       autoRefreshToken: true,
+      // PKCE wajib untuk OAuth (Google). Tanpa ini Supabase memakai implicit
+      // flow yang mengembalikan token di URL hash, dan
+      // exchangeCodeForSession() di /auth/callback akan gagal.
+      flowType: "pkce",
+      detectSessionInUrl: true,
     }
   });
 }

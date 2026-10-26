@@ -28,6 +28,7 @@ import { Route as AuthenticatedOperatorRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LayananIndexRouteImport } from './routes/layanan.index'
 import { Route as LayananSlugRouteImport } from './routes/layanan.$slug'
 import { Route as ProdukIndexRouteImport } from './routes/produk.index'
@@ -208,6 +209,11 @@ const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
   id: '/artikel/$slug',
   path: '/artikel/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
 } as any)
 const LayananIndexRoute = LayananIndexRouteImport.update({
   id: '/layanan/',
@@ -695,7 +701,7 @@ const ApiPublicPaymentsWebhookSumopodRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/bantuan': typeof BantuanRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kebijakan-refund': typeof KebijakanRefundRoute
@@ -712,6 +718,7 @@ export interface FileRoutesByFullPath {
   '/operator': typeof AuthenticatedOperatorRouteWithChildren
   '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
@@ -799,7 +806,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/bantuan': typeof BantuanRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kebijakan-refund': typeof KebijakanRefundRoute
@@ -811,6 +818,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/akun': typeof AuthenticatedAkunRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
@@ -899,7 +907,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/bantuan': typeof BantuanRoute
   '/kebijakan-privasi': typeof KebijakanPrivasiRoute
   '/kebijakan-refund': typeof KebijakanRefundRoute
@@ -916,6 +924,7 @@ export interface FileRoutesById {
   '/_authenticated/operator': typeof AuthenticatedOperatorRouteWithChildren
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
@@ -1022,6 +1031,7 @@ export interface FileRouteTypes {
     | '/operator'
     | '/seller'
     | '/artikel/$slug'
+    | '/auth/callback'
     | '/layanan/$slug'
     | '/produk/$slug'
     | '/see/masuk'
@@ -1121,6 +1131,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/akun'
     | '/artikel/$slug'
+    | '/auth/callback'
     | '/layanan/$slug'
     | '/produk/$slug'
     | '/see/masuk'
@@ -1225,6 +1236,7 @@ export interface FileRouteTypes {
     | '/_authenticated/operator'
     | '/_authenticated/seller'
     | '/artikel/$slug'
+    | '/auth/callback'
     | '/layanan/$slug'
     | '/produk/$slug'
     | '/see/masuk'
@@ -1314,7 +1326,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   BantuanRoute: typeof BantuanRoute
   KebijakanPrivasiRoute: typeof KebijakanPrivasiRoute
   KebijakanRefundRoute: typeof KebijakanRefundRoute
@@ -1479,6 +1491,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/artikel/$slug'
       preLoaderRoute: typeof ArtikelSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/layanan/': {
       id: '/layanan/'
@@ -2278,6 +2297,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface SeeDashboardRouteRouteChildren {
   SeeDashboardKampanyeRoute: typeof SeeDashboardKampanyeRoute
   SeeDashboardKontenRoute: typeof SeeDashboardKontenRoute
@@ -2300,7 +2329,7 @@ const SeeDashboardRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   BantuanRoute: BantuanRoute,
   KebijakanPrivasiRoute: KebijakanPrivasiRoute,
   KebijakanRefundRoute: KebijakanRefundRoute,

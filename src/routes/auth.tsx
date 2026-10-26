@@ -20,7 +20,6 @@ import { GlassActionButton } from "@/components/ui/glass-action-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useSession } from "@/hooks/use-session";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { homeBannerSlides } from "@/lib/website-settings";
@@ -173,15 +172,30 @@ function HalamanAuth() {
 
   async function handleGoogle() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth${next ? `?next=${encodeURIComponent(next)}` : ""}`,
+    // OAuth langsung ke Supabase, bukan lewat broker Lovable. Broker hanya
+    // hidup di Lovable Cloud; setelah self-host, rute /~oauth/initiate tidak
+    // ada (404) sehingga tombol ini mati total di produksi.
+    //
+    // Supabase mengembalikan user ke /auth/callback dengan ?code=.
+    // `next` dititipkan lewat query agar tujuan setelah login tidak hilang.
+    const callback = new URL("/auth/callback", window.location.origin);
+    if (next) callback.searchParams.set("next", next);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callback.toString(),
+        queryParams: { prompt: "select_account" },
+      },
     });
-    if (result.error) {
+
+    if (error) {
       setBusy(false);
       toast.error("Gagal masuk dengan Google. Coba lagi.");
       return;
     }
-    goNext();
+    // Sukses berarti browser sedang diarahkan ke Google; `busy` sengaja
+    // dibiarkan true supaya tombol tidak bisa diklik dua kali saat redirect.
   }
 
   const inputClass = "h-11 rounded-lg bg-card";
