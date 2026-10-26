@@ -475,7 +475,7 @@ export const SETTING_SECTIONS: SettingSection[] = [
         key: "seo_canonical_base",
         label: "Canonical base URL",
         type: "url",
-        default: "https://ebrystore.lovable.app",
+        default: "https://app.ebrystore.my.id",
         isPublic: true,
       },
       {

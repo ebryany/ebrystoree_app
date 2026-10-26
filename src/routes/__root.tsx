@@ -89,6 +89,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         : null,
     ].filter(Boolean) as { name: string; content: string }[];
 
+    // Canonical: sumber kebenaran adalah setting admin. Bila kosong, tag tidak
+    // dirender sama sekali (lebih aman daripada menunjuk domain lama). Path
+    // diambil dari match agar tiap halaman punya canonical sendiri.
+    const canonicalBase = String(s.seo_canonical_base || "").replace(/\/+$/, "");
+    const canonicalPath = String((match as { pathname?: string })?.pathname ?? "");
+    const canonicalHref = canonicalBase
+      ? `${canonicalBase}${canonicalPath === "/" ? "" : canonicalPath}`
+      : undefined;
+
     return {
       meta: [
         { charSet: "utf-8" },
@@ -117,6 +126,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           href: appCss,
         },
         { rel: "icon", href: String(s.site_favicon_url || "/favicon.ico") },
+        ...(canonicalHref ? [{ rel: "canonical", href: canonicalHref }] : []),
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         ...(supabaseOrigin
