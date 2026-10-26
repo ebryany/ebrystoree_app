@@ -2636,6 +2636,44 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_bank_accounts: {
+        Row: {
+          account_holder_name: string
+          account_number: string
+          bank_name: string
+          created_at: string
+          id: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_holder_name: string
+          account_number: string
+          bank_name: string
+          created_at?: string
+          id?: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_holder_name?: string
+          account_number?: string
+          bank_name?: string
+          created_at?: string
+          id?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_bank_accounts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_ledger: {
         Row: {
           amount: number
@@ -3272,6 +3310,130 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          note: string | null
+          withdrawal_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          note?: string | null
+          withdrawal_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          note?: string | null
+          withdrawal_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_events_withdrawal_id_fkey"
+            columns: ["withdrawal_id"]
+            isOneToOne: false
+            referencedRelation: "withdrawals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawals: {
+        Row: {
+          bank_account_holder: string
+          bank_account_number: string
+          bank_name: string
+          bank_reference: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          fee_amount: number
+          fee_bps: number
+          gross_amount: number
+          id: string
+          idempotency_key: string
+          net_amount: number
+          requested_by: string
+          status: string
+          store_id: string
+          transfer_note: string | null
+          transferred_at: string | null
+          transferred_by: string | null
+          updated_at: string
+          withdrawal_number: string
+        }
+        Insert: {
+          bank_account_holder: string
+          bank_account_number: string
+          bank_name: string
+          bank_reference?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          fee_amount: number
+          fee_bps: number
+          gross_amount: number
+          id?: string
+          idempotency_key: string
+          net_amount: number
+          requested_by: string
+          status?: string
+          store_id: string
+          transfer_note?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
+          updated_at?: string
+          withdrawal_number?: string
+        }
+        Update: {
+          bank_account_holder?: string
+          bank_account_number?: string
+          bank_name?: string
+          bank_reference?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          fee_amount?: number
+          fee_bps?: number
+          gross_amount?: number
+          id?: string
+          idempotency_key?: string
+          net_amount?: number
+          requested_by?: string
+          status?: string
+          store_id?: string
+          transfer_note?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
+          updated_at?: string
+          withdrawal_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -3428,6 +3590,7 @@ export type Database = {
         Args: { _order_id: string; _reason: string }
         Returns: Json
       }
+      cancel_own_withdrawal: { Args: { _withdrawal_id: string }; Returns: Json }
       check_rate_limit: {
         Args: {
           _bucket: string
@@ -3438,6 +3601,7 @@ export type Database = {
         Returns: Json
       }
       claim_stock_code: { Args: { _entitlement_id: string }; Returns: string }
+      complete_withdrawal: { Args: { _note?: string | null; _withdrawal_id: string }; Returns: Json }
       confirm_digital_receipt: { Args: { _order_id: string }; Returns: Json }
       consume_download: {
         Args: { _entitlement_id: string; _ip?: string; _ua?: string }
@@ -3538,6 +3702,7 @@ export type Database = {
       get_my_service_order: { Args: { _order_id: string }; Returns: Json }
       get_my_stock_code: { Args: { _entitlement_id: string }; Returns: Json }
       get_my_store_balance: { Args: never; Returns: number }
+      get_my_withdrawal_policy: { Args: never; Returns: Json }
       get_order_monitoring: {
         Args: { _order_id: string; _scope?: string }
         Returns: Json
@@ -3629,6 +3794,7 @@ export type Database = {
         Returns: Json
       }
       mark_inquiry_read: { Args: { _inquiry_id: string }; Returns: Json }
+      mark_withdrawal_reconciliation: { Args: { _note: string; _withdrawal_id: string }; Returns: Json }
       my_store_id: { Args: never; Returns: string }
       next_invoice_number: { Args: never; Returns: string }
       next_order_number: { Args: never; Returns: string }
@@ -3748,6 +3914,10 @@ export type Database = {
         Args: { _issues: Json; _url_path: string }
         Returns: number
       }
+      record_withdrawal_transfer: {
+        Args: { _bank_reference: string; _note?: string | null; _withdrawal_id: string }
+        Returns: Json
+      }
       request_refund: {
         Args: { _order_id: string; _reason: string }
         Returns: Json
@@ -3756,8 +3926,16 @@ export type Database = {
         Args: { _delivery_id: string; _order_id: string; _reason: string }
         Returns: Json
       }
+      request_withdrawal: {
+        Args: { _gross_amount: number; _idempotency_key: string }
+        Returns: Json
+      }
       resolve_service_complaint: {
         Args: { _decision: string; _order_id: string; _reason: string }
+        Returns: Json
+      }
+      resolve_withdrawal_reconciliation: {
+        Args: { _note: string; _outcome: string; _withdrawal_id: string }
         Returns: Json
       }
       review_academic_scope: {
@@ -3778,6 +3956,10 @@ export type Database = {
       }
       review_seller: {
         Args: { _decision: string; _reason: string; _store_id: string }
+        Returns: Json
+      }
+      review_withdrawal: {
+        Args: { _decision: string; _reason?: string | null; _withdrawal_id: string }
         Returns: Json
       }
       save_article_checklist: {
@@ -3840,6 +4022,10 @@ export type Database = {
       seo_audit_summary: { Args: never; Returns: Json }
       set_article_status: {
         Args: { _article_id: string; _new_status: string; _note?: string }
+        Returns: Json
+      }
+      save_seller_bank_account: {
+        Args: { _account_holder_name: string; _account_number: string; _bank_name: string }
         Returns: Json
       }
       set_seller_suspended: {

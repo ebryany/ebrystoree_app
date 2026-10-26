@@ -1098,6 +1098,15 @@ export const SETTING_SECTIONS: SettingSection[] = [
         default: true,
         isPublic: true,
       },
+      {
+        key: "feature_manual_payout",
+        label: "Payout manual seller",
+        type: "boolean",
+        default: false,
+        isPublic: true,
+        confirm:
+          "Mengaktifkan payout manual berarti seller dapat mengajukan tarik saldo dan finance memproses transfer bank nyata. Pastikan legal & operational readiness sudah disetujui. Lanjutkan?",
+      },
     ],
   },
   {
@@ -1244,13 +1253,25 @@ export const SETTING_SECTIONS: SettingSection[] = [
       },
       {
         key: "marketplace_min_payout",
-        label: "Minimum saldo pencairan (Rp)",
+        label: "Minimum penarikan bruto (Rp)",
         type: "number",
-        default: 50000,
+        default: 5000,
         isPublic: true,
         min: 0,
         max: 10000000,
         group: "Escrow & pencairan",
+        help: "Nominal penarikan terkecil yang boleh diajukan; juga syarat minimum saldo tersedia.",
+      },
+      {
+        key: "marketplace_withdrawal_fee_bps",
+        label: "Fee penarikan (basis poin)",
+        type: "number",
+        default: 1500,
+        isPublic: true,
+        min: 0,
+        max: 5000,
+        group: "Escrow & pencairan",
+        help: "1500 basis poin = 15% dari nominal bruto. Fee dikunci saat pengajuan dibuat dan tidak berlaku retroaktif.",
       },
 
       /* ----- Moderasi ----- */

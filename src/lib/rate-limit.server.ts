@@ -21,7 +21,9 @@ const DEFAULT_POLICIES = {
   "topup.create": { limit: 5, windowSeconds: 600 },
   "seller.apply": { limit: 3, windowSeconds: 3600 },
   "seller.product": { limit: 30, windowSeconds: 300 },
+  "seller.payout": { limit: 5, windowSeconds: 300 },
   "admin.seller.decision": { limit: 60, windowSeconds: 300 },
+  "admin.payout.decision": { limit: 60, windowSeconds: 300 },
 } as const;
 
 export type RateLimitBucket = keyof typeof DEFAULT_POLICIES;
@@ -38,11 +40,15 @@ const FAIL_CLOSED_BUCKETS = new Set<RateLimitBucket>([
   "qris.create",
   "topup.create",
   "po.create",
+  "seller.payout",
+  "admin.payout.decision",
 ]);
 
-export type RateLimitResult =
-  | { ok: false; error: string; reason: "limited" | "unavailable" }
-  | null;
+export type RateLimitResult = {
+  ok: false;
+  error: string;
+  reason: "limited" | "unavailable";
+} | null;
 
 /**
  * Mengembalikan null bila diizinkan, atau objek error siap-pakai bila dibatasi.

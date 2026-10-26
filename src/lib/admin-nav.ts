@@ -1,5 +1,6 @@
 import {
   BadgeCheck,
+  Banknote,
   BarChart3,
   BookOpen,
   ClipboardList,
@@ -163,6 +164,13 @@ export const adminNav: AdminNavGroup[] = [
         label: "Refund",
         icon: Undo2,
         permission: "refunds.view",
+        available: true,
+      },
+      {
+        to: "/admin/payouts",
+        label: "Payout Seller",
+        icon: Banknote,
+        permission: "payouts.view",
         available: true,
       },
       {

@@ -19,6 +19,18 @@ function rpcError(message: string) {
     FORBIDDEN: "Anda tidak punya izin untuk aksi ini.",
     NOT_FOUND: "Data tidak ditemukan.",
     NO_CREDIT: "Saldo tidak cukup.",
+    STORE_INACTIVE: "Toko belum aktif atau sedang ditangguhkan.",
+    FEATURE_DISABLED: "Fitur penarikan saldo belum diaktifkan.",
+    BANK_ACCOUNT_REQUIRED: "Daftarkan rekening pencairan terlebih dahulu.",
+    INVALID_BANK_ACCOUNT:
+      "Data rekening tidak valid (bank 2-60 karakter, nomor 6-25 digit, pemilik 2-100 karakter).",
+    INVALID_AMOUNT: "Nominal penarikan tidak valid.",
+    BELOW_MINIMUM: "Nominal di bawah minimum penarikan.",
+    INSUFFICIENT_BALANCE: "Saldo tersedia tidak mencukupi.",
+    INVALID_IDEMPOTENCY_KEY: "Permintaan tidak valid. Muat ulang halaman lalu coba lagi.",
+    INVALID_DECISION: "Keputusan tidak valid.",
+    REFERENCE_REQUIRED: "Referensi transfer wajib diisi (minimal 3 karakter).",
+    SELF_APPROVAL_FORBIDDEN: "Pemilik toko tidak boleh memproses payout toko sendiri.",
   };
   return map[clean] ?? (clean.length > 3 ? clean : "Aksi gagal diproses. Coba lagi.");
 }
@@ -336,9 +348,7 @@ export const archiveMyProduct = createServerFn({ method: "POST" })
 /* ---------------- Storefront publik ---------------- */
 
 export const getPublicStore = createServerFn({ method: "GET" })
-  .validator((data: unknown) =>
-    z.object({ slug: z.string().trim().min(1).max(80) }).parse(data),
-  )
+  .validator((data: unknown) => z.object({ slug: z.string().trim().min(1).max(80) }).parse(data))
   .handler(async ({ data }) => {
     const { createPublicClient } = await import("./supabase-public.server");
     const supabase = createPublicClient();
@@ -629,6 +639,150 @@ export const listSellerLedger = createServerFn({ method: "GET" })
       items: ledger.data ?? [],
       error: null,
     };
+  });
+
+/* ---------------- Penarikan saldo (payout) ---------------- */
+
+type WithdrawalPolicy = {
+  has_store: boolean;
+  feature_enabled: boolean;
+  min_payout?: number;
+  fee_bps?: number;
+  bank?: {
+    bank_name: string;
+    account_number: string;
+    account_holder_name: string;
+    account_number_masked: string;
+    updated_at: string;
+  } | null;
+};
+
+type WithdrawalRow = {
+  id: string;
+  withdrawal_number: string;
+  gross_amount: number;
+  fee_amount: number;
+  net_amount: number;
+  status: string;
+  bank_name: string;
+  bank_account_masked: string;
+  decision_note: string | null;
+  created_at: string;
+  completed_at: string | null;
+};
+
+/** Kebijakan penarikan aktif + rekening terdaftar untuk seller ini. */
+export const getWithdrawalPolicy = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const sb = (context as Ctx).supabase;
+    const { data, error } = await sb.rpc("get_my_withdrawal_policy");
+    if (error) return { policy: null, error: rpcError(error.message) };
+    return { policy: data as WithdrawalPolicy, error: null };
+  });
+
+/** Riwayat pengajuan penarikan milik toko sendiri (RLS membatasi baris). */
+export const listMyWithdrawals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const sb = (context as Ctx).supabase;
+    const store = await sb.rpc("my_store_id");
+    if (store.error) return { items: [] as WithdrawalRow[], error: rpcError(store.error.message) };
+    const storeId = store.data as string | null;
+    if (!storeId) return { items: [] as WithdrawalRow[], error: null };
+
+    const { data, error } = await sb
+      .from("withdrawals")
+      .select(
+        "id, withdrawal_number, gross_amount, fee_amount, net_amount, status, bank_name, bank_account_number, decision_note, created_at, completed_at",
+      )
+      .eq("store_id", storeId)
+      .order("created_at", { ascending: false })
+      .limit(30);
+
+    if (error) return { items: [] as WithdrawalRow[], error: "Riwayat penarikan gagal dimuat." };
+    const items: WithdrawalRow[] = (data ?? []).map((w: any) => ({
+      id: w.id,
+      withdrawal_number: w.withdrawal_number,
+      gross_amount: Number(w.gross_amount),
+      fee_amount: Number(w.fee_amount),
+      net_amount: Number(w.net_amount),
+      status: w.status,
+      bank_name: w.bank_name,
+      bank_account_masked: "****" + String(w.bank_account_number).replace(/[ -]/g, "").slice(-4),
+      decision_note: w.decision_note,
+      created_at: w.created_at,
+      completed_at: w.completed_at,
+    }));
+    return { items, error: null };
+  });
+
+const bankAccountPayload = z
+  .object({
+    bank_name: z.string().trim().min(2).max(60),
+    account_number: z
+      .string()
+      .trim()
+      .regex(/^[0-9][0-9 -]{4,28}[0-9]$/, "Nomor rekening harus 6-25 digit."),
+    account_holder_name: z.string().trim().min(2).max(100),
+  })
+  .strict();
+
+/** Daftar / perbarui rekening pencairan (pemilik toko, lewat RPC ber-audit). */
+export const saveSellerBankAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => bankAccountPayload.parse(data))
+  .handler(async ({ data, context }) => {
+    const ctx = context as Ctx;
+    const limited = await enforceRateLimit(ctx.userId, "seller.payout");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { data: res, error } = await ctx.supabase.rpc("save_seller_bank_account", {
+      _bank_name: data.bank_name,
+      _account_number: data.account_number,
+      _account_holder_name: data.account_holder_name,
+    });
+    if (error) return { ok: false as const, error: rpcError(error.message) };
+    return { ok: true as const, account_masked: (res as any)?.account_masked ?? null, error: null };
+  });
+
+const withdrawalRequestPayload = z
+  .object({
+    gross_amount: z.number().int().min(1).max(2_000_000_000_000),
+    idempotency_key: z.string().min(8).max(80),
+  })
+  .strict();
+
+/** Ajukan penarikan. Server (RPC) menghitung ulang fee dan mengunci saldo secara atomik. */
+export const requestWithdrawal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => withdrawalRequestPayload.parse(data))
+  .handler(async ({ data, context }) => {
+    const ctx = context as Ctx;
+    const limited = await enforceRateLimit(ctx.userId, "seller.payout");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { data: res, error } = await ctx.supabase.rpc("request_withdrawal", {
+      _gross_amount: data.gross_amount,
+      _idempotency_key: data.idempotency_key,
+    });
+    if (error) return { ok: false as const, error: rpcError(error.message) };
+    return { ok: true as const, withdrawal: res, error: null };
+  });
+
+const withdrawalCancelPayload = z.object({ withdrawal_id: z.string().uuid() }).strict();
+
+/** Batalkan pengajuan milik sendiri sebelum transfer (reservasi dikembalikan server). */
+export const cancelWithdrawal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => withdrawalCancelPayload.parse(data))
+  .handler(async ({ data, context }) => {
+    const ctx = context as Ctx;
+    const limited = await enforceRateLimit(ctx.userId, "seller.payout");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { error } = await ctx.supabase.rpc("cancel_own_withdrawal", {
+      _withdrawal_id: data.withdrawal_id,
+    });
+    if (error) return { ok: false as const, error: rpcError(error.message) };
+    return { ok: true as const, error: null };
   });
 
 /* ---------------- Inventori seller ---------------- */

@@ -74,6 +74,8 @@ import { Route as AuthenticatedAdminOrdersIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminOrdersIdRouteImport } from './routes/_authenticated/admin/orders.$id'
 import { Route as AuthenticatedAdminPaymentsIndexRouteImport } from './routes/_authenticated/admin/payments.index'
 import { Route as AuthenticatedAdminPaymentsIdRouteImport } from './routes/_authenticated/admin/payments.$id'
+import { Route as AuthenticatedAdminPayoutsIndexRouteImport } from './routes/_authenticated/admin/payouts.index'
+import { Route as AuthenticatedAdminPayoutsIdRouteImport } from './routes/_authenticated/admin/payouts.$id'
 import { Route as AuthenticatedAdminPengerjaanIndexRouteImport } from './routes/_authenticated/admin/pengerjaan.index'
 import { Route as AuthenticatedAdminPengerjaanIdRouteImport } from './routes/_authenticated/admin/pengerjaan.$id'
 import { Route as AuthenticatedAdminPoIndexRouteImport } from './routes/_authenticated/admin/po.index'
@@ -466,6 +468,18 @@ const AuthenticatedAdminPaymentsIdRoute =
     path: '/payments/$id',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminPayoutsIndexRoute =
+  AuthenticatedAdminPayoutsIndexRouteImport.update({
+    id: '/payouts/',
+    path: '/payouts/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPayoutsIdRoute =
+  AuthenticatedAdminPayoutsIdRouteImport.update({
+    id: '/payouts/$id',
+    path: '/payouts/$id',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminPengerjaanIndexRoute =
   AuthenticatedAdminPengerjaanIndexRouteImport.update({
     id: '/pengerjaan/',
@@ -761,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/admin/chat/$id': typeof AuthenticatedAdminChatIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/payments/$id': typeof AuthenticatedAdminPaymentsIdRoute
+  '/admin/payouts/$id': typeof AuthenticatedAdminPayoutsIdRoute
   '/admin/pengerjaan/$id': typeof AuthenticatedAdminPengerjaanIdRoute
   '/admin/po/$id': typeof AuthenticatedAdminPoIdRoute
   '/admin/refunds/$id': typeof AuthenticatedAdminRefundsIdRoute
@@ -790,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/admin/payments/': typeof AuthenticatedAdminPaymentsIndexRoute
+  '/admin/payouts/': typeof AuthenticatedAdminPayoutsIndexRoute
   '/admin/pengerjaan/': typeof AuthenticatedAdminPengerjaanIndexRoute
   '/admin/po/': typeof AuthenticatedAdminPoIndexRoute
   '/admin/refunds/': typeof AuthenticatedAdminRefundsIndexRoute
@@ -860,6 +876,7 @@ export interface FileRoutesByTo {
   '/admin/chat/$id': typeof AuthenticatedAdminChatIdRoute
   '/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/admin/payments/$id': typeof AuthenticatedAdminPaymentsIdRoute
+  '/admin/payouts/$id': typeof AuthenticatedAdminPayoutsIdRoute
   '/admin/pengerjaan/$id': typeof AuthenticatedAdminPengerjaanIdRoute
   '/admin/po/$id': typeof AuthenticatedAdminPoIdRoute
   '/admin/refunds/$id': typeof AuthenticatedAdminRefundsIdRoute
@@ -889,6 +906,7 @@ export interface FileRoutesByTo {
   '/admin/chat': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsIndexRoute
+  '/admin/payouts': typeof AuthenticatedAdminPayoutsIndexRoute
   '/admin/pengerjaan': typeof AuthenticatedAdminPengerjaanIndexRoute
   '/admin/po': typeof AuthenticatedAdminPoIndexRoute
   '/admin/refunds': typeof AuthenticatedAdminRefundsIndexRoute
@@ -967,6 +985,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/chat/$id': typeof AuthenticatedAdminChatIdRoute
   '/_authenticated/admin/orders/$id': typeof AuthenticatedAdminOrdersIdRoute
   '/_authenticated/admin/payments/$id': typeof AuthenticatedAdminPaymentsIdRoute
+  '/_authenticated/admin/payouts/$id': typeof AuthenticatedAdminPayoutsIdRoute
   '/_authenticated/admin/pengerjaan/$id': typeof AuthenticatedAdminPengerjaanIdRoute
   '/_authenticated/admin/po/$id': typeof AuthenticatedAdminPoIdRoute
   '/_authenticated/admin/refunds/$id': typeof AuthenticatedAdminRefundsIdRoute
@@ -996,6 +1015,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/_authenticated/admin/payments/': typeof AuthenticatedAdminPaymentsIndexRoute
+  '/_authenticated/admin/payouts/': typeof AuthenticatedAdminPayoutsIndexRoute
   '/_authenticated/admin/pengerjaan/': typeof AuthenticatedAdminPengerjaanIndexRoute
   '/_authenticated/admin/po/': typeof AuthenticatedAdminPoIndexRoute
   '/_authenticated/admin/refunds/': typeof AuthenticatedAdminRefundsIndexRoute
@@ -1074,6 +1094,7 @@ export interface FileRouteTypes {
     | '/admin/chat/$id'
     | '/admin/orders/$id'
     | '/admin/payments/$id'
+    | '/admin/payouts/$id'
     | '/admin/pengerjaan/$id'
     | '/admin/po/$id'
     | '/admin/refunds/$id'
@@ -1103,6 +1124,7 @@ export interface FileRouteTypes {
     | '/admin/chat/'
     | '/admin/orders/'
     | '/admin/payments/'
+    | '/admin/payouts/'
     | '/admin/pengerjaan/'
     | '/admin/po/'
     | '/admin/refunds/'
@@ -1173,6 +1195,7 @@ export interface FileRouteTypes {
     | '/admin/chat/$id'
     | '/admin/orders/$id'
     | '/admin/payments/$id'
+    | '/admin/payouts/$id'
     | '/admin/pengerjaan/$id'
     | '/admin/po/$id'
     | '/admin/refunds/$id'
@@ -1202,6 +1225,7 @@ export interface FileRouteTypes {
     | '/admin/chat'
     | '/admin/orders'
     | '/admin/payments'
+    | '/admin/payouts'
     | '/admin/pengerjaan'
     | '/admin/po'
     | '/admin/refunds'
@@ -1279,6 +1303,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/chat/$id'
     | '/_authenticated/admin/orders/$id'
     | '/_authenticated/admin/payments/$id'
+    | '/_authenticated/admin/payouts/$id'
     | '/_authenticated/admin/pengerjaan/$id'
     | '/_authenticated/admin/po/$id'
     | '/_authenticated/admin/refunds/$id'
@@ -1308,6 +1333,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/chat/'
     | '/_authenticated/admin/orders/'
     | '/_authenticated/admin/payments/'
+    | '/_authenticated/admin/payouts/'
     | '/_authenticated/admin/pengerjaan/'
     | '/_authenticated/admin/po/'
     | '/_authenticated/admin/refunds/'
@@ -1814,6 +1840,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaymentsIdRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/payouts/': {
+      id: '/_authenticated/admin/payouts/'
+      path: '/payouts'
+      fullPath: '/admin/payouts/'
+      preLoaderRoute: typeof AuthenticatedAdminPayoutsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/payouts/$id': {
+      id: '/_authenticated/admin/payouts/$id'
+      path: '/payouts/$id'
+      fullPath: '/admin/payouts/$id'
+      preLoaderRoute: typeof AuthenticatedAdminPayoutsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/pengerjaan/': {
       id: '/_authenticated/admin/pengerjaan/'
       path: '/pengerjaan'
@@ -2104,6 +2144,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminChatIdRoute: typeof AuthenticatedAdminChatIdRoute
   AuthenticatedAdminOrdersIdRoute: typeof AuthenticatedAdminOrdersIdRoute
   AuthenticatedAdminPaymentsIdRoute: typeof AuthenticatedAdminPaymentsIdRoute
+  AuthenticatedAdminPayoutsIdRoute: typeof AuthenticatedAdminPayoutsIdRoute
   AuthenticatedAdminPengerjaanIdRoute: typeof AuthenticatedAdminPengerjaanIdRoute
   AuthenticatedAdminPoIdRoute: typeof AuthenticatedAdminPoIdRoute
   AuthenticatedAdminRefundsIdRoute: typeof AuthenticatedAdminRefundsIdRoute
@@ -2118,6 +2159,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminChatIndexRoute: typeof AuthenticatedAdminChatIndexRoute
   AuthenticatedAdminOrdersIndexRoute: typeof AuthenticatedAdminOrdersIndexRoute
   AuthenticatedAdminPaymentsIndexRoute: typeof AuthenticatedAdminPaymentsIndexRoute
+  AuthenticatedAdminPayoutsIndexRoute: typeof AuthenticatedAdminPayoutsIndexRoute
   AuthenticatedAdminPengerjaanIndexRoute: typeof AuthenticatedAdminPengerjaanIndexRoute
   AuthenticatedAdminPoIndexRoute: typeof AuthenticatedAdminPoIndexRoute
   AuthenticatedAdminRefundsIndexRoute: typeof AuthenticatedAdminRefundsIndexRoute
@@ -2140,6 +2182,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminChatIdRoute: AuthenticatedAdminChatIdRoute,
     AuthenticatedAdminOrdersIdRoute: AuthenticatedAdminOrdersIdRoute,
     AuthenticatedAdminPaymentsIdRoute: AuthenticatedAdminPaymentsIdRoute,
+    AuthenticatedAdminPayoutsIdRoute: AuthenticatedAdminPayoutsIdRoute,
     AuthenticatedAdminPengerjaanIdRoute: AuthenticatedAdminPengerjaanIdRoute,
     AuthenticatedAdminPoIdRoute: AuthenticatedAdminPoIdRoute,
     AuthenticatedAdminRefundsIdRoute: AuthenticatedAdminRefundsIdRoute,
@@ -2157,6 +2200,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminChatIndexRoute: AuthenticatedAdminChatIndexRoute,
     AuthenticatedAdminOrdersIndexRoute: AuthenticatedAdminOrdersIndexRoute,
     AuthenticatedAdminPaymentsIndexRoute: AuthenticatedAdminPaymentsIndexRoute,
+    AuthenticatedAdminPayoutsIndexRoute: AuthenticatedAdminPayoutsIndexRoute,
     AuthenticatedAdminPengerjaanIndexRoute:
       AuthenticatedAdminPengerjaanIndexRoute,
     AuthenticatedAdminPoIndexRoute: AuthenticatedAdminPoIndexRoute,

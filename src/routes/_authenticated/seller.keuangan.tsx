@@ -7,6 +7,7 @@ import { ArrowDownLeft, ArrowUpRight, Info, ReceiptText, TrendingUp, Wallet } fr
 import { CountUp } from "@/components/admin/report-widgets";
 import { BankListRow, InlineEmpty, StatTile } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
+import { WithdrawalPanel } from "@/components/ebry/withdrawal-panel";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -56,7 +57,7 @@ function SellerFinance() {
     channel: "seller-keuangan",
     tables: ["notifications"],
     filter: user ? `recipient_id=eq.${user.id}` : undefined,
-    keys: [["seller-ledger"]],
+    keys: [["seller-ledger"], ["withdrawal-policy"], ["my-withdrawals"]],
     enabled: Boolean(user),
   });
 
@@ -150,7 +151,7 @@ function SellerFinance() {
           <CountUp value={balance} format={formatRupiah} />
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Pendapatan dilepas setelah pembeli menerima produk. Penarikan dana belum tersedia.
+          Pendapatan dilepas setelah pembeli menerima produk.
         </p>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -173,6 +174,8 @@ function SellerFinance() {
           </div>
         </dl>
       </motion.section>
+
+      <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
 
       {/* Mutation list */}
       <section
