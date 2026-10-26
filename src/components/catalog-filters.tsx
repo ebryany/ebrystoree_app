@@ -17,6 +17,7 @@ type Props = {
 
 export function CatalogFilters({ q, category, categories, placeholder, onChange }: Props) {
   const [term, setTerm] = useState(q);
+  const [expanded, setExpanded] = useState(false);
   const latest = useRef(q);
   const callback = useRef(onChange);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -85,13 +86,20 @@ export function CatalogFilters({ q, category, categories, placeholder, onChange 
       {/* Baris kategori hanya dirender bila ada kategori nyata. Sebelumnya chip
           "Semua" selalu tampil meski daftar kategori kosong, sehingga panel
           filter terlihat seperti kontrol yang belum jadi. Tombol reset tetap
-          muncul saat ada filter aktif, karena itu berguna. */}
+          muncul saat ada filter aktif, karena itu berguna.
+          Kategori yang banyak (jasa punya 13) memaksa panel filter memakan
+          beberapa baris sebelum katalog terlihat, jadi hanya 8 pertama yang
+          tampil dengan tombol perluas; kategori aktif di luar 8 pertama tetap
+          dipaksa tampil agar filter tidak "hilang" saat aktif. */}
       {categories.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter kategori">
           <CategoryChip active={!category} onClick={() => update({ q: term.trim(), category: "" })}>
             Semua
           </CategoryChip>
-          {categories.map((item) => (
+          {(expanded || isCollapsedActiveHidden(categories, category)
+            ? categories
+            : categories.slice(0, 8)
+          ).map((item) => (
             <CategoryChip
               key={item.id}
               active={category === item.slug}
@@ -102,6 +110,19 @@ export function CatalogFilters({ q, category, categories, placeholder, onChange 
               {item.name}
             </CategoryChip>
           ))}
+          {categories.length > 8 ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setExpanded((value) => !value)}
+              aria-expanded={expanded}
+              className="min-h-11 min-w-0 rounded-lg px-3.5 py-2 text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {expanded
+                ? "Sembunyikan kategori"
+                : `Tampilkan ${categories.length - 8} kategori lagi`}
+            </Button>
+          ) : null}
         </div>
       ) : null}
       {q || category ? (
@@ -118,6 +139,13 @@ export function CatalogFilters({ q, category, categories, placeholder, onChange 
       ) : null}
     </section>
   );
+}
+
+/** Kategori aktif berada di luar 8 pertama: daftar harus diperluas agar chip aktif terlihat. */
+function isCollapsedActiveHidden(categories: CatalogCategory[], category: string): boolean {
+  if (!category) return false;
+  const index = categories.findIndex((item) => item.slug === category);
+  return index >= 8;
 }
 
 function CategoryChip({

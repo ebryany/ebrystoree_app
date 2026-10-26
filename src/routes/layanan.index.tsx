@@ -193,9 +193,15 @@ function HalamanLayanan() {
                     {items.length} layanan ditampilkan
                   </p>
                 </div>
-                <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/* Grid berbasis lebar minimum, sama dengan /produk. Kolom tetap
+                    md:2/lg:3 membuat dua jasa meregang setengah / sepertiga
+                    container sehingga kartu terlihat raksasa; auto-fill +
+                    minmax(260px,1fr) menjaga kartu di rentang 260-320px
+                    seberapa pun sedikit isinya, dan baris terakhir tidak
+                    ikut melebar. */}
+                <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-3 sm:gap-4">
                   {items.map((item) => (
-                    <li key={item.id} className="min-w-0">
+                    <li key={item.id} className="flex min-w-0 flex-col">
                       <SellerServiceCard item={item} />
                     </li>
                   ))}

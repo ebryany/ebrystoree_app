@@ -13,7 +13,7 @@ const idr = new Intl.NumberFormat("id-ID", {
 });
 
 /**
- * Kartu jasa seller di beranda.
+ * Kartu jasa seller.
  *
  * Dibuat ringkas supaya setara kartu produk:
  * - Isi kesepakatan (lingkup, pengecualian, hasil, kebutuhan) TIDAK lagi dibuka
@@ -23,17 +23,29 @@ const idr = new Intl.NumberFormat("id-ID", {
  * - Harga dipindah ke bawah, tepat sebelum aksi, sama seperti kartu produk.
  * - Dua tombol disusun sebaris dan diletakkan di luar area isi, jadi tingginya
  *   tetap dan tidak ikut menghitung panjang teks.
+ * - Varian mengikuti MarketplaceProductCard: "default" untuk katalog (radius
+ *   dan harga sama persis dengan kartu produk di sebelahnya, CTA memakai
+ *   container query karena kartu katalog hanya ~260px), "home" untuk beranda
+ *   yang kartunya lebih besar.
  */
-export function SellerServiceCard({ item }: { item: PublicMarketplaceService }) {
+export function SellerServiceCard({
+  item,
+  variant = "default",
+}: {
+  item: PublicMarketplaceService;
+  variant?: "default" | "home";
+}) {
+  const home = variant === "home";
   const cover = item.media?.find((entry) => entry.kind === "image");
 
   return (
     <article
       className={cn(
-        "group relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card",
+        "group relative flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card @container",
         "transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-colors motion-reduce:duration-150",
         "hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-card motion-reduce:hover:translate-y-0",
         "focus-within:-translate-y-0.5 focus-within:border-accent/50 focus-within:shadow-card motion-reduce:focus-within:translate-y-0",
+        home && "rounded-xl",
       )}
     >
       {cover ? (
@@ -63,10 +75,13 @@ export function SellerServiceCard({ item }: { item: PublicMarketplaceService }) 
         </span>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col p-3.5">
+      <div className={cn("flex min-w-0 flex-1 flex-col", home ? "p-3.5" : "p-3")}>
         <p className="min-w-0 text-xs font-medium text-muted-foreground">{item.category.name}</p>
 
-        <h3 className="mt-1 break-words text-sm font-semibold leading-snug">
+        <h3
+          className="mt-1 line-clamp-2 break-words text-sm font-semibold leading-snug"
+          title={item.name}
+        >
           <Link
             to="/checkout/jasa/$id"
             params={{ id: item.id }}
@@ -82,7 +97,7 @@ export function SellerServiceCard({ item }: { item: PublicMarketplaceService }) 
           params={{ slug: item.store.slug }}
           className="relative z-10 mt-1 flex w-fit min-w-0 items-center gap-1.5 text-xs text-muted-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Store className="size-3.5 shrink-0" aria-hidden="true" />
+          <Store className="size-3 shrink-0" aria-hidden="true" />
           <span className="truncate">{item.store.name}</span>
         </Link>
 
@@ -98,15 +113,22 @@ export function SellerServiceCard({ item }: { item: PublicMarketplaceService }) 
         </div>
 
         <div className="mt-auto flex flex-wrap items-baseline gap-x-2 pt-3">
-          <span className="text-lg font-bold tabular-nums text-price sm:text-xl">
+          <span
+            className={cn(
+              "font-bold tabular-nums text-price",
+              home ? "text-lg sm:text-xl" : "text-base",
+            )}
+          >
             {idr.format(item.price)}
           </span>
         </div>
       </div>
 
-      {/* Aksi dipisah garis dan diletakkan di luar area isi, jadi tingginya tetap
-          dan tidak ikut menghitung panjang teks di atasnya. */}
-      <div className="flex flex-col gap-2 border-t border-border p-3 sm:flex-row">
+      {/* Aksi dipisah garis dan diletakkan di luar area isi. Susunan sebaris
+          ditentukan lebar KARTU (container query, sama dengan kartu produk),
+          bukan lebar viewport: kartu katalog ~260px membuat dua tombol
+          sebaris menyempit, jadi di bawah 300px CTA ditumpuk. */}
+      <div className="flex flex-col gap-2 border-t border-border p-3 @[300px]:flex-row">
         <ServiceChatButton
           serviceId={item.id}
           serviceName={item.name}

@@ -302,7 +302,7 @@ function SellerServicesSection() {
       {query.data.items.map((item) => (
         // Sama seperti kartu produk: satu kolom di mobile, lebar tetap mulai sm.
         <div key={item.id} className="w-full sm:w-[272px]">
-          <SellerServiceCard item={item} />
+          <SellerServiceCard item={item} variant="home" />
         </div>
       ))}
     </div>

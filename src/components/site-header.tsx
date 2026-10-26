@@ -170,11 +170,11 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
                   ref={searchTriggerRef}
                   variant="outline"
                   className="min-h-11 min-w-11 flex-1 justify-start gap-2 px-3 text-muted-foreground lg:hidden"
-                  aria-label="Cari produk dan jasa"
+                  aria-label="Cari produk"
                   onClick={() => setSearchOpen(true)}
                 >
                   <Search className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="truncate text-sm">Cari di Ebrystore</span>
+                  <span className="truncate text-sm">Cari produk</span>
                 </Button>
 
                 <form
@@ -440,7 +440,7 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
           }}
         >
           <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
-            <DialogTitle className="sr-only">Cari di Ebrystore</DialogTitle>
+            <DialogTitle className="sr-only">Cari produk</DialogTitle>
             <form
               onSubmit={searchProducts}
               role="search"
