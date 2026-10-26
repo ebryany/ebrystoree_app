@@ -1,0 +1,10 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.refunds;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.manual_payment_proofs;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.payment_verifications;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.digital_entitlements;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.download_logs;
+ALTER TABLE public.refunds REPLICA IDENTITY FULL;
+ALTER TABLE public.manual_payment_proofs REPLICA IDENTITY FULL;
+ALTER TABLE public.payment_verifications REPLICA IDENTITY FULL;
+ALTER TABLE public.digital_entitlements REPLICA IDENTITY FULL;
+ALTER TABLE public.download_logs REPLICA IDENTITY FULL;

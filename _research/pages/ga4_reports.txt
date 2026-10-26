@@ -1,0 +1,92 @@
+Overview of Google Analytics reports - Analytics Help Skip to main content 
+ Google Help 
+ Help Center
+ Get started with Analytics
+ Collect and manage data
+ Report and explore
+ Advertising and attribution
+ Audiences and remarketing
+ Manage accounts, properties, and users
+ Google Analytics 360
+ Policies and data privacy
+ Community
+ Analytics 
+ Privacy Policy 
+ Terms of Service 
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Analytics Contact us 
+ Reports 
+ Overview of Google Analytics reports 
+ Reports
+ Overview of Google Analytics reports
+ Next: [GA4] About overview reports 
+ Google Analytics collects data from your websites and apps to create reports that provide insights into your business. You can use reports to monitor traffic, investigate data, and understand your users and their activity.
+ Download this comprehensive guide on reporting in Google Analytics .
+ Once Analytics starts to receive data, the data appears in the Realtime report and then in your other reports shortly after. Some of the data in your reports is collected from your websites and apps once you set up Google Analytics , while other data requires some additional setup.
+ You can find all your reports by clicking Reports on the left.
+ Watch a video about Google Analytics reports 
+ Get started
+ When you open your reports, you will see a Reports snapshot report , a Realtime report , and a number of predefined reports . Everyone with access to your Google Analytics will see the same set of reports on the left.
+ Google Analytics provides two types of reports:
+ Overview reports : These reports summarize data about a topic; for example, see how much you're making across ecommerce purchases, in-app purchases, and mobile ads.
+ Detail reports : These reports provide more in-depth information about an area of interest; for example, see in-depth data about ecommerce purchases.
+ You can gather valuable ecommerce data directly within Google Analytics reports. Learn more about Ecommerce in Google Analytics .
+ Report collections
+ The set of reports below the Reports snapshot and Realtime reports on the left are called report collections. You will see some of the following report collections based on information you provide during setup. You can customize the report collections to include any report.
+ Report collection 
+ What it is 
+ Appears automatically when... 
+ App developer 
+ Summarizes key metrics about the apps you connect to Firebase, including data about your users and their behavior
+ you add the Google Analytics for Firebase SDK to your connected mobile app
+ Business objectives 
+ Provides a tailored set of reports based on information you provide about your business when you first set up Google Analytics
+ you selected a business objective during setup that wasn't the "Get baseline reports" option
+ Data import 
+ Helps you assess data imported into Google Analytics.
+ All Google Analytics properties will have this collection.
+ Games reporting 
+ Provides game-specific information to help you measure customer behavior across the user funnel and develop metric-driven insights about your mobile gaming apps
+ you have at least one app data stream associated with a games app in the Google Play Store or Apple App Store, or the industry category in your Property Settings is set to "Games"
+ Life cycle 
+ Helps you understand each stage in the customer journey — from acquisition to retention
+ you selected "Get baseline reports" during setup, you created the property before March 27, 2023, or you migrated from a Universal Analytics property using Setup Assistant
+ User 
+ Helps you understand the people who use your websites and apps, such as their ages, interests, devices, and app versions
+ All Google Analytics properties start with this collection by default.
+ Next: [GA4] About overview reports 
+ Was this helpful?
+ How can we improve it?
+ Submit 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 2533432895378509479
+ true
+ Search Help Center
+ false
+ true
+ true
+ true
+ true
+ true
+ 69256
+ false
+ false
+ false
+ false
+ false

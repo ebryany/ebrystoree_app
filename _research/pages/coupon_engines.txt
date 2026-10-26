@@ -1,0 +1,247 @@
+7 Discount Strategy Tactics for Retailers in 2026 - Shopify Skip to Content 
+ Powering commerce at scale
+ Speak with our team on how to bring Shopify into your tech stack
+ Get in touch Try Shopify 
+ blog | Growth strategies 
+ 7 Discount Strategy Tactics for Retailers in 2026
+ Build a discount strategy that protects margins: 7 tactics, when to use each, and how to choose the right offer for your goal.
+ by Jessica Wynne Lockhart / Michael Keenan 
+ / Brinda Gulati 
+ A discount strategy is a pricing approach that reduces prices on goods or services to increase sales volume and attract new customers. It involves setting rules like quantity discounts or limited-time offers to increase demand and stay profitable. 
+ In April 2026, Doll Beauty CEO Dani Gregory announced the British cosmetics brand was pulling back from TikTok Shop . The channel delivers awareness, community, and direct customer conversation, but also "constant discounting" the brand wasn't built for. 
+ Nine years of formula and packaging investment, she said, weren't worth diluting just to chase more volume. Their TikTok Shop discounting was a clear example of a discount strategy that served the channel, but not the brand.
+ But a lot of retailers don't have that exit. According to Salsify's Q2 2025 “Ecommerce Pulse Report”, 62% of consumers say limited-time discounts are the top reason they complete an online purchase. 
+ A good discount closes more sales. A good discount strategy has to balance those benefits against the importance of protecting margins and brand identity. This guide shows you how to strike that balance, with examples from real brands.
+ Offer discounts you can afford
+ Find your profit margin on discounted items with this free calculator. See pricing breakdowns for percentage-off, fixed, and bundle discounts.
+ Calculate discount 
+ What is a discount strategy?
+ A discount strategy is the framework that decides when, how, and to whom you offer a price reduction, and what you expect to get back. 
+ When deployed well, a discount strategy is also a diagnostic tool to better understand your customers and fine-tune your future marketing efforts. 
+ Kate Ashley, associate teaching professor at Northeastern's D'Amore-McKim School of Business , says: “Using analytics to measure the customer response to different coupons and promotional strategies is a great way for retailers to fine-tune their markdown strategies and understand what types of discounts have the most favorable long-term revenue impact.”
+ The benefits that come from discounting are always balanced against two key considerations:
+ Protecting margins
+ Reducing the price of your product reduces your profit. If you’re racking up more and more sales from discounts, you might feel like you are doing well; but keep an eye on your profit margins and compare to historical data to see if you are cutting too deep.
+ Protecting your brand
+ Brand identities vary across many parameters, one of which is pricing expectations. For some businesses, affordability and discounts are part of the brand, and what customers expect to see. For a luxury brand, on the other hand, too much discounting can hurt the perception that the luxury products are truly “the best of the best”; or, that they are ever actually worth full price.
+ Seven discount strategy tactics that increase sales
+ Buy one, get one free (BOGO) 
+ Free gift with purchase (FGWP) 
+ First-order discount 
+ Tiered discounts by spend threshold 
+ Personalized discounts 
+ Flash sale discounts 
+ VIP early-access discounts 
+ 1. Buy one, get one free (BOGO)
+ As part of a discount strategy, BOGO works because of how shoppers process the word “free.” A foundational 2007 study in Marketing Science by Shampanier, Mazar, and Ariely found that consumers respond to free products as disproportionately more valuable than the same monetary saving framed any other way; what they termed the “zero-price effect.”
+ But BOGO is a closer, not a retainer. An October 2025 study in Advances in Consumer Research found that loyalty points and experiential rewards produced significantly higher customer loyalty scores than BOGO offers.
+ BOGO drives the transaction in front of you, but it doesn't deepen the customer relationship behind it. Use this discount strategy where you need volume now, like sell-through on aging inventory, or trial on a launch SKU.
+ Kylie Cosmetics , for example, frequently runs homepage-hero BOGOs, but the offer is gated to a specific category rather than the full catalog.
+ The hero SKUs from the fragrance and skin lines aren't in the deal, which protects the price architecture on the brand's premium tiers while still using the zero-price hook to move volume on the lipstick range. 
+ You can build BOGO and similar zero-price deals natively in Shopify using Buy X Get Y discounts , which supports automatic discounts, code-based discounts, and point--of-sale (POS) redemption out of the box. The native logic also handles combinable discounts, so a BOGO offer can stack with a free-shipping or order-level discount when configured correctly. 
+ 2. Free gift with purchase (FGWP)
+ A free-gift-with-purchase offer can be a strong discount strategy, but the mechanism extends beyond simply giving customers things for free.
+ The Journal of the Academy of Marketing Science finds that gift effectiveness depends heavily on the relational stage of the customer. That means mismatches between gift value and customer relationship can produce suspicion and unfairness rather than gratitude.
+ For example, a free travel-size item given to a long-time VIP can feel insulting, while a high-value gift given to a first-time browser can feel like a marketing gimmick. 
+ LEGO's Star Wars Day promotion is a great example here. For shoppers to access the free Mandalorian and Grogu lenticular display piece, they have to buy one specific exclusive set within a defined window.
+ Source: Lego 
+ Dermalogica is a similarly great example, but on a larger scale. The brand layers four FGWP mechanics in parallel: a low-threshold pick-your-own gift; a current-cart-value gift; an email-sign-up welcome bag gated to a $125 first order; and, most interestingly, a free gift bundled into every recurring subscription order. 
+ Source: Dermalogica 
+ You can build basic FGWP natively in Shopify by repurposing the Buy X Get Y discount type: set the gift product's discount to 100% off and trigger it on either a specific product purchase or a minimum cart value. That handles the simple cases. 
+ For tiered gifts, gift selection, or auto-add-to-cart, you'll need either a third-party app or a custom build via Shopify Functions . (Shopify Scripts, the legacy alternative, will sunset in June 2026 .)
+ 3. First-order discount
+ According to 2026 benchmarking research from Convertibles, first-time visitors convert at 1.0% to 2.0%, versus 4.5% to 6.0% for returning customers. You're paying full acquisition cost on a cohort that converts at a third of the rate of your repeat base. A discount on their first order can help sway a portion of those hard-to-convert visitors.
+ As always, strategy is key. The same Convertibles analysis ran an A/B test on an eight-figure wellness brand and found that a 50% sitewide discount only lifted profit per visitor by 13.6%, while a more precise pricing move on individual SKUs delivered 54.7%.
+ You can build a first-time discount natively in Shopify by creating a discount code with usage limits set to one per customer, then distributing it through email signup via Shopify Email or your ESP of choice. Native Shopify discounts let you exclude specific collections, so the welcome code can't stack on already-marked-down inventory. You can also use this strategy to discount select SKUs in order to increase profitability, in keeping with the results of the Convertibles study.
+ For more sophisticated logic, like dynamically adjusting the discount based on the cart contents or running A/B tests on the discount depth, you'll want Shopify Functions .
+ 4. Tiered discounts by spend threshold
+ As a discount strategy, tiered discounts work because each threshold pulls the customer toward a higher-value cart, and the satisfaction customers experience when they reach the next tier outweighs the real margin given up.
+ ConvertCart's 2026 study says that the first tier should sit 10% to 20% above your current average order value (AOV)—close enough to be achievable, and far enough to represent a significant increase in sales. A potential failure mode to look out for is the "discount dead-zone," when the gap between AOV and the first tier is small enough that customers who would have spent the threshold amount anyway just collect free margin on their way through without even trying.
+ One retailer who uses discount tiers is apparel brand Bombas . The brand runs an entire collection page dedicated to pack discounts that scale with quantity: 4-packs save 8% to 13%, 8-packs save up to 16%, and underwear 3-packs run as high as 20% off versus the equivalent individual purchases.
+ Source: Bombas 
+ A strategic move here is treating the tiered discount as a permanent pricing layer rather than a campaign. The customers can't miss it because it's named in the top navigation; can't game it because the discount is product-level; and can't comparison-shop their way around it on aggregator sites.
+ Pro tip: For B2B retailers, B2B catalogs let you build volume-break price lists at the product or customer-group level, where the tiers become the wholesale pricing structure rather than a promotional layer on top of it.
+ 5. Personalized discounts
+ Recent research from McKinsey found that blunt offers to large groups of people are no longer cutting it. A personalized discount strategy treats discount targeting as a function of behavior—predicted custom lifetime value (CLV), recency cohort, cart-abandonment history, product-affinity cluster—and then adjusts depth and timing accordingly.
+ Appliance brand Airsign ran a segmented discount campaign with Shopify aimed at a specific customer cohort and reported a 30% conversion rate . 
+ "We identified the segment in Shopify, created a discount for that specific segment, communicated with them in a way that was very personalized for their needs, and we saw about 30% of those people convert," says cofounder Alex Dashefsky. 
+ The implementation is now easier with Shopify's Winter '26 Edition , which added native support for targeted automatic discounts at the customer-segment level. That means Shopify Plus sellers can now easily offer VIP-only pricing , churn-risk-only win-back discounts, or cohort-specific promotions.
+ 6. Flash sale discounts
+ A flash sale is a deep discount on a tight clock, usually 24 to 72 hours or less. The strategy compresses purchase decisions by removing the option to wait, which is why it works for inventory clearance and traffic spikes around tentpole events. The fear of missing out (FOMO) can motivate customers to try and buy before they take the time to reconsider.
+ Shopify's Launchpad handles the operational layer, letting retailers schedule price changes, theme swaps, product publishing, inventory increases, and discount activations to fire at a specific time, and reverse when the event ends. 
+ Blenders Eyewear used Launchpad to run two distinct site experiences over Black Friday and Cyber Monday (BFCM) weekend: one design and offer set for Black Friday, and a different design and offer set for Cyber Monday, both scheduled to swap automatically at midnight without anyone in the office. 
+ CEO Chase Fisher says, “We’ve been with Shopify since the very beginning. Shopify has been a great tool for us to really kind of capitalize on all these promotions and all these sales. And they handle all the traffic.”
+ That BFCM, Blenders saw a 10-times year-over-year sales increase.
+ Shopify now also ships with built-in bot protection for high-traffic events , which is highly relevant for any brand running limited-edition drops where resellers would otherwise scoop inventory in seconds.
+ 7. VIP early-access discounts
+ A 2025 Attentive “Consumer Trends Report” found that 56% of shoppers say members-only sale days are a top perk, and nearly half want early access to limited-edition items. 
+ Sports apparel retailer Gymshark, after two prior drops of their hyped Onyx compression collection were cleared out by resellers within 25 minutes, released a new Onyx Midnight colorway in July 2025 exclusively to loyalty program members in the higher tiers.
+ Source: Gymshark 
+ For store owners running high-demand drops, this is an anti-arbitrage strategy that keeps margin out of the resale market and trust intact with the customer base. This move saved Onyx from wasting their discount margins in a way that doesn’t meaningfully benefit customer relationships.
+ Retailers can combine Shopify's built-in segmentation and a loyalty platform like Yotpo's Loyalty Tiers . The workflow is: Define the tier criteria, segment the audience, schedule the early-access window through Launchpad, and let the platform enforce eligibility at checkout.
+ How to choose the right discount strategy for your goal
+ Each incentive in your discount strategy playbook pulls a different lever and costs a different slice of margin. Start by naming the outcome you care about, then identify the discount that best serves that purpose.
+ To acquire first-time customers: First-purchase discounts
+ For first-time acquisition, a small welcome carrot can still work: 32% of online shoppers in Salsify’s research say a new-customer discount is the nudge that tips them into their very first purchase. 
+ Choose this: When your first-time conversion rate is more than two to three times lower than your returning-customer rate. Returning customers convert at two or three times the rate of first-time visitors across most ecommerce verticals, per Convertibles' 2026 benchmarks. 
+ Don't choose it: If your CTV:CAC ratio is already at or below 3:1. First Page Sage's 2026 CAC report , built on proprietary client data from 2020–2025, sets the goal for ecommerce companies at approximately 3:1.
+ To clear inventory: Targeted discount bundles
+ Leftover inventory is one of the costliest unsolved problems in the 2026 fashion economy. The BoF–McKinsey “State of Fashion 2026” report names margin, cost, and cash strategies as the second-most-significant theme shaping the industry in 2026, behind only tariffs, with 45% of executives identifying sourcing costs as the most pressured area of their economic model, followed by pricing and inventory management.
+ By bundling slow-selling products with bestsellers at a discount, you can clear some of your slow sellers before they turn into dead stock.
+ Choose this: When the inventory problem is concentrated on identifiable SKUs while the rest of your catalogue is still moving at full price. Use a targeted bundle that pairs a slow mover with a fast mover, a tier-gated discount that activates only on specific collections, or a private outlet collection accessible only to email subscribers.
+ Don’t choose it: When the problem is portfolio-wide. A targeted discount mechanic on top of a season that's already dead does both jobs badly: it doesn't clear the inventory fast enough to free up working capital, and it trains customers to expect the targeted offer next season too. 
+ To reward loyalty or reactivate lapsed customers: Segmented discounts
+ While this might sound like two separate issues, they both represent efforts to motivate customers to return. Whereas a loyalty discount incentivizes customers to keep coming back, a reactivation discount tries to recover customers who havestopped.
+ In Gorgias's “CX Growth Playbook” , based on first-party data from over 10,000 Shopify store owners, repeat customers account for only 21% of customers but generate 44% of revenue and 46% of orders, and a 20% increase in repeat customer base can increase revenue by up to 6%. This highlights the value of using discounts to attract these segments.
+ Choose this: When you can segment the offer based on the customer's relationship with the brand. You need somewhat different approaches for loyalty versus reactivation discounts. For active loyalty, frame it as a general reward that shows your appreciation. For lapsed customers, you may need to be more precise in your targeting, offering a significant discount on popular items..
+ Don’t choose it: When you don’t have enough data to know what type of offer will incentivize lapsed or returning customers.
+ Offer discounts you can afford
+ Find your profit margin on discounted items with this free calculator. See pricing breakdowns for percentage-off, fixed, and bundle discounts.
+ Calculate discount 
+ Discount codes vs. automatic discounts on Shopify
+ Discount codes and automatic discounts both come with advantages, and many businesses use both for different purposes. Here is a closer look at both.
+ When discount codes make more sense
+ Discount codes give you control and attribution. On Shopify, you can apply distinct discount codes to up to 100 customer segments , attach UTM parameters via shareable links, and track redemptions and gross sales tied to each code. That's the mechanic for influencer partnerships, segmented win-back flows, channel attribution, and any offer where you need to know which campaign drove the sale. 
+ The trade-off is possible friction at checkout. Baymard Institute's checkout usability research found that promo code fields appear on 70% of ecommerce sites, and the field itself causes a subgroup of users to leave the site to search for codes. Once they leave the checkout, the chance of them not returning increases significantly.
+ When automatic discounts make more sense
+ Automatic discounts remove the code-entry step entirely. On Shopify, they apply in the cart and at checkout when eligibility conditions are met, and you can run up to 25 active automatic discounts at once, including app-based discounts. That's the mechanic for cart thresholds, BOGO offers, free shipping incentives, and sitewide or segment-targeted promos where the offer should just trigger once a customer qualifies.
+ “Offering automatic discounts is much more seamless than sending customers discount codes they have to enter manually,” says Charles Mazzone, digital marketing director for book-related apparel and accessory brand Out of Print . 
+ “With more and more purchases being made on mobile devices, it’s more difficult to enter a code. The real benefit with automatic discounts is that it does the work for the customer and means they have one less thing to worry about.”
+ The trade-off you miss out on the insights you gain when you use codes: there’s no per-campaign attribution, no creator-code economics, and limited visibility into which specific lever drove the sale. 
+ Shopify’s Winter '26 Edition closes one of the bigger historical gaps here by adding native segment-targeted automatic discounts. Previously, this discount strategy often required Shopify Scripts or a third-party app. 
+ Pro tip: For retailers running multiple concurrent automatic discounts, Shopify Flow adds an audit-and-notification layer on top. Whenever an automatic discount is created by you, by a staff member, or by a third-party app, Flow can trigger a workflow that pushes a Slack alert to the marketing team, tags orders that use specific discount types, or pulls a scheduled summary of active discounts . 
+ When to combine discounts
+ Bedding retailer Brooklinen runs free ground shipping on all orders over $100 to the contiguous lower 48 United States, year-round. On top of that, the brand runs tactical codes for specific campaigns: a 25% loyalty member code, sitewide promo codes for new-customer email sign-up, and seasonal campaigns. 
+ The codes stack on top of the free-shipping threshold without conflicting with it because they're different discount classes—shipping versus order—and that's exactly what Shopify's combining discount feature handles. The important part is that each discount strategy has a separate job: one removes a shipping objection, while the other drives a campaign-specific conversion.
+ Two rules govern how Shopify applies combinations: You can combine shipping discounts with product or order discounts, but only one shipping discount can apply per order.
+ This avoids combining two product-level discounts that target the same SKU, so only the highest product discount applies per item. The products are not double-discounted, and if two product discounts target the same item, Shopify selects the one giving the best savings rather than stacking both.
+ Pros of discount codes
+ Discount codes carry a few built-in advantages:
+ Channel-level attribution. Shareable links can carry UTM identifiers and source data automatically, so you can monitor each code's performance in your marketing campaign reports.
+ Built-in fraud and abuse controls. Shopify lets you cap total redemptions across your customer base, limit a discount to one use per customer by tracking email or phone, and configure exact start and end dates.
+ How to protect your profit margin while discounting
+ Discounting only works as a strategy if it doesn't erode the margin you were trying to protect in the first place. Here are four guardrails keep that from happening:
+ Set thresholds above the current AOV or median order value (MOV)
+ The free-shipping threshold should be set just high enough above your median order value or average order value that it nudges customers to add one or two extra items they were previously denying themselves. 
+ The same logic applies to any tier-gated discount: if your first tier triggers below your existing AOV, you're discounting orders that would have happened anyway.
+ Limit usage, duration, and eligible products. 
+ On Shopify, every code can be configured with a total redemption cap across your customer base, a one-use-per-customer limit tracked by email or phone, and exact start and end dates. 
+ Codes can also be restricted to specific collections, products, or customer segments, and made unique per recipient to prevent leakage to coupon aggregators.
+ Test discount depth before repeating the offer
+ Intelligems ran an A/B test for a charger brand comparing two structures—the existing $49.99 price with a volume discount available, versus a flat lower $39.99 price with the volume discount removed. 
+ After 800 completed orders within the test, the lower-priced group hit statistical significance : a two-times increase in both conversion rate and revenue per visitor. Don’t assume a deeper discount strategy is better; test the offer structure before making it a repeatable campaign.
+ Use bundles, gifts, or shipping perks when a percentage-off is too costly
+ Fragrance brand Who Is Elijah built a two-tiered gift-with-purchase rule via Checkout Extensibility for BFCM 2024: Spend over a certain amount and a free bottle of scent is automatically added to the cart; spend a larger amount and the gift escalates to something of greater value. 
+ Average order volume rose 46% , from $86 before the sale to $126 during the sale period. The brand also used Shopify Bundles for Black Friday-specific kit configurations. 
+ This shows how gifts can be a useful discount strategy when a flat percentage off would give away too much margin. Free-shipping discounts and bundles can be used according to the same principle, in which you maintain a level of control over AOV in order to protect your margins.
+ Install Shopify Bundles from the Shopify App Store. 
+ What to consider when building a discount strategy
+ Sitewide vs. specific collections
+ While Out of Print launched predominantly as a t-shirt brand, they have since grown to offer totes, socks, mugs, and accessories. With so many categories, shoppers might fall prey to the paradox of choice if offered a storewide discount.
+ To focus customer attention, digital marketing director Chris Mazzone suggests discounting specific product collections. Out of Print often highlights their Harry Potter, Sesame Street, and Star Wars collections with targeted discounts. Each has become a top seller. 
+ What to discount
+ Buyer behavior is a key ingredient in discounting success. For example, while Out of Print has had success offering BOGO discounts on socks, not all consumers buy their socks in single pairs. 
+ After analyzing the sale, Chris says he learned many customers prefer to purchase their socks in bulk—three to five pairs at a time—and therefore may not be motivated by a BOGO offer.
+ The answer is your own sales data. On Shopify, the ABC analysis by product report under Analytics > Reports > Inventory grades each product variant by its contribution to revenue over the preceding 28 days: The A category accounts for the top 80% of revenue, B is for the next 15%, and C is for the bottom 5%. Use that report to keep your discount strategy focused on B and C inventory, where velocity needs help.
+ Discount duration
+ Highlighting certain deals during specific times of the year is only part of the equation. Discounts should act as a motivator and result in accelerated or incremental purchases. You’ll undercut your margins if you train customers to wait for a discount—and your promotions will lack urgency if they’re perceived as open-ended. 
+ Out of Print routinely experiments with discount duration. Campaigns aligned with a specific catalyst, like Banned Books Week, are often more effective when they last a week. Other campaigns promoting a new release often perform better if they last just 48 hours.
+ Use the business signal to set the window. A discount strategy tied to a fixed external event can run for the length of that event, while a launch, drop, or inventory-clearance push usually needs a shorter window to preserve urgency.
+ Discount presentation
+ The framework most worth knowing here is what marketing professor Jonah Berger called the Rule of 100 in his 2013 book Contagious . For products under $100, percentage-off framing feels larger than the equivalent in dollars off. For products over $100, framing in terms of dollars feels larger.
+ But a second axis that the Rule of 100 doesn't account for is segment familiarity. 
+ Out of Print uses both formats deliberately, choosing percentage-off for first-time visitors who don't yet have a baseline for the brand's pricing, and absolute-dollar framing for repeat customers who do.
+ Chris from Out of Print suggests consumers not as familiar with the brand’s products or pricing are often more influenced by a large number framed as a percentage. Conversely, repeat customers with a better grasp of the company’s pricing often respond better to dollar-off discounts or promotions such as $20 t-shirts or 3 t-shirts for $50.
+ Looking for the best Shopify enterprise plan for your long-term growth?
+ Talk to our sales team today 
+ Read more
+ Supply Chain, Price Gouging and the COVID-19 Pandemic 
+ Chip Wilson on the Dangers of Discounting, and His Relationship with Lululemon Now 
+ Discount strategy FAQ
+ What is a strategic discount?
+ A strategic discount is offering discounts with a clear business goal, like acquiring new shoppers, clearing stale stock, or boosting repeat purchases, and an exit plan that safeguards margin. 
+ Rather than blanket markdowns, retailers set rules that lift sales volume or strengthen customer relationships without training shoppers to wait for a lower original price.
+ What are the four types of pricing strategies?
+ Pricing strategies are broader than the mechanics of discount strategies. The discount is the adjustment you make inside the larger pricing model.
+ Cost-plus pricing starts with landed cost, then adds a fixed markup. A discount strategy under this model needs a strict margin floor so promotions don’t erase the markup.
+ Competition-based pricing uses rival prices as the reference point. Discounting works here when it helps match or beat a competitor for a specific product, but it can quickly become a race to the bottom.
+ Value-based pricing sets price according to the perceived benefit to the customer. A discount strategy should be used carefully here, because frequent promotions can weaken the value signal.
+ Dynamic pricing adjusts prices based on demand, inventory, or channel. Discounts in this model are usually time-sensitive and tied to live conditions, like slow-moving stock or flash-sale demand.
+ What are the four types of discounts?
+ Quantity/bulk discounts to lift basket size
+ Seasonal discounts, like post-holiday clearances, to move time-sensitive stock
+ Promotional discounts tied to events, launches, or limited windows
+ Loyalty discounts that reward loyal customers with points, perks, or exclusive codes
+ What are some common discount strategies?
+ BOGO/BXGY for quick AOV bumps
+ Tiered cart thresholds
+ Member-only drops that double as list-building
+ Flash codes on social channels to spike traffic
+ Clearance bundles that unload end-of-season SKUs fast while keeping full-price hero items intact 
+ by Jessica Wynne Lockhart / Michael Keenan 
+ / Brinda Gulati 
+ Updated on Jul 8, 2026 
+ Share article
+ Facebook 
+ Twitter 
+ LinkedIn 
+ by Jessica Wynne Lockhart / Michael Keenan 
+ / Brinda Gulati 
+ Updated on Jul 8, 2026 
+ The latest in commerce
+ Get news, trends, and strategies for unlocking new growth.
+ Enter email Subscribe 
+ Subscribe 
+ By entering your email, you agree to receive marketing emails from Shopify.
+ popular posts
+ Enterprise commerce How to Choose an Enterprise Ecommerce Platform for Your Scaling Store TCO How to Calculate Total Cost of Ownership for Enterprise Software Migrations Ecommerce Replatforming: A Step-by-Step Guide To Migration B2B Ecommerce What Is B2B Ecommerce? Types + Examples 
+ Unified commerce for the world's most ambitious brands
+ Learn More 
+ popular posts
+ Direct to consumer (DTC) The Complete Guide to Direct-to-Consumer (DTC) Marketing (2025) Tips and strategies Ecommerce Personalization: Benefits, Examples, and 7 Tactics for 2025 Unified commerce How To Sell on Multiple Channels Without the Logistical Headache (2025) Enterprise ecommerce Composable Commerce: What It Means and Is It Right for You? 
+ popular posts
+ Enterprise commerce 
+ How to Choose an Enterprise Ecommerce Platform for Your Scaling Store 
+ TCO 
+ How to Calculate Total Cost of Ownership for Enterprise Software 
+ Migrations 
+ Ecommerce Replatforming: A Step-by-Step Guide To Migration 
+ B2B Ecommerce 
+ What Is B2B Ecommerce? Types + Examples 
+ Direct to consumer (DTC) 
+ The Complete Guide to Direct-to-Consumer (DTC) Marketing (2025) 
+ Tips and strategies 
+ Ecommerce Personalization: Benefits, Examples, and 7 Tactics for 2025 
+ Unified commerce 
+ How To Sell on Multiple Channels Without the Logistical Headache (2025) 
+ Enterprise ecommerce 
+ Composable Commerce: What It Means and Is It Right for You? 
+ The latest in commerce Get news, trends, and strategies for unlocking unprecedented growth.
+ Email here Subscribe 
+ Subscribe 
+ Unsubscribe anytime. By entering your email, you agree to receive marketing emails from Shopify.
+ Popular
+ Headless commerce 
+ Headless Commerce: What It Is and Benefits (2026) 
+ Apr 28, 2026
+ Growth strategies 
+ How to Increase Conversion Rate: 14 Tactics 
+ Oct 5, 2023
+ Growth strategies 
+ 7 Discount Strategy Tactics for Retailers in 2026 
+ Jul 8, 2026
+ Ecommerce Operations Logistics 
+ Third-Party Logistics (3PL): How It Works (2026) 
+ Sep 23, 2026
+ Ecommerce Operations Logistics 
+ Ecommerce Returns: Rates and Best Practices (2026) 
+ Sep 23, 2026
+ Industry Insights and Trends 
+ Global Ecommerce Statistics and Trends (2026) 
+ Customer Experience 
+ 15 Top Fashion Brands and Their Stories (2026) 
+ Growth strategies 
+ SEO Product Descriptions: 7 Tips To Optimize Your Product Pages 
+ Jul 28, 2026
+ Powering commerce at scale Speak with our team on how to bring Shopify into your tech stack.
+ Get in touch Try Shopify

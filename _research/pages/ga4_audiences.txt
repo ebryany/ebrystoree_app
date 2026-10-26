@@ -1,0 +1,246 @@
+Create, edit, and archive audiences - Analytics Help Skip to main content 
+ Google Help 
+ Help Center
+ Get started with Analytics
+ Collect and manage data
+ Report and explore
+ Advertising and attribution
+ Audiences and remarketing
+ Manage accounts, properties, and users
+ Google Analytics 360
+ Policies and data privacy
+ Community
+ Analytics 
+ Privacy Policy 
+ Terms of Service 
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Analytics Contact us 
+ Set up audiences 
+ Create, edit, and archive audiences 
+ Set up audiences
+ Create, edit, and archive audiences
+ Next: Suggested audiences 
+ This article is for website and/or app owners who want to create audiences for reporting in Analytics and for export to ad platforms for remarketing. 
+ Audiences let you segment your users in the ways that are important to your business. You can segment by dimensions, metrics, and events to include practically any subset of users.
+ As Analytics gets new data about users, their audience memberships are reevaluated to ensure they still meet the audience criteria. If the latest data indicate they no longer meet the criteria, they are removed from those audiences.
+ If you link your Analytics account to Google Ads and keep the default option to Enable Personalized Advertising , then your audiences are available in your shared library in Google Ads , and you can use them in your ad campaigns. You can remarket to existing or previous users, and you can create similar audiences to prospect for new users.
+ The user lists in Ads that correspond to your audiences are prepopulated with up to 30 days of data when that data is available.
+ On this page : 
+ Management table 
+ Create an audience 
+ Share audiences with Google Ads for activation and measurement 
+ Edit an audience 
+ Archive an audience 
+ Detailed step examples 
+ Related resources 
+ Management table
+ The table lists predefined audiences and ones you have customized. The following audiences are predefined:
+ All users: Users who have ever launched your app or visited your website.
+ Purchasers: Users who have completed a purchase.
+ Click an audience in the table to see a detailed report for that audience. The user metrics in this report count users who were active during the date range you're using for the report (as opposed to counting the total number of users in the audience).
+ Duplicate, edit, archive, apply to dashboards
+ Click at the far right of a row to duplicate, edit, archive, or apply the audience to your dashboard.
+ You need the Marketer role (not an editor role) for the property in which you want to create the audience.
+ Limits
+ There are a few limits to consider when managing your audiences:
+ You have a limit of up to 100 audiences for each property for Standard properties. For 360 properties, there is a limit of up to 400 audiences per property .
+ You can export an audience to an unlimited number of destinations, including native integrations with Google Ads, Display & Video 360, Search Ads 360, Ad Manager, Firebase, or export via the Audience Export API . However, you can only save a maximum of 100 audiences for each Google Analytics standard property.
+ Each audience condition has a character limit of 500 characters.
+ Create an audience
+ You create an audience by setting conditions based on the dimension, metric, and event data you collect from a property. After you create an audience, it accumulates users who meet the conditions from that point onward.
+ Introduction to Audiences in Google Analytics 
+ To view subtitles in your language, turn on YouTube captions . Select the Settings icon at the top right corner of the video player, select Captions , and then specify your language.
+ When you create a new audience, it can take 24-48 hours for the audience to accumulate new users. In general, when a new user satisfies the audience criteria , it can take a day or two for that new user to be included in the audience.
+ Scope
+ When you set conditions, you set the scope of when the conditions must be met: across all sessions, in a single session, or in a single event. You can set a maximum of 10 conditions.
+ Static vs. dynamic evaluation
+ Conditions support static and dynamic evaluation. Static evaluation includes users if the condition was ever true for them. Dynamic evaluation includes users when they meet the condition and excludes them when they do not.
+ Time-windowed metrics
+ Conditions also support time-windowed metrics: you can specify that a metric condition can be true during any point in the lifetime of a user or that it must be true during a specific number of days (e.g., > 5 during any 7 day period).
+ Sequences
+ Sequences let you specify the order in which conditions must be met: indirectly followed by (anytime after the previous step), directly followed by (immediately after the previous step), or within a specific timeframe. Sequences also let you specify scope for the entire sequence.
+ After you create an audience
+ After you create an audience, it accumulates users who meet the conditions from that point onward.
+ When you create an audience, Analytics adds any users who have met the audience criteria during the last 30 days. This applies to Google Ads audiences only.
+ As you define your audience, the Summary card updates with the number of users who have met your criteria during the last 30 days so you have an idea of potential audience size.
+ Create
+ To create an audience:
+ In Admin , under Data display , click Audiences . 
+ Note : The previous link opens to the last Google Analytics property you accessed. You must be signed in to a Google Account to open the property. You can change the property using the property selector. You must be a Marketer or above at the property level to create audiences.
+ Click New audience .
+ You have three options for creating an audience:
+ Create a custom audience by defining all the parameters yourself.
+ Use a template and modify the existing parameters.
+ Select a suggested audience . You can use it as is, or modify it to suit your needs.
+ The image below identifies the different controls you use when you build an audience.
+ Create a new audience
+ Click New audience .
+ Click Create a custom audience .
+ Enter a name and description for the audience. This name and description let you identify the audience in the management table.
+ Click Add new condition to add users who meet conditions based on dimensions, metrics, and events. For example: Age is one of 18-24, 25-34.
+ See examples of using this part of the audience builder .
+ Set the scope of the condition. Use the menu at the top right to choose an option:
+ Across all sessions : all conditions must be met during the lifetime of the user
+ Within the same session : all conditions must be met within the same session (Learn more about how sessions are calculated about how sessions are calculated)
+ Within the same event : all conditions must be met in a single event
+ Dimensions
+ Conditions support static and dynamic evaluation of dimensions. Select At any point to include users if they ever met the condition (static evaluation). If you don't select this option, then user evaluation for an audience is dynamic: users are added to an audience when they meet the conditions and then removed when they no longer meet them.
+ Metrics
+ For information on working with predictive metrics, see Predictive audiences .
+ Conditions support time-windowed metrics. For example: LTV > 5 in any 7 day period 
+ Select the Time period option to use a time-windowed count vs. a lifetime count.
+ Events
+ Conditions support dynamic lookback for events when the scope is Across all sessions and you select the event_count parameter.
+ Turn on the switch for Time Period.
+ Select either:
+ True at any point in time (condition is true if event_count threshold was ever exceeded)
+ or
+ True at the user's last interaction (condition is true if event_count threshold was exceeded during the past number of days you specify).
+ Enter the number of days for the time period.
+ Add OR or AND conditions as necessary.
+ Click Add condition group to include to add another condition.
+ Click Add sequence to include to add users who meet conditions that occur in a specific order, and optionally within a specific time period. For example: Step 1: first_open, Step 2: in_app_purchase.
+ See examples of using this part of the audience builder .
+ Set the scope of the sequence: Across all sessions, Within the same session.
+ Set Time Constraint to enablete, and define the time period in which the whole sequence must occur (e.g., 30 Minutes).
+ Set the scope for Step 1: Across all sessions, Within the same session, Within the same event.
+ Configure the condition for Step 1.
+ Click Add step for each additional step you want to include in the sequence.
+ Select is indirectly followed by if the additional step can occur any time after the previous step.
+ Select is directly followed by if the additional step has to occur immediately after the previous step.
+ Select Within to define the maximum amount of time between steps.
+ Set the scope for the step.
+ Click Add group to exclude to create a condition that excludes specific users.
+ Select Exclude from audience temporarily to exclude users from the audience during periods when they meet the condition.
+ Select Exclude from audience permanently to exclude users from the audience if they've ever met the condition.
+ Users are first evaluated by INCLUDE conditions, and then any EXCLUDE conditions. If they meet the EXCLUDE conditions, they are not added to the audience.
+ See examples of using this part of the audience builder .
+ Membership duration: Max 540 days/18 months from the time user is added to audience last.
+ Reset on new activity : When enabled , the membership audience duration is limited to 14 months.
+ When disabled , it overrides max audience duration to 14 months (or 2 months in future when user data TTL rolls out and customer explicitly selects 2 months).
+ Each time you engage in behavior that meets the criteria for being included in the audience, your membership duration is reset to the full value of this option.
+ For audiences exported to other products, GA retention settings no longer have control. The receiving product will apply their own policies.
+ Click Save to save your conditions and create the audience.
+ Use a template
+ Audience templates are partially configured audiences that already identify a set of dimensions and/or metrics that form the basis of widely applicable audiences for app- and web-based businesses.
+ For example, the Demographics template includes the Age, Gender, Language, Interest IDs, and Location dimensions that you can use to define a particular audience in which you're interested. Using this template, you supply the operators and dimension values that define the audience you want, e.g.:
+ Age exactly matches 18-24
+ Gender exactly matches female
+ etc.
+ After you complete the audience definition, enter a name, and click Save .
+ Select a suggested audience
+ Analytics also provides a number of fully configured audiences that you can use as is or modify if necessary. These suggested audiences are based on the categories you specify for your apps in Apple's App Store and in Google Play and on the industry category you specify when you configure a property. Learn more about suggested audiences. 
+ For example, the Recently active users audience is defined as follows:
+ Include Users when (event =) user_engagement
+ You can use the audience as is, or you can add conditions or sequences, or change the membership duration as necessary.
+ Use the default name or enter a new name, then click Save .
+ For information on working with suggested predictive audiences, see Predictive audiences .
+ Share audiences with Google Ads for activation and measurement
+ If you have linked your Analytics account to Google Ads and keep the default option to Enable Personalized Advertising , then your audiences are automatically shared with Google Ads for use in advertising campaigns.
+ An audience accumulates users who meet the specified criteria from the point of creation onward by virtue of the events that their devices log. When defining new audiences, it may take some time for the lists to populate.
+ Note that Google Analytics audience size will typically be different from remarketing-list size shown in Google Ads. Learn more about the Audience size differences between Google Analytics and Google Ads .
+ Share audiences with Display & Video 360 and Search Ads 360
+ When you link Analytics to Display & Video 360 or Search Ads 360 , your Analytics audiences are automatically exported if you have activated either Google signals or user-provided data collection in the Analytics property and if you keep the default link setting to enable personalized advertising.
+ Edit an audience
+ After you create an audience, you can edit only the name and description.
+ To edit an audience:
+ In Admin , under Data display , click Audiences .
+ Note : The previous link opens to the last Google Analytics property you accessed. You must be signed in to a Google Account to open the property. You can change the property using the property selector. You must be a Marketer or above at the property level to edit the audiences.
+ In the row for the audience, click > Edit .
+ Edit the name or description.
+ Click Save .
+ Archive an audience
+ If you have reached your limit of 100 audiences and need to create new ones, you can archive the ones that are no longer relevant, and then create new ones. After you archive an audience, it may take up to 48 hours before you can create an audience with the same name.
+ Archiving an audience permanently removes it. You can’t access or restore archived audiences.
+ To archive an audience:
+ In Admin , under Data display , click Audiences .
+ Note : The previous link opens to the last Google Analytics property you accessed. You must be signed in to a Google Account to open the property. You can change the property using the property selector. You must be a Marketer or above at the property level to archive the audiences.
+ In the row for that audience, click > Archive .
+ Detailed step examples
+ Step 4: Add new conditions
+ When you build a condition, start with setting the scope.
+ Then choose the data you want as the basis of the condition. Click Add new condition to open a list of dimensions, metrics, and events.
+ Dimensions
+ Dimensions are listed by category.
+ When you choose a dimension, you also choose an operator and specify the value for the dimension. For example, if you choose Age , then you also choose either is one of or is not one of as the operator, and you specify one of the age ranges as the value.
+ You can also select True at any point if you want the audience to include users who ever met the condition.
+ The operators change depending on the dimension you choose. For example, if you choose the Gaming dimension Virtual currency , then the available operators are begins with , ends with , contains , exactly matches , and is one of .
+ When you specify a value for a dimension with these operators, you usually provide the value by entering text in the Value field, though you might also have the option to select a value from a control like a calendar or list. If you are required to enter text, Analytics will display any known values as you type, and you can select one of those if appropriate.
+ Metrics
+ When you choose a metric, the condition is evaluated on how the user's data compares to the metric value. As with dimensions, you choose an operator and specify a value.
+ For example, to be included in the audience, the user's lifetime value has to be greater than (>) the value you specify.
+ The In any ___ day period option lets you specify whether the cumulative value of the metric meets the condition or whether the value of the metric during a specific number of days meets the condition. For example, based on all data for the user, does the cumulative value of the metric exceed 100 or did it exceed 100 during any 7-day period? If you do not select the option, then the cumulative value of the metric is used. If you select the option, the value must have occurred during any period that matches the number of days you specify as the time frame.
+ Events
+ You can choose from any of the events you collect, for example, first_visit .
+ When you choose an event, you also choose one of the event parameters.
+ Numeric parameter values
+ If you choose an event parameter that has a numeric value, choose a comparative operator (e.g., <, >, =) and enter the numeric value you want to use (e.g., > 0).
+ If the numeric parameter is event_count and the scope is Across all sessions , then you can also specify whether the cumulative value matches your condition, or whether the value matched your condition during a defined time period.
+ To have the cumulative value match your condition, turn off the switch for Time Period (the switch is off by default).
+ To specify that the value matched your condition during a defined time period:
+ Turn on the switch for Time Period .
+ Enter the number of days.
+ Select True at the user's last interaction if you want to include only users whose parameter value met the condition within the most recent N days (e.g., the most recent 7 days).
+ Select True at point in time if you want to include users whose parameter value ever met the condition during an N-day period (e.g., any 7-day period)
+ Text parameter values
+ If you choose a parameter like content that has a text value and generates a dimension in Analytics, then you choose one of the available operators begins with , ends with , contains , exactly matches , or is one of , and enter the text value you want to use.
+ If you need to add more conditions, click Add condition group to include and define the conditions according to the preceding steps.
+ If you need to remove a condition, hover over the condition and click X .
+ Return to Step 4 
+ Step 5: Add sequences
+ If it's necessary to the audience definition that user behavior occurs in a particular order, then you can add one or more sequences.
+ When you define a sequence, start with setting the scope of the entire sequence.
+ If the steps of the sequence need to happen within a specified amount of time, then turn on the time constraint and set the amount of time.
+ Set the scope for the first step of the sequence.
+ Create the conditions for the step using the same methods you use in Step 4 .
+ Click Add step to add another step to the sequence.
+ When you add another step to a sequence, you select either:
+ is indirectly followed by (the next step happens anytime after the previous step)
+ or
+ is directly followed by (the next step happens immediately after the previous step)
+ Return to Step 5 
+ Step 6: Add group to exclude
+ You can define conditions that either temporarily or permanently exclude users.
+ For example, if you create an audience of high-value monthly buyers, you can exclude users anytime their lifetime value (LTV) metric falls below 100 during a 30-day period.
+ Or if your audience includes users in a specific age range (e.g., 18-24), you might want to permanently exclude them when they are no longer in that age bracket (e.g., when they enter the 25-34 bracket).
+ You would use a sequence to accomplish this change in membership: users are included when their age is initially within the age group you define and then excluded anytime after when it is not in that age group.
+ Related resources
+ Import user data 
+ Why your audiences may not be populating in Google Ads 
+ Create new Google Analytics audiences directly in your Google Ads account 
+ Next: Suggested audiences 
+ Was this helpful?
+ How can we improve it?
+ Submit 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 10294063928888894687
+ true
+ Search Help Center
+ false
+ true
+ true
+ true
+ true
+ true
+ 69256
+ false
+ false
+ false
+ false
+ false

@@ -1,0 +1,132 @@
+About conversion measurement - Google Ads Help Skip to main content 
+ Google Help 
+ Help Center
+ Start advertising
+ Campaigns
+ Explore features
+ Optimize performance
+ Account & billing
+ Fix issues
+ Google Partners
+ Community
+ Google Ads
+ Privacy Policy
+ Terms of Service
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Google Ads 
+ Help Center Topics 
+ Optimize performance 
+ Measure results 
+ Track sales and other conversions 
+ Learn about conversions 
+ About conversion measurement 
+ About conversion measurement
+ Are Your Ads Actually Working? Here is the Guide to Conversion Measurement 
+ To view subtitles in your language, turn on YouTube captions . Select the Settings icon at the top right corner of the video player, select Captions , and then specify your language.
+ Conversions provide insights into your campaign performance. You choose what you identify as valuable, like a purchase, sign-up, or phone call, and Google Ads will then help you get the most out of your campaigns. For setup instructions, review Set up your conversions .
+ On this page 
+ Why use conversion measurement 
+ Requirements for conversion import from Google Analytics 
+ How conversions work 
+ Enable Google signals and data sharing in Google Analytics 
+ Security and privacy standards 
+ Why use conversion measurement 
+ Learn which keywords, ads, ad groups , and campaigns are best at driving valuable customer activity.
+ Understand your return on investment (ROI) and make better informed decisions about your ad spend.
+ Use Smart Bidding strategies (such as Maximize Conversions, target CPA, and target ROAS) that automatically optimize your campaigns according to your business goals.
+ Find out how many customers may be interacting with your ads on one device or browser and converting on another. You can view cross-device, cross-browser, and other conversion data in your “All conversions” reporting column.
+ Important : Smart Bidding strategies require a standard 7-14 day learning phase to gather sufficient data and stabilize ad delivery. Avoid frequent manual changes to budgets, targets (CPA or ROAS), or conversion goals during this period, as these adjustments will reset the learning window and delay campaign optimization. Learn more About Smart Bidding .
+ Requirements for conversion import from Google Analytics 
+ Ensure the following criteria are met before attempting to import conversions:
+ Permissions : You must have Admin access in Google Ads and Edit access in the linked Google Analytics property.
+ Key events : Only events marked as key events in Google Analytics are eligible for import.
+ Linked accounts : Verify that the correct Google Analytics property is actively linked to your Google Ads account.
+ Important : After linking accounts or marking an event as key events, it can take 24 to 48 hours for the system to propagate before the import options appear in Google Ads.
+ How conversions work 
+ Important : Account types (Organization vs. Individual) are permanently fixed upon creation and cannot be changed. Carefully select the correct type during initial setup to avoid future verification and billing restrictions. Learn more about account types .
+ 1. Choose data sources to measure conversions
+ First, tell us about your business and where your conversions happen.
+ Website conversions : Website conversion measurement analyzes specific actions that users take on your website after interacting with your Google Ads. Learn more about setting up web conversions. 
+ Categories: Purchases, sign-ups, and other actions that customers complete on your website . Learn more about how Google Ads tracks website conversions .
+ App conversions : For businesses with mobile apps, in-app conversions are essential to measure the true impact of Google Ads. Learn more about setting up app conversions 
+ Categories: App installs and in-app actions. Installs of your Android or iOS mobile apps, and purchases or other activity within those apps. Learn more About mobile app conversion tracking .
+ If you have both a website and a mobile app, you can set up app conversion tracking using App Connect to provide a seamless web-to-app experience for your customers.
+ Phone call conversions: By connecting call data to your campaigns, you can identify which ads are driving valuable phone leads. Learn more about setting up phone call conversions 
+ Categories: Calls directly from your ads, calls to a phone number on your website, and clicks on a phone number on your mobile website. Learn more about phone call conversion tracking .
+ Note : To ensure your calls are recorded correctly, enable call reporting in your account settings and set the conversion action to "Primary". You can also adjust the "minimum call length" threshold and check the "Call Details" report to view individual call durations. Note that Google Ads attributes these conversions to the date of the ad click.
+ Offline conversions: You can review your offline conversions to help determine how your ads are impacting your sales in physical stores. Learn more about setting up offline conversions 
+ Categories: Offline conversion imports (OCI) involve uploading data from files or APIs. To ensure successful processing, confirm that the conversion action source is set to "Manual uploads" or "Other" instead of "Website" and make sure that names match exactly. Keep in mind that processing takes 24 to 48 hours and Google Click IDs (GCLIDs) must be within 90 days. You can check the "Diagnostics" tab for specific error logs such as "Invalid date." Learn more About offline conversion imports .
+ After making your selections, add a data source for the conversion locations you’ve selected. A data source is the origin of your customer data, like your CRM system, a data file (like a CSV), or another platform. Connecting your data sources to Google Ads is important because it enables more accurate conversion measurement, provides deeper insights for optimizing campaigns, and powers features like enhanced audience targeting. You can choose between or select both Google Analytics and the Google tag:
+ Google Analytics : If you’re already using Google Analytics, this is the most efficient choice for advertisers who want to reuse existing website event tracking.
+ Google tag : If you want a dedicated tracking signal optimized specifically for Google Ads bidding. This is recommended if you do not use Google Analytics or if you require advanced Ads-specific features like enhanced conversions.
+ We’ll save your data source preferences for the next time you come back to this conversion set up workflow.
+ Note : You can select both if you want the flexibility to use different signals for different conversion actions.
+ 2. Group your conversions
+ When you move to the next step, you’ll be able to create conversion actions from any of the data sources you’ve added.
+ A conversion action is a specific customer activity that is valuable to your business. This action will be measured and the measurements can be used to refine your campaign so that you can best meet your advertising objectives. Learn more about the Different ways to track conversions .
+ Important : Correctly configuring your conversion actions as primary (biddable) or secondary (observation-only) is critical. Misconfiguring these settings can prevent Smart Bidding from optimizing effectively, as the algorithm relies on these signals to improve your campaign performance.
+ 3. Finish setup
+ After you’ve created your conversions, you can review the next steps to ensure your conversions can be measured correctly. For setup instructions, review Set up your conversions 
+ The conversion measurement process works a little differently for each conversion source, but for each type besides offline conversions, it tends to fall into one of these categories:
+ You add a Google tag, or code snippet, to your website or mobile app code. When a customer clicks on your ad from Google Search or selected Google Display Network sites, or when they view your video ad, a temporary cookie is placed on their computer or mobile device. When they complete the action you defined, our system recognizes the cookie (through the code snippet you added), and we record a conversion.
+ Some kinds of conversion measurement don’t require a tag. For example, to track phone calls from call assets or call-only ads, you use a Google forwarding number to track when the call came from one of your ads, and to track details like call duration, call start and end time, and caller area code. Also, app downloads and in-app purchases from Google Play, and local actions will automatically be recorded as conversions, and no tracking code is needed.
+ After you’ve set up conversion measurement, you can view data on conversions for your campaigns, ad groups, ads, and keywords. Viewing this data in your reports can help you understand how your advertising helps you achieve important goals for your business. Learn more about fixing common issues with conversion measurement .
+ There are several factors to check if your conversion tracking is set up but you're not getting conversions, or the numbers are lower than expected:
+ Ensure your conversion tracking tags are correctly implemented. You can use Google Tag Assistant for verification.
+ If your conversion action isn’t showing as “Active”, troubleshoot your conversion tracking status .
+ Note : An "Unverified" or "Inactive" status is normal for new tags. The status will update to "Active" only after Google Ads records its first conversion or a successful test event. For advertisers in the European Economic Area (EEA), ensure Consent Mode is correctly configured to maintain data accuracy and prevent tracking gaps.
+ If you’re using Google Tag Manager, confirm that the Conversion Linker tag is set up correctly. Learn how to troubleshoot issues in your tag configuration .
+ View-through conversions measure instances where a customer saw your ad but did not click it. They are excluded from the main "Conversions" column to ensure Smart Bidding optimizes for active interactions rather than passive impressions. Learn more About view-through conversions .
+ Enable Google signals and data sharing in Google Analytics 
+ Enabling Google Signals is essential for cross-device reporting and ensuring consistent conversion data.
+ In Admin , under Data collection and modification , select Data collection .
+ In the "Google signals data collection" section, click Get started .
+ Click Continue , then click Activate .
+ Under “Account settings”, click Account to expand, then click Account details .
+ Review and check "Google products & services".
+ Click Save .
+ Security and privacy for conversion and event tracking 
+ Google has strict security standards. Google Ads only collects data on sites and apps where you have configured tracking.
+ Ensure that you provide users with clear and comprehensive information about the data you collect on your sites, apps, and other properties. Make sure that you also get consent where required by law or any applicable Google policies governing user consent, including Google’s EU user consent policy .
+ Confirm that your government ID exactly matches your billing settings to ensure a smooth verification process. If you use a "Doing Business As" (DBA) name, provide a business license linking your name to the entity. For document quality, upload clear PDF, JPG, or PNG files where all four corners are visible.
+ When requesting a payments profile account, your new Authorization to Offer (ATO) document must exactly match the name on the new payments profile. Any naming discrepancies will result in the request being rejected by the verification system. For more information, refer to Edit your payments profile account .
+ Note : If you haven't obtained users’ consent for the collection, sharing, and use of personal data for personalization of ads where legally required, be sure to disable the collection of remarketing data. Learn how to modify the Google tag to disable the collection of personalized advertising data for specific users.
+ Related links
+ Different ways to track conversions 
+ Google's privacy policy 
+ Understand your conversion tracking data 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Achieve your advertising goals today! Attend our Performance Max Masterclass, a livestream workshop session bringing together industry and Google ads PMax experts.
+ Register now 
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 5321495407567730924
+ true
+ Search Help Center
+ true
+ true
+ true
+ true
+ true
+ true
+ 73067
+ false
+ false
+ true
+ true
+ false
+ false

@@ -1,0 +1,171 @@
+Title: Sorry, this page can't be found.
+
+URL Source: https://support.google.com/analytics/answer/10597520?hl=en
+
+Warning: Target URL returned error 404: Not Found
+
+Markdown Content:
+[Skip to main content](https://support.google.com/analytics/answer/10597520?hl=en#hcfe-content)
+
+[](https://support.google.com/?tab=uu)
+
+[](https://support.google.com/?tab=uu)
+
+[Analytics Help](https://support.google.com/analytics)
+
+[](https://www.google.com/intl/en/about/products?tab=uh)
+
+[Sign in](https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=http://support.google.com/analytics/answer/10597520%3Fhl%3Den&ec=GAZAdQ)
+
+Send feedback on...
+
+This help content & information 
+
+General Help Center experience 
+
+Close Next
+
+*   [Help Center](https://support.google.com/analytics/?hl=en)
+*   [Community](https://support.google.com/analytics/community?hl=en)
+*   [Announcements](https://support.google.com/analytics/announcements/10707884)
+
+[Analytics](https://www.google.com/analytics/)[Contact us](https://support.google.com/analytics/gethelp)
+
+*   [Get started with Analytics](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Collect and manage data](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Report and explore](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Advertising and attribution](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Audiences and remarketing](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Manage accounts, properties, and users](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Google Analytics 360](https://support.google.com/analytics/answer/10597520?hl=en)
+*   [Policies and data privacy](https://support.google.com/analytics/answer/10597520?hl=en)
+
+# Sorry, this page can't be found.
+
+This page doesn't exist in Google Analytics Help. It may be deleted because the feature doesn't exist anymore, or the URL may be incorrect.
+
+[Get Google Analytics Help](https://support.google.com/analytics?source=404)
+
+[Search on Google](https://www.google.com/?source=404)
+
+ ©2026 Google 
+*   [Privacy Policy](https://www.google.com/intl/en/privacy.html)
+*   [Terms of Service](https://www.google.com/accounts/TOS)
+
+ Language  
+
+English‎
+1.   català‎
+2.   dansk‎
+3.   Deutsch‎
+4.   español‎
+5.   español (Latinoamérica)‎
+6.   Filipino‎
+7.   français‎
+8.   hrvatski‎
+9.   Indonesia‎
+10.   italiano‎
+11.   latviešu‎
+12.   lietuvių‎
+13.   magyar‎
+14.   Nederlands‎
+15.   norsk‎
+16.   polski‎
+17.   português‎
+18.   português (Brasil)‎
+19.   română‎
+20.   slovenčina‎
+21.   slovenščina‎
+22.   suomi‎
+23.   svenska‎
+24.   Tiếng Việt‎
+25.   Türkçe‎
+26.   čeština‎
+27.   Ελληνικά‎
+28.   български‎
+29.   русский‎
+30.   српски‎
+31.   українська‎
+32.   ‏עברית
+33.   ‏العربية
+34.   हिन्दी‎
+35.   ไทย‎
+36.   中文（简体）‎
+37.   中文（繁體）‎
+38.   日本語‎
+39.   한국어‎
+40.   English‎
+
+Enable Dark Mode
+
+Send feedback on...
+
+This help content & information General Help Center experience
+
+Search
+
+Clear search
+
+Close search
+
+Google apps
+
+Main menu
+
+14242713981667629432
+
+true
+
+Search Help Center
+
+false
+
+true
+
+true
+
+true
+
+[Google Help](https://support.google.com/)
+
+[* Help Center](https://support.google.com/analytics/?hl=en)
+    [* Get started with Analytics](https://support.google.com/analytics/topic/14090456?hl=en&ref_topic=3544742,2986333,)
+    [* Collect and manage data](https://support.google.com/analytics/topic/14132937?hl=en&ref_topic=3544742,2986333,)
+    [* Report and explore](https://support.google.com/analytics/topic/9228654?hl=en&ref_topic=3544742,2986333,)
+    [* Advertising and attribution](https://support.google.com/analytics/topic/10595744?hl=en&ref_topic=3544742,2986333,)
+    [* Audiences and remarketing](https://support.google.com/analytics/topic/9303474?hl=en&ref_topic=3544742,2986333,)
+    [* Manage accounts, properties, and users](https://support.google.com/analytics/topic/9303569?hl=en&ref_topic=3544742,2986333,)
+    [* Google Analytics 360](https://support.google.com/analytics/topic/10985992?hl=en&ref_topic=3544742,2986333,)
+    [* Policies and data privacy](https://support.google.com/analytics/topic/1008008?hl=en&ref_topic=3544742,2986333,)
+
+[* Community](https://support.google.com/analytics/community?hl=en)[* Analytics](https://www.google.com/analytics/)
+
+[* Privacy Policy](https://www.google.com/intl/en/privacy.html)[* Terms of Service](https://www.google.com/accounts/TOS)[* Submit feedback](https://support.google.com/analytics/answer/10597520?hl=en)
+
+[Introduction to Analytics](https://support.google.com/analytics/topic/14089939?hl=en&ref_topic=14090456,3544742,2986333,)[Set up Analytics](https://support.google.com/analytics/topic/14088998?hl=en&ref_topic=14090456,3544742,2986333,)[Guides and videos](https://support.google.com/analytics/topic/14089317?hl=en&ref_topic=14090456,3544742,2986333,)[Troubleshoot](https://support.google.com/analytics/topic/13614110?hl=en&ref_topic=14090456,3544742,2986333,)[Glossary](https://support.google.com/analytics/topic/9355633?hl=en&ref_topic=14090456,3544742,2986333,)
+
+[Events and key events](https://support.google.com/analytics/topic/14710097?hl=en&ref_topic=14132937,3544742,2986333,)[Import data from external systems](https://support.google.com/analytics/topic/10054560?hl=en&ref_topic=14132937,3544742,2986333,)[Integrations](https://support.google.com/analytics/topic/9306488?hl=en&ref_topic=14132937,3544742,2986333,)[Measure ecommerce](https://support.google.com/analytics/topic/12270146?hl=en&ref_topic=14132937,3544742,2986333,)[Measure lead generation](https://support.google.com/analytics/topic/12943241?hl=en&ref_topic=14132937,3544742,2986333,)[First-party data](https://support.google.com/analytics/topic/14272008?hl=en&ref_topic=14132937,3544742,2986333,)[Troubleshoot data issues](https://support.google.com/analytics/topic/16714023?hl=en&ref_topic=14132937,3544742,2986333,)
+
+[Reports](https://support.google.com/analytics/topic/13818299?hl=en&ref_topic=9228654,3544742,2986333,)[Explorations](https://support.google.com/analytics/topic/9266525?hl=en&ref_topic=9228654,3544742,2986333,)[Dimensions and metrics](https://support.google.com/analytics/topic/11151952?hl=en&ref_topic=9228654,3544742,2986333,)[Analytics Intelligence](https://support.google.com/analytics/topic/10333392?hl=en&ref_topic=9228654,3544742,2986333,)[The Analytics app](https://support.google.com/analytics/topic/12677004?hl=en&ref_topic=9228654,3544742,2986333,)[How data is stored and displayed](https://support.google.com/analytics/topic/13987797?hl=en&ref_topic=9228654,3544742,2986333,)
+
+[Understand advertising](https://support.google.com/analytics/topic/10604827?hl=en&ref_topic=10595744,3544742,2986333,)[Understand attribution](https://support.google.com/analytics/topic/10597959?hl=en&ref_topic=10595744,3544742,2986333,)[Manage and configure attribution](https://support.google.com/analytics/topic/10595462?hl=en&ref_topic=10595744,3544742,2986333,)[iOS conversion measurement](https://support.google.com/analytics/topic/13165701?hl=en&ref_topic=10595744,3544742,2986333,)
+
+[Set up audiences](https://support.google.com/analytics/topic/14272803?hl=en&ref_topic=9303474,3544742,2986333,)[Use audiences for advertising and remarketing](https://support.google.com/analytics/topic/14277381?hl=en&ref_topic=9303474,3544742,2986333,)[Audiences for common marketing objectives](https://support.google.com/analytics/topic/13286687?hl=en&ref_topic=9303474,3544742,2986333,)[Troubleshoot audiences](https://support.google.com/analytics/topic/14277483?hl=en&ref_topic=9303474,3544742,2986333,)
+
+[[GA4] Subproperties](https://support.google.com/analytics/topic/11525653?hl=en&ref_topic=9303569,3544742,2986333,)[Roll-up properties](https://support.google.com/analytics/topic/11525654?hl=en&ref_topic=9303569,3544742,2986333,)
+
+[[GA4] Subproperties](https://support.google.com/analytics/topic/11525653?hl=en&ref_topic=10985992,3544742,2986333,)[Roll-up properties](https://support.google.com/analytics/topic/11525654?hl=en&ref_topic=10985992,3544742,2986333,)[How data is stored and displayed](https://support.google.com/analytics/topic/13987797?hl=en&ref_topic=10985992,3544742,2986333,)
+
+[Data privacy and security](https://support.google.com/analytics/topic/2919631?hl=en&ref_topic=1008008,3544742,2986333,)
+
+true
+
+true
+
+69256
+
+false
+
+false
+
+false

@@ -1,0 +1,248 @@
+About audience segments - Google Ads Help Skip to main content 
+ Google Help 
+ Help Center
+ Start advertising
+ Campaigns
+ Explore features
+ Optimize performance
+ Account & billing
+ Fix issues
+ Google Partners
+ Community
+ Google Ads
+ Privacy Policy
+ Terms of Service
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Google Ads 
+ Manage ads 
+ Reach your audience 
+ Reach people interested in what you offer 
+ About audience segments 
+ About audience segments
+ To provide a comprehensive and consolidated view of your Audiences and make audience management and optimization simpler, you’ll find the following improvements in Google Ads:
+ New audience reporting : Go to Audiences within the Campaigns menu for detailed reporting about audience demographics, segments, and exclusions. You can also easily manage your audiences from this report page. Learn more About Audience reporting .
+ New terms : We’re using new terms on your audience report and throughout Google Ads. For example, “audience types” (these include custom, in-market, and affinity) are now referred to as audience segments and “remarketing” is now referred to as “your data”. Learn more about the Updates to Audience terms and phrases .
+ You can add audience segments to ad groups and reach people based on who they are, their interests and habits, what they’re actively researching, or how they've interacted with your business. Audience segments can boost your campaign's performance by reaching people browsing websites, using apps, or watching videos. Refer to the personalized advertising policy , formerly known as interest-based advertising, to help improve the experience for users and advertisers alike.
+ As Apple’s App Tracking Transparency (ATT) policies go into effect, your data segments (especially website , app and automatically created segments) and Customer Match segments may be impacted on iOS 14 traffic (including the use of these segments for exclusions). Campaigns promoting web-based conversion goals - particularly those using Customer Match and your other data segments - may also find performance fluctuations. During this time we will be expanding modeled conversions to more iOS 14 traffic.
+ How audience segments work
+ For Display, Search, Video, Hotel and Standard Shopping campaigns, audiences are made up of segments, or groups of people with specific interests, intents, and demographic information, as estimated by Google. When adding an audience to a campaign or ad group, you can select from a wide range of segments. For example, these segments could include fans of sport and travel, people shopping for cars, or specific people that have visited your website or app. Google Ads will show ads to people who are likely in the selected categories.
+ Audiences are determined by people’s activity using Google products and third-party websites, or estimated based on content certain groups of people are likely to be interested in. Activity and content on third-party websites are primarily used for audience segments on third-party websites, and activity and content on Google products are primarily used for audience segments on those products.
+ Note : The data used to generate audience segments, for example, page visit history, past Google searches, may be used to improve the bidding and accuracy of your audience campaigns.
+ Refer to the below for a brief description of the different audience segment types to use for accuracy in your campaigns:
+ Affinity segments : Reach users based on what they're passionate about and their habits and interests.
+ Custom segments : Custom segments help you reach your ideal audience by entering relevant keywords, URLS and apps.
+ Detailed demographics : Reach users based on long-term life facts.
+ Life events : Reach users when they're in the midst of important life milestones.
+ In-market : Reach users based on their recent purchase intent.
+ Your data segments : Reach users that have interacted with your business.
+ Website and app visitors : Reach people who have visited either your website or your apps.
+ Customer Match : Reach your existing customers based on your CRM data.
+ Lookalike segments: Reach groups of people that share characteristics with others on an existing "seed" list. Lookalike segments are only available in Demand Gen campaigns.
+ Google-engaged audiences : Reach users who have previously interacted with your website on Google Search, YouTube, or other Google sites.
+ The table below summarizes which audience segment type is available for each campaign type:
+ Campaign type 
+ Affinity segments 
+ Custom segments 
+ Detailed demographics 
+ Life events 
+ In-market 
+ Your data 
+ Demand Gen
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Display
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Search
+ Yes
+ No
+ Yes
+ No
+ Yes
+ Yes
+ Video
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Yes
+ Hotel
+ No
+ No
+ No
+ No
+ No
+ Yes
+ Standard Shopping
+ Yes
+ No
+ Yes
+ No
+ Yes
+ Yes
+ Note : For Performance Max campaigns, audience signals indicating which users are most likely to convert can be added to the campaign to help speed up Google AI. However, this isn't a guarantee that ads will be served to only users within these audiences. If it’s determined that other segments of users are converting well, ads will be served outside of users specified in the audience signals. Learn more about how to Build an asset group .
+ Different audience segment options
+ After you’ve identified the interests, needs, behaviors, and goals of your audience, you can define who your audience will be for a particular campaign or ad group. You can select segments that are preconfigured by Google Ads.
+ Lookback windows
+ The audience data is refreshed every week, so the results you find may change slightly from week to week. You can also change your monthly view for audiences as far back as the last 11 months. This means that you can learn how the audience for your content has changed over time.
+ Search data is refreshed one to two weeks into the following month. However, you can look back 3 years for your search data. You can also change the view of your audience by a month, with a lookback window of 30 days. This means that you can see the audience for your business for any specific month. Search data allows you to choose a particular month to view insights for.
+ Data
+ Refresh frequency 
+ Lookback window 
+ Audience
+ Weekly
+ Last 30 days
+ Search
+ 1-2 weeks into the following month
+ 3 years
+ Affinity segments 
+ Reach users based on a holistic picture of their lifestyles, interests, and habits.
+ A video can be assigned an Affinity Audience label, for example 'motorcycle enthusiasts', based on a combination of both contextual and personalized signals or based on only contextual signals. When an advertiser leverages an affinity audience segment where personalized advertising is not permitted, we would only use contextual signals to place their ads on videos. This includes videos designated as made for kids and ensures we never personalize ads on made for kids videos.
+ Currently, all Google advertisers can access affinity segments in Search, Display, Standard Shopping, and Video campaigns, as well as Gmail and Display & Video 360.
+ Find a curated segment of affinity categories by downloading this CSV .
+ Affinity segments: Other
+ An auto-generated component is now available for this segment. It’s a custom intent segment created by Google for your Display campaigns.
+ Example : Affinity Audiences > Other Interests
+ Health affinity segments
+ Google Audiences are made up of segments, or groups of people with specific interests, intents, and demographic information, as estimated by Google.
+ Affinity segments : Allows you to reach users based on what they're passionate about and their habits and interests. You can reach people based on a holistic picture of their lifestyles, passions, and habits. Those in the affinity segment have demonstrated a qualified passion in the health segment, allowing you to reach the people that matter most with their products or offerings. 
+ Below is a representation of affinity health segments. Find a fully curated segment of affinity categories by downloading this CSV.
+ Affinity segment name
+ Affinity segment name 
+ /Food & Dining/Vegetarians & Vegans
+ /Food & Dining/Vegetarians & Vegans/Vegans
+ /Lifestyles & Hobbies/Green Living Enthusiasts
+ /Sports & Fitness
+ /Sports & Fitness/Health & Fitness Buffs
+ /Sports & Fitness/Health & Fitness Buffs/Weightlifters
+ /Sports & Fitness/Health & Fitness Buffs/Yoga Lovers
+ /Sports & Fitness/Sports Fans
+ /Sports & Fitness/Sports Fans/Baseball Fans
+ /Sports & Fitness/Sports Fans/Basketball Fans
+ /Sports & Fitness/Sports Fans/Boating & Sailing Enthusiasts
+ /Sports & Fitness/Sports Fans/Cricket Enthusiasts
+ /Sports & Fitness/Sports Fans/Cycling Enthusiasts
+ /Sports & Fitness/Sports Fans/Fans of American Football
+ /Sports & Fitness/Sports Fans/Fans of Australian Football
+ /Sports & Fitness/Sports Fans/Fight & Wrestling Fans
+ /Sports & Fitness/Sports Fans/Golf Enthusiasts
+ /Sports & Fitness/Sports Fans/Hockey Fans
+ /Sports & Fitness/Sports Fans/Motor Sports Enthusiasts
+ /Sports & Fitness/Sports Fans/Olympics Fans
+ /Sports & Fitness/Sports Fans/Racquetball Enthusiasts
+ /Sports & Fitness/Sports Fans/Rugby Enthusiasts
+ /Sports & Fitness/Sports Fans/Running Enthusiasts
+ /Sports & Fitness/Sports Fans/Skiing Enthusiasts
+ /Sports & Fitness/Sports Fans/Soccer Fans
+ /Sports & Fitness/Sports Fans/Swimming Enthusiasts
+ /Sports & Fitness/Sports Fans/Tennis Enthusiasts
+ /Sports & Fitness/Sports Fans/Water Sports Enthusiasts
+ /Sports & Fitness/Sports Fans/Winter Sports Enthusiasts
+ Google will never use sensitive information like health, race, religion, or sexual orientation to tailor ads to users.
+ Based on your inputs or selection of Audience segments, Google AI will choose the right audience to best fit the needs of your campaign. 
+ (Last updated Apr. 28, 2023)
+ Life events 
+ Engage with viewers on YouTube, Gmail and Display around important life milestones, like graduating from college, moving homes, or getting married. By understanding when these moments are taking place, you can tailor your advertising to reach the right users with the right messages.
+ Like other important milestones, life events are infrequent, and as a result may reach a smaller segment compared to affinities. However, since life events may correspond with many related purchasing decisions, the segment is often larger than the in-market segment, which corresponds with a single purchasing decision. For example, someone who’s about to move will likely buy new furniture, moving services, mortgages, and other moving-related items during the months of their move.
+ In-market segments 
+ Select from this segment to find customers who are in the market, which means that they're researching products and are actively considering buying a service or product like yours.
+ In-market segments are designed for advertisers focused on getting conversions from likely buyers. These segments reach consumers close to completing a purchase.
+ Find a curated segment of in-market segments by downloading this CSV .
+ In-market segments: Other
+ An auto-generated component is now available for this segment. It’s a custom intent segment created by Google for your Demand Gen campaigns.
+ Example : In-Market Audiences > Other In-Market
+ Health in-market segments
+ Allows you to reach users based on their recent purchase intent. These users are researching health products, browsing pages more frequently, and are actively considering buying a service or product like yours.
+ Below is a representation of in-market health segments. Find a curated segment of in-market segments by downloading this CSV .
+ In-market segments
+ Segment name 
+ /Sports & Fitness
+ /Sports & Fitness/Fitness Products & Services
+ /Sports & Fitness/Fitness Products & Services/Nutrition Drinks & Shakes
+ Google will never use sensitive information like health, race, religion, or sexual orientation to tailor ads to users.
+ Based on your inputs or selection of Audience segments, Google AI will choose the right audience to best fit the needs of your campaign. 
+ (Last updated Apr. 28, 2023)
+ Custom segments
+ Custom segments let you decide how you want to reach your ideal segment by entering keywords, URLs and apps.
+ You can set up a custom segment in your Display, Demand Gen, Gmail, Standard Shopping, and Video campaigns by including specific keywords, URLs and apps related to your product or service. Google Ads will then display ads to people who are likely to be interested in these keywords on pages, apps, and videos.
+ By inferring your campaign goals and bidding strategy, the system will interpret all of those signals and will choose a segment that is focused on one of the following:
+ Reach
+ Consideration
+ Performance
+ For example, rather than reaching the Sports Fans affinity segment, a running shoe company may want to reach Avid Marathon Runners instead. With a custom segment, the shoe company can define this segment by:
+ Entering interests like "5K in San Francisco," "triathlon athlete," or "long distance runner"
+ Using URLs of websites with content about running, training schedules, marathon nutrition, and other marathon themes
+ Entering apps
+ Custom intent segments: auto-created (Display and Video) 
+ The auto-created custom intent segment allows you to define and reach the ideal segment for your Display campaigns. You can use a custom intent segment to show your ad on a specific vertical or landing page.
+ For now, auto-created segments are available in English, German, Japanese, Spanish, Russian, Portuguese, French, and Italian. Check back for updates. New languages will be added over time.
+ Your data segments (formerly known as remarketing)
+ You can also reach people who have already engaged with your company’s products and services, including past visitors to a website, mobile app, videos, or customers who have given you their contact information. Learn more about your data segment . Your data segments include:
+ People who’ve visited your website or apps.
+ Customers who have shared information with you. This online and offline data can help you reach and re-engage your customers across Search, Shopping, Gmail, Standard Shopping, YouTube, and Display.
+ Detailed demographics 
+ Demographics commonly refer to age, gender, and parental status, but detailed demographic segments are broad segments of the population that share common traits. Detailed demographic segments include college students, homeowners, or new parents. Find a curated segment of detailed demographics by downloading this CSV .
+ Note : Currently, custom segments and segments built from your data aren't supported with Target frequency video campaigns.
+ How bidding for segments works with multiple campaigns
+ If you have multiple campaigns relevant to the same traffic, the auction will select the one with the highest effective bid.
+ Example
+ Suppose Campaign A and Campaign B are relevant to the same model of shoes in a user locality.
+ Campaign A has a $2 base bid, with a 100% bid multiplier for an audience segment, and Campaign B has a $5 base bid with no multiplier. Campaign B will earn the impression, even though it has no segment bid adjustment.
+ About dynamic prospecting
+ Use dynamic prospecting to reach and attract new customers with ads for your highest-performing products.
+ How it works
+ Dynamic prospecting uses Google AI to predict which feed items prospective buyers are looking for. Using historical feed performance and user behavior, dynamic prospecting predicts which new users are most likely to perform well for items in your feed. Once the system finds statistically significant relationships between feed items and user intent, it combines that possible intent with demographics-based information such as age and gender to match the user’s intent with a relevant product in your feed . The products in your feed are evaluated and selected based on performance, relevance, and other factors to determine which ones are most likely to lead to conversions.
+ Example
+ Imagine you're a hotel provider, and a customer wants to take a vacation in Paris. This customer is researching many topics about Paris, such as its cultural attractions, restaurants, hotels, and flight options. Since you have enabled dynamic prospecting, every new bit of relevant information in this user’s journey that indicates their travel intent to Paris, helps Google's systems know that showing your Parisian hotels to this customer is more likely to lead to a relevant, assistive-style ad that this user may be more likely to convert from.
+ About Target frequency
+ Starting in the second half of 2022, you can use Target frequency as an optimization solution for shaping your reach and driving higher ad viewing on YouTube in your brand awareness campaigns. It’s a simplified way to drive higher ad viewing to achieve your frequency goals.
+ Target frequency campaigns do positive targeting to show ads based on an advertiser-defined weekly Target frequency to as many users as possible. It assumes building frequency is your most important goal. It serves first ad impressions to as many users matching your campaign criteria as possible. After users are served the first impression, they automatically become eligible for the remaining frequencies over a period of 7 days, even if their audience profile changes or they are served impressions outside the specified topics. This increases brand awareness among the target audience. Learn more About Target frequency .
+ Related links
+ Add audience targeting to an ad group or campaign 
+ About targeting for video campaigns 
+ About Audience reporting 
+ Use Lookalike segments to grow your audience 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Achieve your advertising goals today! Attend our Performance Max Masterclass, a livestream workshop session bringing together industry and Google ads PMax experts.
+ Register now 
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 6134190983766873509
+ true
+ Search Help Center
+ true
+ true
+ true
+ true
+ true
+ true
+ 73067
+ false
+ false
+ true
+ true
+ false
+ false

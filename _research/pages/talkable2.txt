@@ -1,0 +1,507 @@
+Talkable | The Referral Marketing Platform 
+ Talkable MCP lets approved agents work with Talkable using the same permissions as the dashboard.
+ See setup 
+ Platform 
+ Referral Marketing
+ Turn customers into advocates
+ Loyalty Programs
+ Points, tiers, and VIP rewards
+ Video Referrals
+ UGC-powered social proof
+ Talkable Wallet
+ Apple & Google Wallet passes
+ Solutions 
+ Fashion & Apparel
+ Beauty & Cosmetics
+ Health & Wellness
+ Home & Living
+ Food & Beverage
+ Subscriptions
+ Jewelry & Accessories
+ Outdoor & Sports
+ Travel
+ Pets
+ eLearning
+ Home Services
+ All Integrations
+ Results 
+ All Case Studies
+ Real revenue numbers and launch details
+ Partners 
+ Agency Partners
+ Technology Partners
+ Resources 
+ Referral Marketing Guide
+ Loyalty Programs Guide
+ Case Studies
+ Blog
+ Documentation
+ Product Updates
+ Customer Login 
+ Book a Demo 
+ $3B
+ Referral
+ Referral Marketing
+ Turn customers into brand advocates with automated refer-a-friend programs. Post-purchase, invite pages, floating widgets, sweepstakes. Every touchpoint covered.
+ Explore Referral 
+ 02
+ Loyalty
+ Loyalty Programs
+ Points, tiers, and rewards that keep customers coming back. Integrated with your referral engine.
+ Explore Loyalty 
+ 03
+ Video
+ Video Referrals
+ Capture authentic customer stories on video. Automate collection, moderation, and publishing at scale.
+ Explore Video 
+ Wallet
+ Talkable Wallet
+ Apple and Google Wallet passes for loyalty cards, offers, and referral rewards. Push notifications, location triggers, NFC sharing.
+ Explore Wallet 
+ Top Vertical · 2026
+ Fashion &
+Apparel
+ American Eagle, Fashion Nova, PUMA, ALO Yoga, Kendra Scott, Shapermint, Native Shoes, Lunya & more. $125M+ in referral revenue driven.
+ + more 
+ Beauty & Cosmetics
+ Rodan + Fields · RMS Beauty · Image Skincare
+ Jewelry
+ James Allen · Brilliant Earth · Kendra Scott
+ Health & Wellness
+ Hydrow · Nutrafol · Kaged
+ Home & Living
+ Purple · CB2 · Leesa
+ Food & Beverage
+ Olipop · Peet's · ByHeart
+ Subscriptions
+ Daily Dose · Nutrafol · Persona Nutrition
+ Outdoor & Sports
+ Backcountry · RTIC · TREW Gear
+ Travel
+ Sandals Resorts · Turo · Avid4
+ eLearning
+ Babbel · The CE Shop · Scholastic
+ Home Services
+ Pergolux · Trinity Solar
+ Fashion & Apparel
+ Beauty & Cosmetics
+ Health & Wellness
+ Home & Living
+ Food & Beverage
+ Subscriptions
+ Jewelry
+ Outdoor & Sports
+ Travel
+ Pets
+ eLearning
+ Home Services
+ +more 
+ 135×
+ ROI on Talkable
+ $50M+
+ Referral sales
+ 5×
+ Referral Lift
+ 340%
+ Revenue Growth
+ 52×
+ ROI on Talkable
+ View all case studies 
+ Agency Partners
+ Certified Program
+ Add referral marketing to your service offering. Revenue share, certified training, and priority support for your clients.
+ Explore program 
+ Technology Partners
+ Integration Ecosystem
+ Build integrations with Talkable. Co-market to shared audiences and expand your ecommerce ecosystem together.
+ Explore program 
+ R
+ Essential Guide
+ Referral Marketing Playbook
+ Everything you need to build, launch, and optimize a high-ROI referral program. From first principles to advanced strategies.
+ Read the guide 
+ L
+ Essential Guide
+ Loyalty Programs That Work
+ Design retention programs that keep customers coming back. Points, tiers, VIP, and the psychology behind it all.
+ Read the guide 
+ Resource Library
+ Case Studies
+ Real customer programs, revenue numbers, and launch details from brands using Talkable.
+ View all case studies 
+ Blog
+ Insights and strategy
+ Documentation
+ API reference and tech docs
+ Product Updates
+ What's new in Talkable
+ $3B+
+ Campaign-based
+ referrals for
+ enterprise brands.
+ Launch targeted offers, adapt by customer segment, measure what works, and keep improving with a platform built for enterprise ecommerce.
+ Book a Demo 
+ See the Results 
+ Version 16.05.26 (last updated May 26, 2026) 
+ What's New? 
+ Trusted by
+ Fashion · Beauty · DTC · Health & Wellness · Food & Beverage · Pet · Retail · Fitness · Jewelry
+ Referral adds the trust paid media can't buy.
+ Use it alongside paid, email, and loyalty to acquire customers who arrive warmer and stay longer.
+ 01 
+ Lower CAC 
+ Warm traffic. Less paid waste.
+ 02 
+ Higher LTV 
+ Customers who buy like your best buyers.
+ 03 
+ Incremental growth 
+ Demand paid alone is unlikely to catch.
+ 04 
+ Better customers 
+ Cleaner signal for the next audience.
+ Real campaigns from real brands. 
+ View all campaigns 
+ Campaign-based referrals replace the static refer-a-friend box.
+ Talkable gives teams control over offers, placements, creative, fraud rules, and follow-up experiences. Each campaign can match the audience, moment, and goal so referral behaves like a managed acquisition channel.
+ ← 
+ → 
+ Campaign placements:
+ where  referral happens.
+ Standalone campaign landing pages for paid, email, SMS, influencer, and seasonal launches
+ On-site widgets for home, product, account, cart, checkout, and post-purchase moments
+ Triggered share prompts that meet customers when intent and satisfaction are highest
+ Campaign levers:
+ built  to optimize.
+ Creative, placements, rewards, eligibility, and market rules
+ A/B tests, campaign reporting, fraud controls, and managed optimization
+ Lifecycle campaigns for acquisition, retention, loyalty, and seasonal moments
+ Acquisition campaigns:
+ matched  to intent.
+ Target offers by segment, geography, lifecycle stage, or product line
+ Launch seasonal and event-based campaigns without rebuilding the program
+ Shift budget toward referred customers with cleaner attribution and stronger trust
+ Lifecycle campaigns:
+ relationships  that compound.
+ Re-engage advocates with fresh creative, rewards, and placements
+ Use referral incentives to support repeat purchase and category expansion
+ Measure value past the first conversion so optimization is tied to LTV
+ Actual brands. Absurd results. 
+ Select a case study
+ 112% ROI increase.
+370,000 A/B tests a year. Non-stop.
+ American Eagle didn't just run a referral program. They built a compounding growth machine. 370,000 A/B tests a year, full-service optimization, and results that kept climbing month after month.
+ Referral Program Performance: 12 Month Optimization
+ ROI Increase +112% 
+ Advocacy Rate +159% 
+ Click Rate +251% 
+ New Customers/Mo 1,733 
+ +112%
+ ROI increase
+ +159%
+ Advocacy rate
+ 1,733
+ New customers/month
+ +251%
+ Click rate improvement
+ Get Results Like This 
+ Read the case study 
+ “The Talkable program exceeded my expectations in terms of sales volume and traffic quality. Their account managers take care of optimization and offer lots of tests and ideas during calls. One of the best providers on the market.” 
+ Kristi Siemsen, Associate CRM Manager - American Eagle Outfitters 
+ ~135x ROI on Talkable spend.
+The gold standard.
+ James Allen turned word-of-mouth into their most profitable acquisition channel. Over $65 million in referred revenue with Talkable managing every aspect of optimization.
+ Fine Jewelry · Lifetime Referral Performance
+ Referred Revenue ~135x ROI 
+ ROI on Spend 135x 
+ Referral Conv. Rate 4.2% 
+ AOV vs Non-Referral +28% 
+ ~135x ROI
+ Referred revenue
+ 135x
+ ROI on Talkable spend
+ 4.2%
+ Referral conversion
+ 28%
+ Higher AOV
+ Get Results Like This 
+ Read the case study 
+ “Talkable has been a fantastic partner for our referral program. The platform is robust, the team is responsive, and the results speak for themselves. Referrals are now one of our strongest acquisition channels.” 
+ James Allen Growth Team 
+ 198x ROI from
+in-app referrals alone.
+ Hydrow embedded Talkable directly into their app experience. The result? A referral channel that drove nearly 200x return on investment from customers who were already engaged and excited.
+ Connected Fitness · In-App Referral Results
+ In-App ROI 198x 
+ LTV vs Paid CAC 3.4x higher 
+ App Engagement Rate +67% 
+ Referral Conversion +38% 
+ 198x
+ ROI from in-app referrals
+ #1
+ CAC reduction channel
+ 3.4x
+ Higher LTV vs paid
+ In-App
+ Native integration
+ Get Results Like This 
+ Read the case study 
+ “Talkable and our referral program has been one of our key drivers for new customer acquisition and lifetime value. The Talkable team is great to work with and always responsive. They make everything so easy and I always appreciate the ease of reporting out of the platform.” 
+ Ben Coulter, Customer Insights Associate - Mizzen + Main 
+ 5.3x revenue per
+referred customer.
+ Fashion Nova turned their passionate community into a referral engine. Brand advocates drove higher lifetime value with Talkable managing the full program across web and mobile.
+ Fashion & Accessories · Community Referral Program
+ Revenue per Referred 5.3x 
+ Share Rate 34% 
+ Repeat Purchase 2.1x 
+ Mobile Conversion 89% 
+ 5.3x
+ Revenue per referred
+ 34%
+ Share rate
+ 2.1x
+ Repeat purchase rate
+ 89%
+ Mobile traffic
+ Get Results Like This 
+ “Our community is everything. Talkable lets us harness that energy and turn our most loyal customers into our best acquisition channel. The results have been incredible.” 
+ Charlotte Cho, Co-Founder - Fashion Nova 
+ 57x peak ROI.
+From zero to $2.1M.
+ Puma had no referral program before December 2023. Three months later, they hit 57x ROI. Systematic A/B testing, mobile-first design, and a "Link Emphasis" layout that made sharing 20x easier turned a blank slate into a compounding growth engine.
+ Fashion Retail · Referral Program Launch & Scale
+ Peak ROI 57x 
+ Total Revenue $2.1M 
+ Advocate Impressions 896K 
+ Conversion Efficiency 14-18% 
+ 57x
+ Peak ROI
+ $2.1M
+ Referral revenue
+ 5,068
+ New customers
+ 8/13
+ Winning A/B tests
+ Get Results Like This 
+ Read the case study 
+ “Zero to 57x ROI in three months. The Link Emphasis layout removed sharing friction entirely, and systematic testing nearly doubled our conversion efficiency from 5-11% to a sustained 14-18%.” 
+ Puma Referral Program - Launched Dec 2023 
+ 0% to 2,023% ROI.
+In twelve months.
+ Puffy's referral program was dead on arrival in early 2023. A complete strategic overhaul hit every lever: simplified sharing, personalized incentives, mobile-first design, and a quality-over-quantity pivot. Monthly revenue jumped 172% and stayed above 1,000% ROI for 12 straight months.
+ Online Mattresses · Full Program Turnaround
+ Peak ROI 2,023% 
+ Revenue Growth +172% 
+ CTR Improvement +257% 
+ Conversion Rate 12% → 22% 
+ 20x
+ Peak ROI
+ +172%
+ Monthly revenue
+ +257%
+ Click-through rate
+ +83%
+ Conversion rate
+ Get Results Like This 
+ Read the case study 
+ “From 0% ROI to 12 consecutive months above 1,000%. A complete turnaround driven by simplification, personalization, and relentless testing on every element of the referral experience.” 
+ Puffy Referral Program - Turnaround 2023 
+ $2M+ loyalty revenue.
+97% repeat purchase.
+ Lensrentals built a loyalty program that turned professional photographers and hobbyists into a retention machine. 14,600 members, 70M+ points earned, and a repeat purchase rate that crushes their non-loyalty baseline by 21 percentage points.
+ Equipment Rentals · Loyalty Program Performance
+ Loyalty Revenue $2M+ 
+ Repeat Purchase (Loyalty) 97% 
+ Points Earned 70M+ 
+ Redemption Rate 27% 
+ $2M+
+ Loyalty revenue
+ 97%
+ Repeat purchase rate
+ 14.6K
+ Loyalty members
+ 70M+
+ Points earned
+ Get Results Like This 
+ Read the case study 
+ “Loyalty members hit a 97% repeat purchase rate vs. 76% overall. 14,600 members opted in, earned 70M+ points, and redeemed 19M+ worth of rewards. The program paid for itself many times over.” 
+ Lensrentals Loyalty Program - Since 2016 
+ 278% revenue increase.
+7+ years running.
+ SwimOutlet's referral program had loyal customers but low visibility. Strategic touchpoint optimization and a Shopify extension launch drove a 278% revenue increase. Inline CTAs outperformed button CTAs by 241% in share rate, proving embedded placement wins.
+ Swimwear Retail · 7+ Year Partnership
+ Revenue Increase +278% 
+ Share Rate (Inline CTA) +241% 
+ Partnership Length 7+ Years 
+ LTV vs Paid Channels Higher 
+ +278%
+ Referral revenue
+ +241%
+ Share rate (inline)
+ 7+
+ Years as partner
+ Lower
+ CPA vs paid ads
+ Get Results Like This 
+ Read the case study 
+ “[Talkable has] been great at bringing new optimization ideas to the table without us having to ask. I appreciate how easy they've made it for our team to test creative, adjust modules, and roll out updates with very little lift on our side.” 
+ Adam Hayim, VP Marketing & Growth - SwimOutlet 
+ 31% of digital revenue.
+10+ year partnership.
+ CB2 has run their referral program with Talkable for over a decade. Their always-on campaign delivers steady results, but a 10-day elevated-reward burst ($50 instead of $20 for advocates) drove 31% of total digital revenue in January and proved that periodic re-engagement keeps a mature program growing.
+ Modern Furniture · 10+ Year Partnership
+ Revenue from Referrals 31% 
+ Impression Lift +19% 
+ Sharer Increase +20% 
+ Share Volume +18% 
+ 31%
+ Of digital revenue
+ +20%
+ More sharers
+ 10+
+ Years as partner
+ +19%
+ Impression lift
+ Get Results Like This 
+ Read the case study 
+ “Our biggest objective is to replicate the in-store experience online. Whilst we know this is a challenge, Talkable have helped us speak to our customers, at scale, through a channel that we know our customers are receptive to.” 
+ Alicia Waters, Head of Marketing - CB2 
+ Referral programs can do more than share links.
+ Talkable connects referral to wallet, loyalty, video, and fraud controls so brands can build programs that acquire, retain, and protect revenue at scale.
+ ← 
+ → 
+ Wallet pass:
+ friction,  reduced.
+ Wallet-based sharing without digging for a link
+ White-labeled experiences matched to brand standards
+ Location-based push for store and event moments
+ Multi-currency & multi-reward support
+ B2B and in-store attribution (unique to Talkable)
+ Learn About Wallet 
+ Loyalty programs:
+ retention  that refers.
+ Points-based and tiered programs in one platform
+ Referral bonuses that award points alongside cash rewards
+ Onsite enrollment prompts, member hubs, and cart reminders
+ Non-transactional rewards for reviews, UGC, surveys, and social actions
+ Loyalty analytics for repeat rate, tier movement, spend, and LTV
+ Explore Loyalty 
+ Video referrals:
+ customer proof  inside the program.
+ In-browser recording. No app download required
+ Built for Gen Z & Alpha audiences
+ Unlimited UGC library per brand
+ Auto-generated captions & transcripts
+ Cross-platform distribution (email, social, SMS)
+ See Video Referrals 
+ Video Library 
+ All Videos
+ Favorites
+ High Impact
+ 2,147
+ Total Videos
+ 62%
+ Avg Click Rate
+ 4.2x
+ Conv. Lift
+ $284K
+ Video Revenue
+ 0:24
+ Sarah M.
+ 12.4K views High 
+ 0:18
+ James K.
+ 8.2K views Med 
+ 0:31
+ Lisa R.
+ 15.1K views High 
+ 0:22
+ Mike T.
+ 3.1K views New 
+ 0:28
+ Anna P.
+ 9.8K views High 
+ 0:19
+ David W.
+ 5.4K views Med 
+ Favorite 
+ Download 
+ Repurpose 
+ Showing 6 of 2,147 videos 
+ Enterprise fraud:
+ $110M+ protected. 
+ 15+ years of referral fraud pattern data
+ Real-time checks across suspicious behavior
+ Phone number verification layer
+ Custom fraud rules engine per brand
+ Dedicated fraud analyst team on retainer
+ Security Overview 
+ Fraud settings
+ Managed referral growth that feels like part of your team.
+ Strategy, testing, reporting, and day-to-day campaign support from people who keep pushing performance.
+ Miranda Johnson
+ Growth Marketing Manager, Caraway
+ “
+ The Talkable team truly cares about your success, and it shows in everything they do. From performance check-ins to actionable recommendations, we've been thrilled with our experience so far.” 
+ 3.2x
+ Higher LTV
+ 67%
+ Lower CAC
+ 45K+
+ Monthly Referrals
+ “
+ Talkable Team are ALWAYS there to make it work, provide valuable feedback on driving incremental value to both our customers and our organization and simply a pleasure to get to collaborate with.” 
+ Kerim Agalar
+ Director, Retention - Rodan+Fields
+ “
+ We are a busy team, with limited time to focus on optimizing our referral campaigns. Our Customer Success team at Talkable does all the heavy lifting to manage our campaigns, and we are so happy with the results.” 
+ Egan Roa
+ Head of Performance Marketing - Cerascreen
+ Launch motion
+ From signed to scaling in weeks,  not months. 
+ A managed launch path that gets your stack connected, your first campaign live, and your optimization loop moving without turning it into a developer project.
+ Step 1
+ Connect the stack
+ Shopify, BigCommerce, Klaviyo, Attentive, loyalty, analytics, and reward systems get wired into the launch plan.
+ Step 2
+ Build the campaign
+ Offer logic, brand styling, referral widgets, emails, fraud rules, and segmentation are configured around your customers.
+ Step 3
+ Optimize the engine
+ Your CS team starts testing placements, rewards, creative, and reporting so the program improves after launch.
+ Ideas your growth team can put to use.
+ Practical referral strategy, retention moments, and ecommerce growth thinking from the team behind billions in referral revenue.
+ More referral insights 
+ Best Practices 
+ Apr 6, 2026 
+ The Wallet Install Is the New Welcome Trigger
+ Why install is the highest-intent moment in your funnel and how to wire it into Klaviyo, loyalty, and beyond.
+ Read 
+ Growth Marketing 
+ Mar 8, 2026 
+ The Post-Purchase Moment Most Brands Waste
+ Your order confirmation page gets 100% attention. Here's how to turn it into a revenue engine.
+ Read 
+ Referral Marketing 
+ Feb 2, 2026 
+ 5 Reasons Referral Marketing Works for eCommerce
+ Why referrals work, how to build them into your strategy, and what makes them different from every other channel.
+ Read 
+ Ecommerce Trends 
+ Jan 15, 2026 
+ What We Learned at NRF 2026
+ Five key takeaways from NRF 2026, from agentic commerce to why referrals matter more when AI buys things.
+ Read 
+ Recognized on G2 - Summer 2026
+ Integrated with the tools you already use
+ View all 24+ integrations 
+ $3B+
+ See what $3B in
+ referral revenue
+ looks like for your brand. 
+ A 30-minute conversation. We'll show you what Talkable could drive for your specific brand, with real numbers, real benchmarks, no fluff.
+ Book a Demo 
+ Flat fee, no percentage of revenue
+ Implementation handled by our team
+ Results-focused from day one

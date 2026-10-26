@@ -1,0 +1,109 @@
+Title: Create a Customer List Custom Audience
+
+URL Source: https://www.facebook.com/business/help/170456843145568
+
+Markdown Content:
+[![Image 1: Meta for Business (formerly Facebook for Business)](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=369852008357062&version=1789737248)](https://www.facebook.com/business)
+
+[![Image 2](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/445356466_1170799447379124_1827778994453747726_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=VMgCS1Q33X4Q7kNvwEeUncy&_nc_oc=AdrvctheyLUkaN4IhiHgYvi2Fth0k2zWrTfg5bjfRX3dZLLlQuGzg-rmxQeNr3i4hkE&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=bDvu5HH8zlpfycWnVsnXHQ&_nc_ss=7b289&oh=00_AQONJXwvQ-8cJhUe9ug0Mc-8x_dslIhN2rqDvPc8M4NCEg&oe=6AC8D282)](https://www.facebook.com/business/help/170456843145568#)
+
+[![Image 3](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1389774634917761&version=1788927509)](https://www.facebook.com/business/help/170456843145568#)
+
+![Image 4](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/315221436_683202276756209_1888406246823173964_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=f537c7&_nc_ohc=gG5q99Pe4KgQ7kNvwGjDk-I&_nc_oc=AdoHGNTtPqusgDYIz7H6gFvBxNDb1O0tlVqg0RRituMNJ8j9HG7d_DT4_b0Jo9k18gY&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=bDvu5HH8zlpfycWnVsnXHQ&_nc_ss=7b289&oh=00_AQM2vBFaSQTohsrU3shNXUJoYS71GyS8z0onoil_Qgr3Ow&oe=6AC8C50A)
+
+## Log in to Meta for Business
+
+Manage your ad accounts and get personalized support.
+
+![Image 5](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+![Image 6](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+Review our [terms](https://www.facebook.com/legal/terms/customaudience) to ensure you have a legal basis to use the information you plan to upload. Under the General Data Protection Regulation (GDPR), advertisers act as the data controller for any lists uploaded to create a custom audience. (This includes people residing in the European Union). Visit [our GDPR microsite](https://www.facebook.com/business/gdpr) for more information.
+
+![Image 7](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+**Note:** Targeting options are limited for audiences that include [people](https://www.facebook.com/business/help/283579896000936) under 18 (or older in some countries). Learn more about [targeting options to reach teens](https://www.facebook.com/business/help/229435355723442) and how this update may impact your ad sets.
+
+A [customer list custom audience](https://www.facebook.com/business/help/341425252616329) is an ad targeting option that lets you find your existing audiences among [people](https://www.facebook.com/business/help/283579896000936) across Meta technologies.
+
+## Before you begin
+
+*   You must be the owner of the [ad account connected to a business portfolio](https://www.facebook.com/business/help/915885887059947), or have admin or advertiser permissions on the ad account which is connected to a business portfolio. **Note**: If your account is new or if you’ve recently linked to an existing account, it may take a few weeks before you’re able to create or share a customer list custom audience. If your new account is part of a tenured business portfolio, you may be able to go through [business verification](https://www.facebook.com/business/help/2058515294227817).
+
+*   Your customer list custom audience cannot be named, include, or be based on prohibited information, which includes information that is or is based on, directly or otherwise, social security numbers, health information, financial information, consumer report information, or other categories of sensitive information (including any information defined as sensitive under applicable laws, regulations, or industry guidelines), or information that is otherwise not allowed under our terms. **Learn more** about [prohibited information](https://www.facebook.com/business/help/1055828013359808).
+
+## Create a customer list custom audience
+
+1.   Open [Audiences](https://www.facebook.com/ads/manage/audiences.php) in Ads Manager.
+2.   Select **Create audience** then **Custom audience**.  
+If you haven't created an audience before, select **Create a custom audience**.
+3.   Select **Customer list**, then **Next**. 
+
+    *   
+**Add list**:
+
+        *   Choose if you want to use your custom audience for **Inclusions or exclusions**, or **Only exclusions**.
+
+**Only exclusions** can be useful if you always need to exclude some people (for example, because they opted out of marketing). If anyone in your ad account tries to use an **Only exclusions** customer list custom audience under **Include these custom audiences** in Ads Manager, the custom audience will appear grayed out so they can't use it. If you select **Only exclusions** this cannot be changed later and the audience cannot be used to make a lookalike audience. 
+        *   You can **Upload a file** or **Paste comma-separated values**.
+
+        *   You may be asked if your file includes a [customer value](https://www.facebook.com/business/help/1033094474356222) column.
+
+        *   You can choose an [**Audience label**](https://www.facebook.com/business/help/706325895111530), **Audience name** and **Description** to help you identify and find your custom audience.
+
+        *   Accept the custom audience terms, then select **Next**.
+
+    *   
+**Map identifiers**:
+
+        *   ![Image 8](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1598189144196663&version=1787126667&transcode_extension=webp) The check icon means your identifiers were mapped correctly and are ready to be hashed, then used for the matching process.
+
+        *   ![Image 9](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1790840154802107&version=1787126667&transcode_extension=webp) The exclamation point means either that you chose not to include certain identifiers or that some identifiers need to be manually updated. You have higher chances of getting a better match rate to build your audience if you make the corrections before uploading your file.
+
+4.   Select **Import and create**.
+
+You'll return to [Audience](https://www.facebook.com/ads/manage/audiences.php) and see your audience **Populating**.
+
+*   We’ll let you know when your audience is **Ready**. You may see **Outdated**. This means your customer list hasn't been updated in over 30 days which may impact your ad delivery. You can choose to **Update list**.
+
+*   The column **Match score** (which you can add by selecting **Columns** in the top right) shows a score out of ten for how well identifiers in your customer list have matched profiles on Meta platforms in your last successful upload. Adding more **Emails**, **Phone numbers** and **Device IDs** can improve your match score (see our [customer list formatting guidelines](https://www.facebook.com/business/help/2082575038703844)).
+
+Match score has limited retention, so if you don't see a score you may need to update your list. Match score only appears in increments of 0.5 and is calculated by dividing matched rows by uploaded rows. 
+
+You can now create an ad to reach your new custom audience, or create a [lookalike audience](https://www.facebook.com/business/help/164749007013531) to find new people who share similar behaviors and interests with your existing customers.
+
+**Note:** Before we use your uploaded list for the matching process, the information in your customer list is hashed and will be unidentifiable at an individual level. [Hashing](https://www.facebook.com/help/112061095610075) is a type of cryptographic security method that turns your identifiers into randomized code and cannot be reversed. (Depending on the size of your list, this may take a few minutes.)
+
+## Learn more
+
+![Image 10](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1124271668792488&version=1771391301)
+##### Common support topics
+
+##### Business Help Center
+
+![Image 11](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 12](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 13](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 14](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[![Image 15](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/321383695_1761464880891846_7163045669980296910_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=4esgfue7nsUQ7kNvwERUCJx&_nc_oc=AdoUaNn5p9VO1aKBMc6QBKQk9O3m9Y7O7sy1BvCajpQxocVTDFpn7BMiSu_fY4aXn_aaz7hT7734SMUPm5rYxzi8&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=iMCQwF2nFD3BzRC6s7f-PQ&_nc_ss=7b289&oh=00_AQNhWnoRuvKuYxvptr-1oBTsJwbpbrs7jC2OKkD-yAdKdA&oe=6AC8DCB8)](https://www.facebook.com/business/help/170456843145568#)
+
+[![Image 16: Permalink](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=514159977391799&version=1666676243&transcode_extension=webp)](https://www.facebook.com/business/help/170456843145568?helpref=uf_permalink)[![Image 17: Share](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=814226356566295&version=1666676243&transcode_extension=webp)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fhelp%2F170456843145568)
+
+Was this information helpful?
+
+Yes
+
+No
+
+More in this section: Audiences

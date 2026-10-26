@@ -1,0 +1,90 @@
+Must-Have Features for eCommerce Sites | Refersion 
+ Search 
+ Close Search 
+ ← Back to blog 
+ Last Modified: March 7, 2024 
+ 15 Must-Have Features for eCommerce Sites
+ Industry 
+ UNCATEGORIZED 
+ Written by 
+ Ruthie Carey 
+ What is your average conversion rate on your eCommerce site? Do you know? To give you a baseline, the average conversion rate for retail sites in 2017 was around 2.5% to 3%. Considering that we’re talking about billions of dollars in sales here, you can see that even a fractional increase in conversion rate can lead to a huge revenue boost for companies that sell online.
+ So, are you sure your site has all the necessary features to convert visitors at the highest rate possible? Here are 15 elements you should definitely have on your eCommerce website.
+ 1. Accurate Search Box
+ A survey by Kissmetrics shows that a little less than half of respondents preferred to search via the on-site search box rather than navigate to specific products. Be sure to cater to these users by having a prominent and accurate search box on your site.
+ 2. Mobile-Friendly Design
+ As more and more people  shop online via their phones and tablets , your business must take into consideration a version of your eCommerce site that is quick and smooth on those devices. Do your pages load in about three seconds even on 2-year-old phones? They should.
+ 3. Simple Navigation
+ For the over 50% of potential shoppers who want to click around to get to their products of choice, make sure your site-wide navigation is simple and “trace back-able.” Keep your top navbar extremely simple (use drop-down menus rather than over-stuff that navbar), and have a great breadcrumb navigation structure to facilitate browsing.
+ 4. Personalization
+ The more your site can cater specifically to each user, the higher the chances of a conversion. Use cookies to remember users in order to display their previous browsing history of products, as well as items similar to what they’ve researched in the past. Keep a log-in button/link at the right top of the page in case they’ve logged out.
+ 5. Live Chat
+ Great customer service is key to conversions, retention, and word-of-mouth referrals . An unobtrusive live chat at the bottom corner of the page can be a great way to assist shoppers when they have questions. Yes, it takes some support man-power on your end, but apps like Intercom can help keep the manual work down to a minimum.
+ 6. Clear Shipping Costs
+ Customers get frustrated when shipping costs are hidden until the last minute. This can lead to a lot of abandoned shopping carts. Keep shipping costs up-front and visible on your product pages. Need to know their zip code to display the costs? Great! Another reason to ask them to log-in on your site. Check out this great article on bigcommerce on the ins-and-outs of shipping.
+ 7. One-Click Wishlist
+ Your eCommerce site should make it dead simple for someone to save products to a wishlist on the go. As close to one-click as you can make it, the better. This is a great way to not only keep track of what they are interested in, but a good reason to email market to them reminding them about items on their list.
+ 8. Loyalty Program Reminder
+ Reserve a section on the site for your loyalty program, reminding users either to sign-up in the first place, or how close they are to achieving a discount or freebie. Keeping this reminder in a static sidebar can help reinforce the gamification aspect of the shopping process, helping with conversion.
+ 9. FAQs including Return Policy
+ Keep an FAQ section linked in the footer of your site, as shoppers always ask the same questions. It will help put them at ease as well as lighten the load on your customer support staff. The most frequent questions usually have to do with your business’s return policy, so put that at the top of the list in plain English (or your local language).
+ 10. Infinite Scroll of Products
+ Continually loading products as people scroll on mobile and on desktop can increase their TOS (time on site). This takes careful design architecture to get it right (especially on mobile), so the classic “load more” button may be a prudent choice for some retailers. Ecommerce Illustrated has a good article on the logic and implementation of these choices.
+ 11. Prominent Security Seal
+ Cars.com saw their conversion rate jump when they displayed an internet security seal . Especially if you’re a newer player on the market, alleviate credit-card-hesitation by getting your site certified-secure from trusted places like TRUSTe or Symantec .
+ 12. Fast Checkout
+ Keep your checkout process down to as few steps/pages as possible. All you really need is 3 pages:
+ Delivery/Payment address and info
+ Confirmation page
+ Success/Thank you page
+ Any more than that, you can probably streamline your process. Test and see which may lead to fewer abandoned carts.
+ 13. Featured Promotion and Products
+ Having a dedicated section of your eCommerce homepage for promotions, deals, or special products is a good way to get certain items in front of your entire audience. Amazon always has a slider showcasing their newest Alexa device or a discount. It’s great “advertising” space for your company to put your best products and services forward.
+ 14. Showcase Product Reviews
+ Reevoo found that even bad product reviews are good for sales . For real! Check out their article. So don’t be afraid to prominently display customer reviews (ie. star ratings) on each of your products, positive or negative. It helps consumers trust your brand and won’t hurt your bottom-line either.
+ 15. Better Product Images
+ Your product images could always be better. Many sites have pictures that don’t look professional, load too slowly, or simple don’t have enough to show all sides of the product. Raise your image game by hiring good photographers and editors who can really make your items shine on both a desktop monitor and a small smartphone screen.
+ Product 
+ Pricing 
+ Login 
+ Create Account 
+ Book a Demo 
+ The easiest way to manage affiliate marketing.
+ All trademarks and registered trademarks are the property of their respective owners. 
+ Copyright ©2013 - 2026 Refersion Inc. 
+ Platform
+ Overview 
+ Affiliate Attribution and First Party Tracking 
+ Campaigns &#038; Management 
+ Payments &#038; Taxes 
+ Advanced Offers &#038; Commissions 
+ Data Insights &#038; Privacy 
+ Integrations &#038; Partners 
+ Company
+ Contact Us 
+ Terms 
+ Privacy Policy 
+ Solutions
+ Influencer Marketing 
+ Brand Ambassador Software 
+ Affiliate Marketing 
+ Home &#038; Furnishings 
+ Fashion &#038; Beauty 
+ Food &#038; Beverage 
+ Health &#038; Wellness 
+ Partners
+ Agencies 
+ App &#038; Tool Integrations 
+ Shopify Integration 
+ Shopify Plus Integration 
+ BigCommerce Integration 
+ WooCommerce Integration 
+ Stripe Integration 
+ Resources
+ Learn 
+ Blog 
+ Case Studies 
+ Customer Support 
+ API Docs 
+ Tracking Docs 
+ Status

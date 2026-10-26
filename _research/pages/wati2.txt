@@ -1,0 +1,518 @@
+WhatsApp Business API | Wati 
+ -->
+ Help Center 
+ Partners 
+ Partner with Us 
+ Referral Partner 
+ -->
+ Value Added Reseller Partner 
+ Tech Partner 
+ Become an Affiliate 
+ Log in 
+ Português 
+ Español 
+ English 
+ -->
+ Solutions 
+ Teams
+ Wati for Marketing 
+ Acquire and engage leads, personalise
+ campaigns at scale 
+ Wati for Support 
+ AI-powered query resolution and
+ automation 
+ Wati for Sales 
+ Nurture leads, build pipeline and close deals 
+ Industries
+ eLearning 
+ Retail 
+ -->
+ E-commerce 
+ Marketing Agencies 
+ Healthcare 
+ Soluções 
+ Equipes
+ Wati para Marketing 
+ Adquiere y compromete leads y 
+personaliza campañas a escala 
+ Suporte ao Cliente 
+ Resolução de consultas com IA e
+ automação 
+ Equipe de Vendas 
+ Nutre leads, acelera el pipeline y
+ cierra más ventas 
+ Indústrias
+ eLearning 
+ Varejo 
+ -->
+ Ecommerce 
+ Agências de Marketing 
+ Saúde 
+ Soluciones 
+ Equipos
+ Wati para Marketing 
+ Adquirí y comprometé leads, personalizá campañas a escal 
+ Servicio al Cliente 
+ Resolución de consultas con IA y automatización 
+ Equipo de Ventas 
+ Nutrí leads, desarrollá el pipeline y cerrá 
+acuerdos 
+ Industrias
+ eLearning 
+ Minorista 
+ -->
+ Ecommerce 
+ Agencias de Marketing 
+ Salud 
+ 解决方案 
+ 团队
+ Wati 营销版 
+ 获取并吸引潜在客户，大规模个性化营销活动 
+ 客户支持 
+ 基于 AI 的查询解答与自动化 
+ 销售团队 
+ 培养潜在客户，构建销售渠道并达成交易 
+ 行业
+ 在线学习 
+ 零售 
+ -->
+ 电子商务 
+ 营销机构 
+ 医疗保健 
+ 解決方案 
+ 團隊
+ Wati 行銷版 
+ 獲取並吸引潛在客戶，大規模個人化行銷活動 
+ 客戶支援 
+ AI 驅動的查詢解決與自動化 
+ 銷售團隊 
+ 培養潛在客戶，建立銷售管道並完成交易 
+ 產業
+ 線上學習 
+ 零售 
+ -->
+ 電子商務 
+ 行銷代理 
+ 醫療保健 
+ الحلول 
+ الفرق
+ واتّي للتسويق 
+ اكتساب العملاء المحتملين والتفاعل معهم، تخصيص 
+الحملات على نطاق واسع 
+ واتّي للدعم 
+ حل الاستفسارات وأتمتة العمليات مدعومة بالذكاء
+ الاصطناعي 
+ واتّي للمبيعات 
+ رعاية العملاء المحتملين، بناء قاعدة عملاء، 
+وإتمام الصفقات 
+ الصناعات
+ التعلم الإلكتروني 
+ البيع بالتجزئة 
+ -->
+ التجارة الإلكترونية 
+ وكالات التسويق 
+ الرعاية الصحية 
+ Product 
+ features
+ AI at Wati New 
+ -->
+ No Code Chatbots 
+ AI-powered, human like chatbots for every use case 
+ AI Support Agent 
+ Respond to and resolve queries instantly 
+ -->
+ WhatsApp Business API 
+ Connect with customers at scale on WhatsApp 
+ Instagram and Facebook messenger 
+ Stay connected with your customers 24*7 
+ -->
+ Instagram Automation 
+ Automate Instagram DMs, comments, and leads 
+ Click to WhatsApp ads 
+ Turn ad clicks into chats and improve ad performance 
+ Empty Heading
+ Campaigns 
+ Send personalized campaigns with best delivery rates 
+ Team Inbox 
+ Win customers with all sales & service chats in one place 
+ WhatsApp Business Calling 
+ Turn WhatsApp into your full-fledged voice channel 
+ Wati AI 
+ Wati AI The Conversational Intelligence Layer — Copilot, AI Agents, and BYOA 
+ INTEGRATIONS
+ Overview 
+ Library 
+ Produto 
+ Recursos
+ IA na Wati novo 
+ -->
+ Chatbot sem código 
+ Chatbots com IA, parecidos com humanos, para todos os casos de uso 
+ API do WhatsApp Business 
+ Conecte-se com clientes em escala no WhatsApp 
+ Agente de suporte de IA 
+ Responda e resolva dúvidas instantaneamente 
+ Anúncios Cliques para WhatsApp 
+ Transforme cliques em anúncios em conversas e melhore o desempenho das campanhas 
+ Automação do Instagram 
+ Automatize DMs, comentários e leads do Instagram 
+ Empty Heading
+ Campanhas 
+ Envie campanhas personalizadas com as melhores taxas de entrega 
+ Caixa de entrada da equipe 
+ Conquiste clientes com todas as conversas de vendas e suporte em um só lugar 
+ Ligações do WhatsApp Business 
+ Transforme o WhatsApp em seu canal de voz completo 
+ Wati AI 
+ Wati AI A Camada de Inteligência Conversacional — Copilot, Agentes de IA e BYOA 
+ Producto 
+ Características
+ IA en Wati Nuevo 
+ -->
+ Chatbot sin código 
+ Chatbots con IA, similares a humanos, para cada caso de uso 
+ API de WhatsApp Business 
+ Conectate con clientes a escala en WhatsApp 
+ Agente de soporte de IA 
+ Respondé y resolvé consultas al instante 
+ Anuncios de clic para WhatsApp 
+ Convertí clics de anuncios en chats y mejorá el rendimiento publicitario 
+ Automatización de Instagram 
+ Automatizá DMs, comentarios y leads de Instagram 
+ Empty Heading
+ Campañas 
+ Enviá campañas personalizadas con las mejores tasas de entrega 
+ Bandeja de entrada del equipo 
+ Ganate a los clientes con todos los chats de ventas y soporte en un solo lugar 
+ Llamadas de WhatsApp Business 
+ Convierte WhatsApp en tu canal de voz completo 
+ Wati AI 
+ Wati AI La Capa de Inteligencia Conversacional — Copilot, Agentes de IA y BYOA 
+ 产品 
+ 精选功能
+ Wati 的人工智能 新 
+ -->
+ 无代码聊天机器人 
+ 适用于各种场景的类人 AI 聊天机器人 
+ AI 客服代理 
+ 即时响应并解决用户问题 
+ 点击到WhatsApp广告 
+ 将广告点击转化为聊天，提高广告表现 
+ 营销活动 
+ 发送个性化营销活动，确保最佳送达率 
+ Empty Heading
+ 团队收件箱 
+ 统一管理销售与客服聊天，赢得客户 
+ WhatsApp商务通话 
+ 将WhatsApp转变为您的全面语音渠道 
+ Wati AI 
+ Wati AI 对话智能层 — Copilot、AI 智能体和 BYOA 
+ 產品 
+ 功能特點
+ Wati 的人工智慧 新 
+ -->
+ 無代碼聊天機器人 
+ 適用於各種場景的類人 AI 聊天機器人 
+ AI 支援客服 
+ 即時回應並解決用戶問題 
+ 點擊到WhatsApp廣告 
+ 將廣告點擊轉換為對話，提升廣告效能 
+ 行銷活動 
+ 發送個人化行銷活動，達到最佳投遞率 
+ Empty Heading
+ 團隊收件匣 
+ 整合所有銷售與客服對話，贏得顧客青睞 
+ WhatsApp 商業通話 
+ 將 WhatsApp 轉變為您的全功能語音通道 
+ Wati AI 
+ Wati AI 對話智能層 — Copilot、AI 智能體和 BYOA 
+ المنتج 
+ المزايا
+ الذكاء الاصطناعي في Wati جديد 
+ -->
+ روبوت دردشة بدون رمز 
+ روبوتات دردشة مدعومة بالذكاء الاصطناعي تشبه البشر لكل حالة استخدام 
+ وكيل دعم الذكاء الاصطناعي 
+ الرد على الاستفسارات وحلها على الفور 
+ الإعلانات التي توجه لمحادثات الواتساب 
+ تحويل نقرات الإعلانات إلى محادثات وتحسين أداء الإعلانات 
+ Empty Heading
+ البثّات 
+ إرسال حملات مخصصة بأفضل معدلات تسليم 
+ صندوق الوارد للفريق 
+ اكسب العملاء من خلال جمع كل محادثات المبيعات والخدمة في مكان واحد 
+ Wati AI 
+ Wati AI طبقة الذكاء التحاوري — Copilot ووكلاء الذكاء الاصطناعي و BYOA 
+ Astra AI 
+ -->
+ Partners 
+ Partner with Us 
+ Become an Affiliate 
+ Parceiros 
+ Seja nosso parceiro 
+ Torne-se um Afiliado 
+ Socios 
+ Asociate con nosotros 
+ Conviértete en un afiliado 
+ 合作伙伴 
+ 与我们合作 
+ 成为联盟会员 
+ 合作夥伴 
+ 與我們合作 
+ 成為聯盟夥伴 
+ الشركاء 
+ شارك معنا 
+ انضم كشريك تسويقي 
+ -->
+ Resources 
+ Customers 
+ Blogs 
+ Chatbot Library 
+ E Books 
+ Help Center -->
+ Recursos 
+ Clientes 
+ Blogs 
+ Biblioteca de Chatbots 
+ E-books 
+ Central de Ajuda -->
+ Recursos 
+ Clientes 
+ Blogs 
+ Biblioteca de Chatbots 
+ E-books 
+ Centro de ayuda -->
+ 资源 
+ 客户 
+ 博客 
+ 聊天机器人库 
+ 电子书 
+ 帮助中心 -->
+ 資源中心 
+ 客戶 
+ 部落格 
+ 聊天機器人庫 
+ 電子書 
+ 幫助中心 -->
+ الموارد 
+ العملاء 
+ مدونات 
+ مكتبة روبوتات الدردشة 
+ الكتب الإلكترونية 
+ مركز المساعدة -->
+ Pricing 
+ Planos 
+ Precios 
+ 定价 
+ 價格方案 
+ التسعير 
+ Book a Demo 
+ Try for Free 
+ Falar com Consultor 
+ Teste gratuito 
+ Entrar 
+ Jadwalkan Demo 
+ Uji Coba Gratis 
+ -->
+ Hablar con Consultor 
+ Prueba gratuita 
+ Acceder -->
+ 预约演示 
+ 免费试用 
+ 登录 
+ احجز عرض توضيحي 
+ تجربة مجانية 
+ تسجيل الدخول 
+ 預約示範 
+ 免費試用 
+ 登入 
+ Book demo 
+ Pricing 
+ The End‑To‑End WhatsApp API Platform for Revenue Growth
+ No coding needed, unlimited automations, multi-agent access and deep CRM integrations turn every chat into revenue. Start free, scale seamlessly.
+ Start Free Trial 
+ Book Demo 
+ *No credit card required 
+ 4.6/5 on G2 
+ Meta Business Partner
+ -->
+ World’s Best Brands Use Wati for WhatsApp Business API
+ What is WhatsApp Business API
+ And why do you need it?
+ WhatsApp Business API unlocks the full power of WhatsApp for brands.
+ Unlike the standard WhatsApp Business app, the API version allows for automation, integration with your existing business systems, and the ability to handle high-volume messaging efficiently.
+ What can Wati help you with? 
+ Support
+ Let AI handle common queries instantly, while your team focuses on complex issues. Combine automation with the human touch to reduce ticket volumes and support costs by up to 50%.
+ Book a free trial 
+ Sales
+ Your sales reps can keep the personal touch & broadcast at scale. Managers get full visibility across multiple rep numbers through Wati’s Team Inbox
+ Book a free trial 
+ Marketing
+ Use chatbots and automation to engage customers at scale. Share product catalogs, recover abandoned carts, and turn every interaction into a personalised WhatsApp conversation.
+ Book a free trial 
+ 200M+ 
+ Monthly Messages
+ 95%+ 
+ Open Rates
+ 3X 
+ More Conversions
+ 4X 
+ Lower CACs
+ How is WhatsApp Business API Different? 
+ Who it’s for
+ Setup
+ Devices / Agents
+ Message volume
+ Automation
+ Integrations
+ Compliance & Templates
+ Pricing model
+ Analytics & Reporting
+ Reliability & Scale
+ WhatsApp Business API 
+ - by
+ Medium-to-large brands with high ticket & lead volumes
+ Verify your number once, then connect the API to the Wati dashboard or your own backend
+ Unlimited agents, work on unlimited devices
+ Built for bulk sends and handles large volumes
+ End-to-end automation, chatbots, WhatsApp flows, catalogue, webhooks, and AI features
+ Plug-and-play with CRM, analytics, payment links, ticketing, and more
+ Official BSP connection: template pre-approval, quality scoring, opt-in management
+ Meta’s conversation-based fees; pay only for what you use
+ Granular dashboards, funnel analytics, messaging insights, agent SLAs, exportable data
+ Cloud-hosted backbone with SLAs, fail-over, and dedicated support
+ WhatsApp Business App 
+ Solo owners & small teams that chat manually
+ Install the free mobile/desktop app and verify your number
+ Up to 5 linked devices, but one phone remains the “primary”
+ 1-to-1 chats and broadcast lists capped at 256 contacts each
+ Quick-replies & labels only
+ None (manual copy-paste into other tools)
+ Follows WhatsApp policies; template approval happens inside the app
+ Free (data charges only)
+ Basic message counts and read receipts
+ Depends on the phone’s battery and network
+ How is WhatsApp Business API Different? 
+ WhatsApp Business API 
+ WhatsApp Business App 
+ Who it’s for
+ Medium-to-large brands with high ticket & lead volumes
+ Setup
+ Verify your number once, then connect the API to the Wati dashboard or your own backend
+ Devices / Agents
+ Unlimited agents, work on unlimited devices
+ Message volume
+ Built for bulk sends and handles large volumes
+ Automation
+ End-to-end automation, chatbots, WhatsApp flows, catalogue, webhooks, and AI features 
+ Integrations
+ Plug-and-play with CRM, analytics, payment links, ticketing, and more
+ Compliance & Templates
+ Official BSP connection: template pre-approval, quality scoring, opt-in management
+ Pricing model
+ Meta’s conversation-based fees; pay only for what you use
+ Analytics & Reporting
+ Granular dashboards, funnel analytics, messaging insights, agent SLAs, exportable data
+ Reliability & Scale
+ Cloud-hosted backbone with SLAs, fail-over, and dedicated support
+ Onboading & Technical Support
+ ✓ Smooth onboarding, Email & Chat support
+ -->
+ Who it’s for
+ Solo owners & small teams that chat manually
+ Setup
+ Install the free mobile/desktop app and verify your number
+ Devices / Agents
+ Up to 5 linked devices, but one phone remains the “primary”
+ Message volume
+ 1-to-1 chats and broadcast lists capped at 256 contacts each
+ Automation
+ Quick-replies & labels only
+ Integrations
+ None (manual copy-paste into other tools)
+ Compliance & Templates
+ Follows WhatsApp policies; template approval happens inside the app
+ Pricing model
+ Free (data charges only)
+ Analytics & Reporting
+ Basic message counts and read receipts
+ Reliability & Scale
+ Depends on the phone’s battery and network
+ Onboading & Technical Support
+ ❌ Email support only (delayed response)
+ -->
+ How to get started with Wati’s WhatsApp
+ Business API provider 
+ 1 Get Wati
+ Sign up for a free 7-day trial — no credit card needed. Choose a plan that fits your business size, from startups to enterprise teams.
+ 2 Set up your Wati
+ account
+ Complete a few prerequisites — verify your Meta Business account, have your website and phone number ready.
+ 3 Launch your campaigns
+ Send bulk broadcasts, automate replies, qualify leads, and track performance — all from one dashboard. Your first campaign can go live in under 10 minutes
+ All the features you need, all in one place
+ Click to WhatsApp Ads
+ Turn ad clicks into revenue-driving conversations by capturing verified leads from Meta and Google, engaging them instantly, and sending conversion signals back to improve ad targeting and ROAS.
+ Broadcast & Bulk Messages
+ Drive higher engagement than email & SMS. Reach thousands instantly with ready-to-use message templates across different languages.
+ WhatsApp Flows
+ Effortlessly capture customer interests with WhatsApp flows. Create frictionless surveys, interactive experiences, and registrations to collect customer preferences, enabling targeted promotions and personalized engagement.
+ WhatsApp Catalog
+ Let people browse, ask and buy, right inside WhatsApp. Use your catalog to highlight offers, share updates and keep customers coming back.
+ No-code Chatbot
+ Build flows in minutes, not hours. Answer FAQs, guide purchases, or route chats, all while staying available 24/7 across marketing, support, and sales.
+ Integrate with Your MarTech Stack Easily
+ -->
+ 16,000+ customers across 180+ countries love Wati 
+ InvestAI got 30x more responses than traditional emails using Wati 
+ 30x 
+ Improved
+ Response Rates
+ 50% 
+ Enhanced customer
+ satisfaction
+ Read full case study → 
+ How Bowaba Delivers 11X ROAS for Clients with Wati's Click-to-WhatsApp Ads Solution 
+ 15% 
+ Reduction in
+ Cost Per Lead
+ 20% 
+ Increase in Sales-
+Qualified Leads
+ Read full case study → 
+ How Hunar.ai is Transforming Frontline Staff Engagement AI, WhatsApp, and Wati
+ 90% 
+ reduction in time wasted
+ on uninterested 
+candidates
+ 100% 
+ Of hiring volume flows 
+through WhatsApp
+ Read full case study → 
+ Wati helped Zellbury achieve an impressive 87% customer satisfaction rate on support!
+ 78% 
+ Conversations via
+ WhatsApp
+ 87% 
+ Customer
+ satisfaction rate
+ Read full case study → 
+ Guides to Help You Get More from WhatsApp 
+ How AI Chatbots Can Save Your Sanity (And Your Customers)? 
+ Read more 
+ Google Sheet Integration for WhatsApp: Send Messages Directly from Google… 
+ Read more 
+ WhatsApp for Customer Service:
+ Techniques + Examples [2025]  
+ Read more 
+ How to Send a Link in WhatsApp + Advanced Tips 
+ Read more 
+ What is Instagram Automation? A Beginner’s Guide to Streamlining Your DMs 
+ Read more 
+ WhatsApp Bulk Message: How to Send 1000 Bulk Messages on WhatsApp? 
+ Read more 
+ Ready to use WhatsApp Business API with Wati?
+ Explore on your own or book a quick walkthrough with our team.
+ Start Free Trial 
+ Book a demo

@@ -1,0 +1,87 @@
+About setting up your data segments - Google Ads Help Skip to main content 
+ Google Help 
+ Help Center
+ Start advertising
+ Campaigns
+ Explore features
+ Optimize performance
+ Account & billing
+ Fix issues
+ Google Partners
+ Community
+ Google Ads
+ Privacy Policy
+ Terms of Service
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Google Ads 
+ Manage ads 
+ Reach your audience 
+ Your data segments 
+ Set up & management 
+ About setting up your data segments 
+ About setting up your data segments
+ To provide a comprehensive and consolidated view of your Audiences and make audience management and optimization simpler, you’ll find the following improvements in Google Ads:
+ New audience reporting : Go to Audiences within the Campaigns menu for detailed reporting about audience demographics, segments, and exclusions. You can also easily manage your audiences from this report page. Learn more About Audience reporting .
+ New terms : We’re using new terms on your audience report and throughout Google Ads. For example, “audience types” (these include custom, in-market, and affinity) are now referred to as audience segments and “remarketing” is now referred to as “your data”. Learn more about the Updates to Audience terms and phrases .
+ Your data segments include existing customers and people who have previously visited your website or mobile app. Learn how to use your data in Display campaigns and Search campaigns .
+ Add the Google tag to your website or app
+ To start using your data segments, set up an audience source for your website or apps. Tag snippets are small blocks of code that you get when you tag your site in Audience sources. Once you have the snippets, you can add them to your site. To target people who have used your mobile apps, set up your data with an SDK to segment by the events that you set up. Learn more about your dynamic for apps 
+ The event snippet
+ Once you’ve added the Google tag, you can send additional data to Google Ads to create your data segments, and to track conversions using the ‘event’ command. The event snippet lets you capture events and associated event parameters used to create your data segments.
+ For example, you can use the event snippet to target users who have registered on your website. Depending on your business type, you'll need to pass specific data to Google Ads via the event snippet.
+ Learn how to use event parameters for your business type 
+ Getting started with your data segments
+ After you've set up an audience source , you’re ready to create a segment. You can create segments for different types of visitors. For example, you can add visitors to your most popular product category webpage to your segment. Your data snippet tells Google Ads to save visitors to your 'Popular category segment'. When people visit that page, their cookie ID is added to your data segments.
+ Learn how to create data segments with your website visitors and app users 
+ Automatically created segments
+ If you've set up audience sources, Google Ads will create default segments for you. You can immediately start targeting these segments in your ad groups. Learn more about automatically created segments that are available for you 
+ Popular default segments to consider include:
+ All visitors : This segment populates using all values from all parameters in your tagging implementation and includes 'Are people who visited your pages with your data event snippets'.
+ All converters : This segment populates automatically using your conversion tracking tag and includes 'Anyone who converted on your website'. If you haven't set up conversion tracking, this segment will be empty.
+ Google Ads optimized segment : This is a combination segment, made up of multiple segments from available audience sources. To create this segment, you'll need to connect at least 1 data source in the Audience sources page.
+ Your data segment rules
+ Once you've added the Google tag and an optional event snippet to your website or app, you can define segments for different sections of your website or app using rules. For example, if you want to define a segment for a web page where you sell stilettos, you can use this rule: 'URL contains stilettos'. Note that you must have 'stilettos' in the URL of the product pages such as www.example.com/stilettos.
+ With rules, you can create as many segments as you want without having to add more tags to your website or app. It’s best practice to start with the segments that are automatically created for you, but if you’d like to personalize your segment you can use the segment rules. Bear in mind that only segments with more than 100 active users will be eligible to run ads. Granular segments may not be eligible to run as they may not meet the minimum requirements.
+ Learn more about your data segment rules 
+ Custom parameters
+ Your dynamic remarketing event snippet lets you send custom parameters that you can use to create your data segments.
+ For example, you can send the product price and the page type (such as the purchase page) in the event snippet to create a segment for people who bought any product above a certain price. In this case, the custom parameters that you'd include in the event snippet would be 'value' (price of the product) and 'page type' (type of page, which indicates how close to purchasing customers are).
+ Learn more about how to use templates for previous website visitor segments .
+ Note: Google Ads doesn't permit the implementation of tags on pages related to policy-restricted offers. Learn more about Personalized advertising .
+ Disable the collection of your data
+ You can choose to disable the collection of personalized advertising data for users who do not wish to view personalized ads or for your own compliance reasons. You can modify the Google tag and disable the collection of personalized advertising data for particular users on your site, or choose to exclude all users from California in the Audience Manager section of your Google Ads account.
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Achieve your advertising goals today! Attend our Performance Max Masterclass, a livestream workshop session bringing together industry and Google ads PMax experts.
+ Register now 
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 12551585095596519976
+ true
+ Search Help Center
+ true
+ true
+ true
+ true
+ true
+ true
+ 73067
+ false
+ false
+ true
+ true
+ false
+ false

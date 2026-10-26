@@ -1,0 +1,36 @@
+Shopify Help Center | Setting up marketing in Shopify Help 
+ Start for free 
+ Log in 
+ Contents 
+ Setting up marketing in Shopify
+ You can use Shopify&#x27;s marketing tools to reach new customers, grow your subscriber list, run paid ads, and track your results.
+ For guidance on combining some of these tools into a marketing automation workflow, refer to Marketing automation tools .
+ If your store has access to Campaign Autopilot , then you can use it from the Growth page to get recommended marketing actions based on your store data. Campaign Autopilot can recommend tactics for connected channels such as Shopify Messaging , Shop Campaigns , and Meta Ads . You review and approve tactics before you run them.
+ Organizing and tracking marketing campaigns
+ Campaigns help you organize and track multichannel marketing efforts that work toward a specific goal. You can combine activities such as email, social posts, and paid ads under a single campaign, and measure results using shareable links, QR codes, and UTM auto-match rules.
+ Sending email and SMS marketing to subscribers
+ You can use the following tools to collect subscriber information and stay in touch with customers:
+ Collecting customer contact information : Ask customers for consent to use their contact information before sending marketing.
+ Shopify Forms : Build popup or inline sign-up forms that grow your subscriber list and create customer segments.
+ Shopify Messaging : Send email and SMS campaigns and automations directly to your subscriber list, including abandoned checkout recovery.
+ Running paid ads
+ Use the following tools to reach new or lapsed customers through paid advertising:
+ Shop Campaigns : Run ads on the Shop app, Shop website, Shopify Product Network, and third-party platforms. You pay only when a customer converts. Found under Sales channels > Shop > Advertising .
+ Facebook and Instagram by Meta : Sync your products to Facebook and create and manage ads from Shopify.
+ Sharing on social media
+ Social media marketing lets you share blog posts, products, and collections directly to your social media accounts from Shopify.
+ Scheduling events and promotions
+ Launchpad lets you schedule and execute time-sensitive events such as product drops, sales, and inventory restocks. Available on the Shopify Plus plan.
+ In this section
+ Multi-channel marketing with Shopify Messaging 
+ Collecting customer contact information 
+ Shopify Forms app 
+ Campaigns for multichannel marketing 
+ Marketing on Facebook and Instagram 
+ Posting on social media 
+ Marketing automation tools 
+ Recovering abandoned checkouts 
+ Creating QR codes with Shopcodes 
+ Managing sales events with Launchpad 
+ Opt in to the new abandoned checkout automation 
+ Leave feedback

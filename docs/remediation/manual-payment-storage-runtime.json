@@ -1,0 +1,12 @@
+{
+  "passed": [
+    "deployed bucket private with 5 MiB limit",
+    "publishable-key SDK uploadToSignedUrl accepts real PNG",
+    "oversize.png rejected by Storage: The object exceeded the maximum allowed size",
+    "forbidden.zip rejected by Storage: mime type application/zip is not supported",
+    "anonymous SDK cannot download private proof",
+    "authorized temporary preview downloads uploaded PNG",
+    "only objects created by this test removed"
+  ],
+  "no_customer_payment_mutation": true
+}

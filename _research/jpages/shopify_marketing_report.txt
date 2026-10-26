@@ -1,0 +1,155 @@
+Title: Marketing reports
+
+URL Source: https://help.shopify.com/en/manual/reports-and-analytics/shopify-reports/report-types/marketing-reports
+
+Markdown Content:
+You can use the Marketing reports to check how effective your marketing is and to learn about your conversions. A conversion occurs when an online store visitor becomes a paying customer.
+
+The marketing reports can help you understand what leads shoppers to your online store and what converts them into paying customers. The reports can outline which of your marketing channels are resulting in the highest number of customers and the customers of the highest value, based on their interactions with your online store.
+
+The reports summarize information from all Online Store channel orders. For visit or conversion information about a single order, review [_Conversion tracking_](https://help.shopify.com/en/manual/fulfillment/managing-orders/analytics/conversion-summary).
+
+If you want to view reports on the results of your marketing campaigns that use marketing apps, then see [_Marketing activity reports_](https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing/marketing-performance).
+
+You can filter your **Reports** list to display only Marketing reports.
+
+#### Steps:
+
+Desktop
+1.   From your Shopify admin, go to **Analytics**>[**Reports**](https://admin.shopify.com/analytics/reports).
+
+2.   Click the **Category** filter.
+
+3.   Click **Marketing** to filter the reports to display only Marketing reports.
+
+Mobile
+1.   From the [Shopify app](https://www.shopify.com/install/detect), tap the ![Image 1: Menu](https://cdn.shopify.com/shopifycloud/help-center/manual/admin-icons/MenuIcon.svg) icon.
+
+2.   Tap **Analytics**>**Reports**.
+
+3.   Tap the filter icon, and then tap **Category**.
+
+4.   Tap **Marketing** to filter the reports to display only Marketing reports.
+
+5.   Tap **< Filter by** or **←**, and then **X** to navigate back to the filtered **Reports** list.
+
+For more marketing insights into campaigns you create within Shopify, refer to [_Marketing performance in Shopify_](https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing/marketing-performance).
+
+The method that a customer uses to get to your store is called the _referrer_. A referrer can be a search, or can be a link from an ad, email, or website, for example. By knowing the referrer, you can attribute sales to the referrer that the customer used. This is a standard way of analyzing and attributing sales.
+
+However, a customer can visit your store multiple times and as the result of different referrers, so the referrers are categorized as _first interaction_ or _last interaction_:
+
+*   The referrer that introduced a customer to your store is categorized under first interaction.
+*   The referrer that the customer used just before placing an order is categorized under last interaction.
+
+Example: A customer clicks on a Facebook ad that takes them to your store for the first time, and they immediately buy one of your products. The referrer is Facebook for both the first interaction and the last interaction. Your ad is given credit for making the sale.
+
+Example: A customer searches Google and finds a link to your store for a product that they want. They visit your store several times during the week to browse your other products, and signs up for a newsletter, but they don't buy anything. The following week, you send out an email marketing offer to them. They click the link in the email and place an order. This sale is a last interaction conversion. The first interaction referrer is Google, but the email service is the referrer that is given credit for the sale.
+
+### Interactions after an order or after 30 days
+
+If a visitor doesn't buy anything within 30 days of a session, then the first interaction referrer is reset to be whatever the next referrer is.
+
+Similarly, if a visitor places an order, then the next referrer is deemed to be a first interaction for their next order.
+
+Example: A customer visits your store on August 1 by directly entering the URL for your online store. They revisit the store several times, but don't make a purchase. Then, on September 15 (which is more than 30 days after their first session), they click an ad for your store and place an order. The first and last interaction for this conversion is the ad, not the direct URL.
+
+You can use attribution models to get information about the channels that your customers interact with and which channels contribute to your sales. This information can help you understand when and where across the customer journey that customers are converting.
+
+When your report contains a sales metric, such as **Gross sales**, and a marketing dimension, such as **Referring channel**, then an additional **Attribution** menu displays in the report's [configuration panel](https://help.shopify.com/en/manual/reports-and-analytics/shopify-reports/report-types/reports-overview#configuration-panel). You can use this menu to select which attribution models you want to include in your report data. When the metric and dimension conditions are met, the **Last click** model is selected by default.
+
+Shopify Analytics supports the following attribution models:
+
+Descriptions of the attribution models available for marketing activity data.
+| Attribution model | Marketing credit allocation rules | Using the attribution model |
+| --- | --- | --- |
+| **Last non-direct click** | Gives 100% of attribution credit to the last channel that the customer interacts with before making a purchase, excluding direct visits. If a customer's journey contains only direct traffic, then their order is attributed as direct, as there's no non-direct source to attribute to. | This is the default attribution model when viewing your marketing activity data, and can help you understand the last marketing channel that influenced a conversion. |
+| **Last click** | Gives 100% of attribution credit to the last channel that the customer interacts with, including direct visits. | This attribution model can be helpful when you're trying to convert traffic into customers, and need to understand the final impact to purchase. |
+| **First click** | Gives 100% of attribution credit to the first channel that the customer interacts with, including direct visits. | This attribution model can help you understand which channels contribute to generating top-of-funnel interest. |
+| **Any click** | Gives 100% of attribution credit to each channel that the customers clicked, recognizing all interactions that contributed to a conversion. | Because this attribution model allocates more credit than orders you've received, it's best used to analyze a single marketing channel. You can also use this model to reconcile attribution reported by each channel. |
+| **Linear** | Gives equal attribution credit to each click in the customer's journey that contributed to a sale, including direct visits. | This attribution model offers a balanced view, and can help you understand more complex customer journeys. |
+
+The following default Shopify reports contain the option to set attribution models by default:
+
+*   **Performance by marketing channel**
+*   **Performance by marketing campaign**
+*   **Performance by marketing activity**
+
+The marketing reports use the following terms:
+
+Definition of terms in conversion reports
+| Term | Definition |
+| --- | --- |
+| **Referrer source** | Indicates how the customer who placed an order reached your online store. Possible values are: * **Direct**: The customer entered your store's URL into their browser. * **Search**: The customer clicked your store from a search engine's results page. * **Email**: The customer clicked a link to your store in an email. * **Social**: The customer clicked a link on social media. * **Unknown**: The referrer source doesn't fit into one of the above cases. |
+| **Referrer name** | The name of the referrer, such as Google, Facebook, or Pinterest. For direct sources, if the referrer can't be determined, then the name is listed as N/A. This can occur for many reasons, such as the following situations: * The user’s web browser has Do Not Track activated. * The referrer data is blocked by a proxy or firewall. * A shortened URL was used as the link. |
+| **Average order value (first or last interaction)** | Displays the average value of all orders (excluding gift cards), divided by the total number of orders that contained at least one product other than a gift card. Order value includes taxes, shipping, and discounts before returns. This value helps you know how much customers tend to spend on your store and can help inform your pricing policies. |
+| **Orders (first or last interaction)** | Displays the number of orders that were placed depending on the type of interaction. |
+
+Canceled, pending, and unpaid orders are included in the reports. Test and deleted orders are **not** included.
+
+The [**Performance by marketing channel**](https://admin.shopify.com/analytics/reports/performance_by_marketing_channel) report displays your paid, organic, and referring traffic together.
+
+A marketing channel is where a visit came from, such as an ad platform that you've connected to Shopify, a marketing app, or the site that referred the visit.
+
+The report groups your results by marketing channel, and splits each channel by traffic type. The traffic types are paid, organic, direct, unattributed, and unknown. You can use this report to compare the paid and organic performance of one channel, and to compare channels against each other, without opening a second report.
+
+The report includes the following metrics:
+
+*   Sessions, total sales, orders, and conversion rate.
+*   Ad spend, return on ad spend (ROAS), cost per acquisition (CPA), and customer acquisition cost (CAC).
+*   Impressions, clicks, and clickthrough rate (CTR).
+*   Average order value (AOV), first-time customers, and returning customers.
+
+By default, the report displays the last 30 days of data using the last non-direct click attribution model. You can change the date range, the attribution model, and the columns that are displayed.
+
+The [**Performance by marketing campaign**](https://admin.shopify.com/analytics/reports/performance_by_marketing_campaign) report uses the same metrics as the **Performance by marketing channel** report, grouped by campaign first. Each campaign is broken down by marketing channel, and then by traffic type. If a campaign runs on more than one channel, then the campaign is displayed as a single group with each of its channels underneath, so that you can review the campaign's combined results.
+
+Traffic that isn't associated with a campaign isn't included in this report. Direct and organic traffic are displayed as their own rows.
+
+The [**Sales attributed to marketing**](https://admin.shopify.com/analytics/reports/sales_attributed_to_marketing) report includes the sales that can be attributed to trackable marketing efforts.
+
+The sales in your [**Sales attributed to marketing**](https://admin.shopify.com/analytics/reports/sales_attributed_to_marketing) report are only those that came from traffic that can be directly attributed to your marketing efforts. These efforts could be campaigns and activities managed through the Marketing section in your Shopify admin or externally managed efforts that use Urchin Tracking Module (UTM) parameters. Because of this, the sales amount in this report can differ from sales figures in other reports.
+
+When you open this report, the data is up to date, give or take about 1 minute. You can reopen or refresh the report to display newer data.
+
+The sales reports use several [common terms](https://help.shopify.com/en/manual/reports-and-analytics/shopify-reports/report-types/default-reports/sales-report#common-sales-report-terms). This report uses the following additional terms:
+
+Additional terms in the sales attributed to marketing report
+| Term | Definition |
+| --- | --- |
+| **UTM campaign name** | The name you gave the Urchin Tracking Module (UTM) campaign when you set it up, if applicable. |
+| Values set by the marketing app used to make the campaign, if applicable: |
+| **Marketing event type** | Displays the format of the campaign. For example, if the campaign target is **twitter**, then the marketing event type will be either **ad** or **post**. If you didn't use a marketing app from the Shopify App Store to set up the campaign, then this field reads N/A. |
+| **Marketing event target** | Displays the target of the campaign. Some example values are **email**, **facebook_messenger**, and **twitter**. If you didn't use a marketing app from the Shopify App Store to set up the campaign, then this field reads N/A. |
+
+### Sales versus payments
+
+Sales reports don't track money moving between you and your customers. When a sale is made, the reports show the value of goods included in the sale, not the amount of money that you've received. Depending on how you've set up your payment methods, you might not receive the actual payment until a later date.
+
+Similarly, when you process a return, the reports display the value of goods that you're receiving, not the amount of money that you're issuing to the customer.
+
+Chargebacks aren't included in the sales reports.
+
+The [**Sessions attributed to marketing campaigns**](https://admin.shopify.com/analytics/reports/sessions_attributed_to_marketing) report includes the number of sessions on your online store that are the result of marketing, such as a UTM campaign, Facebook ads, or Google Shopping ads. Learn more about [tracking your marketing campaigns](https://www.shopify.com/blog/14759449-how-to-track-your-marketing-campaigns-in-google-analytics).
+
+When you open this report, the data is up to date, give or take a few seconds. You can reopen or refresh the report to display newer data.
+
+### Sessions and visitors
+
+The number of sessions and the number of visitors are based on cookies. Cookies are small files that are stored on a shopper's device, such as a desktop or smartphone, when they visit your online store. One cookie identifies the device (the visitor). Another cookie keeps track of the length of the session.
+
+A session ends after 30 minutes of inactivity. Because the same visitor can have multiple sessions, the number of sessions is usually higher than the number of visitors.
+
+Example: A customer views products on your store for 20 minutes, then returns to your store 2 hours later for another 10 minutes. 2 sessions and 1 visitor are reported. If the shopper instead views your store for 5 minutes, leaves, and returns 10 minutes later, then 1 session and 1 visitor are reported.
+
+If you want to view your online store and not have it count as a session in your acquisition reports, then on your desktop Shopify admin, click the eye icon. Any other method of viewing your online store on desktop counts as a session in your reports.
+
+If you view your online store from the [Shopify app](https://www.shopify.com/install/detect) on iPhone or Android, then it counts as a session in your acquisition reports.
+
+The following default conversion reports are deprecated:
+
+*   **Conversion by first interaction**
+*   **Conversion by last interaction**
+*   **Attribution model comparison**
+
+You can perform this analysis through the [**Marketing top channel performance** report](https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing/marketing-performance) instead.

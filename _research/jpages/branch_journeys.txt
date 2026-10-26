@@ -1,0 +1,365 @@
+Title: Smart Banners & Web-to-App Engagement | Branch
+
+URL Source: https://www.branch.io/journeys/
+
+Markdown Content:
+[Skip to content](https://www.branch.io/journeys/#wp--skip-link--target)
+
+[![Image 6: Branch Logo](https://www.branch.io/wp-content/uploads/2026/02/branch-logo-tm.svg)](https://www.branch.io/)
+
+*   [Products](https://www.branch.io/products/)
+    *   [Left Column](https://www.branch.io/journeys/#)
+        *   [Engagement Increase conversions from owned and organic channels.](https://www.branch.io/products/engagement/)
+        *   [Performance Improve ads ROI with sophisticated attribution.](https://www.branch.io/products/performance/)
+        *   [Activation Drive actions with branded short links and QR codes.](https://www.branch.io/products/activation/)
+        *   [Discovery Reach your users with targeted programmatic media buying.](https://www.branch.io/products/discovery/)
+
+    *   [Right column](https://www.branch.io/journeys/#)
+        *   [Data Exports Get your data where and how you want it, on your schedule.](https://www.branch.io/products/data-exports/)
+        *   [Ivy Intelligence that accelerates growth.](https://www.branch.io/products/ivyai/)
+        *   [Banners Targeted web-to-app banners that convert browsers into buyers.](https://www.branch.io/products/banners/)
+        *   [Link Management Create, manage, and analyze links at scale](https://www.branch.io/products/linkhub/)
+
+*   [Solutions](https://www.branch.io/use-cases/)
+    *   [Use Cases](https://www.branch.io/journeys/#)
+        *   [Deep Linking](https://www.branch.io/deep-linking/)
+        *   [Attribution](https://www.branch.io/attribution/)
+        *   [Advanced Compliance](https://www.branch.io/advanced-compliance/)
+
+    *   [Industries](https://www.branch.io/journeys/#)
+        *   [Health](https://www.branch.io/resources/guide/health-industry-hub/)
+        *   [Finance](https://www.branch.io/resources/guide/finance-industry-hub/)
+        *   [Retail & E-commerce](https://www.branch.io/resources/guide/retail-and-e-commerce-industry-hub/)
+        *   [Food & Beverage](https://www.branch.io/resources/guide/food-and-beverage-industry-hub/)
+        *   [Media & Entertainment](https://www.branch.io/resources/guide/media-and-entertainment-industry-hub/)
+        *   [Travel](https://www.branch.io/resources/guide/travel-industry-hub/)
+
+    *   [Partners](https://www.branch.io/journeys/#)
+        *   [Partners Overview](https://www.branch.io/partners/)
+
+*   [Learn](https://www.branch.io/resources/)
+    *   [Blogs](https://www.branch.io/resources/category/blog/)
+    *   [Guides](https://www.branch.io/resources/category/guide/)
+    *   [Glossary](https://www.branch.io/glossary/)
+    *   [White Papers](https://www.branch.io/resources/category/white-paper/)
+    *   [Webinars](https://www.branch.io/resources/category/webinar/)
+    *   [Podcasts](https://www.branch.io/resources/category/podcast/)
+    *   [Case Studies](https://www.branch.io/resources/category/case-study/)
+    *   [Events](https://www.branch.io/events/)
+    *   [Branch University](https://university.branch.io/paths)
+    *   [Maturity Assessment](https://www.branch.io/resources/mobile-growth-maturity-assessment/)
+    *   [Help Center](https://help.branch.io/)
+
+*   [Pricing](https://www.branch.io/pricing/)
+*   [Login](https://app.branch.io/signin)
+
+[Request a demo](https://www.branch.io/contact-sales/)
+
+Branch Banners
+
+# Turn browsers into buyers
+
+Convert your highest-intent web visitors into app users, buyers, and subscribers with web-to-app banners that turn your website into free ad space. Target browsers by engagement level, build without dev resources, and route users directly into your app with the context they expect.
+
+[**See Banners in action**](https://www.branch.io/contact-sales)
+
+![Image 7](https://www.branch.io/wp-content/uploads/2026/01/branch-banners.webp)
+
+## You have the audience, now convert it.
+
+![Image 8](https://www.branch.io/wp-content/uploads/2026/01/target-icon-green.svg)
+### Understand who’s driving results
+
+See who makes up your web audience and engagement cohorts, so you can reach the right users with the right message.
+
+![Image 9](https://www.branch.io/wp-content/uploads/2026/06/devices-green-icon.svg)
+### Deliver personalized experiences that convert
+
+Replace one-size-fits-all banners with customized creative that performs better and speaks to users based on where they are in their journey.
+
+![Image 10: Green location pin icon with a flag in the center](https://www.branch.io/wp-content/uploads/2026/01/location-icon-green.svg)
+### Tailor in-app experiences to every user
+
+Don’t just drive installs — use deep links to land users exactly where they need to be, even through app install.
+
+![Image 11: Claire Lecherf logo](https://www.branch.io/wp-content/uploads/2026/01/la-redoute-logo.svg)
+
+### “By leveraging Branch’s web-to-app smart banners, our marketing team finally has an efficient way to help our web customers discover or re-engage with our app. The level of customization Journeys offers allows us to constantly test and improve our approach.”
+
+![Image 12: Claire Lecherf](https://www.branch.io/wp-content/uploads/2026/01/Claire-Lecherf-Senior-Traffic-Manager-La-Redoute-60x60.webp)
+
+Claire Lecherf
+
+Senior Traffic Manager, La Redoute
+
+![Image 13: Sean Fitzpatrick logo](https://www.branch.io/wp-content/uploads/2026/01/IMDB-logo.svg)
+
+### “Working with Branch has been a top-notch experience. It stands out as some of the best technical support I’ve ever encountered when collaborating with another team. The responsiveness is unparalleled — rarely do I have to wait more than a few hours for a response. The most significant impact of Branch’s technology is the direct attribution, allowing us to measure the app install impacts accurately based on user actions taken on our website. It’s a game changer for understanding and optimizing our campaigns.”
+
+![Image 14: Sean Fitzpatrick](https://www.branch.io/wp-content/uploads/2026/01/sean-fitzpatrick-imdb-60x60.webp)
+
+Sean Fitzpatrick
+
+Sr. Product Manager, Growth, IMDb
+
+## What’s behind Branch Banners:
+
+### Smart banners
+
+### Deep linking
+
+### Targeting
+
+### No dev required
+
+### A/B testing
+
+### Measurement
+
+### Attribution
+
+Smart banners
+
+Web-to-app banners that actually convert
+
+Display banners on your website drive users exactly where you want them: a product page, signup flow, or specific app content.
+
+*   User viewing a product on web? Send them to the exact product page in your app.
+*   Reading an article? Same article, now in your app.
+*   Browsing a category? Deep link directly to that category in your app.
+
+![Image 15: Illustration demonstrating the creation, preview, and A/B testing of banner ads](https://www.branch.io/wp-content/uploads/2026/02/smart-banners-1.svg)
+
+Deep linking
+
+No app, no problem
+
+When a user doesn’t have your app installed, one tap takes them to the App Store or Google Play. After install, [deferred deep linking](https://www.branch.io/glossary/deferred-deep-linking/) avoids dead ends by preserving context and delivering them to the original content they expected.
+
+![Image 16](https://www.branch.io/wp-content/uploads/2026/02/deep-linking-1-scaled.webp)
+
+Targeting
+
+Precision targeting, not blasts
+
+Show different messages based on device, location, behavior, purchase history, app install status, and referring source. This isn’t just audience building — it’s delivering the right message to the right user at the right moment.
+
+*   Target users who don’t have the app with install prompts
+*   Welcome back lapsed users with personalized CTAs
+*   Exclude users who already converted
+*   Treat Google search traffic differently to protect SEO efforts
+
+![Image 17](https://www.branch.io/wp-content/uploads/2026/02/targeting.webp)
+
+No dev required
+
+Build and launch without engineering
+
+Use visual editing and more than 20 templates to launch when you’re ready. You own the creative, targeting, and schedule — no dev queue required.
+
+![Image 18](https://www.branch.io/wp-content/uploads/2026/02/no-dev-required-1440x929.webp)
+
+A/B testing
+
+Test everything, scale what wins
+
+Run [A/B variations](https://www.branch.io/resources/blog/maximizing-conversions-tips-for-a-b-testing-branch-journeys/) on creative, copy, and CTAs. See conversion rates in real time and instantly shift traffic to winners.
+
+![Image 19](https://www.branch.io/wp-content/uploads/2026/02/a-b-testing.webp)
+
+Measurement
+
+Full-funnel visibility
+
+From views to conversions, see the complete picture. Track every twist, turn, and branch-out in your funnel. Slice by campaign, device, OS, or any dimension that matters. Know exactly where Banners drove value and where revenue actually came from.
+
+![Image 20](https://www.branch.io/wp-content/uploads/2026/02/branch-banners-measurement.png)
+
+Attribution
+
+Your paid channels keep credit
+
+If a user comes from a paid ad and converts through Banners, attribution goes to the original ad. No channel cannibalization, so your measurement stays clean.
+
+![Image 21](https://www.branch.io/wp-content/uploads/2026/02/banners-attribution.webp)
+
+[![Image 22: 5 Best Practices for Journeys Smart Banners](https://www.branch.io/wp-content/uploads/2024/09/Q3-Journey_Header@1.5x-1-300x170.webp)](https://www.branch.io/resources/blog/5-best-practices-for-journeys-smart-banners/)
+
+ Blog 
+
+[5 Best Practices for Journeys Smart Banners](https://www.branch.io/resources/blog/5-best-practices-for-journeys-smart-banners/)
+
+Explore five best practices to get the most out of your Journeys web-to-app smart banners.
+
+[Read More](https://www.branch.io/resources/blog/5-best-practices-for-journeys-smart-banners/)
+
+[![Image 23: Illustration of a person with a megaphone looking at three mobile screens displaying app interfaces.](https://www.branch.io/wp-content/uploads/2022/08/Q3_Blog_5_New_Journeys_Features-768x402-1-300x157.webp)](https://www.branch.io/resources/blog/5-new-journeys-features-to-make-your-smart-banners-better/)
+
+ Blog 
+
+[5 New Journeys Features To Make Your Smart Banners Even Better](https://www.branch.io/resources/blog/5-new-journeys-features-to-make-your-smart-banners-better/)
+
+[Read More](https://www.branch.io/resources/blog/5-new-journeys-features-to-make-your-smart-banners-better/)
+
+[![Image 24: Tips for A/B Testing Branch Journeys](https://www.branch.io/wp-content/uploads/2024/06/Q2_2024_blog_Journeys_a_b_test-300x169.webp)](https://www.branch.io/resources/blog/maximizing-conversions-tips-for-a-b-testing-branch-journeys/)
+
+ Blog 
+
+[Maximizing Conversions: Tips for A/B Testing Branch Banners](https://www.branch.io/resources/blog/maximizing-conversions-tips-for-a-b-testing-branch-journeys/)
+
+To get the most out of your web-to-app strategy, follow these tips and tricks for setting up your very own A/B variations.
+
+[Read More](https://www.branch.io/resources/blog/maximizing-conversions-tips-for-a-b-testing-branch-journeys/)
+
+## **Branch Banners frequently asked questions (FAQs)**
+
+****What is Branch Banners?****
+Branch Banners is an enterprise-grade [web-to-app](https://help.branch.io/marketer-hub/docs/web-to-app)conversion platform. It enables brands to deploy [smart banners](https://www.branch.io/glossary/smart-banner/) and interstitials on mobile and desktop web to route users seamlessly into their native apps.
+
+**What happens if a user doesn’t have my app installed?**
+Branch uses [deferred deep linking](https://www.branch.io/glossary/deferred-deep-linking/) to preserve context through install. The user is sent to the appropriate app store to download the app, and upon opening it for the first time, automatically taken to the specific content they were viewing on the web.
+
+**Can I target specific banners to different web audiences?**
+Yes. You can segment audiences based on behavior, purchase history, and install status to show the most relevant banner to every visitor.
+
+**Do I need a developer to update banner creative?**
+No. Branch Banners provides a visual editor and over 20 templates, so you can launch and edit without engineering help.
+
+**How does Branch Banners handle iOS Private Relay and ATT?**
+Branch is built for a privacy-first world, helping you reclaim attribution and maintain accurate web-to-app measurement while staying compliant with Apple’s latest frameworks.
+
+![Image 25](https://www.branch.io/wp-content/themes/branch/assets/images/CTA.svg?ver=1789060734)
+
+## Ready to seamlessly connect your website and your app?
+
+[Request a demo](https://www.branch.io/contact-sales/)
+
+![Image 26: footer-logo](https://www.branch.io/wp-content/themes/branch/assets/images/branch-start-logo.svg?ver=1789060734)
+
+### [Products](https://www.branch.io/products/)
+
+*   [Engagement](https://www.branch.io/products/engagement/)
+*   [Performance](https://www.branch.io/products/performance/)
+*   [Activation](https://www.branch.io/products/activation/)
+*   [Discovery](https://www.branch.io/products/discovery/)
+*   [Data Exports](https://www.branch.io/products/data-exports/)
+*   [AI](https://www.branch.io/products/ivyai/)
+*   [Link Management](https://www.branch.io/products/linkhub/)
+*   [Banners](https://www.branch.io/products/banners/)
+
+### [Solutions](https://www.branch.io/use-cases/)
+
+*   [Deep Linking](https://www.branch.io/deep-linking/)
+*   [Attribution](https://www.branch.io/attribution/)
+*   [Advanced Compliance](https://www.branch.io/advanced-compliance/)
+*   [Health](https://www.branch.io/resources/guide/health-industry-hub/)
+*   [Finance](https://www.branch.io/resources/guide/finance-industry-hub/)
+*   [Retail & E-commerce](https://www.branch.io/resources/guide/retail-and-e-commerce-industry-hub/)
+*   [Food & Beverage](https://www.branch.io/resources/guide/food-and-beverage-industry-hub/)
+*   [Media & Entertainment](https://www.branch.io/resources/guide/media-and-entertainment-industry-hub/)
+*   [Travel](https://www.branch.io/resources/guide/travel-industry-hub/)
+*   [Partners Overview](https://www.branch.io/partners/)
+
+### [Learn](https://www.branch.io/resources/)
+
+*   [Blogs](https://www.branch.io/resources/category/blog/)
+*   [Guides](https://www.branch.io/resources/category/guide/)
+*   [Glossary](https://www.branch.io/glossary/)
+*   [White Papers](https://www.branch.io/resources/category/white-paper/)
+*   [Webinars](https://www.branch.io/resources/category/webinar/)
+*   [Podcasts](https://www.branch.io/resources/category/podcast/)
+*   [Events](https://www.branch.io/events/)
+*   [Branch University](https://university.branch.io/paths/)
+*   [Maturity Assessment](https://www.branch.io/resources/mobile-growth-maturity-assessment/)
+*   [Help Center](https://help.branch.io/)
+
+### [Company](https://www.branch.io/journeys/#0)
+
+*   [About Us](https://www.branch.io/about/)
+*   [Careers](https://www.branch.io/careers/)
+*   [Culture](https://www.branch.io/careers/culture/)
+*   [Leadership](https://www.branch.io/leadership/)
+*   [Newsroom](https://www.branch.io/resources/category/news/)
+*   [Brand Guidelines](https://www.branch.io/brand/)
+*   [Contact Us](https://www.branch.io/contact/)
+
+### [Pricing](https://www.branch.io/pricing/)
+
+Branch powers every touchpoint with links that work and insights that prove it.  
+From click to conversion, we make growth measurable.
+
+© 2026 Branch, All rights reserved
+
+*   [Privacy Policy](https://legal.branch.io/saas/privacy-policy/)
+*   [Terms of Service](https://legal.branch.io/website-terms-of-service/)
+*   [Opt-Out](https://legal.branch.io/saas/privacy-opt-out/)
+*   [Discovery Policies](https://legal.branch.io/discovery/)
+*   [Your Privacy Choices](https://www.branch.io/journeys/#cookie-banner-modal-link)
+
+[![Image 27: Linkedin Logo](https://www.branch.io/wp-content/themes/branch/assets/images/linkedin.svg?ver=1789060734)](https://www.linkedin.com/company/branch-metrics/)[![Image 28: Youtube Logo](https://www.branch.io/wp-content/themes/branch/assets/images/youtube.svg?ver=1789060734)](https://www.youtube.com/@Branch-Metrics)
+
+![Image 29](https://bat.bing.com/action/0?ti=187263976&tm=gtm002&Ver=2&mid=d8a20a55-743f-46df-9e83-b8296627ce2d&bo=1&sid=d51f2ed0c06911f1b96cd1d350902b7b&vid=d51f4ee0c06911f19232b16db4a4dd7f&vids=1&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=Smart%20Banners%20%26%20Web-to-App%20Engagement%20%7C%20Branch&p=https%3A%2F%2Fwww.branch.io%2Fjourneys%2F&r=&lt=898&evt=pageLoad&sv=2&cdb=AQAS&rn=162134)
+
+By clicking “Accept All Cookies”, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
+
+Cookies Settings Reject All Accept All Cookies
+
+![Image 30: Company Logo](https://cdn.cookielaw.org/logos/static/ot_company_logo.png)
+
+## Privacy Preference Center
+
+When you visit any website, it may store or retrieve information on your browser, mostly in the form of cookies. This information might be about you, your preferences, or your device, and is mostly used to make the site work as you expect. The information does not usually identify you directly, but it can give you a more personalized web experience. Because we respect your right to privacy, you can choose not to allow some types of cookies. Click on the different category headings to learn more and change our default settings. Blocking some types of cookies may impact your experience of the site and the services we are able to offer.   
+[More information](https://cookiepedia.co.uk/giving-consent-to-cookies)
+
+Allow All
+### Manage Consent Preferences
+
+#### Strictly Necessary Cookies
+
+Always Active
+
+These cookies are necessary for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms. You can set your browser to block or alert you about these cookies, but some parts of the site will not then work. These cookies do not store any personally identifiable information.
+
+#### Functional Cookies
+
+- [x] Functional Cookies 
+
+These cookies enable the website to provide enhanced functionality and personalisation. They may be set by us or by third party providers whose services we have added to our pages. If you do not allow these cookies then some or all of these services may not function properly.
+
+#### Performance Cookies
+
+- [x] Performance Cookies 
+
+These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular and see how visitors move around the site. All information these cookies collect is aggregated and therefore anonymous. If you do not allow these cookies we will not know when you have visited our site, and will not be able to monitor its performance.
+
+#### Targeting Cookies
+
+- [x] Targeting Cookies 
+
+These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites. They do not store directly personal information, but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will experience less targeted advertising.
+
+#### Social Media Cookies
+
+- [x] Social Media Cookies 
+
+These cookies are set by a range of social media services that we have added to the site to enable you to share our content with your friends and networks. They are capable of tracking your browser across other sites and building up a profile of your interests. This may impact the content and messages you see on other websites you visit. If you do not allow these cookies you may not be able to use or see these sharing tools.
+
+### Performance Cookies
+
+Clear
+
+- [x] checkbox label label
+
+Apply Cancel
+
+Consent Leg.Interest
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+Reject All Confirm My Choices
+
+[![Image 31: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/solutions/consent-and-preferences/)

@@ -1,0 +1,12 @@
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) FROM authenticated, anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_super_admin(uuid) FROM authenticated, anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_admin(uuid) FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_staff(uuid) FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.has_permission(uuid, text) FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_my_permissions() FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.sync_my_profile_email() FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.write_audit_log(text, text, uuid, jsonb, jsonb, text, text, text) FROM anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated, anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.protect_profile_email() FROM authenticated, anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.protect_role_changes() FROM authenticated, anon, PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.set_updated_at() FROM authenticated, anon, PUBLIC;

@@ -1,0 +1,103 @@
+Title: Page Not Found
+
+URL Source: https://docs.voucherify.io/docs/referral-program
+
+Warning: Target URL returned error 404: Not Found
+
+Markdown Content:
+> ## Documentation Index
+> 
+> 
+> Fetch the complete documentation index at: [/llms.txt](https://docs.voucherify.io/llms.txt)
+> 
+> 
+> Use this file to discover all available pages before exploring further.
+
+[Skip to main content](https://docs.voucherify.io/docs/referral-program#content-area)
+
+Welcome Worfklows: Configure webhooks for loyalty v2 events! [Learn more about Workflows](https://docs.voucherify.io/integrations/workflows)!
+
+[Voucherify home page![Image 1: light logo](https://mintcdn.com/voucherify/1CLLMV_7y-xjMglv/images/voucherify_logo_black.png?fit=max&auto=format&n=1CLLMV_7y-xjMglv&q=85&s=44f1ac052a12ff4f06419b90c4227570)![Image 2: dark logo](https://mintcdn.com/voucherify/1CLLMV_7y-xjMglv/images/voucherify_logo_white.png?fit=max&auto=format&n=1CLLMV_7y-xjMglv&q=85&s=89afd6e2a2be4d0f902c1847443142b2)](https://docs.voucherify.io/)
+
+Search...
+
+Ctrl K Ask Assistant CTRLI
+
+*   [Contact support](https://www.voucherify.io/contact-support)
+*   [Contact sales](https://www.voucherify.io/contact-sales)
+*   [Log In](https://app.voucherify.io/#/redirect-to-docs)
+
+Search...
+
+Navigation
+
+Page Not Found
+
+[Voucherify](https://docs.voucherify.io/get-started/introduction)[Developer guides](https://docs.voucherify.io/guides/api-quickstart)[User guides](https://docs.voucherify.io/discover/voucherify-user-guide)[API reference](https://docs.voucherify.io/api-reference/introduction-api)[Changelog](https://docs.voucherify.io/changelog/changelog)
+
+### Develop
+
+*   [API quickstart](https://docs.voucherify.io/guides/api-quickstart)
+*   [Development checklist](https://docs.voucherify.io/guides/development)
+*   [Authentication and authorization](https://docs.voucherify.io/guides/authentication)
+*   [Integration processes](https://docs.voucherify.io/guides/integration-processes)
+*   [API overview](https://docs.voucherify.io/guides/api-overview)
+*   [Management API](https://docs.voucherify.io/guides/management-api)
+*   [Data parsing](https://docs.voucherify.io/guides/data-parsing)
+*   [Metadata mapping](https://docs.voucherify.io/guides/metadata-mapping)
+*   [Voucherify Core MCP](https://docs.voucherify.io/guides/voucherify-core-mcp)
+*   [Voucherify Docs MCP](https://docs.voucherify.io/guides/voucherify-docs-mcp)
+*   [Data synchronization](https://docs.voucherify.io/guides/data-synchronization)
+*   [SDKs](https://docs.voucherify.io/guides/sdks)
+*   [Security](https://docs.voucherify.io/guides/security)
+*   [Limits](https://docs.voucherify.io/guides/limits)
+*   [Transfer loyalty points SUNSET](https://docs.voucherify.io/guides/transfer-loyalty-points)
+
+### Incentivize
+
+*   [Loyalty v2 developer overview](https://docs.voucherify.io/guides/loyalty-v2-overview)
+*   [Integrate loyalty v2](https://docs.voucherify.io/guides/loyalty-v2-integrate)
+*   [Take loyalty v2 to production](https://docs.voucherify.io/guides/loyalty-v2-take-to-production)
+
+### Explore
+
+*   [Qualification - checking eligibility](https://docs.voucherify.io/guides/checking-eligibility)
+*   [Locking validation session](https://docs.voucherify.io/guides/locking-validation-session)
+*   [CSV export with API](https://docs.voucherify.io/guides/csv-export)
+*   [Import legacy codes](https://docs.voucherify.io/guides/import-codes)
+
+### Integrate
+
+*   Workflows  
+*   [Distribution overview](https://docs.voucherify.io/integrations/distributions-overview)
+*   [Create distribution](https://docs.voucherify.io/integrations/create-distribution)
+*   Customer Engagement & Experience  
+*   CDP  
+*   Commerce Platforms  
+*   CRM  
+*   CMS  
+
+404
+# Page Not Found
+
+[Voucherify home page![Image 3: light logo](https://mintcdn.com/voucherify/1CLLMV_7y-xjMglv/images/voucherify_logo_black.png?fit=max&auto=format&n=1CLLMV_7y-xjMglv&q=85&s=44f1ac052a12ff4f06419b90c4227570)![Image 4: dark logo](https://mintcdn.com/voucherify/1CLLMV_7y-xjMglv/images/voucherify_logo_white.png?fit=max&auto=format&n=1CLLMV_7y-xjMglv&q=85&s=89afd6e2a2be4d0f902c1847443142b2)](https://docs.voucherify.io/)
+
+[linkedin](https://www.linkedin.com/company/voucherifyio)[slack](https://www.voucherify.io/community)
+
+[Contact support](https://www.voucherify.io/contact-support)[API status](https://status.voucherify.io/)[Product roadmap](https://roadmap.voucherify.io/)
+
+[linkedin](https://www.linkedin.com/company/voucherifyio)[slack](https://www.voucherify.io/community)
+
+[Powered by This documentation is built and hosted on Mintlify, a developer documentation platform](https://www.mintlify.com/?utm_campaign=poweredBy&utm_medium=referral&utm_source=voucherify)
+
+Assistant
+
+Responses are generated using AI and may contain mistakes.
+
+We value your privacy
+
+This site uses cookies to improve your browsing experience, analyze site traffic, and show personalized content.
+
+Reject All Accept All
+
+Customize

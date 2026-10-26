@@ -1,0 +1,1 @@
+UPDATE public.services SET academic_category_id = category_id WHERE academic_category_id IS NULL AND category_id IS NOT NULL;

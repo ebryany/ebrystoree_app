@@ -1,0 +1,63 @@
+Workflow Automation made easy with Shopify Flow - Shopify Indonesia Skip to Content 
+ Shopify Flow
+ Automate everything and get back to business
+ Create custom workflows, get more from your existing apps, and watch business boom.
+ Get Flow Watch how Flow works 
+ Don't have a Shopify store? Start one for free 
+ Create custom ecommerce automations with no&#8209;code building blocks
+ With simple trigger, condition, and action blocks, anyone can quickly create a workflow.
+ Tailored solutions. Limitless potential.
+ From simple operations to multi-step workflows that connect with your apps, Flow gives you the flexibility to automate repetitive tasks, so you can focus on your business.
+ Inventory management
+ Hide products on your site when they’re out of stock, instantly reorder supplies when they’re low, and so much more.
+ Read the inventory management playbook   
+ Fraud prevention
+ Set up a workflow that flags high-risk orders for you, so you don’t have to manually sort through every one.
+ Read the fraud prevention playbook   
+ Loyalty and retention
+ Identify, track, and reward customers based on parameters such as total spend, total orders, subscriptions, and more.
+ Read the loyalty and retention playbook   
+ Fulfillment management
+ Automatically review orders and either put them on hold or release them for fulfillment, based on pre-set conditions. Plus so much more.
+ Read the fulfillment management playbook   
+ Plug-and-play templates, at the ready
+ To help your businesses run more efficiently, we’ve created pre-built, no-code templates that can help you quickly start automating some of the most common time-consuming tasks you face.
+ See our 10 most popular templates 
+ Scheduled to fit your life
+ You no longer need an event to occur to run a workflow—with scheduled automations you choose when to pull data and run reports, opening up a whole new realm of possibilities within Flow.
+ Learn how scheduled automations work 
+ Always on, so you don’t have to be
+ Flow handles all the strains and pressures of huge sales like Black Friday Cyber Monday, while also taking care of those easily forgotten manual tasks, so you can focus on more important things.
+ 562M
+ Workflows ran during Black Friday Cyber Monday
+ 1B+
+ Decisions automated every month
+ 22k
+ Unique jobs completed by Flow
+ The biggest limitation of Flow is your imagination, and the things I’ve been able to automate have been game-changers for our operations.
+ We reinvested time that we saved... into ecommerce management, optimizing shipping, ensuring quality translations, and we focused more time to curate products and produce engaging content... It’s been a huge time saver.
+ Frequently asked questions
+ What is ecommerce automation?
+ Ecommerce automation is software built to convert tasks, processes, or campaigns within your business to automations that intelligently execute exactly when needed. It’s how businesses can do more with what they have.
+ Why do I need ecommerce automation?
+ The problem is simple: as a business scales, the demands, complexity, and repetition add up. Systems that used to work become increasingly inefficient and break down. In response, companies turn to time-consuming workarounds—time that could be spent on what’s important is sacrificed for time spent on what’s urgent, even when that’s just pushing buttons. Or companies turn to new hires. Unfortunately, people don’t scale. But that doesn’t undercut the value of people—if anything, it reinforces it. People, especially their ability to focus on key activities, not tasks that a workflow could do, are your most powerful resource.
+ What are some workflow automation examples?
+ Ecommerce automations can take a host of different forms like tagging customers for segmentation and marketing, hiding products and initiating reorders for low or out-of-stock items, or tracking and halting high-risk orders. With each workflow, the goal is the same: to let merchants build the workflow that their business needs to scale.
+ Here are some of the most popular examples :
+ Inventory management: Unpublish out-of-stock products and send a Slack message or email to your marketing team so they can pause advertising
+ Fraud prevention: Send an email to review an order over $5000, before fulfillment as that is atypical for the store
+ Product reviews: Automatically create a customer support ticket and send a slack message when a negative review is posted
+ Loyalty: Award loyalty points and send a thank you SMS after a customer makes their second purchase
+ How does workflow automation work on Flow?
+ Flow is based on a simple, no-code “trigger, condition, and action” format . Basically, a “trigger” is an event that Flow looks out for and which sets an automation in motion, a “condition” must then be met, and the “action” is the task that is completed when the condition is met.
+ Here’s what that might look like for a workflow that automatically adds a customer to your loyalty program:
+ Trigger: An order is placed.
+ Condition: The order total must be $500 or more.
+ Action: The customer is tagged as a VIP in the system.
+ How do I start automating ecommerce workflows?
+ It’s so easy. Start by downloading Flow in our app store. Then either start using one (or many) of our pre-built templates designed to automate dozens of the common tasks businesses need to automate. Or start creating your own workflows to solve the unique problems your business faces, using our no-code “trigger, condition, and actions” workflow creator.
+ Is Flow available in any languages other than English?
+ Currently the Flow platform is only available in English.
+ Get Flow today and start building the custom automations your business needs to grow
+ Get Flow Start for free 
+ Shopify Flow is available to businesses in all countries on the Basic, Grow, Advanced, and Shopify Plus plans. Flow is only available in English.

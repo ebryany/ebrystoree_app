@@ -1,0 +1,67 @@
+Title: WhatsApp Flows | Meta for Developers
+
+URL Source: https://developers.facebook.com/docs/whatsapp/flows/
+
+Markdown Content:
+Updated:May 21, 2026
+
+Copy for LLM
+
+WhatsApp Flows is a way to build structured interactions for business messaging. With Flows, businesses can define, configure, and customize messages with rich interactions that give customers more structure in the way they communicate.
+
+You can use Flows to generate leads, recommend products, get new sales leads, or anything else where structured communication is more natural or comfortable for your customers.
+
+![Image 1: WhatsApp Flows screens for selecting product options and registering for Black Friday deals](https://scontent-sea5-1.xx.fbcdn.net/v/t39.2365-6/651665580_1459945459197437_575182176736124006_n.png?_nc_cat=110&ccb=1-7&_nc_sid=e280be&_nc_ohc=KsLQdGNYd9UQ7kNvwFWFxVZ&_nc_oc=Adp5-kDja2HyeHFc75QKJ1HNkWttLszkgoeLv-qKIhohUyrPAZlrNSxUFx4RL3JCU50&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=R6Y6E_Bmen1YAxFMq1jQzw&_nc_ss=7b289&oh=00_AQOoXrt2_BUeo9NSCPpQ4tj5I8X0BO1XEYXrppvame8WJA&oe=6ADD63C5)
+
+Below you can find the most popular use cases, which we packaged together with templates, step-by-step guides and code for ease of use. You can build many more use cases with Flows.
+
+In this guide, designed for businesses in the Financial Service sector, you will learn to build a Flows powered pre-approved loan experience that simplifies the borrowing process, allowing users to secure funds with just a few clicks. This guide will help you create a Flow that:
+
+*   Presents a loan amount to a user, with the ability for the user to customize loan terms like repayment period.
+*   Allows the user to select their disbursement and preferred payment method.
+*   Includes the ability for the user to authenticate themselves to confirm their identity.
+
+This guide can be adapted to suit other relevant use cases, including credit card offer, loan/credit limit calculators, loan offers for shopping, and full loan qualification.
+
+![Image 2: WhatsApp Flow screens for a pre-approved loan: credit details, payment method, and summary](https://scontent-sea5-1.xx.fbcdn.net/v/t39.2365-6/653040004_1459945719197411_215194558083014827_n.png?_nc_cat=106&ccb=1-7&_nc_sid=e280be&_nc_ohc=d3bvrvtjhSUQ7kNvwHrazwr&_nc_oc=AdopRsX2evulukzkDSoX58vFEazTGQ3h6RzGrfOAPimwAyA02YzENimBnBP3M0ylLZg&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=R6Y6E_Bmen1YAxFMq1jQzw&_nc_ss=7b289&oh=00_AQNeWniGk1lXOm6MuxrTCpgY_OSj7muxMrLxQT-r2t3AOQ&oe=6ADD5EB1)
+
+This guide will help you create a Flow that enables users to seamlessly enroll in and customize their insurance coverage within WhatsApp. This use case is ideal for businesses that want to offer customizable products, particularly where a user’s details and preferences will generate a tailored quote. The guide will explain how to create a Flow that:
+
+*   Collects personal preferences and details from a user (number of members covered, health risks, premium, etc.) for any type of insurance, and allows them to view, customize and choose the insurance plans they are interested in.
+*   Provides a quote based on the options selected, and allows the user to select how frequently they would like to pay.
+
+Although this guide is based on an _Insurance sales_ use case, it can be adapted for use cases such as insurance renewal, profile completion, and customer onboarding.
+
+![Image 3: WhatsApp Flow screens for an insurance quote: coverage level, policy selection, and price summary](https://scontent-sea5-1.xx.fbcdn.net/v/t39.2365-6/652130758_1459945559197427_709902753047097400_n.png?_nc_cat=104&ccb=1-7&_nc_sid=e280be&_nc_ohc=mWZmqq5N010Q7kNvwFf-Fr3&_nc_oc=AdoUVvF1tWgtghwqyLjmmCqxhUp0yu1wWHosQJ_OiYd47arSpcwRCgOPR5WsI1JWrxc&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=R6Y6E_Bmen1YAxFMq1jQzw&_nc_ss=7b289&oh=00_AQMTRqMNXcR0VCXcANvejEpVVrFzKzxgUh2gcLxzo5TIFg&oe=6ADD3B35)
+
+This guide will help you to create a Flow for a business to understand what products or services your customers are interested in. This data can be leveraged in advance of Marketing and Sales campaigns, and to offer personalised promotion. This guide will help you build a Flow that can:
+
+*   Collect relevant personal data from a customer, such as name and email address
+*   Allows the user to select the products or services that they are interested in
+
+This guide can be adapted to a range of use cases where you’d like to collect information from users.
+
+![Image 4: WhatsApp Flow screens collecting customer details and product category interest for Black Friday](https://scontent-sea5-1.xx.fbcdn.net/v/t39.2365-6/651706993_1459945709197412_5831719837776262328_n.png?_nc_cat=111&ccb=1-7&_nc_sid=e280be&_nc_ohc=ZQq-sD8vdZUQ7kNvwHqhFaf&_nc_oc=AdrmyOp7Rc2De9eitno7MBwm3mHbvBuLb1O_8GwsyloBbsH6NZsDc_0JCJ-6GKcwBVI&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=R6Y6E_Bmen1YAxFMq1jQzw&_nc_ss=7b289&oh=00_AQPNCX3BaF0VKm4mqO3ip3J2NIAqGzoXT7t6OEDHNlUbUw&oe=6ADD6257)
+
+This guide will explain how to create a Flow that offers personalised offers to your customers.
+
+*   Users will be able to select products they are interested in, their budget, and receive a specific recommendation on what to purchase.
+*   You can then follow up with a message with instructions on how to complete the purchase.
+
+This guide is ideal for engaging users in promotional events.
+
+![Image 5: WhatsApp Flows screens for selecting product options and registering for Black Friday deals](https://scontent-sea5-1.xx.fbcdn.net/v/t39.2365-6/651665580_1459945459197437_575182176736124006_n.png?_nc_cat=110&ccb=1-7&_nc_sid=e280be&_nc_ohc=KsLQdGNYd9UQ7kNvwFWFxVZ&_nc_oc=Adp5-kDja2HyeHFc75QKJ1HNkWttLszkgoeLv-qKIhohUyrPAZlrNSxUFx4RL3JCU50&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=R6Y6E_Bmen1YAxFMq1jQzw&_nc_ss=7b289&oh=00_AQOoXrt2_BUeo9NSCPpQ4tj5I8X0BO1XEYXrppvame8WJA&oe=6ADD63C5)
+
+You will need to conform to relevant local regulations when handling user data, and ensure that your use case adheres to our [Business Messaging Policy⁠](https://l.facebook.com/l.php?u=https%3A%2F%2Fbusiness.whatsapp.com%2Fpolicy%23overview&h=AUD0Jnr3D5ArjcC6wkEFo4zGpwr7MA87QIS-V4XE3QQpzV6lCjhaakfSVFAEPY5Pazm3lKXNDHIeLR7va__RhtLdbh8ru5Nf5ZlGla8-RA2C3eSeHgYxKAjOJTwTPAQ5MPIRMdCnbaUYNQ).
+
+Brand new to WhatsApp Flows? Start here! Learn how to build your first example Flow here.
+
+Do you need some direction on best practices for Flows? Or want to see complete examples using Flow JSON? Explore more [here](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/guides).
+
+Looking for technical details? Learn more about Flow JSON, the Flows REST API, error codes, and more here.
+
+Try to quickly configure and preview a basic Flow.
+
+If you’re stuck on something with WhatsApp Flows, start here to get help.
+
+Are you looking for updates on what’s changed? This section includes details on current versions, API changes, and more.

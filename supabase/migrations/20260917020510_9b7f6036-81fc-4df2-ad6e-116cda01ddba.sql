@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.trg_stock_codes_recalc() FROM PUBLIC, anon, authenticated;

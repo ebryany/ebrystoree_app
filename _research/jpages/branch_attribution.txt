@@ -1,0 +1,351 @@
+Title: Decoupled & accurate cross-platform attribution| Branch
+
+URL Source: https://www.branch.io/attribution/
+
+Markdown Content:
+[Skip to content](https://www.branch.io/attribution/#wp--skip-link--target)
+
+[![Image 16: Branch Logo](https://www.branch.io/wp-content/uploads/2026/02/branch-logo-tm.svg)](https://www.branch.io/)
+
+*   [Products](https://www.branch.io/products/)
+    *   [Left Column](https://www.branch.io/attribution/#)
+        *   [Engagement Increase conversions from owned and organic channels.](https://www.branch.io/products/engagement/)
+        *   [Performance Improve ads ROI with sophisticated attribution.](https://www.branch.io/products/performance/)
+        *   [Activation Drive actions with branded short links and QR codes.](https://www.branch.io/products/activation/)
+        *   [Discovery Reach your users with targeted programmatic media buying.](https://www.branch.io/products/discovery/)
+
+    *   [Right column](https://www.branch.io/attribution/#)
+        *   [Data Exports Get your data where and how you want it, on your schedule.](https://www.branch.io/products/data-exports/)
+        *   [Ivy Intelligence that accelerates growth.](https://www.branch.io/products/ivyai/)
+        *   [Banners Targeted web-to-app banners that convert browsers into buyers.](https://www.branch.io/products/banners/)
+        *   [Link Management Create, manage, and analyze links at scale](https://www.branch.io/products/linkhub/)
+
+*   [Solutions](https://www.branch.io/use-cases/)
+    *   [Use Cases](https://www.branch.io/attribution/#)
+        *   [Deep Linking](https://www.branch.io/deep-linking/)
+        *   [Attribution](https://www.branch.io/attribution/)
+        *   [Advanced Compliance](https://www.branch.io/advanced-compliance/)
+
+    *   [Industries](https://www.branch.io/attribution/#)
+        *   [Health](https://www.branch.io/resources/guide/health-industry-hub/)
+        *   [Finance](https://www.branch.io/resources/guide/finance-industry-hub/)
+        *   [Retail & E-commerce](https://www.branch.io/resources/guide/retail-and-e-commerce-industry-hub/)
+        *   [Food & Beverage](https://www.branch.io/resources/guide/food-and-beverage-industry-hub/)
+        *   [Media & Entertainment](https://www.branch.io/resources/guide/media-and-entertainment-industry-hub/)
+        *   [Travel](https://www.branch.io/resources/guide/travel-industry-hub/)
+
+    *   [Partners](https://www.branch.io/attribution/#)
+        *   [Partners Overview](https://www.branch.io/partners/)
+
+*   [Learn](https://www.branch.io/resources/)
+    *   [Blogs](https://www.branch.io/resources/category/blog/)
+    *   [Guides](https://www.branch.io/resources/category/guide/)
+    *   [Glossary](https://www.branch.io/glossary/)
+    *   [White Papers](https://www.branch.io/resources/category/white-paper/)
+    *   [Webinars](https://www.branch.io/resources/category/webinar/)
+    *   [Podcasts](https://www.branch.io/resources/category/podcast/)
+    *   [Case Studies](https://www.branch.io/resources/category/case-study/)
+    *   [Events](https://www.branch.io/events/)
+    *   [Branch University](https://university.branch.io/paths)
+    *   [Maturity Assessment](https://www.branch.io/resources/mobile-growth-maturity-assessment/)
+    *   [Help Center](https://help.branch.io/)
+
+*   [Pricing](https://www.branch.io/pricing/)
+*   [Login](https://app.branch.io/signin)
+
+[Request a demo](https://www.branch.io/contact-sales/)
+
+Cross-platform attribution for a mobile-first world
+
+# Unified measurement for total visibility
+
+Get deduplicated, accurate attribution across paid, owned, and earned channels to power smarter marketing decisions.
+
+[Request a demo](https://www.branch.io/contact-sales/)
+
+![Image 17](https://www.branch.io/wp-content/uploads/2026/02/performance-ads-attribution-illustration-scaled.webp)
+
+## Understand the real impact of your marketing investment
+
+Make better investment decisions with unified attribution for paid, owned, and earned channels in one centralized dashboard. Branch provides the infrastructure to capture the entire omnichannel shopping journey across every touchpoint.
+
+![Image 18: Green attribution icon](https://www.branch.io/wp-content/uploads/2026/01/attribution-icon-green.svg)
+### Know what’s actually driving results
+
+[Attribution](https://www.branch.io/glossary/attribution/) connects your marketing efforts to real outcomes. See which campaigns drive conversions, understand the complete customer journey, and measure impact where it matters — not just where it’s easy.
+
+![Image 19: Green dollar sign symbol representing ROI](https://www.branch.io/wp-content/uploads/2026/01/ROI-icon-green.svg)
+### Invest with confidence
+
+When you see true performance across every channel, you know exactly where your budget should go. Spot top performers, cut what’s not working, and allocate resources to your highest-ROI opportunities.
+
+![Image 20: Green dashboard icon](https://www.branch.io/wp-content/uploads/2026/01/dashboard-icon-green.svg)
+### See one source of truth for every channel
+
+One dashboard means one truth. Unified attribution lets you stack every channel side-by-side so you can finally compare experimental campaigns against evergreen ones and see exactly what drives results. No platform bias, just clear answers.
+
+## Two steps to better attribution
+
+**1. Start tracking all user touchpoints**
+
+User journeys happen across channels and devices. To get accurate attribution, you need to measure every interaction. Branch has a years-long track record of powering flawless cross-channel user experiences on both digital and offline channels.
+
+**2. Capture the entire cross-platform journey**
+
+Your customer journeys aren’t linear, so your attribution shouldn’t be either. Influence and engagement happen on any platform, and to understand the full return on your marketing investments, you need to track all of your campaigns. Branch attribution provides a deduplicated, unbiased view across paid, owned, and earned channels. With last-touch attribution by default, our attribution reporting is free from systemic bias toward any specific channel or source — designed instead to give useful insights for omnichannel marketing strategies. But you don’t see only the last touch. You see the full journey. Branch Funnel Analysis lets you track every interaction that led to conversion so you can make the most informed decisions about where to invest.
+
+![Image 21: screenshot of anthony joshua X (Twitter) feed](https://www.branch.io/wp-content/uploads/2026/02/attribution-screenshot.webp)
+
+## Learn how Branch attribution is different
+
+Our goal is to help you create authentic connections with your customers through amazing user experiences and give you the data you need to make better business decisions. We don’t exist to sell retargeting data, and we won’t charge you more just because you drive more conversions.  
+  
+We care about the same thing you do: happy, engaged, retained users.
+
+## The industry standard for accurate marketing attribution
+
+![Image 22: Logo of A&E network](https://www.branch.io/wp-content/uploads/2026/02/AE_Network_logo-white.svg)
+
+### “When we identified an attribution gap, Branch was interested in hearing about our challenge and was proactive in solving the problem.”
+
+![Image 23: Jen Taylor headshot](https://www.branch.io/wp-content/uploads/2026/02/Jen_Taylor_Headshot-60x60.webp)
+
+Jen Taylor
+
+VP Director of Digital Audience Development, A&E Networks
+
+![Image 24: ifit logo](https://www.branch.io/wp-content/uploads/2026/02/Logo_ifit-white.svg)
+
+### “We went with Branch as our MMP tool because they had solutions beyond attribution, such as the ability to power quick links, email, and web-to-app customizable banners on our website—it’s what we rely on to create a best-in-class experience for our members in order for our product to be successful.”
+
+![Image 25: headshot of kevin chelak](https://www.branch.io/wp-content/uploads/2026/02/kevin_chelak_headshot-60x60.webp)
+
+Kevin Chelak
+
+Acquisition Marketing Director, iFIT
+
+![Image 26: hipages logo](https://www.branch.io/wp-content/uploads/2026/02/Logo_Hipages-white.svg)
+
+### “We moved from AppsFlyer to Branch for our attribution and we’ve been very happy. Branch is the next-gen tool we’ve been waiting for.”
+
+![Image 27: headshot of marie huynh](https://www.branch.io/wp-content/uploads/2026/02/marie_huynh_headshot-60x60.webp)
+
+Marie Huynh
+
+Digital Marketing PM, Hipages
+
+## Cross-platform attribution solutions from Branch
+
+![Image 28](https://www.branch.io/wp-content/uploads/2026/06/stack-icon-green.svg)
+### Simple, one-time setup
+
+Seamless integrations with your marketing, product, and data stacks
+
+[Review our mobile SDK documentation](https://docs.branch.io/pages/apps/ios/)
+
+[Review our web SDK documentation](https://docs.branch.io/pages/web/integrate/)
+
+![Image 29](https://www.branch.io/wp-content/uploads/2026/06/insights-icon-green.svg)
+### Cross-channel insights
+
+Web, email, ads, social, SEO, affiliates, and QR codes, all in one place
+
+[Learn about our platform](https://www.branch.io/products/)
+
+![Image 30: Green unified arrows icon representing a single view of performance data](https://www.branch.io/wp-content/uploads/2026/01/unify-icon-green.svg)
+### Cohort analysis
+
+Standardized comparisons across every campaign
+
+[Learn more about cohort analytics](https://help.branch.io/using-branch/docs/cohort-analytics)
+
+![Image 31: Green attribution icon](https://www.branch.io/wp-content/uploads/2026/01/attribution-icon-green.svg)
+### Configurable attribution windows
+
+Attribution windows at the campaign or link level to fit your needs
+
+[Learn how to configure attribution windows](https://help.branch.io/using-branch/docs/attribution-windows-link-settings)
+
+![Image 32: Green layout icon](https://www.branch.io/wp-content/uploads/2026/01/layout-icon-green.svg)
+### Advanced analytics dashboard
+
+Total visibility into where clicks, installs, and conversion events occurred, segmented by device, platform, channel, campaign, and more
+
+[Learn more about the Branch Dashboard](https://help.branch.io/using-branch/docs/branch-summary-page)
+
+![Image 33: Green attribution window icon](https://www.branch.io/wp-content/uploads/2026/01/attribution-window-icon-green.svg)
+### Owned and earned attribution
+
+One tool for all your channels without switching between platforms
+
+[Learn more about Branch Engagement](https://www.branch.io/products/engagement/)
+
+![Image 34: Green data icon](https://www.branch.io/wp-content/uploads/2026/01/data-icon-green.svg)
+### Centralized data across all ad networks
+
+Deduplicated performance across networks for numbers you can trust
+
+[Learn more about Universal Ads](https://www.branch.io/universal-ads/)
+
+![Image 35: Green mobile linking icon](https://www.branch.io/wp-content/uploads/2026/01/mobile-linking-green-icon.svg)
+### App attribution for SEO
+
+Quantified SEO and AI-powered search impact on mobile app engagement
+
+[Learn more about SEO App Attribution](https://www.branch.io/seo-app-attribution/)
+
+![Image 36: Green code editor icon](https://www.branch.io/wp-content/uploads/2026/01/code-editor-icon-green.svg)
+### Complete data freedom
+
+Turnkey integrations, robust APIs, webhooks, and CSV exports to access your data anywhere you need it
+
+[Learn more about data integration](https://www.branch.io/products/data-exports/)
+
+## Branch attribution frequently asked questions (FAQs)
+
+**What is attribution?**
+Attribution shows you what actually drives results by capturing every interaction between users and your brand and connecting conversions to the interactions that drove them. Without unified measurement, every channel looks like a winner. Unified attribution shows you which ones really are.
+
+**Why is omnichannel attribution important?**
+Customer journeys don’t happen in one channel. People move across devices, platforms, and touchpoints before they convert. Omnichannel attribution eliminates data silos by providing a complete view of how ads, web, email, and social interactions work together to drive app engagement.  
+  
+Branch brings paid, owned, and earned into one unified view — cross-platform, cross-device, cross-channel. You see the complete journey so you can make smarter investment decisions.
+
+**How does Branch support privacy-safe measurement?**
+Branch uses a compliance-first infrastructure to provide accurate attribution while adhering to regulations like GDPR and CCPA. We turn privacy into a competitive advantage with multi-touch attribution models that help you grow while respecting user data through advanced multi-touch attribution models.
+
+![Image 37](https://www.branch.io/wp-content/themes/branch/assets/images/CTA.svg?ver=1789060734)
+
+## Ready to unify your attribution?
+
+[Request a demo](https://www.branch.io/contact-sales/)
+
+![Image 38: footer-logo](https://www.branch.io/wp-content/themes/branch/assets/images/branch-start-logo.svg?ver=1789060734)
+
+### [Products](https://www.branch.io/products/)
+
+*   [Engagement](https://www.branch.io/products/engagement/)
+*   [Performance](https://www.branch.io/products/performance/)
+*   [Activation](https://www.branch.io/products/activation/)
+*   [Discovery](https://www.branch.io/products/discovery/)
+*   [Data Exports](https://www.branch.io/products/data-exports/)
+*   [AI](https://www.branch.io/products/ivyai/)
+*   [Link Management](https://www.branch.io/products/linkhub/)
+*   [Banners](https://www.branch.io/products/banners/)
+
+### [Solutions](https://www.branch.io/use-cases/)
+
+*   [Deep Linking](https://www.branch.io/deep-linking/)
+*   [Attribution](https://www.branch.io/attribution/)
+*   [Advanced Compliance](https://www.branch.io/advanced-compliance/)
+*   [Health](https://www.branch.io/resources/guide/health-industry-hub/)
+*   [Finance](https://www.branch.io/resources/guide/finance-industry-hub/)
+*   [Retail & E-commerce](https://www.branch.io/resources/guide/retail-and-e-commerce-industry-hub/)
+*   [Food & Beverage](https://www.branch.io/resources/guide/food-and-beverage-industry-hub/)
+*   [Media & Entertainment](https://www.branch.io/resources/guide/media-and-entertainment-industry-hub/)
+*   [Travel](https://www.branch.io/resources/guide/travel-industry-hub/)
+*   [Partners Overview](https://www.branch.io/partners/)
+
+### [Learn](https://www.branch.io/resources/)
+
+*   [Blogs](https://www.branch.io/resources/category/blog/)
+*   [Guides](https://www.branch.io/resources/category/guide/)
+*   [Glossary](https://www.branch.io/glossary/)
+*   [White Papers](https://www.branch.io/resources/category/white-paper/)
+*   [Webinars](https://www.branch.io/resources/category/webinar/)
+*   [Podcasts](https://www.branch.io/resources/category/podcast/)
+*   [Events](https://www.branch.io/events/)
+*   [Branch University](https://university.branch.io/paths/)
+*   [Maturity Assessment](https://www.branch.io/resources/mobile-growth-maturity-assessment/)
+*   [Help Center](https://help.branch.io/)
+
+### [Company](https://www.branch.io/attribution/#0)
+
+*   [About Us](https://www.branch.io/about/)
+*   [Careers](https://www.branch.io/careers/)
+*   [Culture](https://www.branch.io/careers/culture/)
+*   [Leadership](https://www.branch.io/leadership/)
+*   [Newsroom](https://www.branch.io/resources/category/news/)
+*   [Brand Guidelines](https://www.branch.io/brand/)
+*   [Contact Us](https://www.branch.io/contact/)
+
+### [Pricing](https://www.branch.io/pricing/)
+
+Branch powers every touchpoint with links that work and insights that prove it.  
+From click to conversion, we make growth measurable.
+
+© 2026 Branch, All rights reserved
+
+*   [Privacy Policy](https://legal.branch.io/saas/privacy-policy/)
+*   [Terms of Service](https://legal.branch.io/website-terms-of-service/)
+*   [Opt-Out](https://legal.branch.io/saas/privacy-opt-out/)
+*   [Discovery Policies](https://legal.branch.io/discovery/)
+*   [Your Privacy Choices](https://www.branch.io/attribution/#cookie-banner-modal-link)
+
+[![Image 39: Linkedin Logo](https://www.branch.io/wp-content/themes/branch/assets/images/linkedin.svg?ver=1789060734)](https://www.linkedin.com/company/branch-metrics/)[![Image 40: Youtube Logo](https://www.branch.io/wp-content/themes/branch/assets/images/youtube.svg?ver=1789060734)](https://www.youtube.com/@Branch-Metrics)
+
+![Image 41](https://bat.bing.com/action/0?ti=187263976&tm=gtm002&Ver=2&mid=b5b42c80-e5eb-425a-b59b-14bd73d39647&bo=1&sid=bc7d29f0c06a11f1b2b499db79361a52&vid=bc7d4e70c06a11f1bab9f9a77852ebce&vids=1&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=Decoupled%20%26%20accurate%20cross-platform%20attribution%7C%20Branch&p=https%3A%2F%2Fwww.branch.io%2Fattribution%2F&r=&lt=1213&evt=pageLoad&sv=2&cdb=AQAS&rn=751698)
+
+By clicking “Accept All Cookies”, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts.
+
+Cookies Settings Reject All Accept All Cookies
+
+![Image 42: Company Logo](https://cdn.cookielaw.org/logos/static/ot_company_logo.png)
+
+## Privacy Preference Center
+
+When you visit any website, it may store or retrieve information on your browser, mostly in the form of cookies. This information might be about you, your preferences, or your device, and is mostly used to make the site work as you expect. The information does not usually identify you directly, but it can give you a more personalized web experience. Because we respect your right to privacy, you can choose not to allow some types of cookies. Click on the different category headings to learn more and change our default settings. Blocking some types of cookies may impact your experience of the site and the services we are able to offer.   
+[More information](https://cookiepedia.co.uk/giving-consent-to-cookies)
+
+Allow All
+### Manage Consent Preferences
+
+#### Strictly Necessary Cookies
+
+Always Active
+
+These cookies are necessary for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms. You can set your browser to block or alert you about these cookies, but some parts of the site will not then work. These cookies do not store any personally identifiable information.
+
+#### Functional Cookies
+
+- [x] Functional Cookies 
+
+These cookies enable the website to provide enhanced functionality and personalisation. They may be set by us or by third party providers whose services we have added to our pages. If you do not allow these cookies then some or all of these services may not function properly.
+
+#### Performance Cookies
+
+- [x] Performance Cookies 
+
+These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular and see how visitors move around the site. All information these cookies collect is aggregated and therefore anonymous. If you do not allow these cookies we will not know when you have visited our site, and will not be able to monitor its performance.
+
+#### Targeting Cookies
+
+- [x] Targeting Cookies 
+
+These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites. They do not store directly personal information, but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will experience less targeted advertising.
+
+#### Social Media Cookies
+
+- [x] Social Media Cookies 
+
+These cookies are set by a range of social media services that we have added to the site to enable you to share our content with your friends and networks. They are capable of tracking your browser across other sites and building up a profile of your interests. This may impact the content and messages you see on other websites you visit. If you do not allow these cookies you may not be able to use or see these sharing tools.
+
+### Performance Cookies
+
+Clear
+
+- [x] checkbox label label
+
+Apply Cancel
+
+Consent Leg.Interest
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+Reject All Confirm My Choices
+
+[![Image 43: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/solutions/consent-and-preferences/)

@@ -1,0 +1,1 @@
+CREATE POLICY "Staff can delete reviews" ON public.product_reviews FOR DELETE TO authenticated USING (public.is_staff(auth.uid()));

@@ -1,0 +1,525 @@
+Title: Hubspot 404
+
+URL Source: https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports
+
+Markdown Content:
+We use cookies to improve HubSpot’s site. Some cookies are necessary for our website and services to function properly. Other cookies are optional and help personalize your experience, including advertising and analytics. You can consent to all cookies, decline all optional cookies, or manage optional cookies. Without a selection, our default cookie settings will apply. You can change your preferences at any time. To learn more, check out our [Cookie Policy](https://legal.hubspot.com/cookie-policy?_ga=2.50914222.648097249.1661181827-2085802971.1659562077).
+
+Accept all Decline all
+
+Manage Cookies
+
+[Skip to content](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports#global-nav-main-content)
+
+*    English Select a language 
+    *   [日本語](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Deutsch](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [English](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Español](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Português](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Français](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+
+*   High Contrast
+*   [Customer Support](https://help.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+*   [Contact Sales](https://offers.hubspot.com/contact-sales?hubs_signup-url=knowledge.hubspot.com/404&hubs_signup-cta=nav-utility-contactsales&hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-contactsales&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+
+*   Close Search
+*   [Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Freports%2Fanalyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com&uuid=anon2df546d7172a03871bfbd53dfb10) 
+*    About About 
+    *   [About Us](https://www.hubspot.com/our-story?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-about&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Careers](https://www.hubspot.com/careers?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-careers&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Contact Us](https://www.hubspot.com/company/contact?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-contact&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Investor Relations](https://ir.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-investors&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Management Team](https://www.hubspot.com/company/management?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-management&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+ Back [![Image 1: HubSpot](blob:http://localhost/478e386801d9e528682eb3058ce6120e)![Image 2: HubSpot](blob:http://localhost/24ccdadb4f49a6fcfc6d3605e2dfbe5f)](https://www.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=HubSpot&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Menu
+
+*   Close Search
+
+*   
+Products Products 
+
+    *   ## The HubSpot Customer Platform
+
+All of HubSpot's marketing, sales, and customer service software on one agentic platform. [Free HubSpot CRM](https://www.hubspot.com/products/crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-freecrm&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)[Overview of all products](https://www.hubspot.com/products/get-started?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-platform&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+
+    *    ### Marketing Hub
+
+Marketing automation software
+
+[Free and premium plans](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Sales Hub
+
+Sales software
+
+[Free and premium plans](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Service Hub
+
+Customer service software
+
+[Free and premium plans](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Content Hub
+
+Content marketing software
+
+[Free and premium plans](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Data Hub
+
+Data management software
+
+[Free and premium plans](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Revenue Hub
+
+CPQ, billing, and payments software
+
+[Free and premium plans](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Smart CRM
+
+AI-powered, flexible CRM software
+
+[Learn more](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### Agent Hub
+
+Your central home for building and managing AI agents across the platform
+
+[Learn more](https://www.hubspot.com/products/artificial-intelligence?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-agents&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+
+    *    ### Small Business Bundle
+
+The Starter edition of each product, built for startups and small businesses
+
+[Learn more](https://www.hubspot.com/products/crm/starter?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-starter&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### AEO (Beta)
+
+Answer engine optimization tools that track and improve your brand's visibility in AI results
+
+[Learn more](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *    ### HubSpot Marketplace
+
+Connect your favorite apps to HubSpot
+
+[See all integrations](https://ecosystem.hubspot.com/marketplace/apps?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketplace&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+
+*   
+Solutions Solutions 
+
+    *    By Use Case 
+    *    By Team Size 
+    *    Why HubSpot? 
+
+    *    
+## Marketing 
+
+        *   ### [Generate leads](https://www.hubspot.com/use-case/generate-leads?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-leads&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Convert visitors into contacts for your database.  
+        *   ### [Automate marketing](https://www.hubspot.com/use-case/automate-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-automate&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Create campaigns with automation and AI.  
+
+    *    
+## Sales 
+
+        *   ### [Build pipeline](https://www.hubspot.com/use-case/build-sales-pipeline?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-pipeline&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Generate a pipeline of high-quality prospects.  
+        *   ### [Close deals](https://www.hubspot.com/use-case/close-more-deals?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-deals&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Streamline your process and close more deals faster.  
+
+    *    
+## Customer Service 
+
+        *   ### [Scale support](https://www.hubspot.com/use-case/scale-customer-service-support?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Support customers at scale with AI and a help desk.  
+        *   ### [Drive retention](https://www.hubspot.com/use-case/drive-customer-satisfaction?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-retention&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Identify opportunities to improve customer health.  
+
+    *    
+## Content 
+
+        *   ### [Create content](https://www.hubspot.com/use-case/create-content-for-customer-journey?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-create&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Easily craft content for your audience, with help from AI.  
+        *   ### [Manage content](https://www.hubspot.com/use-case/manage-content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-manage&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Organize, update, and distribute content in one place.  
+
+    *    
+## Startups & Small Businesses 
+
+        *   ### [Find and reach customers](https://www.hubspot.com/use-case/find-and-reach-customers?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-find&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Generate leads through content, AI, and automation.  
+        *   ### [Grow sales and get paid](https://www.hubspot.com/use-case/grow-sales-and-get-paid-faster?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-grow&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Prospect smarter and automate payments.  
+        *   ### [Organize customer data](https://www.hubspot.com/use-case/understand-and-organize-customer-data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-data&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Unify your team and data on one platform.  
+
+    *    
+## Artificial Intelligence 
+
+        *   ### [Resolve customer queries 24/7](https://www.hubspot.com/products/artificial-intelligence/ai-customer-service-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-customeragent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Scale customer service with an AI customer agent.  
+        *   ### [Automate sales prospecting](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-prospectagent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Identify and engage high-value leads with an AI prospecting agent.  
+        *   ### [Research customers faster](https://www.hubspot.com/products/artificial-intelligence/ai-data-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-dataagent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+Get instant answers about your customers with an AI data agent.  
+
+## By Team Size
+
+    *   ![Image 3: 195309752641](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports) ### For Small Businesses & Startups
+
+HubSpot’s all-in-one Starter Customer Platform helps your growing startup or small business find and win customers from day one.
+
+[Learn more about HubSpot’s Starter Customer Platform](https://www.hubspot.com/products/crm/starter?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-smallbiz&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *   ![Image 4: 195309752642](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports) ### For Enterprises
+
+With HubSpot’s integrated Enterprise Customer Platform, you don’t have to sacrifice power for ease of use.
+
+[Learn more about HubSpot’s Enterprise Customer Platform](https://www.hubspot.com/products/crm/enterprise?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-enterprise&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+
+## Why HubSpot?
+
+    *   ![Image 5: 195309752643](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports) ### Why Choose HubSpot?
+
+After just one year, HubSpot customers acquire 129% more leads, close 36% more deals, and see a 37% improvement in ticket closure rates.
+
+[Learn more about why how HubSpot’s solution is different](https://www.hubspot.com/why-choose-hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-wch&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *   ![Image 6: 195303448595](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports) ### Case Studies
+
+Explore examples of companies like yours from all over the globe that use HubSpot to unite their teams, empower their businesses, and grow better.
+
+[See all case studies](https://www.hubspot.com/case-studies?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-casestudies&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+    *   ![Image 7: 191228329371](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports) ### Spotlight: Product Updates
+
+Learn about HubSpot’s featured product releases and announcements in this semi-annual product showcase.
+
+[Explore product updates](https://www.hubspot.com/spotlight?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-spotlight&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+
+*   [Pricing](https://www.hubspot.com/pricing/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-pricing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)  
+*   
+Resources Resources 
+
+    *    
+## Featured Links 
+
+        *   [Spotlight: Product Updates](https://www.hubspot.com/spotlight?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-spotlight&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [What's New in HubSpot](https://www.hubspot.com/new?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-new&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Why Choose HubSpot?](https://www.hubspot.com/why-choose-hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-wch&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Sustainability](https://www.hubspot.com/sustainability?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-sustainability&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    
+## Community & Events 
+
+        *   [UNBOUND Event](https://unbound.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-unbound&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Webinars](https://www.hubspot.com/resources/webinar?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-webinars#resource-library-page-headers)
+        *   [HubSpot Community](https://community.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-community&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot User Groups](https://www.hubspot.com/hubspot-user-groups?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-usergroups&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    
+## Partners 
+
+        *   [Solutions Partner Program](https://www.hubspot.com/partners/solutions?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-solutions&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Technology Partner Program](https://www.hubspot.com/partners/app?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-tech&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Affiliate Partner Program](https://www.hubspot.com/partners/affiliates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-affiliate&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Education Partner Program](https://academy.hubspot.com/education-partner-program?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-education&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Startup Partner Program](https://www.hubspot.com/startups/partners?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-startup&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    
+## Education 
+
+        *   [The Loop Marketing Playbook](https://www.hubspot.com/loop-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-loopmarketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [What Is Inbound Marketing?](https://www.hubspot.com/inbound-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-inboundmarketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot Blogs](https://blog.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-blogs&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Free Courses & Certifications](https://academy.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-academy&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Ebooks, Guides & More](https://www.hubspot.com/resources?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-resources&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot Knowledge Base](https://knowledge.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-knowledge&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    
+## Tools 
+
+        *   [Website Templates](https://ecosystem.hubspot.com/marketplace/templates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-templates&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Developer Tools](https://developers.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-devtools&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    
+## Services 
+
+        *   [Onboarding](https://www.hubspot.com/services/onboarding?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-onboarding&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Migration](https://www.hubspot.com/services/professional/migrations?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-migration&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Premium Support](https://www.hubspot.com/services/premium-support?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Hire a Solutions Partner](https://ecosystem.hubspot.com/marketplace/solutions?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-hirepartner&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+*    Products Products
+    *   ## The HubSpot Customer Platform
+
+All of HubSpot's marketing, sales, and customer service software on one agentic platform. 
+
+    *   ### [Free HubSpot CRM](https://www.hubspot.com/products/crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-freecrm&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   ### [Overview of all products](https://www.hubspot.com/products/get-started?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-platform&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   [![Image 8: 195140668528](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/marketing-hub.svg) ### Marketing Hub Marketing automation software](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 9: 195146645596](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/sales-hub.svg) ### Sales Hub Sales software](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 10: 195140668527](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/service-hub.svg) ### Service Hub Customer service software](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 11: 195140649745](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/content-hub.svg) ### Content Hub Content marketing software](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 12: 195289608884](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/data-hub.svg) ### Data Hub Data management software](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 13: 195140609672](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/commerce-hub.svg) ### Revenue Hub CPQ, billing, and payments software](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 14: 195146050660](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/smart-crm.svg) ### Smart CRM AI-powered, flexible CRM software](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 15: ProductIcons_AgentHub_Icon_Orange](https://www.hubspot.com/hubfs/assets/webteam-cms-portal/images/breeze/ProductIcons_AgentHub_Icon_Orange.svg) ### Agent Hub Your central home for building and managing AI agents across the platform](https://www.hubspot.com/products/artificial-intelligence?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-agents&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   [![Image 16: 195140649746](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/small-business.svg) ### Small Business Bundle The Starter edition of each product, built for startups and small businesses](https://www.hubspot.com/products/crm/starter?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-starter&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 17: 210646671655](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/aeo.svg) ### AEO (Beta) Answer engine optimization tools that track and improve your brand's visibility in AI results](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [![Image 18: 195140649747](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/app-marketplace.svg) ### HubSpot Marketplace Connect your favorite apps to HubSpot](https://ecosystem.hubspot.com/marketplace/apps?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketplace&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+*    Solutions Solutions
+    *    By Use Case 
+
+        *   ## Marketing
+
+            *   [Generate leads](https://www.hubspot.com/use-case/generate-leads?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-leads&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Automate marketing](https://www.hubspot.com/use-case/automate-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-automate&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+        *   ## Sales
+
+            *   [Build pipeline](https://www.hubspot.com/use-case/build-sales-pipeline?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-pipeline&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Close deals](https://www.hubspot.com/use-case/close-more-deals?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-deals&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+        *   ## Customer Service
+
+            *   [Scale support](https://www.hubspot.com/use-case/scale-customer-service-support?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Drive retention](https://www.hubspot.com/use-case/drive-customer-satisfaction?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-retention&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+        *   ## Content
+
+            *   [Create content](https://www.hubspot.com/use-case/create-content-for-customer-journey?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-create&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Manage content](https://www.hubspot.com/use-case/manage-content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-manage&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+        *   ## Startups & Small Businesses
+
+            *   [Find and reach customers](https://www.hubspot.com/use-case/find-and-reach-customers?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-find&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Grow sales and get paid](https://www.hubspot.com/use-case/grow-sales-and-get-paid-faster?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-grow&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Organize customer data](https://www.hubspot.com/use-case/understand-and-organize-customer-data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-data&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+        *   ## Artificial Intelligence
+
+            *   [Resolve customer queries 24/7](https://www.hubspot.com/products/artificial-intelligence/ai-customer-service-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-customeragent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Automate sales prospecting](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-prospectagent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+            *   [Research customers faster](https://www.hubspot.com/products/artificial-intelligence/ai-data-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-dataagent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *    By Team Size 
+
+        *   ## By Team Size
+
+ 
+            *   ![Image 19: 195309752641](https://www.hubspot.com/hs-fs/hubfs/assets/hubspot.com/global-navigation/2025/Small%20Businesses%20%26%20Start%20ups.webp?width=1035&height=450&name=Small%20Businesses%20%26%20Start%20ups.webp) ### For Small Businesses & Startups
+
+HubSpot’s all-in-one Starter Customer Platform helps your growing startup or small business find and win customers from day one.
+
+[Learn more about HubSpot’s Starter Customer Platform](https://www.hubspot.com/products/crm/starter?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-smallbiz&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+            *   ![Image 20: 195309752642](https://www.hubspot.com/hs-fs/hubfs/assets/hubspot.com/global-navigation/2025/Enterprise.webp?width=1035&height=450&name=Enterprise.webp) ### For Enterprises
+
+With HubSpot’s integrated Enterprise Customer Platform, you don’t have to sacrifice power for ease of use.
+
+[Learn more about HubSpot’s Enterprise Customer Platform](https://www.hubspot.com/products/crm/enterprise?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-enterprise&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+
+    *    Why HubSpot? 
+
+        *   ## Why HubSpot?
+
+ 
+            *   ![Image 21: 195309752643](https://www.hubspot.com/hs-fs/hubfs/assets/hubspot.com/global-navigation/2025/Why%20Choose%20HubSpot.webp?width=1035&height=450&name=Why%20Choose%20HubSpot.webp) ### Why Choose HubSpot?
+
+After just one year, HubSpot customers acquire 129% more leads, close 36% more deals, and see a 37% improvement in ticket closure rates.
+
+[Learn more about why how HubSpot’s solution is different](https://www.hubspot.com/why-choose-hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-wch&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+            *   ![Image 22: 195303448595](https://www.hubspot.com/hs-fs/hubfs/assets/hubspot.com/global-navigation/2025/Case%20Studies.webp?width=1035&height=450&name=Case%20Studies.webp) ### Case Studies
+
+Explore examples of companies like yours from all over the globe that use HubSpot to unite their teams, empower their businesses, and grow better.
+
+[See all case studies](https://www.hubspot.com/case-studies?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-casestudies&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+            *   ![Image 23: 191228329371](https://www.hubspot.com/hs-fs/hubfs/spotlight_resized_518x225.png?width=518&height=225&name=spotlight_resized_518x225.png) ### Spotlight: Product Updates
+
+Learn about HubSpot’s featured product releases and announcements in this semi-annual product showcase.
+
+[Explore product updates](https://www.hubspot.com/spotlight?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-spotlight&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com) 
+
+*   [Pricing](https://www.hubspot.com/pricing/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-pricing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*    Resources Resources
+    *   ## Featured Links
+
+        *   [Spotlight: Product Updates](https://www.hubspot.com/spotlight?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-spotlight&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [What's New in HubSpot](https://www.hubspot.com/new?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-new&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Why Choose HubSpot?](https://www.hubspot.com/why-choose-hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-wch&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Sustainability](https://www.hubspot.com/sustainability?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-sustainability&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   ## Community & Events
+
+        *   [UNBOUND Event](https://unbound.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-unbound&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Webinars](https://www.hubspot.com/resources/webinar?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-webinars#resource-library-page-headers)
+        *   [HubSpot Community](https://community.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-community&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot User Groups](https://www.hubspot.com/hubspot-user-groups?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-usergroups&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   ## Partners
+
+        *   [Solutions Partner Program](https://www.hubspot.com/partners/solutions?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-solutions&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Technology Partner Program](https://www.hubspot.com/partners/app?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-tech&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Affiliate Partner Program](https://www.hubspot.com/partners/affiliates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-affiliate&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Education Partner Program](https://academy.hubspot.com/education-partner-program?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-education&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Startup Partner Program](https://www.hubspot.com/startups/partners?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-startup&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   ## Education
+
+        *   [The Loop Marketing Playbook](https://www.hubspot.com/loop-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-loopmarketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [What Is Inbound Marketing?](https://www.hubspot.com/inbound-marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-inboundmarketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot Blogs](https://blog.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-blogs&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Free Courses & Certifications](https://academy.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-academy&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Ebooks, Guides & More](https://www.hubspot.com/resources?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-resources&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [HubSpot Knowledge Base](https://knowledge.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-knowledge&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   ## Tools
+
+        *   [Website Templates](https://ecosystem.hubspot.com/marketplace/templates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-templates&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Developer Tools](https://developers.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-devtools&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+    *   ## Services
+
+        *   [Onboarding](https://www.hubspot.com/services/onboarding?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-onboarding&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Migration](https://www.hubspot.com/services/professional/migrations?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-migration&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Premium Support](https://www.hubspot.com/services/premium-support?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+        *   [Hire a Solutions Partner](https://ecosystem.hubspot.com/marketplace/solutions?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-hirepartner&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+*    About About
+    *   [About Us](https://www.hubspot.com/our-story?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-about&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Careers](https://www.hubspot.com/careers?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-careers&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Contact Us](https://www.hubspot.com/company/contact?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-contact&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Investor Relations](https://ir.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-investors&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+    *   [Management Team](https://www.hubspot.com/company/management?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-management&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+[Start free or get a demo](https://www.hubspot.com/products/get-started?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=homepage-nav&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+[Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Freports%2Fanalyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com&uuid=anon2df546d7172a03871bfbd53dfb10)
+
+*    English Select a language
+    *   [日本語](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Deutsch](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [English](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Español](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Português](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+    *   [Français](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+
+*   High Contrast
+*   [Customer Support](https://help.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Contact Sales](https://offers.hubspot.com/contact-sales?hubs_signup-url=knowledge.hubspot.com/404&hubs_signup-cta=nav-utility-contactsales&hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-utility-contactsales&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+## Looks like you've drifted off course.
+
+Vector distance: -0.6706528067588806
+That page doesn't exist. But based on where you were headed, this one's worth a look:
+
+[Analyze performance across campaigns in Marketing Studio](https://knowledge.hubspot.com/campaigns/analyze-campaign-performance?hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=smart404-Analyze%2520performance%2520across%2520campaigns%2520in%2520Marketing%2520Studio)
+
+This article discusses how to review campaign performance in Marketing Studio, giving users a broad way to see how their campaigns are doing without moving between different tools or pages. It explains that the Overview tab offers AI-generated insights, campaign pipeline performance, and recent customer engagement, while the Analyze tab provides a more detailed reporting workspace. It also notes that users can analyze individual campaigns and learn about available HubSpot campaign metrics, with Super Admin or Campaign permissions required and legacy campaign analytics still reachable through global search, and attribution reports depend on enabled interaction types in revenue attribution settings. The Analyze filters include campaign, date range, and attribution model, with topline metrics, campaign brand visibility, contact conversion path, ROI over time, and asset performance organized by asset type.
+
+[Get a demo](https://offers.hubspot.com/demo?hubs_signup-url=knowledge.hubspot.com/404&hubs_signup-cta=analyze-performance-across-campaigns-in-marketing-studio)
+
+If that's not what are you looking for, here are some options to help you get back on track:
+
+*   Learn about the marketing, sales, and customer service software in HubSpot's customer platform. [Get started here](https://www.hubspot.com/products/get-started/?hubs_content-cta=404-getstarted&hubs_content=knowledge.hubspot.com/404&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com).
+*   Stay ahead of the curve with the latest tips, trends, and news on the [HubSpot blog](https://blog.hubspot.com/?hubs_content-cta=404-blog&hubs_content=knowledge.hubspot.com/404&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com).
+*   Take your professional skills to the next level with free online courses and certifications from [HubSpot Academy](https://academy.hubspot.com/?hubs_content-cta=404-academy&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com).
+
+![Image 24: hot air balloon illustration](https://www.hubspot.com/hs-fs/hubfs/WBZ%202025%20Rebrand/2025%20Illustrations/Linear%20Illustrations/Discovery_Illustrations_Color_LightBG.webp?width=480&name=Discovery_Illustrations_Color_LightBG.webp)
+
+Back
+
+Close
+
+## Popular Features
+
+*   [All Products and Features All Products and Features](https://www.hubspot.com/products?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-all&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [HubSpot AEO HubSpot AEO](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-aeo&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Meeting Scheduler App Free Meeting Scheduler App](https://www.hubspot.com/products/sales/schedule-meeting?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-meetings&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Agent Hub Agent Hub](https://www.hubspot.com/products/artificial-intelligence?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-agents&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Email Tracking Software Email Tracking Software](https://www.hubspot.com/products/sales/email-tracking?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailtracking&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [AI Content Writer AI Content Writer](https://www.hubspot.com/products/cms/ai-content-writer?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-aicontent&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [AI Website Generator AI Website Generator](https://www.hubspot.com/products/cms/ai-website-generator?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-aiwebsite&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Email Marketing Software Email Marketing Software](https://www.hubspot.com/products/marketing/email?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailmarketing&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Lead Management Software Lead Management Software](https://www.hubspot.com/products/crm/lead-management?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-leads&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [AI Prospecting Agent AI Prospecting Agent](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-aiprospecting&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Website Builder Free Website Builder](https://www.hubspot.com/products/cms/drag-and-drop-website-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-website&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Landing Page Builder Free Landing Page Builder](https://www.hubspot.com/products/marketing/landing-pages?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-landingpages&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Online Form Builder Free Online Form Builder](https://www.hubspot.com/products/marketing/forms?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-forms&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Chatbot Builder Free Chatbot Builder](https://www.hubspot.com/products/crm/chatbot-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-chatbots&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Live Chat Software Free Live Chat Software](https://www.hubspot.com/products/crm/live-chat?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-livechat&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Marketing Analytics Marketing Analytics](https://www.hubspot.com/products/marketing/analytics?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-analytics&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Breeze Assistant Breeze Assistant](https://www.hubspot.com/products/artificial-intelligence/breeze-ai-assistant?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-breeze&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Web Hosting Free Web Hosting](https://www.hubspot.com/products/cms/web-hosting?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-hosting&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+## Free Tools
+
+*   [See All Free Business Tools See All Free Business Tools](https://www.hubspot.com/free-business-tools?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-all&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [AEO Grader opens in a new tab AEO Grader](https://www.hubspot.com/aeo-grader?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-aeo&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [AI Search Sensor opens in a new tab AI Search Sensor](https://www.hubspot.com/aeo-sensor?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-search&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Make My Persona opens in a new tab Make My Persona](https://www.hubspot.com/make-my-persona?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-persona&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Email Signature Generator Email Signature Generator](https://www.hubspot.com/email-signature-generator?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-emailsig&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Free Business Templates Free Business Templates](https://www.hubspot.com/resources/templates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-biztemplates&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Software Comparisons Library Software Comparisons Library](https://www.hubspot.com/comparisons?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-comparisons&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Website Templates Website Templates](https://ecosystem.hubspot.com/marketplace/website?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-tools-webtemplates&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Connector for Claude Connector for Claude](https://www.hubspot.com/claude?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=connector-for-claude-connector-for-claude&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+## Company
+
+*   [About Us About Us](https://www.hubspot.com/our-story?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-about&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Careers Careers](https://www.hubspot.com/careers?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-careers&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Management Team Management Team](https://www.hubspot.com/company/management?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-management&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Board of Directors Board of Directors](https://www.hubspot.com/company/board-of-directors?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-directors&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Investor Relations opens in a new tab Investor Relations](https://ir.hubspot.com/?_ga=2.262843276.12874469.1592422655-430007000.1592422655&hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-investors&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Blog opens in a new tab Blog](https://blog.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-blog&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Sustainability Sustainability](https://www.hubspot.com/sustainability?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-sustainability&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Contact Us Contact Us](https://www.hubspot.com/company/contact?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-company-contact&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+## Customers
+
+*   [Customer Support opens in a new tab Customer Support](https://help.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-customers-support&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Join a Local User Group Join a Local User Group](https://www.hubspot.com/hubspot-user-groups?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-customers-hugs&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+## Partners
+
+*   [All Partner Programs All Partner Programs](https://www.hubspot.com/partners?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-partners-all&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Solutions Partner Program Solutions Partner Program](https://www.hubspot.com/partners/solutions?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-partners-solutions&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Technology Partner Program Technology Partner Program](https://www.hubspot.com/partners/app?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-partners-technology&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [HubSpot for Startups opens in a new tab HubSpot for Startups](https://www.hubspot.com/startups/partners?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-partners-startups&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Affiliate Program Affiliate Program](https://www.hubspot.com/partners/affiliates?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-partners-affiliate&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+*   [Facebook](https://www.facebook.com/hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_facebook&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Instagram](https://www.instagram.com/hubspot/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_instagram&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Youtube](https://youtube.com/user/HubSpot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_youtube&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Twitter](https://x.com/HubSpot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_twitter&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Linkedin](https://www.linkedin.com/company/hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_linkedin&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Reddit](https://www.reddit.com/r/hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_reddit&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Tiktok](https://www.tiktok.com/@hubspot?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=hstc_medium&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+[![Image 25: Download on the App Store](https://www.hubspot.com/hs-fs/hubfs/app%20store%20high%20res.png?width=136&height=45&name=app%20store%20high%20res.png)](https://apps.apple.com/us/app/hubspot/id1107711722?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=global-footer__app&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)[![Image 26: Get it on Google Play](https://www.hubspot.com/hs-fs/hubfs/google%20play%20high%20res.png?width=136&height=45&name=google%20play%20high%20res.png)](https://play.google.com/store/apps/details?id=com.hubspot.android&hl=en_US&hubs_content=knowledge.hubspot.com/404&hubs_content-cta=global-footer__app&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+
+[![Image 27: HubSpot](blob:http://localhost/f8b3e6aa43c867cdf3af8ddab3cee5c9)](https://www.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=HubSpot&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+Copyright © 2026 HubSpot, Inc.
+
+*   [Legal Center](https://legal.hubspot.com/legal-center?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=legal-center&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Privacy Policy](https://legal.hubspot.com/privacy-policy?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=privacy-policy&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Security](https://legal.hubspot.com/security?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=security&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Website Accessibility](https://legal.hubspot.com/website-accessibility?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=website-accessibility&url=/reports/analyze-campaigns-with-attribution-reports&domain=knowledge.hubspot.com)
+*   [Manage Cookies](https://knowledge.hubspot.com/reports/analyze-campaigns-with-attribution-reports)
+*   [Your Privacy Choices](https://www.hubspot.com/hubspot-privacy-preferences)
+
+![Image 29](https://trkn.us/pixel/conv/ppt=23029;g=sitewide;gid=54862;ord=[uniqueid])![Image 30](https://arttrk.com/pixel/?ad_log=referer&action=lead&pixid=6d6f32d8-e109-4ae6-9589-0a5f14faea43)![Image 31](https://sca-1113-adswizz.attribution.adswizz.com/fire?pixelId=8000fe70-c5b5-41f6-adb3-32183985eb54&type=sitevisit&subtype=Sitewide&aw_0_req.gdpr=true)![Image 32](https://t.co/1/i/adsct?=&bci=4&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=3&event=%7B%22%22%3A%22%22%7D&event_id=6cdc9b46-12fe-45e5-992f-c8d548427892&integration=gtm&p_id=Twitter&p_user_id=0&pl_id=c14d30ff-30e1-460b-a066-848c89450e04&tw_ch_fvl=Chromium%2F154.0.8037.92%2CGoogle%20Chrome%2F154.0.8037.92%2CNot%20A(Brand%2F99.0.0.0&tw_document_href=&tw_document_referrer=&tw_engaged_ms=2&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1791169186307-805526840&tw_session_start=1&twpid=tw.1791169186307.750664448601448923&txn_id=nueas&type=javascript&version=2.4.11)![Image 33](https://analytics.twitter.com/1/i/adsct?=&bci=4&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=3&event=%7B%22%22%3A%22%22%7D&event_id=6cdc9b46-12fe-45e5-992f-c8d548427892&integration=gtm&p_id=Twitter&p_user_id=0&pl_id=c14d30ff-30e1-460b-a066-848c89450e04&tw_ch_fvl=Chromium%2F154.0.8037.92%2CGoogle%20Chrome%2F154.0.8037.92%2CNot%20A(Brand%2F99.0.0.0&tw_document_href=&tw_document_referrer=&tw_engaged_ms=2&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1791169186307-805526840&tw_session_start=1&twpid=tw.1791169186307.750664448601448923&txn_id=nueas&type=javascript&version=2.4.11)
+
+![Image 34](https://bat.bing.com/action/0?ti=5576715&tm=gtm002&Ver=2&mid=d97dfe98-acb3-4884-80e2-c45d92645b24&bo=3&sid=d2e86770c06811f19289c3de0da08dd0&vid=d2e86a20c06811f1ae9e793c15edf4b0&vids=0&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=Hubspot%20404&p=https%3A%2F%2Fknowledge.hubspot.com%2F404%3Furl%3D%252Freports%252Fanalyze-campaigns-with-attribution-reports%26domain%3Dknowledge.hubspot.com&r=https%3A%2F%2Fknowledge.hubspot.com%2Freports%2Fanalyze-campaigns-with-attribution-reports&lt=1081&evt=pageLoad&sv=2&asc=G&cdb=AQAS&rn=482893)

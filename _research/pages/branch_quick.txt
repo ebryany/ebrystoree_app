@@ -1,0 +1,43 @@
+404 page not found 
+ ` instead of inline ` `. Site V2's
+ host directive `appImageViewer` (viewerjs) then treats the diagram
+ like an uploaded image — clicking opens the same lightbox.
+ `tableFilterSortEnabledCheck` gates the table sort/filter header
+ controls on the 'Table Sort & Filter' article setting. The CE reads
+ this config object once at bundle load — before project metadata is
+ available — so the closure reads the late-bound
+ `__D360_TABLE_FILTER_SORT_ENABLED__` global (set by ProjectService
+ from projectSetting.documentationSetting.articleContentSettings) at
+ article-render time instead of capturing a value here.
+ -->
+ element and fetches the CE
+ bundle on demand. Pages without an article (login, home, etc.)
+ pay zero bytes.
+ URL resolution (in priority order):
+ 1. window.__D360_ARTICLE_CDN__ — runtime override; set this from
+ environment config (or any inline script BEFORE this stub) to
+ point at the versioned CDN URL.
+ 2. Default `/d360-article-ce/main.js` — same-origin. The CE bundle
+ is copied into Site V2's served output by the gulp
+ `copy-d360-article-ce` task (see gulpfile.js + the
+ `build:env:step3` script in package.json), which runs for BOTH
+ local dev (`build:ssr-local`) and production (`build`). The
+ namespace prefix `/d360-article-ce/` avoids colliding with
+ Site V2's own root-level main.js / polyfills.js bundle names.
+ SSR-safe: this 
+ Documentation Index
+ Fetch the complete documentation index at: https://help.branch.io/llms.txt 
+ Use this file to discover all available pages before exploring further.
+ 404
+ Page not found
+ This page may have moved or no longer exists.
+Try searching or browse a hub below.
+ Browse by Hub
+ Account Hub
+ Account and admin resources for setting up and configuring Branch.
+ Marketer Hub
+ Resources for your daily Branch workflows, like campaign management and analytics.
+ Developer Hub
+ SDK, API, and integration documentation for developers using Branch.
+ APIs
+ API reference documentation for Branch endpoints.

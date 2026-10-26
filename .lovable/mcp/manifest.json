@@ -1,0 +1,2391 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ayhwmcptscfbuzcobcav.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "ebry-pay-sell",
+      "version": "0.1.0",
+      "title": "Ebry Pay & Sell"
+    },
+    "tools": [
+      {
+        "name": "list_digital_products",
+        "title": "Daftar produk digital",
+        "description": "Menampilkan daftar produk digital beserta harga, status, stok tersedia, dan jumlah terjual. Bisa dicari dan difilter per status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "search": {
+              "description": "Kata kunci nama produk.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "status": {
+              "description": "Filter status produk.",
+              "type": "string",
+              "enum": [
+                "all",
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_digital_product",
+        "title": "Detail produk digital",
+        "description": "Menampilkan detail satu produk digital (harga, stok, mode pengiriman, ringkasan berkas stok, dan rata-rata rating) berdasarkan slug atau id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "description": "Slug produk.",
+              "type": "string",
+              "minLength": 1
+            },
+            "id": {
+              "description": "ID produk.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_digital_product",
+        "title": "Tambah produk digital",
+        "description": "Membuat produk digital baru (nama, harga, deskripsi, kategori, mode pengiriman, batas unduhan, masa berlaku). Produk dibuat sebagai draft kecuali status diisi.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 120,
+              "description": "Nama produk."
+            },
+            "price": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Harga normal dalam rupiah."
+            },
+            "slug": {
+              "description": "Slug URL; otomatis dari nama bila kosong.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "short_description": {
+              "description": "Deskripsi singkat.",
+              "type": "string",
+              "maxLength": 300
+            },
+            "description": {
+              "description": "Deskripsi lengkap.",
+              "type": "string",
+              "maxLength": 5000
+            },
+            "discount_price": {
+              "description": "Harga diskon.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "category_id": {
+              "description": "ID kategori (lihat list_categories).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "status": {
+              "description": "Status publikasi (default draft).",
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "delivery_mode": {
+              "description": "shared = file sama untuk semua, unique = satu file per pembeli.",
+              "type": "string",
+              "enum": [
+                "shared",
+                "unique"
+              ]
+            },
+            "download_limit": {
+              "description": "Batas unduhan (default 5).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "validity_days": {
+              "description": "Masa berlaku akses hari (default 365).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650
+            },
+            "usage_notes": {
+              "description": "Catatan penggunaan.",
+              "type": "string",
+              "maxLength": 2000
+            },
+            "thumbnail_url": {
+              "description": "URL gambar thumbnail.",
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            }
+          },
+          "required": [
+            "name",
+            "price"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_digital_product",
+        "title": "Ubah produk digital",
+        "description": "Mengubah harga, harga diskon, status publikasi, deskripsi singkat, batas unduhan, atau masa berlaku sebuah produk digital. Hanya berhasil bila akun punya izin kelola produk.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID produk digital yang diubah."
+            },
+            "price": {
+              "description": "Harga normal dalam rupiah.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "discount_price": {
+              "description": "Harga diskon; null untuk menghapus.",
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "description": "Status publikasi.",
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "short_description": {
+              "description": "Deskripsi singkat.",
+              "type": "string",
+              "maxLength": 300
+            },
+            "download_limit": {
+              "description": "Batas unduhan per pembeli.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "validity_days": {
+              "description": "Masa berlaku akses (hari).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "archive_digital_product",
+        "title": "Arsip / hapus produk digital",
+        "description": "Mengarsipkan produk (tidak tampil di katalog) atau menghapusnya secara lunak. Data pesanan lama tetap aman.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID produk digital."
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "archive",
+                "soft_delete",
+                "restore"
+              ],
+              "description": "archive = sembunyikan, soft_delete = hapus lunak, restore = kembalikan sebagai draft."
+            }
+          },
+          "required": [
+            "id",
+            "mode"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "bulk_update_product_status",
+        "title": "Ubah status produk massal",
+        "description": "Mengubah status banyak produk digital sekaligus (arsipkan, terbitkan, atau jadikan draft) berdasarkan daftar ID produk.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_ids": {
+              "minItems": 1,
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "description": "Daftar ID produk (maks 50)."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ],
+              "description": "Status tujuan."
+            },
+            "reason": {
+              "description": "Alasan untuk audit log.",
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "required": [
+            "product_ids",
+            "status"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_categories",
+        "title": "Daftar kategori",
+        "description": "Menampilkan kategori produk/layanan beserta ID-nya untuk dipakai saat menambah produk.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "description": "Filter jenis kategori.",
+              "type": "string",
+              "enum": [
+                "all",
+                "product",
+                "service"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_category",
+        "title": "Kelola kategori",
+        "description": "Membuat, mengubah, menonaktifkan, mengaktifkan kembali, atau mengarsipkan kategori produk atau layanan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "create",
+                "update",
+                "deactivate",
+                "activate",
+                "soft_delete"
+              ],
+              "description": "Aksi yang dilakukan."
+            },
+            "id": {
+              "description": "ID kategori (wajib selain action create).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "description": "Nama kategori.",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80
+            },
+            "kind": {
+              "description": "Jenis kategori (wajib saat create).",
+              "type": "string",
+              "enum": [
+                "product",
+                "service"
+              ]
+            },
+            "slug": {
+              "description": "Slug URL; otomatis dari nama bila kosong.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": {
+              "description": "Deskripsi kategori.",
+              "type": "string",
+              "maxLength": 500
+            },
+            "sort_order": {
+              "description": "Urutan tampil.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 999
+            }
+          },
+          "required": [
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_articles",
+        "title": "Daftar artikel",
+        "description": "Menampilkan artikel blog/panduan beserta status, tag, jumlah dibaca, dan waktu terbit.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "search": {
+              "description": "Cari judul artikel.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "status": {
+              "description": "Filter status.",
+              "type": "string",
+              "enum": [
+                "all",
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_article",
+        "title": "Kelola artikel",
+        "description": "Membuat, mengubah, menerbitkan, mengarsipkan, atau menghapus artikel blog/panduan (judul, isi, tag, cover, status).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "create",
+                "update",
+                "publish",
+                "archive",
+                "soft_delete"
+              ],
+              "description": "Aksi yang dilakukan."
+            },
+            "id": {
+              "description": "ID artikel (wajib selain action create).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "title": {
+              "description": "Judul artikel.",
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 140
+            },
+            "content": {
+              "description": "Isi artikel (markdown).",
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 50000
+            },
+            "slug": {
+              "description": "Slug URL; otomatis dari judul bila kosong.",
+              "type": "string",
+              "maxLength": 140
+            },
+            "excerpt": {
+              "description": "Ringkasan singkat.",
+              "type": "string",
+              "maxLength": 300
+            },
+            "cover_url": {
+              "description": "URL gambar sampul.",
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            },
+            "tags": {
+              "description": "Maksimal 6 tag.",
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              }
+            },
+            "status": {
+              "description": "Status publikasi saat create/update.",
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            }
+          },
+          "required": [
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_services",
+        "title": "Daftar layanan jasa",
+        "description": "Menampilkan layanan jasa beserta paket dan add-on-nya. Pakai untuk melihat ID layanan/paket sebelum mengubah harga atau menambah paket.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "search": {
+              "description": "Cari berdasarkan nama layanan.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "status": {
+              "description": "Filter status publikasi.",
+              "type": "string",
+              "enum": [
+                "all",
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_service",
+        "title": "Tambah layanan jasa",
+        "description": "Membuat layanan jasa baru lengkap dengan paket harga dan add-on opsional. Layanan dibuat sebagai draft kecuali status diisi.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 120,
+              "description": "Nama layanan."
+            },
+            "slug": {
+              "description": "Slug URL; otomatis dari nama bila kosong.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "category_id": {
+              "description": "ID kategori (lihat list_categories).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "short_description": {
+              "description": "Deskripsi singkat.",
+              "type": "string",
+              "maxLength": 240
+            },
+            "description": {
+              "description": "Deskripsi lengkap.",
+              "type": "string",
+              "maxLength": 5000
+            },
+            "requirements_note": {
+              "description": "Catatan kebutuhan dari pelanggan.",
+              "type": "string",
+              "maxLength": 2000
+            },
+            "thumbnail_url": {
+              "description": "URL gambar layanan.",
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            },
+            "order_capacity": {
+              "description": "Kapasitas pesanan aktif.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "status": {
+              "description": "Status publikasi (default draft).",
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "default_revision_limit": {
+              "description": "Jatah revisi default.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            },
+            "default_sla_hours": {
+              "description": "SLA default dalam jam.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8760
+            },
+            "packages": {
+              "description": "Paket harga layanan.",
+              "maxItems": 10,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 120
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "price": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "estimated_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  },
+                  "free_revisions": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 50
+                  },
+                  "sla_hours": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 8760
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": [
+                      "normal",
+                      "priority",
+                      "express"
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "sort_order": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999
+                  }
+                },
+                "required": [
+                  "name",
+                  "price"
+                ]
+              }
+            },
+            "addons": {
+              "description": "Add-on opsional.",
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 120
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "price": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "sort_order": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 999
+                  }
+                },
+                "required": [
+                  "name",
+                  "price"
+                ]
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_service",
+        "title": "Ubah layanan jasa",
+        "description": "Mengubah data layanan jasa: nama, deskripsi, kategori, status publikasi, kapasitas pesanan, jatah revisi default, dan SLA default.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID layanan."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 120
+            },
+            "short_description": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 5000
+            },
+            "requirements_note": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "thumbnail_url": {
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            },
+            "category_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "order_capacity": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "default_revision_limit": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            },
+            "default_sla_hours": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8760
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "archive_service",
+        "title": "Arsip / hapus layanan jasa",
+        "description": "Mengarsipkan layanan agar tidak tampil di katalog, menghapusnya secara lunak, atau memulihkannya.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID layanan."
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "archive",
+                "soft_delete",
+                "restore"
+              ],
+              "description": "archive = sembunyikan, soft_delete = hapus lunak, restore = kembalikan sebagai draft."
+            }
+          },
+          "required": [
+            "id",
+            "mode"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_service_package",
+        "title": "Kelola paket layanan",
+        "description": "Menambah, mengubah, atau menghapus paket harga sebuah layanan jasa (harga, estimasi hari, jatah revisi, SLA, prioritas, aktif/nonaktif).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "create",
+                "update",
+                "delete"
+              ],
+              "description": "Aksi yang dijalankan."
+            },
+            "id": {
+              "description": "ID paket (wajib untuk update/delete).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "service_id": {
+              "description": "ID layanan (wajib untuk create).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "price": {
+              "description": "Harga paket dalam rupiah.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "estimated_days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            "free_revisions": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            },
+            "sla_hours": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8760
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "priority",
+                "express"
+              ]
+            },
+            "is_active": {
+              "type": "boolean"
+            },
+            "sort_order": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 999
+            }
+          },
+          "required": [
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_service_addon",
+        "title": "Kelola add-on layanan",
+        "description": "Menambah, mengubah, atau menghapus add-on (layanan tambahan berbayar) pada sebuah layanan jasa.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "create",
+                "update",
+                "delete"
+              ],
+              "description": "Aksi yang dijalankan."
+            },
+            "id": {
+              "description": "ID add-on (wajib untuk update/delete).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "service_id": {
+              "description": "ID layanan (wajib untuk create).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "price": {
+              "description": "Harga add-on dalam rupiah.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "is_active": {
+              "type": "boolean"
+            },
+            "sort_order": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 999
+            }
+          },
+          "required": [
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_orders",
+        "title": "Daftar pesanan",
+        "description": "Menampilkan pesanan terbaru beserta status, total, dan status pembayarannya. Bisa difilter status, jenis pesanan, dan rentang tanggal.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter status pesanan, mis. awaiting_payment, paid, completed.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "order_type": {
+              "description": "Jenis pesanan.",
+              "type": "string",
+              "enum": [
+                "all",
+                "digital_product",
+                "service"
+              ]
+            },
+            "from": {
+              "description": "Tanggal awal ISO (YYYY-MM-DD).",
+              "type": "string"
+            },
+            "to": {
+              "description": "Tanggal akhir ISO (YYYY-MM-DD).",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_order",
+        "title": "Detail pesanan",
+        "description": "Menampilkan detail satu pesanan: item, pembayaran, dan hak akses produk digital yang diterbitkan. Cari lewat nomor pesanan atau id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_number": {
+              "description": "Nomor pesanan, mis. ORD-000123.",
+              "type": "string",
+              "minLength": 3
+            },
+            "id": {
+              "description": "ID pesanan.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "sales_summary",
+        "title": "Ringkasan penjualan",
+        "description": "Merangkum penjualan pada rentang tanggal: jumlah pesanan per status, total omzet dari pesanan lunas, dan produk digital terlaris.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "from": {
+              "description": "Tanggal awal (YYYY-MM-DD). Default 30 hari terakhir.",
+              "type": "string"
+            },
+            "to": {
+              "description": "Tanggal akhir (YYYY-MM-DD). Default hari ini.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "daily_sales_report",
+        "title": "Laporan penjualan harian",
+        "description": "Laporan penjualan per hari: jumlah pesanan, omzet lunas, rata-rata nilai pesanan, dan rincian metode pembayaran.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "Jumlah hari terakhir (default 14).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "customer_insights",
+        "title": "Analitik pelanggan",
+        "description": "Menampilkan pelanggan teratas berdasarkan belanja lunas, jumlah pelanggan baru, dan tingkat pembelian ulang pada rentang hari tertentu.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "Rentang hari (default 30).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            "limit": {
+              "description": "Jumlah pelanggan teratas (default 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "product_performance",
+        "title": "Performa produk & layanan",
+        "description": "Menghitung performa tiap produk/layanan dari item pesanan: jumlah terjual, omzet, dan rata-rata rating produk digital.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "Rentang hari (default 30).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            "item_type": {
+              "description": "Filter jenis item.",
+              "type": "string",
+              "enum": [
+                "all",
+                "digital_product",
+                "service"
+              ]
+            },
+            "limit": {
+              "description": "Jumlah baris (default 15).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "stock_alerts",
+        "title": "Peringatan stok produk",
+        "description": "Menampilkan produk digital bermode stok unik yang stoknya menipis atau habis, agar bisa segera ditambah berkas stoknya.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "threshold": {
+              "description": "Batas stok minimum (default 3).",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "export_orders_csv",
+        "title": "Ekspor pesanan ke CSV",
+        "description": "Mengekspor daftar pesanan pada rentang tanggal menjadi teks CSV siap disimpan (nomor, tanggal, jenis, status, total, catatan).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "from": {
+              "description": "Tanggal awal (YYYY-MM-DD). Default 30 hari terakhir.",
+              "type": "string"
+            },
+            "to": {
+              "description": "Tanggal akhir (YYYY-MM-DD). Default hari ini.",
+              "type": "string"
+            },
+            "status": {
+              "description": "Filter status pesanan.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "order_type": {
+              "description": "Filter jenis pesanan.",
+              "type": "string",
+              "enum": [
+                "all",
+                "digital_product",
+                "service"
+              ]
+            },
+            "limit": {
+              "description": "Maksimal baris (default 300).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "resend_order_notification",
+        "title": "Kirim ulang notifikasi pesanan",
+        "description": "Mengirim ulang notifikasi status pesanan ke pemesan, misalnya pengingat pembayaran atau kabar pesanan selesai. Pesan bisa disesuaikan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan."
+            },
+            "title": {
+              "description": "Judul notifikasi; otomatis bila kosong.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "message": {
+              "description": "Isi pesan; otomatis dari status pesanan bila kosong.",
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "order_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_reviews",
+        "title": "Daftar ulasan produk",
+        "description": "Menampilkan ulasan produk digital beserta rating, isi, nama pengulas, dan status tampil.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "description": "Filter per produk.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "visibility": {
+              "description": "Filter status tampil.",
+              "type": "string",
+              "enum": [
+                "all",
+                "visible",
+                "hidden"
+              ]
+            },
+            "min_rating": {
+              "description": "Rating minimum.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "max_rating": {
+              "description": "Rating maksimum.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "moderate_review",
+        "title": "Moderasi ulasan",
+        "description": "Menyembunyikan, menampilkan kembali, atau menghapus ulasan produk yang melanggar aturan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "review_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID ulasan."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "hide",
+                "show",
+                "delete"
+              ],
+              "description": "Aksi moderasi."
+            },
+            "reason": {
+              "description": "Alasan moderasi untuk audit log.",
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "required": [
+            "review_id",
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_product_files",
+        "title": "Daftar berkas produk",
+        "description": "Menampilkan berkas stok sebuah produk digital: nama, versi, status aktif, dan apakah sudah dialokasikan ke pembeli. Unggah berkas baru tetap dilakukan lewat dashboard admin.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID produk digital."
+            }
+          },
+          "required": [
+            "product_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "upload_product_file",
+        "title": "Unggah berkas produk digital",
+        "description": "Mengunggah berkas master ke sebuah produk digital, langsung ke penyimpanan privat, lalu mencatatnya sebagai versi/stok. Isi content_base64 (isi berkas dalam base64) ATAU source_url (berkas akan diunduh dari URL tersebut). Pada mode 'shared' berkas baru menjadi versi aktif; pada mode 'unique' setiap berkas menjadi satu slot stok.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID produk digital tujuan."
+            },
+            "filename": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180,
+              "description": "Nama berkas asli, termasuk ekstensi."
+            },
+            "version": {
+              "default": "v1",
+              "description": "Label versi berkas, misal v1.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "content_base64": {
+              "description": "Isi berkas dalam base64 (boleh data URL).",
+              "type": "string",
+              "minLength": 4
+            },
+            "source_url": {
+              "description": "URL sumber berkas bila tidak mengirim base64.",
+              "type": "string",
+              "maxLength": 1000,
+              "format": "uri"
+            },
+            "mime_type": {
+              "description": "Tipe MIME berkas, contoh application/pdf.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "make_active": {
+              "default": true,
+              "description": "Jadikan versi aktif (mode shared). Diabaikan pada mode unique.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "product_id",
+            "filename"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_product_file",
+        "title": "Kelola berkas produk digital",
+        "description": "Mengaktifkan, menonaktifkan, atau menghapus berkas produk digital. Berkas yang sudah dialokasikan ke pembeli tidak dapat diubah atau dihapus.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "file_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID berkas (lihat list_product_files)."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "activate",
+                "deactivate",
+                "delete"
+              ],
+              "description": "Tindakan pada berkas."
+            }
+          },
+          "required": [
+            "file_id",
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "set_product_delivery_mode",
+        "title": "Atur mode pengiriman produk",
+        "description": "Mengubah mode pengiriman produk digital: 'shared' (semua pembeli mengunduh berkas versi aktif yang sama) atau 'unique' (setiap pembeli mendapat satu berkas stok berbeda). Berkas nonaktif tidak diaktifkan otomatis.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID produk digital."
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "shared",
+                "unique"
+              ],
+              "description": "Mode pengiriman baru."
+            }
+          },
+          "required": [
+            "product_id",
+            "mode"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_payments",
+        "title": "Daftar pembayaran",
+        "description": "Menampilkan pembayaran beserta status, metode, nominal, dan bukti transfer manual yang menunggu verifikasi.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter status pembayaran, mis. pending_verification, paid.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "verify_manual_payment",
+        "title": "Verifikasi pembayaran manual",
+        "description": "Menyetujui atau menolak bukti transfer manual. Persetujuan akan menandai pesanan lunas dan menerbitkan hak akses produk digital.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "payment_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pembayaran yang diverifikasi."
+            },
+            "decision": {
+              "type": "string",
+              "enum": [
+                "approve",
+                "reject"
+              ],
+              "description": "approve = sahkan, reject = tolak bukti."
+            },
+            "reason": {
+              "description": "Alasan keputusan (wajib untuk penolakan).",
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "payment_id",
+            "decision"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_refunds",
+        "title": "Daftar refund",
+        "description": "Menampilkan permintaan refund beserta status, nominal, alasan, dan waktu pengajuan.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter status refund, mis. requested, approved, processed, rejected.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "review_refund",
+        "title": "Putuskan / proses refund",
+        "description": "Menyetujui atau menolak permintaan refund, atau menandai refund sudah dibayarkan dengan nomor referensi transfer.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "refund_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID refund."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "approve",
+                "reject",
+                "request_info",
+                "process"
+              ],
+              "description": "approve/reject/request_info = keputusan, process = tandai sudah ditransfer."
+            },
+            "reason": {
+              "description": "Catatan keputusan (wajib untuk penolakan).",
+              "type": "string",
+              "maxLength": 500
+            },
+            "reference": {
+              "description": "Nomor referensi transfer (untuk action process).",
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "refund_id",
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_service_jobs",
+        "title": "Daftar pengerjaan jasa",
+        "description": "Menampilkan pesanan jasa beserta operator yang ditugaskan, status penugasan, progres terakhir, dan hasil yang dikirim.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter status pesanan jasa.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "unassigned_only": {
+              "description": "true = hanya pesanan yang belum punya operator.",
+              "type": "boolean"
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "assign_operator",
+        "title": "Tugaskan operator",
+        "description": "Menugaskan operator ke sebuah pesanan jasa, lengkap dengan tenggat pengerjaan dan catatan internal.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan jasa."
+            },
+            "operator_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID user operator (lihat list_users dengan role operator)."
+            },
+            "deadline": {
+              "description": "Tenggat ISO, mis. 2026-08-20T10:00:00Z.",
+              "type": "string"
+            },
+            "note": {
+              "description": "Catatan internal untuk operator.",
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "order_id",
+            "operator_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "hermes_take_job",
+        "title": "Ambil pesanan jasa",
+        "description": "Hermes mengambil sebuah pesanan jasa atas nama akun yang login: menugaskan diri sebagai operator lalu (opsional) langsung menandai pekerjaan dimulai.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan jasa."
+            },
+            "deadline": {
+              "description": "Tenggat ISO, mis. 2026-09-20T10:00:00Z.",
+              "type": "string"
+            },
+            "note": {
+              "description": "Catatan internal.",
+              "type": "string",
+              "maxLength": 1000
+            },
+            "start_now": {
+              "description": "true (default) = langsung terima & mulai kerja.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "order_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "hermes_update_progress",
+        "title": "Kabari progres pengerjaan",
+        "description": "Mengirim update progres pengerjaan jasa (persentase dan catatan) yang langsung tampil di timeline pesanan pembeli.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan jasa."
+            },
+            "percent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Persentase progres 0-100."
+            },
+            "note": {
+              "description": "Catatan progres untuk pembeli.",
+              "type": "string",
+              "maxLength": 1000
+            },
+            "internal_only": {
+              "description": "true = catatan hanya untuk internal, tidak tampil ke pembeli.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "order_id",
+            "percent"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "hermes_deliver_result",
+        "title": "Kirim hasil pekerjaan ke pembeli",
+        "description": "Mengirim hasil pengerjaan jasa ke pembeli: ringkasan, catatan pengiriman, tautan hasil (Drive/link), dan opsional berkas yang diunggah langsung. Pesanan otomatis berpindah ke status menunggu review pembeli.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan jasa."
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 2000,
+              "description": "Ringkasan hasil pekerjaan untuk pembeli."
+            },
+            "delivery_note": {
+              "description": "Catatan tambahan/cara pakai hasil.",
+              "type": "string",
+              "maxLength": 2000
+            },
+            "result_url": {
+              "description": "Tautan hasil, mis. Google Drive.",
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            },
+            "file_base64": {
+              "description": "Isi berkas hasil dalam base64 (maks ~40MB).",
+              "type": "string",
+              "minLength": 16
+            },
+            "file_name": {
+              "description": "Nama berkas, mis. laporan.pdf.",
+              "type": "string",
+              "maxLength": 160
+            },
+            "file_mime": {
+              "description": "Tipe MIME berkas, mis. application/pdf.",
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "order_id",
+            "summary"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "hermes_notify_telegram",
+        "title": "Kirim pesan Telegram ke pemilik toko",
+        "description": "Mengirim pesan Telegram ke chat pemilik toko, mis. pengingat pesanan jasa baru atau ringkasan pekerjaan. Hanya untuk akun dengan izin pengerjaan pesanan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3500,
+              "description": "Isi pesan (mendukung HTML dasar Telegram)."
+            },
+            "dispatch_pending_orders": {
+              "description": "true = sekaligus kirim notifikasi pesanan jasa berbayar yang belum diberitahukan.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "message"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "operator_workload",
+        "title": "Beban kerja operator",
+        "description": "Menghitung beban kerja tiap operator: tugas aktif, tugas selesai, deadline terdekat, dan pekerjaan yang lewat tenggat — untuk membantu memilih operator saat penugasan.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "Rentang hari penugasan (default 30).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 180
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "review_job_result",
+        "title": "Tinjau hasil pengerjaan",
+        "description": "Menyetujui hasil pengerjaan operator (pesanan selesai) atau meminta revisi dengan alasan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pesanan jasa."
+            },
+            "decision": {
+              "type": "string",
+              "enum": [
+                "approve",
+                "revise"
+              ],
+              "description": "approve = terima hasil, revise = minta revisi."
+            },
+            "reason": {
+              "description": "Alasan/permintaan revisi (wajib untuk revise).",
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "order_id",
+            "decision"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_admin_tasks",
+        "title": "Daftar tugas admin",
+        "description": "Menampilkan antrean tugas operasional (verifikasi pembayaran, refund, SLA) beserta prioritas dan tenggat.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter status tugas, mis. open, in_progress, done.",
+              "type": "string",
+              "maxLength": 40
+            },
+            "task_type": {
+              "description": "Filter jenis tugas.",
+              "type": "string",
+              "maxLength": 60
+            },
+            "limit": {
+              "description": "Jumlah baris (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_admin_task",
+        "title": "Kelola tugas admin",
+        "description": "Mengambil, menugaskan, menyelesaikan, membatalkan, atau membuka kembali sebuah tugas operasional.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "task_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID tugas."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "claim",
+                "assign",
+                "complete",
+                "cancel",
+                "reopen"
+              ],
+              "description": "Tindakan pada tugas."
+            },
+            "assignee_id": {
+              "description": "ID petugas tujuan (untuk action assign).",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "note": {
+              "description": "Catatan tugas.",
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "task_id",
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_users",
+        "title": "Daftar pengguna & role",
+        "description": "Menampilkan pengguna beserta email, nama, dan role yang dimiliki. Bisa dicari dan difilter per role.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "search": {
+              "description": "Cari nama atau email.",
+              "type": "string",
+              "maxLength": 120
+            },
+            "role": {
+              "description": "Filter role.",
+              "type": "string",
+              "enum": [
+                "all",
+                "customer",
+                "operator",
+                "support",
+                "finance",
+                "admin",
+                "super_admin"
+              ]
+            },
+            "limit": {
+              "description": "Jumlah baris (default 30).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "manage_user_role",
+        "title": "Beri / cabut role pengguna",
+        "description": "Memberikan atau mencabut role (customer, operator, support, finance, admin, super_admin) untuk seorang pengguna. Hanya berhasil bila akun punya izin kelola pengguna.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID pengguna (lihat list_users)."
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "customer",
+                "operator",
+                "support",
+                "finance",
+                "admin",
+                "super_admin"
+              ],
+              "description": "Role yang diatur."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "grant",
+                "revoke"
+              ],
+              "description": "grant = beri role, revoke = cabut role."
+            }
+          },
+          "required": [
+            "user_id",
+            "role",
+            "action"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_audit_logs",
+        "title": "Daftar audit log",
+        "description": "Menampilkan jejak audit tindakan penting (siapa, apa, kapan) untuk penelusuran.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "action": {
+              "description": "Filter nama aksi.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "entity_type": {
+              "description": "Filter jenis entitas, mis. order, payment.",
+              "type": "string",
+              "maxLength": 80
+            },
+            "limit": {
+              "description": "Jumlah baris (default 30).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "broadcast_notification",
+        "title": "Kirim notifikasi",
+        "description": "Mengirim notifikasi/pengumuman ke semua pengguna, ke satu role tertentu, atau ke daftar pengguna tertentu.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 150,
+              "description": "Judul notifikasi."
+            },
+            "message": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 1000,
+              "description": "Isi pesan."
+            },
+            "audience": {
+              "description": "Sasaran (default all).",
+              "type": "string",
+              "enum": [
+                "all",
+                "role",
+                "users"
+              ]
+            },
+            "role": {
+              "description": "Role sasaran bila audience = role.",
+              "type": "string",
+              "enum": [
+                "customer",
+                "operator",
+                "support",
+                "finance",
+                "admin",
+                "super_admin"
+              ]
+            },
+            "user_ids": {
+              "description": "Daftar user bila audience = users.",
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              }
+            },
+            "type": {
+              "description": "Jenis notifikasi (default announcement).",
+              "type": "string",
+              "maxLength": 40
+            },
+            "link": {
+              "description": "Tautan tujuan bila ada.",
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "required": [
+            "title",
+            "message"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_website_settings",
+        "title": "Lihat pengaturan website",
+        "description": "Menampilkan pengaturan website (nama toko, tagline, kontak, warna, menu, feature flag, maintenance) beserta nilai saat ini dan daftar key yang bisa diubah.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "section": {
+              "description": "ID bagian, mis. umum/branding/kontak. Kosong = semua.",
+              "type": "string",
+              "maxLength": 40
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_website_settings",
+        "title": "Ubah pengaturan website",
+        "description": "Mengubah satu atau beberapa pengaturan website berdasarkan key (mis. store_name, site_tagline, site_accent_color, feature flag, maintenance_active). Nilai divalidasi; jika ada satu yang tidak valid, tidak ada yang disimpan.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "values": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "additionalProperties": {},
+              "description": "Peta key -> nilai baru, contoh {\"site_tagline\":\"Belanja digital lebih mudah\"}."
+            }
+          },
+          "required": [
+            "values"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

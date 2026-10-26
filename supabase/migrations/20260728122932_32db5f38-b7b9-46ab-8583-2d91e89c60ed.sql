@@ -1,0 +1,12 @@
+REVOKE EXECUTE ON FUNCTION public.protect_profile_email() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.protect_role_changes() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.has_permission(uuid, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_super_admin(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_my_permissions() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.sync_my_profile_email() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.write_audit_log(text, text, uuid, jsonb, jsonb, text, text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.has_permission(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_super_admin(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_my_permissions() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.sync_my_profile_email() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.write_audit_log(text, text, uuid, jsonb, jsonb, text, text, text) TO authenticated;

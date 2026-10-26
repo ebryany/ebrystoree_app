@@ -1,0 +1,220 @@
+Title: Fragmentation, not partner supply, is the real ceiling on enterprise affiliate programs
+
+URL Source: https://impact.com/partnerships/affiliate-management/
+
+Published Time: 2026-08-31T09:04:25+00:00
+
+Markdown Content:
+Many large affiliate programs struggle to grow, but not from a lack of partners. The real problem is that partner data is spread across too many systems, making it impossible to see what actually works. By bringing all their partnership data into a single platform, companies like Sephora have seen partner revenue triple.
+
+![Image 1: Three businesswomen engaged in discussion at a conference table, with documents and laptops in front of them.](https://impact.com/wp-content/uploads/2020/03/enterprise-affiliate-programs.webp)
+
+![Image 2: Jason Perumal headshot](https://impact.com/wp-content/uploads/2026/05/Jason-Perumal-headshot-1.png)
+
+Jason Perumal
+
+Affiliate Marketing Senior Content Manager
+
+Read time: 12 mins
+
+Sephora runs affiliate partnerships in 29 countries. For years, it operated without an affiliate management software solution that could see them all at once. Every region’s partner data sat wherever that market’s account manager happened to keep it, split across different networks with no shared view of what was working where.
+
+Sephora had partners. What it didn’t have was one platform that could see them all. That’s the same problem most enterprise programs have, even when they think their problem is a shortage of partners.
+
+According to the Performance Marketing Association’s (PMA) “[2026 Performance Marketing U.S. Brand Survey,](https://thepma.org/announcing-the-2026-performance-marketing-u-s-brand-survey-results/)” the share of enterprise programs running on multiple affiliate platforms more than doubled year over year, climbing from just under 9% to nearly 20%. Programs aren’t consolidating. They’re fragmenting further, at exactly the moment fragmentation is getting more expensive to manage, not less.
+
+Enterprise affiliate programs don’t stall because they run out of partners to recruit. They stall because the program runs through disconnected platforms and processes. Fragmentation, not partner volume, is the actual ceiling on growth.
+
+## **What fragmentation actually costs enterprise affiliate programs**
+
+Sephora’s story is common enough to be the default operating condition for enterprise partnership programs, not the exception.
+
+If you’re running a partnership channel across multiple entities, markets, or brand divisions, you inherit costs that a single-market program never has to absorb, and none of them look like a recruitment problem.
+
+Here’s where those costs actually show up in your program:
+
+| **Cost category** | **Impact of fragmentation** |
+| --- | --- |
+| **Technical** | Separate contracts, separate billing, and geo-based attribution logic that has to be reconciled by hand across every platform a program touches. |
+| **Organizational** | Legal, finance, and compliance each sign off on a different vendor relationship in a different market, multiplying the approval cycle by however many platforms the program runs. |
+| **Measurement** | A tracking and attribution gap that widens every time a new platform enters the mix, because no single system captures the full customer journey across all of them. |
+
+The stakes are not small. According to impact.com’s [“The Global State of Affiliate Marketing in 2025, “](https://impact.com/research-reports/state-of-affiliate-marketing/) 74% of brands already generate 11-30% of total revenue from affiliate partnerships. If that’s your program, fragmentation doesn’t stay contained to marketing operations. It turns into a problem your finance team will ask you about.
+
+![Image 3: Fragmentation costs hinder program growth, impacting overall efficiency and development potential.](https://impact.com/wp-content/uploads/2020/03/affiliate-management-software-solutions-1.webp)
+
+None of these costs will appear in a partner-recruitment report. You’ll see them instead in slower time-to-launch, in duplicated reporting nobody trusts, and in account managers who can answer for their own market but not for the program as a whole. impact.com CEO Dave Yovanno made a related point in remarks connected to the company’s [iPX26 conference](https://impact.com/partnerships-experience/).
+
+The software solution most enterprise programs lack is a trustworthy, program-wide view of what their existing partners are doing.
+
+## **How Sephora consolidated a 29-country affiliate program without losing regional nuance**
+
+Sephora’s problem was a lack of visibility into its existing partners, and closing that gap changed everything downstream. Here’s what it looked like inside a 29-country program.
+
+The beauty business spans roughly 1,900 stores across 29 countries, plus more than 200 stores across Asia-Pacific. Its performance marketing mix already included paid search and social. However, the affiliate channel was split by country and region, with siloed partner data managed by different account managers on different networks in each market.
+
+| **The problem** | **The change** |
+| --- | --- |
+| **Recruitment relied on regional expertise** and manual processes driven by individual account managers. | **A discovery portal was implemented** to give regional teams a direct way to recruit non-traditional partners. |
+| **Contracting processes were decentralized**, making it difficult to maintain consistent oversight or customize terms efficiently. | **SKU-level flexible contracting was introduced**, allowing markets to run seasonal promotions without renegotiating terms. |
+| **Reporting was limited to high-level outcomes** like clicks and revenue, lacking the data needed for deeper analysis. | **Granular, SKU- and segment-level reporting**replaced the high-level-only view. |
+| The **lack of a unified view** made it impossible to compare regional strategies or identify high-performing tactics across markets. | The **affiliate program was consolidated onto a single platform**, creating a unified, cross-region view. |
+
+### **The results**
+
+One year after consolidation:
+
+| **Metric** | **Result** |
+| --- | --- |
+| Revenue from partners | $7.4 million from 293 partners |
+| Revenue growth | 3x |
+| Partner growth | 101% increase |
+
+**_Source_**_:_[_The Sephora x impact.com case study_](https://impact.com/case-studies/sephora-case-study-pars-csb-imp-ev-nam-1122/)
+
+Consolidation changed Sephora’s trajectory. The platform made the partners the retailer already had visible enough and comparable enough to actually manage. The lesson for your program is to **fix the platform first, and the partner growth follows**.
+
+![Image 4: Homepage of a website showcasing diverse content types, including articles, images, and videos in a grid layout.](https://impact.com/wp-content/uploads/2020/03/affiliate-management-software-solutions-2.webp)
+
+_Sephora tapped into impact.com’s Marketplace of 300K+ global partners_
+
+## **Brand Collective migrated several brands mid-peak season, and revenue didn’t drop**
+
+If timing is the strongest argument against consolidation, Brand Collective’s migration tests it directly. The Australian fashion and footwear retailer’s portfolio includes Reebok, Superdry, Hush Puppies, Review, and Shoes & Sox across more than 300 retail stores and 16 online stores.
+
+Previously, the company ran its partnerships through external agencies across multiple networks, which resulted in different publisher-naming conventions for each network and brand.
+
+| **The problem** | **The change** |
+| --- | --- |
+| **Recruitment required separate onboarding** for any publisher who wanted to work with more than one Brand Collective label. | Partnership management was brought in-house, **migrating all brands onto a single platform** (impact.com). |
+| **Reporting, finance, and tracking were fragmented across multiple networks** and handled by external agencies, resulting in limited visibility. | **A Shopify integration** enabled tracking setup in minutes per site, and standardized contracts replaced the agency-intermediary relationship. |
+| A **real-time, whole-channel view was nearly impossible** to achieve with reporting duplicated across different brands. | **Real-time reporting was implemented** to identify incremental, full-price sales rather than just discounted ones. |
+
+### **The results**
+
+| **Metric** | **Result** |
+| --- | --- |
+| Partnership-channel revenue | +34% year-over-year |
+| ROI | +8.5% year-over-year |
+| Migration | Completed on schedule—no drop in revenue or partner activity during the switch |
+
+**_Source_**_:_[_The Brand Collective x impact.com case study_](https://impact.com/case-studies/brand-collective-case-study-retl-csb-imp-ev-apac-0724/)
+
+Sephora shows what consolidation makes possible at enterprise scale. Brand Collective goes a step further, proving the timing objection doesn’t hold even in the riskiest quarter of the year. For your program, that means there’s no safe season to wait for before fixing fragmentation.
+
+![Image 5: Dashboard displaying a bar chart and a line graph, illustrating data trends and comparisons visually.](https://impact.com/wp-content/uploads/2020/03/affiliate-management-software-solutions-3.webp)
+
+[_impact.com’s reporting suite_](https://impact.com/optimize-insights/)_empowered Brand Collective to make smarter decision-making_
+
+## **Isn’t running multiple platforms just diversification?**
+
+Fragmentation usually gets mistaken for a deliberate diversification strategy. A common argument is that using specialized platforms in each market is a smart strategy. The thinking goes:
+
+*   It avoids vendor lock-in.
+*   It allows each region to use the “best-of-breed” platform for that specific market.
+*   It seems like you’re trading a little administrative inconvenience for a better local fit.
+
+### **The reality: It’s fragmentation, not strategy**
+
+While the argument sounds reasonable, it only holds up in very specific cases. Here’s the counter-argument:
+
+**1. The exception, not the rule:** The “diversification” argument is only valid if a market’s partner mix is so unique that a general platform can’t support it. This is rare.
+
+**2. The data tells a different story:**The same PMA report shows that the share of enterprise programs on multiple platforms more than doubled in one year (from 9% to 20%), but local sophistication didn’t increase enough to justify it.
+
+**3. Consolidation creates visibility:** As the Sephora case shows, a single platform didn’t erase regional differences. It made them visible and comparable for the first time. Local teams could finally see what other regions were doing and act on those insights.
+
+In most cases, fragmentation doesn’t preserve local optimization. It makes it impossible to compare performance across markets. A single, unified platform and local optimization are not mutually exclusive goals. If you’re keeping multiple platforms for the sake of local fit, you’re not protecting local optimization. You’re just making it harder to see.
+
+![Image 6: A man writes on paper, stating "multiple platforms hide your true local performers."](https://impact.com/wp-content/uploads/2020/03/affiliate-management-software-solutions-4.webp)
+
+## **Consolidation fixes fragmentation. It doesn’t automatically fix attribution.**
+
+Unifying your affiliate program onto a single platform is a necessary first step, but it’s not enough on its own. It solves the visibility problem, but not the attribution problem. Here’s the distinction:
+
+### **Consolidation gives you a clear view**
+
+Bringing all partners onto a single system is powerful. It solves fragmentation by delivering:
+
+*   One unified dashboard.
+*   One consistent reporting structure.
+*   One source of truth for what each partner contributed.
+
+A consolidated platform makes a complete view of performance possible, but it doesn’t make it automatic.
+
+### **You still have to fix the attribution problem**
+
+Even with a perfect, unified view, you can still be rewarding the wrong partners. The platform shows you the data, but it doesn’t change the crediting rules you apply to it.
+
+The PMA report reveals that nearly 80% of brands still use last-click attribution. This means a program can migrate successfully and _still_ reward a last-click coupon site over a content partner who drove the customer’s initial research.
+
+![Image 7: Diagram illustrating last-click attribution, highlighting its tendency to favor incorrect marketing partners.](https://impact.com/wp-content/uploads/2020/03/affiliate-management-software-solutions-5.webp)
+
+The same impact.com report found that 94% of brands are already experimenting with or planning to adopt alternative attribution models within the year. Most brands don’t expect to use last-click much longer, and they’re already planning its replacement.
+
+Consolidation is the platform work you do first. Deciding how to credit partners correctly is a separate decision you still have to make after that.
+
+## **What an affiliate management software solution needs to actually solve fragmentation**
+
+A single login doesn’t fix fragmentation. These are the specific capabilities that do, and with impact.com research showing AI adoption is already near 97% for brands, automation is now something you should expect from any platform, not a nice extra.
+
+Use the table below to check whether your platform, or the one you’re evaluating, actually replaces market-by-market work with one program you can run from a single place.
+
+| **Capability** | **What it does** | **Fragmentation problem it solves** |
+| --- | --- | --- |
+| [Cross-Program Tracking](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/tracking/set-up-tracking/enable-cross-program-tracking) | Counts a click from one program as a valid referral across a brand’s other programs or regions, without duplicate tracking setup. | Credits partners for cross-brand traffic rather than losing it to disconnected regional programs. |
+| [Recruitment Agent](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/review-partner-applications/recruitment-agent) | Automatically evaluates and approves partner applications across configurable strategy tiers, with brand-safety filters that auto-block fraud-flagged applicants. | [Replaces manual, market-by-market recruitment](https://impact.com/partnerships/how-to-find-affiliate-marketing-partners/) that depends on one account manager’s personal knowledge. |
+| [Unified tracking methods](https://impact.com/partnership-track/) | Combines pixel, server-to-server API, FTP, CPC, and Shopify-integrated tracking, with server-to-server API as the recommended, cookie-less standard. | [Measures every partner](https://impact.com/affiliate/affiliate-measurement-incrementality-strategies/) consistently across web, app, and ecommerce, regardless of platform or browser restrictions. |
+| [Template Terms & Contracts](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/contracts-and-template-terms/template-terms) | Lets a brand define standardized payout and contract terms that auto-generate individual partner contracts, with public, private, and fully custom options. | Replaces per-partner, per-market contract negotiation with one scalable but still customizable structure. |
+| [Manage Your Partners](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/reach-out-to-partners/partner-management/manage-my-partners) dashboard | Centralizes every partner’s contract stage, group, country, business model, and account manager in one view, with bulk actions across the base. | Gives one person a program-wide view instead of a market-by-market one. |
+| [Multi-Program Reporting Suite](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/cross-channel-performance-insights) | Unifies analytics across every program and brand, including [Leapfrogging Reports](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/multi-program-reports/leapfrogging-reports) (which flag when one partner’s last-click credit displaces a partner who did more of the earlier work) and [Data Lab custom reports](https://help.impact.com/brand/what-would-you-like-to-learn-about/platform-features/multi-program-reports/data-lab-custom-reports/data-lab-introduction). | Replaces duplicated, per-network reporting with one reporting structure spanning the whole program. |
+| [Flexible Commissioning](https://impact.com/partnerships/everything-you-need-to-know-about-dynamic-payouts/) | Enable a brand to set [performance-based, tiered, or hybrid payout terms](https://impact.com/affiliate/5-effective-affiliate-commission-structures/)per partner or partner group instead of one flat program-wide rate. | Replaces manually negotiated, per-market payout terms with one commissioning structure a brand can adjust centrally. |
+
+## **Fragmented vs. consolidated: what changes for an enterprise program**
+
+Line up what fragmentation is quietly costing you against what changes the moment you consolidate, and the decision stops being close.
+
+| **Decision factor** | **Fragmented multi-platform state** | **Consolidated affiliate management software solution** |
+| --- | --- | --- |
+| Technical lift | Separate tracking setup, contracts, and billing per platform and market; geo-based attribution logic reconciled by hand. | One tracking implementation extended across programs and regions; geo-based logic handled inside a single system. |
+| Partner visibility | Each market’s account manager sees only their own partners; no shared view of the full program. | One dashboard shows every partner’s contract stage, group, country, and account manager across the whole program. |
+| Recruitment speed | Manual, dependent on individual account managers’ market knowledge. | Automated evaluation and approval against configurable strategy tiers, with fraud filters applied consistently. |
+| Reporting | Duplicated per network or market; clicks and revenue only, no segment or SKU detail. | Unified, cross-program reporting with segment- and SKU-level detail. |
+| Contract flexibility | Each partner negotiates or manages their own contract terms per platform. | Standardized template terms that still support public, private, and fully custom structures. |
+| ROI defensibility | Performance data siloed by market makes it hard to prove which partners or regions are driving growth. | Cross-program reporting makes partner- and program-level ROI provable in one place. |
+
+## **Frequently asked questions**
+
+###### What is affiliate management software for enterprise brands?
+
+Affiliate management software for enterprise brands is a platform that consolidates partner recruitment, contracting, tracking, payment, and reporting into a single system across every market, brand, or entity a company operates in. Rather than coordinating those functions separately on different networks per region, an enterprise program runs its entire partner base, including affiliates and creators, through a single source of truth for performance data.
+
+###### What features should enterprise affiliate management software include?
+
+Enterprise affiliate management software should combine cross-program tracking and server-to-server APIs with automated recruitment tools to streamline application approvals across web, app, and ecommerce environments. Beyond these core features, an effective platform must provide standardized yet customizable contract templates, a centralized partner dashboard, and unified reporting that spans an entire enterprise program rather than just individual markets.
+
+###### What is the best affiliate management software solution for enterprise programs?
+
+There’s no single best affiliate management software solution for every enterprise program. The right choice depends on how many markets, brands, or entities a company runs partnerships across, and how much of that complexity the platform can absorb without requiring separate technical setup per region. The strongest option is the one that replaces a brand’s specific fragmented systems with one program-wide view, not the one with the longest feature list. Sephora and Brand Collective both chose consolidation on impact.com for that reason. The platform matched the multi-market and multi-brand complexity that each was already managing.
+
+###### Does consolidating affiliate platforms fix attribution problems?
+
+Consolidating affiliate platforms doesn’t automatically fix attribution. It fixes fragmentation. Bringing every partner onto one system creates a single, trustworthy view of what each partner is doing, but it doesn’t change the crediting rule a program applies to that data. According to impact.com’s [“The Global State of Affiliate Marketing in 2025”](https://impact.com/research-reports/state-of-affiliate-marketing/), 94% of brands are experimenting with or planning to adopt alternative attribution models within the next year. This signals that platform consolidation and attribution model choice are two separate decisions enterprise programs need to make on purpose.
+
+###### How long does it take to migrate an enterprise affiliate program onto one platform?
+
+Migration timelines for an enterprise affiliate program depend on how many brands, markets, or networks are being consolidated, but they don’t require pausing the program to complete. Brand Collective migrated several brands onto impact.com in a matter of months, launching on schedule during pre-Christmas peak trading with no drop in partnership revenue or partner activity. Migrations that use an already-integrated ecommerce platform, like Shopify, can move faster still, since tracking setup takes minutes per site rather than requiring separate implementation work for each brand.
+
+## **The programs pulling ahead are choosing fewer platforms, not fewer partners**
+
+293 partners, and later 354—that’s not what grew Sephora’s program. The platform underneath them is what did, by finally making those partners visible enough to compare and simple enough to actually manage. Brand Collective didn’t wait for a quiet season to prove the same principle. It migrated several brands mid-peak and grew partnership revenue anyway.
+
+The enterprise programs pulling ahead right now have stopped treating fragmentation as an unavoidable cost of running partnerships at scale. They’ve started treating it as the actual constraint on how fast the program can grow. That change happens by choosing one affiliate management software solution that can hold the whole program at once, then doing the separate, deliberate work of fixing how that program credits the partners driving it.
+
+### **Further reading**
+
+*   [How to find affiliate marketing partners at scale through AI-powered discovery](https://impact.com/partnerships/how-to-find-affiliate-marketing-partners/) (blog)
+*   [Rethinking affiliate measurement for today’s partnerships](https://impact.com/affiliate/affiliate-measurement-incrementality-strategies/) (blog)
+*   [Sephora glows up its partnership program and triples revenue with impact.com](https://impact.com/case-studies/sephora-case-study-pars-csb-imp-ev-nam-1122/) (case study)
+*   [Brand Collective grows revenue by 34% after migrating to impact.com](https://impact.com/case-studies/brand-collective-case-study-retl-csb-imp-ev-apac-0724/) (case study)
+*   [The Global State of Affiliate Marketing in 2025](https://impact.com/research-reports/state-of-affiliate-marketing/) (research report)

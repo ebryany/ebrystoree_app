@@ -1,0 +1,129 @@
+Loyalty and rewards - LoyaltyLion 
+ A rewards program that drives repeat sales
+ Delight your customers by rewarding them from their very first visit and watch your brand loyalty soar.
+ Book a demo 3-minute tour 
+ Ways to earn rewards
+ Unlock points and rewards for customers who engage with your brand both on-site and off-site.
+ account_circle Account creation
+ cake Birthday
+ shopping_basket Purchase
+ add_reaction Referral
+ reviews Write a review
+ share Social follow
+ Ways to spend rewards
+ Create a Shopify rewards program that builds trust by making it fun and easy to spend rewards
+ featured_seasonal_and_gifts Free product
+ percent Discount voucher
+ local_shipping Free delivery
+ Membership perks
+ Nurture your most loyal customers with exclusive perks.
+ award_star Double points days
+ lock_open_right Queue jumping
+ diamond Exclusive events
+ How your loyalty program works
+ Create an omnichannel loyalty program for Shopify, Shopify Plus and Shopify POS.
+ 1. Set up
+ Together, we build you an on-brand, integrated loyalty page.
+ 2. Create
+ You’re in control with custom rules that trigger rewards.
+ 3. Engage
+ Create and promote new incentives to drive engagement.
+ 4. Optimize
+ View real-time buying behaviors to optimize your program.
+ Book a demo 
+ VIP Tiers
+ Tiered loyalty program
+ Offer bigger and better benefits for each tier to encourage customers to return, engage and spend more.
+ Explore VIP tiers 
+ On-brand loyalty page
+ Integrated loyalty page
+ We build a customized, fully accessible loyalty program fast and easily in collaboration with you.
+ About integrated loyalty pages 
+ Challenges
+ Loyalty Challenges
+ Reward customers every time they hit an order, subscription, review or referral milestone. You decide the criteria, the cadence and the reward.
+ Loyalty dashboard
+ Loyalty analytics
+ Get real-time access to detailed data and buying behaviors to easily evaluate and optimize your loyalty program.
+ Explore loyalty analytics 
+ Integrations
+ Connect loyalty to platforms you use daily
+ mail Email
+ Auto-trigger highly relevant loyalty emails to segmented customers based on activity.
+ Email integrations arrow_right_alt 
+ sms SMS
+ Deliver hyper-personalized SMS messages that drive repeat purchases.
+ SMS integrations arrow_right_alt 
+ wifi_calling_3 Helpdesk
+ Personalize helpdesk responses by accessing loyalty data and solving problems with loyalty points.
+ Helpdesk integrations arrow_right_alt 
+ Frequently asked questions
+ Why choose LoyaltyLion over other providers?
+ +
+ LoyaltyLion is trusted by small and enterprise brands for its flexibility, deep customization, and superior user experience for your customers.
+ LoyaltyLion offers a fully embedded loyalty experience rather than relying on a pop-up widget, making it feel like a natural part of your store.
+ Make your own rules and rewards, build flexible VIP tiers with exclusive perks, and integrate with 50+ tools to automate communications.
+ Our platform segments customers into groups like Loyal, At Risk, and Win Back, allowing you to personalize communications.
+ Ideal for omnichannel brands with multiple physical locations, LoyaltyLion lets your customers earn and redeem rewards online and in person.
+ Plus, our top-rated support team guides you through every step of the journey!
+ We’re proud to partner with you from day one to ensure you succeed at loyalty. See what our customers say on G2 !
+ What ecommerce platforms do you support?
+ +
+ LoyaltyLion is made for Shopify and Shopify Plus .
+ If your shop is built on Shopify you can create a custom loyalty program and connect to Shopify Point of Sale (POS) .
+ If you use Shopify Plus, you can also offer gift card rewards, let customers redeem points at checkout and use the Shopify Flow connector to automate loyalty workflows.
+ Does LoyaltyLion support omnichannel loyalty?
+ +
+ Yes! LoyaltyLion integrates with Shopify POS , allowing you to offer a seamless loyalty experience both online and in one or more physical stores. Customers can earn and redeem points across multiple locations.
+ The Shopify integration is available for:
+ Classic plan (Single location)
+ Advanced plan (Multiple locations)
+ Plus plan (Multiple locations)
+ This ensures your loyalty program works seamlessly, no matter where your customers shop.
+ Can I customize my loyalty program?
+ +
+ Absolutely! We work closely with you to build an on-brand loyalty program, starting with a name that resonates with your brand and audience.
+ Your integrated Loyalty Page is designed and built by us, in collaboration with you. No development is required by your team. And, once you are up and running, our intuitive Theme Editor gives you total control of your integrated Loyalty Page’s look and feel as your brand and loyalty program evolves.
+ Furthermore, with every program rule you set, your customers’ Loyalty Page automatically updates, making it easier than ever to optimize your program and run short promotions.
+ Your loyalty page, referral links, receipt upload pages and loyalty pass install page can all sit on your own custom brand domain so every touchpoint feels like a natural part of your store.
+ Trusted by 10,000+ brands worldwide
+ Got questions? Book a demo
+ Rated #1 for loyalty on G2 and trusted by brands worldwide for over 10 years, let’s scale your business together. Get in touch today!
+ Book a demo 
+ Product
+ New features Why LoyaltyLion Platform Integrations Headless Shopify loyalty program 3-minute tour 
+ Support
+ FAQs Help center Find a partner Book a demo Refer a brand 
+ Company
+ About Careers Partners Contact 
+ Resources
+ Loyalty Connect Blog Case studies Top loyalty programs Revenue predictor Loyalty benchmarks Free loyalty program review Email loyalty insights Compare
+ Yotpo vs LoyaltyLion Rivo vs LoyaltyLion Smile vs LoyaltyLion Bubblehouse vs LoyaltyLion 
+ 4.6 out of 5 stars
+ (535)
+ 4.6 out of 5 stars
+ (623)
+ 4.6 out of 5 stars
+ (535)
+ 4.6 out of 5 stars
+ (623)
+ 4.6 out of 5 stars
+ (535)
+ 4.6 out of 5 stars
+ (623)
+ 4.6 out of 5 stars
+ (535)
+ 4.6 out of 5 stars
+ (623)
+ © Copyright 2026. All rights reserved.
+ Privacy policy Security Sitemap 
+ plus [data-roi="fill"], [data-roi="handle"], [data-roi="uplift"] and [data-roi="orders"] elements.
+ Maths ported verbatim from the live site's roiWidget.js (AOV 50, 2 purchases a year, 4 lifetime
+ purchases hardcoded; referral revenue a flat 50,000). Display rules: 0 orders shows 0; a million or
+ more is shown as "X.XX mil"; at the top of the range a "+" is appended and the order count reads
+ "10k+" / "85k+". Live's floating panels are replaced by static readouts, so only the fill width and
+ the handle position are animated. Used by /resources/loyalty-roi-calculator (0-10,000 orders) and
+ /platform/enterprise-loyalty-program (10,000-85,000 orders). -->
+ here at load. Runs synchronously, before webflow.js and the ready()
+ scripts above touch the DOM. carries no styles, so layout is unchanged. A page that already
+ has a or [role=main] is left alone. -->

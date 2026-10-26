@@ -1,0 +1,24 @@
+Shopify Help Center | Shopify Flow Help 
+ Start for free 
+ Log in 
+ Contents 
+ Shopify Flow
+ Shopify Flow 
+ Install Shopify Flow from the Shopify App Store.
+ Shopify Flow is an ecommerce automation platform that you can use to automate tasks and processes within your store and across your apps. Shopify Flow monitors your store for events and lets you create a sequence of actions that are taken in response. You can automate tasks and processes within your store and across your apps by creating workflows using triggers , conditions , and actions .
+ To use Shopify Flow, you must first install the free Shopify Flow app from the Shopify App Store. After it&#x27;s installed, you can then access the app in your Shopify admin .
+ Plan requirement
+ Shopify Flow is a free app available on the Basic, Grow, Advanced, and Plus plans. Although most Shopify Flow features are available across all plans, there are some features that are accessible only to certain plans:
+ Stores on the Grow, Advanced, and Plus plans can use the Send HTTP Request action.
+ Stores on the Plus plan can use tasks created by custom partner apps.
+ Stores are given different usage limits in Shopify Flow according to the API limits governed by their plan.
+ For more information about the features that are available on each plan, refer to Shopify plans and pricing .
+ Tip
+ To see more videos, visit our YouTube channel .
+ In this section
+ Getting started with Shopify Flow 
+ Creating workflows in Shopify Flow 
+ Managing workflows in Shopify Flow 
+ Shopify Flow reference 
+ Developing extensions for Shopify Flow 
+ Leave feedback

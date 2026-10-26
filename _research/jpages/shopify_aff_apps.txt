@@ -1,0 +1,51 @@
+Title: Marketing and promotions
+
+URL Source: https://help.shopify.com/en/manual/promoting-marketing/affiliate-marketing
+
+Markdown Content:
+You can use marketing tools in Shopify to reach new customers, stay connected with customers who have purchased from your store before, and measure your marketing efforts.
+
+### Planning your marketing strategy and measuring performance
+
+For guidance on building a marketing strategy across channels, refer to [_Developing a marketing plan_](https://help.shopify.com/en/manual/promoting-marketing/developing-a-marketing-plan). After your campaigns are running, you can review key performance metrics from the **Growth** page. For details about interpreting your data, refer to [_Analyzing marketing performance_](https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing/marketing-performance). You can also add [pixels](https://help.shopify.com/en/manual/promoting-marketing/pixels) to your store to track customer behavior and improve your ad targeting.
+
+### Creating marketing campaigns and messaging subscribers
+
+You can create marketing campaigns, send email and SMS marketing, build sign-up forms, and connect third-party marketing integrations from the [**Growth**](https://admin.shopify.com/growth). Refer to [_Setting up marketing in Shopify_](https://help.shopify.com/en/manual/promoting-marketing/create-marketing) for the full range of tools available.
+
+### Reaching new customers
+
+You can use multiple tools for bringing new customers to your store, depending on your budget, location, and preferred channel:
+
+*   **[Shopify Collabs](https://help.shopify.com/en/manual/promoting-marketing/collabs/merchants)**: Connects you with creators and influencers for affiliate and creator-led marketing.
+*   **[Shopify Audiences](https://help.shopify.com/en/manual/promoting-marketing/shopify-audiences)**: Generates targeted audience lists for external ad platforms such as Meta and Google. Available on the Shopify Plus plan only.
+*   **[Shop Campaigns](https://help.shopify.com/en/manual/online-sales-channels/shop/shop-campaigns)**: Runs ads on the Shop app, Shop website, Shopify Product Network, and third-party platforms to acquire new customers, or reengage lapsed customers. You pay only when a customer converts.
+*   **[SEO tools](https://help.shopify.com/en/manual/promoting-marketing/seo)**: Helps new customers find your store through organic search with no additional ad costs.
+
+### In this section
+
+*   [Developing a marketing plan](https://help.shopify.com/en/manual/promoting-marketing/developing-a-marketing-plan)
+
+*   [Setting up marketing in Shopify](https://help.shopify.com/en/manual/promoting-marketing/create-marketing)
+
+*   [Create a content marketing strategy](https://help.shopify.com/en/manual/promoting-marketing/content-marketing)
+
+*   [Managing your brand assets](https://help.shopify.com/en/manual/promoting-marketing/managing-brand-assets)
+
+*   [Improving search engine optimization (SEO)](https://help.shopify.com/en/manual/promoting-marketing/seo)
+
+*   [Analyzing the success of your online marketing campaigns](https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing)
+
+*   [Automating your marketing with Campaign Autopilot](https://help.shopify.com/en/manual/promoting-marketing/autopilot)
+
+*   [Shopify Audiences](https://help.shopify.com/en/manual/promoting-marketing/shopify-audiences)
+
+*   [Shopify Knowledge Base](https://help.shopify.com/en/manual/promoting-marketing/knowledge-base)
+
+*   [Sales events and promotions](https://help.shopify.com/en/manual/promoting-marketing/sales)
+
+*   [Shopify Collabs](https://help.shopify.com/en/manual/promoting-marketing/collabs)
+
+*   [Shopify Product Network](https://help.shopify.com/en/manual/promoting-marketing/shopify-product-network)
+
+*   [Pixels and customer events](https://help.shopify.com/en/manual/promoting-marketing/pixels)

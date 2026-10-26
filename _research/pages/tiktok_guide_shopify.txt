@@ -1,0 +1,284 @@
+TikTok Ads in 2026: Strategy, Costs & Best Practices - Shopify Skip to Content 
+ Start selling with Shopify today
+ Start your free trial with Shopify today—then use these resources to guide you through every step of the process.
+ Enter your email address 
+ You agree to receive Shopify marketing emails. 
+ Start for free 
+ Start for free How does Shopify work 
+ TikTok Ads in 2026: Strategy, Costs & Best Practices 
+ Master TikTok ads in 2026 with this comprehensive guide. Learn how to launch high-performing campaigns, refine targeting, manage spend, and boost ROI.
+ by Lauren Strapagiel Jul 10, 2026 • 22 min read 
+ With nearly two billion monthly active users on the platform, TikTok ads have significant marketing potential for businesses. This is especially the case for emerging businesses since 70% of TikTok users surveyed have discovered a new brand via the platform.
+ For example, Haley Pavone, founder of footwear label Pashion , says pivoting her advertising strategy to TikTok helped her grow her business. 
+ “I picked up my phone, and I started filming TikToks,” she shares on an episode of the Shopify Masters podcast . “I gained 250,000 followers overnight, and we spent nothing on marketing.” 
+ Pashion has grown its TikTok following to more than 400,000 and is now an eight-figure business.
+ Here’s a detailed look at how TikTok advertising works, including who can use it, the potential benefits for brands, the different types of ads , and real-life examples. You’ll also learn the process for creating your first TikTok ad, along with some best practices.
+ What are TikTok ads?
+ TikTok ads are paid promotional content that appears in users’ feeds on the app, seamlessly integrating with TikTok’s short-form video format. These ads can take different forms, such as top-feed videos, in-feed videos, or sponsored effects. 
+ TikTok’s advertising platform presents a unique challenge for brands who want to capture the attention of users in a fast-paced, content-rich environment. To make money on TikTok , advertisers create compelling, visually appealing ads that blend with the platform’s content but also make a lasting impression. 
+ This requires embracing the platform’s vertical video format, aligning with popular in-app trends and hashtags, and creating authentic, relatable campaigns that connect with a brand’s target audience. One popular example is to inspire and use positive user-generated content (UGC) .
+ What is TikTok GMV Max?
+ As of July 2025, GMV Max , the platform’s AI campaign automation system, powers TikTok Shop Ads. These are ads that drive traffic to your in-app shop rather than to your external ecommerce website. 
+ GMV Max’s objective is to maximize your gross merchandise value (GMV) , or the total sales revenue before subtracting advertising costs. After determining your daily budget, return on investment (ROI) target, and the products you want advertised, TikTok’s system calculates the best ad creatives, target audience, and optimal distribution of spending.
+ There are two GMV Max campaign types, each with its own agenda:
+ Product GMV Max promotes your selected products across various TikTok placements linked to your TikTok Shop . 
+ LIVE GMV Max is a live shopping campaign that directs traffic to your TikTok LIVE stream.
+ Brands using Shopify for their online store can use the TikTok Shop Sales Channel to sync their catalog, inventory, and order details between Shopify and TikTok Shop. This makes it convenient to manage both stores from a single hub. 
+ For Shopify store owners based in the US, the TikTok App on Shopify helps you start with TikTok advertising and TikTok Shop, and to manage your campaigns directly from your Shopify dashboard.
+ Set up shop on TikTok
+ Help boost sales with creative content that converts the next generation of customers.
+ Install now 
+ Who can advertise on TikTok?
+ Users must have a TikTok Ads Manager account , rather than a personal account, to advertise on TikTok. The platform also requires advertisers to adhere to the app’s advertising policies . 
+ TikTok advertising is available in dozens of countries and regions worldwide , with some geographic limitations and restrictions. For example, TikTok is currently banned in India . 
+ Additionally, some countries have specific regulations or restrictions on the types of products or services businesses can advertise on social media platforms like TikTok. Here are a few examples:
+ In the United States, the Food and Drug Administration (FDA) has strict guidelines for advertising health-related products, such as prescription drugs and medical devices. Advertisers must ensure their content complies with these regulations.
+ In the United Kingdom, the Advertising Standards Authority (ASA) has rules regarding the advertising of age-restricted products, such as alcohol and gambling. Brands must target their ads appropriately and include necessary disclaimers.
+ The European Union has strict data privacy laws, such as the General Data Protection Regulation ( GDPR ), with which advertisers must comply when targeting users in EU countries.
+ Benefits of advertising on TikTok
+ Massive and engaged user base 
+ Creative and interactive ad formats 
+ Precise targeting options 
+ Potential to reach new audiences 
+ Continuing expansion of services and integrations 
+ In-app marketing and analytics features 
+ With its rapidly growing user base, high engagement rates, and innovative ad formats, TikTok for Business provides an opportunity for brands to try to reach a wide audience. Here are some of the benefits of incorporating TikTok ads into your marketing strategy . 
+ Massive and engaged user base
+ TikTok is one of the most popular social media platforms, with almost two billion monthly active users worldwide spending an average of one hour and 37 minutes per day on the platform. 
+ And at 3.7% , TikTok’s engagement rate per post is several times higher than that of Instagram (0.48%), Facebook (0.15%), and X (0.12%). 
+ This sizable user base and high level of engagement make TikTok a valuable platform for brands wanting to expand their reach.
+ Creative and interactive ad formats
+ The TikTok ad platform has a range of creative and interactive ad formats. For example, Catalog Ads allow ecommerce companies to display personalized product ads for users. This provides them with an immersive and shoppable experience directly within the app. 
+ Meanwhile, businesses can use Branded Mission ads to increase brand awareness and encourage user participation on the platform. 
+ Precise targeting options
+ TikTok’s targeting capabilities allow you to set your desired audience segmentation with a high degree of precision. Ad targeting dimensions include demographics, interests, behaviors, and device types. You can also create custom audiences based on user engagement with similar content or TikTok hashtags. 
+ For example, an ecommerce brand that sells eco-friendly beauty products could target TikTok users who have engaged with content related to sustainable living, clean beauty, and self-care.
+ Potential to reach new audiences
+ One of TikTok’s primary features is the For You page, which displays personalized content tailored to a user’s interests and engagement history. While some social networks heavily prioritize the content of a user’s friends and connections, TikTok does not.
+ TikTok’s algorithm prioritizes content likely to be engaging and shareable, regardless of who created it. This means even small brands and creators have the potential for their content to be seen by a wide audience—or to even go viral on TikTok . 
+ Mike Xhaxho, founder of hydration company Waterboy , says this is precisely why he prioritized TikTok for early campaigning. “We decided to hone in and focus on TikTok because it felt like that was the one where your content reach is not dependent on how big of a channel you have,” he says on Shopify Masters .
+ Continuing expansion of services and integrations
+ TikTok continues to innovate new ways for businesses to widen their advertising reach, periodically adding capabilities to its own platform and through partnerships. 
+ For example, in Q2 of 2026, TikTok announced a partnership with Vistar Media that expands TikTok’s Out of Phone ad extension option. This extension allows businesses to expand the reach of their TikTok ads beyond the mobile app and into formats like billboards, airport screens, and movie theater ads. 
+ Around the same time, TikTok also announced an extension of their integration with HubSpot , a widely used customer relationship management (CRM) platform . Brands who use HubSpot for their CRM workflows can now handle TikTok onboarding, lead management, and audience activation directly within HubSpot’s Marketing Hub.
+ In-app marketing and analytics features
+ TikTok provides brands with a host of features to optimize ad production and analytics. 
+ One such in-app service is TikTok One , which connects brands and creators for collaboration. TikTok One has multiple features that make it easier for brands to partner with creators . 
+ For example, AI-powered TikTok One search tool matches creators to campaign briefs and allows businesses to like or dislike suggested matches or ask for other similar creators. Another tool curates relevant content already made by creators, making it easier to create Spark ads.
+ TikTok Market Scope is an analytics tool that can track your target users’ behavior through different stages of interaction with your brand, from awareness to interest and then conversion. It provides data-driven insights into the factors that lead consumers from one stage of the buyer journey to the next, so you can reproduce your successes.
+ Connect with shoppers on TikTok
+ Shopify comes with powerful tools to help you tell your brand story and create TikTok in-feed ads in minutes. Make sales on TikTok and manage all your orders, returns, and payments from Shopify.
+ Start selling on TikTok 
+ How much do TikTok ads cost?
+ The cost of TikTok ads depends on several factors, including your target audience, ad format, and campaign objectives. The platform’s auction-based system and flexible budgeting options mean you can set daily or lifetime budgets for your TikTok ad groups and choose between various bidding strategies based on your campaign goals. 
+ While TikTok’s self-serve in-feed ads allow you to set a daily budget starting at $20, the actual cost of your ads will be influenced by the following factors:
+ Ad format. Different ad formats, such as in-feed ads, brand takeovers, and branded hashtag challenges, have varying costs based on their placement and visibility.
+ Targeting. The more specific your target audience, the higher the cost may be to reach them. Factors like user demographics, interests, and behaviors can impact the cost of your ads.
+ Bidding strategy. TikTok uses an auction-based system, where advertisers bid against each other for ad placement. Your bidding strategy, such as cost per click (CPC) or cost per mille (CPM) , can affect the overall cost of your ads.
+ Competition. The level of competition in your industry or niche can influence the cost of your ads. If many advertisers are after the same target market , the cost may be higher.
+ Ultimately, your company’s overall marketing allocation and the specific goals you want to achieve through your TikTok campaigns determine your TikTok advertising budget.
+ Types of TikTok ads
+ In-feed video ads 
+ Branded Mission ads 
+ Spark ads 
+ TopView and TopFeed ads 
+ Catalog ads 
+ TikTok has a variety of ad formats to suit different marketing objectives and budgets. As you gain experience with the platform and learn how to use TikTok advertising to pursue your brand goals, you can experiment with different ad formats to find the ones that work best for your brand. TikTok ad format options include:
+ In-feed video ads 
+ TikTok in-feed video ads appear seamlessly within a user’s content feed, resembling native TikTok videos. These ads can be up to 60 seconds long and include a call to action (CTA) button that directs users to a webstore URL. In-feed video ads are meant to blend naturally with the user experience and can be targeted to specific audiences based on their demographics, interests, device characteristics, and user behaviors.
+ Branded Mission ads
+ Branded Mission ads let brands crowdsource UGC from eligible creators and run the highest-performing content as advertisement. Businesses can also run a Branded Hashtag Challenge where participants create prompted videos with specific guidelines and share them with a Branded Hashtag. 
+ Spark ads
+ Spark Ads are a type of in-feed video ad that allows a brand to amplify existing organic TikTok content from their own account or from a user who has granted permission and tries to drive traffic to their TikTok profile or website. 
+ By boosting top-performing content, brands borrow the authenticity and social proof of UGC while still maintaining control over their campaign targeting, budgeting, and optimization.
+ This is the strategy Carl Matheson and Kate Blazeska , cofounders of Book Box , applied to promote their Australian book subscription service on TikTok. When Book Box partnered with a micro-influencer , their ad quickly gained 100,000 views. 
+ After seeing the success of the video as an organic post, Carl ran it as a paid campaign as well. “My thing was, if it’s performing well organically, it will always perform well on paid advertisement because you are promoting it to the right audience,” Carl says. 
+ TopView and TopFeed ads
+ TopView ads are a type of full-screen ad that displays first thing when a user opens the TikTok app. TopView ads are designed to maximize brand exposure and recall and are used to launch new products, promote special events, or create a strong first impression with a wide audience. Interested brands must contact TikTok’s sales representatives to see if they qualify.
+ Similar to TopView ads, TikTok’s TopFeed ads receive premium placement, positioned as the first organic-looking in-feed video content in a user’s For You feed.
+ For maximum visibility, businesses can use TikTok’s TopReach ad solution, which combines both of these ad placements into a single service.
+ Catalog Ads
+ Catalog Ads sync with your product catalog to generate personalized carousel or video ads for targeted users. These ads can feature product tags, descriptions, and pricing information, and users have the ability to make purchases by tapping through to a linked external website, an in-app Instant Page, or TikTok Shop.
+ How to create your first TikTok ad campaign
+ Make sure you have a business account 
+ Integrate TikTok with your Shopify store 
+ Open the TikTok Ads Manager 
+ Set your advertising goal 
+ Select your audience 
+ Set your budget and schedule 
+ Create your ad 
+ Submit 
+ There are two ways to create campaigns for your business on the TikTok Ads Manager —a simplified version and a custom version. The custom version is designed for experienced marketers and has more options, like creating an ad group or using a custom bidding strategy. 
+ For a small to medium-sized business, the simplified version is straightforward, easy to use, and doesn’t require technical expertise.
+ This tutorial covers the simplified way of creating a campaign. When you navigate to the TikTok Ads Manager, make sure to select Simplified Mode on the first page when prompted. Then, follow these steps:
+ 1. Make sure you have a business account
+ In order to use the TikTok Ads Manager, you’ll need to convert your brand’s TikTok account to a business account (if you haven’t already). 
+ In the app, go to Settings and Privacy, then Manage Account, and tap Switch to Business Account. This will give you access to analytics that can tell you the best time to post on TikTok , as well as other features, such as the ability to add a link in your bio .
+ 2. Integrate TikTok with your Shopify store
+ If you have a Shopify store, install the TikTok app . This gives you options for automated ad creation and product catalog syncing. If you’re located in select countries, you’ll also be able to launch a shopping tab on your TikTok profile.
+ 3. Open the TikTok Ads Manager
+ The TikTok app is built for mobile, but using your TikTok Ads Manager account is something you’ll want to do on desktop. Navigate to ads.tiktok.com and log in with your TikTok for Business account.
+ 4. Set your advertising goal 
+ When you select Simplified Mode within TikTok Ads Manager, you’ll be presented with four campaign objectives to choose from:
+ Increase traffic. This option is designed to drive traffic to a website , such as for generating soft leads (email captures).
+ Drive community interaction. This option is designed to grow a presence on TikTok and build community , such as in the lead-up to a brand or product launch.
+ Generate customer leads. This option is designed to capture information from users via a contact form , such as for retargeting potential customers and nurturing existing followers.
+ Get website conversions. This option is designed to drive more conversions on a store’s webpage. 
+ 5. Select your audience
+ On the next screen, tell the platform who exactly you want to see your TikTok ads. You can select “Automatic audience” to let TikTok decide for you. It’s also easy to add a few parameters of your own if you’d rather go the “Custom audience” route.
+ Select your target audience based on their gender, age group, languages, and location. As you make your selections, a slider in the top right corner estimates the size of your target audience. 
+ You can also drill down further and target users who have a history of interacting (such as liking and commenting) with TikTok content in certain subjects—for example, clothing, cooking, or pets.
+ 6. Set your budget and schedule
+ Next, you’ll determine your daily budget. Campaign-level ads must exceed a minimum daily budget of $50, while the minimum daily budget for ad groups within that campaign is $20. 
+ You’ll then decide how long to run your ads. TikTok will multiply the total number of days your ad group is up by $20 to calculate your minimum lifetime budget. You can also select “No end date” to run your campaign indefinitely and stop it at a later point. 
+ 7. Create your ad
+ For the ad content, you can either select one of your existing TikTok videos to run as a video ad or upload a new video. Write a caption for your ad and create a CTA button, such as “Shop Now.” Be sure to include a link to your store.
+ 8. Submit
+ After you submit your TikTok ad, it will go through a review process of around 24 hours before going live. You’ve now created your first ad campaign on TikTok and will soon be able to analyze its performance. Monitor your results to learn what is and isn’t working to optimize your next campaign.
+ Best practices for creating engaging TikTok ads
+ Start with an attention-grabbing hook 
+ Create ads that feel native to TikTok 
+ Leverage user-generated content 
+ Partner with influencers 
+ Provide a compelling offer 
+ Refresh your creative periodically 
+ Explore TikTok’s creative resources 
+ To produce the best results, TikTok recommends brands create content that feels authentic and native to the platform. Here are several best practices you can try to create engaging ad content.
+ Start with an attention-grabbing hook 
+ To account for users’ ability to simply scroll past your ads, write hooks aimed at capturing their attention as quickly as possible. 
+ “Think about how to make someone stop the scroll in the first two seconds and not keep scrolling away,” says Savannah Sanchez , founder of The Social Savannah , a Meta and TikTok ad creative agency. 
+ As a TikTok marketing partner, Savannah has shaped TikTok ad creative for such notable brands as Topicals, ASICS, BYLT Basics , and BlendJet. 
+ “I always tell brands they should focus 90% of their attention on optimizing the hook and making sure it’s very thumb-stopping, and 10% of their attention on the rest of the ad. The first two seconds, the hook, is incredibly important.”
+ Savannah recommends leveraging TikTok trends and transitions to create scroll-stopping content . She also suggests saying something shocking or surprising within the first two seconds to grab viewers’ attention. 
+ Alternatively, featuring something “weird” or “oddly satisfying” can also be an effective way to make your TikTok ads stand out in users’ feeds.
+ Create ads that feel native to TikTok
+ Savannah recommends making content under a minute long and feels like it was created by a user, not a brand. 
+ This means shooting short-form, vertical videos on your mobile phone instead of relying on high-end production value. Incorporate popular TikTok editing techniques and leverage trending TikTok sounds and hashtags to tap into existing conversations.
+ “We see ads that are around 30 seconds long that do the best on TikTok. We also see ads that are utilizing native TikTok fonts doing the best,” Savannah says. 
+ “[Ads] should look like they’re filmed on an iPhone and edited in CapCut with native TikTok text treatments. They shouldn’t look like it’s from the studio or too overproduced. Looking like it’s actually made [by] a creator is really important.”
+ Leverage user-generated content
+ One way to create TikTok ads that feel authentic and relatable is to promote UGC. “People want to buy from people who are relatable to them and who are genuine. They don’t want to listen to a TV commercial or just a boring photo with value propositions over it,” Savannah says. 
+ “TikTok is all about getting genuine feedback from the community and sharing products that people genuinely love. So that’s how your ads have to come across—it can’t look like an ad.”
+ Encourage your customers to create TikTok videos featuring your products and then browse their videos to see what you can repurpose in your ad campaigns to build brand trust and credibility with your target audience. 
+ Savannah says, “One of the main things that we see across all of our best-performing ads is that there is a creator testimonial. That means having an onscreen talent talking to the camera, giving a genuine testimonial about why they love the product. That is a formula that works time and time again.”
+ Partner with influencers 
+ Collaborate with TikTok influencers to reach new audiences and add brand credibility to your ad campaigns. For every new collaboration, create a brief outlining your campaign goals, key talking points, and any other specific guidelines you want the influencer to follow.
+ “One of the biggest mistakes I see brands make when working with TikTok creators is that they don’t provide them with a very specific brief,” Savannah says. 
+ “When I work with a creator, I send them a detailed shot list of every angle, unboxing, testimonial that I’m going to need. I send them visual ad examples so that they can have a reference to what I am looking for, what a great ad looks like, what great lighting looks like, and then scripts.”
+ An influencer likely has a good idea of what will resonate with their primary audience , so it’s worth taking their suggestions into consideration. At the same time, Savannah recommends providing your collaborators with resources that will give the campaign the best possible odds of success. 
+ “Just because a TikTok influencer is a great creator, it doesn’t mean that they’re necessarily a great ad creative strategist. They don’t always know what’s going to work for ecommerce marketing,” Savannah says. 
+ “They may be really great at talking to the camera, being engaging, and having great lighting. But that doesn’t always mean that they’re going to know what it means to have a great hook, or a strong call to action, or the best value props to mention in the ad.”
+ Try to strike a balance between allowing your collaborators some creative freedom and providing clear guidelines and assets that will help them effectively communicate your brand’s message.
+ Provide a compelling offer
+ Multiple businesses may be vying for the attention of your target audience, so if you want your ads to inspire TikTok users to engage with your brand further, you must provide them with a convincing reason to do so.
+ “To get a good click-through rate on your ad, consider having a very strong offer or deal or a limited-time special,” Savannah says. “I’ve used strategies like offering 15% in the caption or mentioning in the ad script that there’s a crazy sale that viewers need to check out before it ends. 
+ “Having a high sense of urgency paired with an offer is what works well on TikTok, since they are so price-conscious.” Savannah says these tactics can also help boost overall ad ROI . 
+ Experiment with different offer strategies—a free trial, a gift with purchase (e.g. “a free lip balm with a lipstick order”), or any other promotion that offers value to your target audience. 
+ Refresh your creative periodically
+ When consumers are exposed to ads or ad formats that feel repetitive, they can experience a phenomenon known as ad fatigue, or creative fatigue. This can lead to declining delivery results or a low number of daily new users. 
+ To combat this effect, TikTok recommends refreshing your ad creative regularly. This could include changing an ad’s visuals, background music, narration, messaging, or copy. 
+ Use tools like video insights and TikTok Market Scope to analyze your ad performance and determine which audiences are showing declines in engagement or click-through rate (CTR) , then refresh your materials based on that data. 
+ TikTok’s AI-powered Symphony Creative Studio can facilitate the creative refresh process: Use it to turn your production information or URL into a video, add video script narration, or localize your existing videos with language translation or dubbing.
+ Explore TikTok’s creative resources
+ Find inspiration for your next campaign in the TikTok Creative Center , which contains examples of top performing ads and popular trends. 
+ The Creative Center’s Top Ads page presents a collection of high-performing ads. Each video includes the number of likes the video received, the general budget category, a percentage-based CTR score, and an analysis of what formats and features appear to be working in the ad’s favor. 
+ In the Trends section, you can discover what audio, hashtags, creators, and videos are most popular on TikTok. This information may help you come up with your own video ideas , including specific themes or certain elements to incorporate.
+ 4 examples of great TikTok ads
+ Medik8 
+ MVST 
+ MERIT 
+ Naturium 
+ Here are examples of successful TikTok ads from brands across different industries, from skincare lines to luggage companies.
+ Medik8
+ Medik8 , a British dermatological skincare brand, partnered with a creator to advertise two of their products: Liquid Peptides and Crystal Retinal 6. The ad strikes a familiar feel; the creator is speaking to the camera and using the recognizable “get ready with me” format that’s popular on TikTok. 
+ Source: Medik8 on TikTok 
+ The user features the products prominently and hits several key talking points, such as the products coming in “five different strengths” and including “10 different peptides.” Finally, the video offers viewers a 20% discount on the products to give them a try.
+ MVST
+ MVST , a premium luggage company, takes a unique approach to their ad—without saying a word. They borrow and combine two recognizable video formats: an “unboxing video” and an ASMR video. 
+ ASMR videos feature soft sounds or gentle visuals that trigger a tingling sensation or relaxation in some viewers, appealing to those seeking stress relief or a calming sensory experience.
+ Source: MVST on TikTok 
+ The video focuses squarely on the product instead of featuring a creator. Users see a hand opening the luggage, spinning the wheels, and unzipping the compartments. 
+ This approach cleverly combines product demonstration with ASMR, as the soft sounds of the zippers and wheels create a satisfying auditory experience while still showcasing the luggage’s features.
+ MERIT
+ MERIT , a vegan and cruelty-free cosmetics company, opens their TikTok ad with a compelling offer—every customer who makes a first purchase through their website receives a free signature bag loaded with products. The ad shows all the complimentary products, creating excitement around the offer, and a trending song as its soundtrack.
+ Source: MERIT on TikTok 
+ By providing an enticing offer and using a popular song in its TikTok ad, MERIT grabs users’ attention, encourages excitement around making a purchase with the brand, and uses what’s already resonating with its target audience.
+ Naturium
+ In this video for Naturium , a high-performance skincare brand, the creator, Emma Elyse, hooks viewers by using a tone of voice and facial expression that at first suggest the brand’s products are overhyped. But then she quickly reveals her true option: it’s a great brand that she enjoys.
+ Source: @emmaelysee on TikTok 
+ Rather than sharing Emma’s video from their own TikTok account, Naturium chose to promote the existing UGC as a Spark Ad. 
+ Emma, a registered esthetician, showcases various products—such as the Energizer Mandelic Acid Body Wash and Smoother Glycolic Acid Body Wash—and shares her opinion on each one. She packs the video with educational skincare education, teaching viewers about the active ingredients across the brand’s line.
+ Read more
+ How To Source Products To Sell Online 
+ 17 Ways to Get More Followers on Instagram (2024) 
+ 10 Best Paid and Free Business Card Makers (+ Templates) 
+ The 13 Best Dropshipping Suppliers in 2024 
+ How to Start a Dropshipping Business- A Complete Playbook for 2024 
+ 130+ Dropshipping Products To Sell for Profit 
+ The Ultimate Guide To Dropshipping (2024) 
+ What Is Passive Income? Ultimate Guide With Examples 
+ How to Get Verified on Instagram in 2024 
+ 5 Awesome Black Friday Cyber Monday Social Media Campaigns You Can Steal 
+ TikTok Ads FAQ
+ Is TikTok advertising worth it?
+ Whether TikTok advertising is worth it for your business depends on several factors, including your brand’s goals, budget, and other resources. While some brands may achieve virality on TikTok, there is no guarantee your business will achieve the same results. 
+ However, TikTok provides numerous resources to help brands target their ideal customers , maximize their ad spend, and track their ads’ performance to optimize their campaigns in real time.
+ Can you run TikTok ads globally?
+ Yes, you can run TikTok ads globally, as the platform is available in dozens of countries and regions. However, advertisers should be aware of any local regulations, cultural differences, and language considerations when running campaigns in different markets.
+ How long should a TikTok ad be?
+ The ideal length of a TikTok ad depends on the ad format and campaign objectives, but generally, shorter ads tend to perform better. In-feed ads can be up to 60 seconds long, but TikTok recommends keeping them between 9 and 15 seconds to maintain user engagement.
+ Are there any drawbacks to advertising on TikTok?
+ A potential drawback to advertising on TikTok is that your creative must be refreshed regularly to combat ad fatigue. For brands with limited budget, time, personnel, and resources, it could be difficult to generate content in alignment with TikTok’s unique style and trends on the cadence necessary to avoid declines in engagement.
+ What is the secret to creating a viral TikTok ad campaign?
+ There is no guaranteed formula for creating a viral TikTok ad campaign, although the best-performing campaigns demonstrate an understanding of the platform’s unique culture, trends, and user behavior, and feature authentic, creative content that appeals to the TikTok community while also encouraging interaction.
+ by Lauren Strapagiel Updated by Alec Cole on Jul 10, 2026 
+ Share article
+ Share on Facebook 
+ Share on X 
+ Share on LinkedIn 
+ by Lauren Strapagiel Jul 10, 2026 • 22 min read 
+ The newsletter for entrepreneurs
+ Join millions of self-starters in getting business resources, tips, and inspiring stories in your inbox.
+ Enter email 
+ Unsubscribe anytime. By entering your email, you agree to receive marketing emails from Shopify. By proceeding, you agree to the Terms and Conditions and Privacy Policy .
+ popular posts
+ Social Media Optimization
+ How To Make Money on Instagram in 2025 (9 Actionable Ideas) 
+ Starting Up
+ How To Start an Ecommerce Business: Guide for 2025 
+ Guides
+ What Is Dropshipping and How Does It Work? (2025) 
+ Find an Idea
+ What Is Print on Demand & How To Start a Business (2025) 
+ The point of sale for every sale.
+ Start for free 
+ popular posts
+ Sell Online
+ How To Create a Website in 9 Steps (2025) 
+ Starting Up
+ How To Start an Online Store in 2025 (Step-by-Step Guide) 
+ Find an Idea
+ How To Make and Sell Merch Your Fans Will Love (2025) 
+ Sell Online
+ 10 Best Ecommerce Website Builders for Your Online Store (2025) 
+ Make Shopify a preferred source
+ Our latest articles will show up more often in Google Top Stories.
+ Add Shopify 
+ popular posts
+ Social Media Optimization How To Make Money on Instagram in 2025 (9 Actionable Ideas) 2023-11-08 
+ Starting Up How To Start an Ecommerce Business: Guide for 2025 2023-09-01 
+ Guides What Is Dropshipping and How Does It Work? (2025) 2023-12-05 
+ Find an Idea What Is Print on Demand & How To Start a Business (2025) 2023-11-09 
+ Sell Online How To Create a Website in 9 Steps (2025) 2023-09-20 
+ Starting Up How To Start an Online Store in 2025 (Step-by-Step Guide) 2023-11-23 
+ Find an Idea How To Make and Sell Merch Your Fans Will Love (2025) 2023-12-02 
+ Sell Online 10 Best Ecommerce Website Builders for Your Online Store (2025) 2023-11-06 
+ The newsletter for entrepreneurs
+ Join millions of self-starters in getting business resources, tips, and inspiring stories in your inbox.
+ Enter email Subscribe 
+ Subscribe 
+ Unsubscribe anytime. By entering your email, you agree to receive marketing emails from Shopify. By proceeding, you agree to the Terms and Conditions and Privacy Policy .
+ Sell anywhere with Shopify
+ Learn on the go. Try Shopify for free, and explore all the tools you need to start, run, and grow your business.
+ Start for free 
+ Start free then enjoy 3 months for $1/month

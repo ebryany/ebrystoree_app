@@ -1,0 +1,156 @@
+About Performance Max campaigns - Google Ads Help Skip to main content 
+ Google Help 
+ Help Center
+ Start advertising
+ Campaigns
+ Explore features
+ Optimize performance
+ Account & billing
+ Fix issues
+ Google Partners
+ Community
+ Google Ads
+ Privacy Policy
+ Terms of Service
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Google Ads 
+ Help Center Topics 
+ Campaigns 
+ Performance Max 
+ Create a Performance Max campaign 
+ Get started 
+ About Performance Max campaigns 
+ About Performance Max campaigns
+ Performance Max is a goal-based campaign type that allows you to access all Google Ads inventory , including YouTube, Display, Search, Discover, Gmail, and Maps, from a single campaign. You can use Performance Max to complement your keyword-based Search campaigns, to help optimize performance based on specific goals, and to find new ways to help generate more conversions and value.
+ This article outlines the benefits of Performance Max, explains how it works, and provides answers to your frequently asked questions.
+ Performance Max campaigns: General concepts video 
+ To view subtitles in your language, turn on YouTube captions . Select the Settings icon at the top right corner of the video player, select Captions , and then specify your language.
+ On this page 
+ Benefits 
+ How Performance Max works 
+ When to use Performance Max 
+ Keep in mind 
+ Frequently asked questions 
+ Next steps 
+ Benefits
+ Unlock new audiences : You can use Google’s real-time analysis of consumer intent and preferences, along with audience signals, to unlock new customer segments and find more converting customers.
+ Drive better performance : Use data-driven attribution and Google AI predictions about ads, audiences, and creative combinations to help optimize for touchpoints that can drive customers to convert.
+ Get transparent insights : Use insights, like rising search trends and asset reporting, to understand changes in performance, to help optimize creatives for impact, and to inform your business strategy.
+ Automate and simplify campaign management : Customize the goals that matter to your business and engage customers across Google channels to help maximize conversions or conversion value.
+ How Performance Max works
+ When you create a Performance Max campaign, the assets and settings you provide in your campaign or Google Ads account (like images, data feeds, and bidding goals) are combined with the power of Google AI to serve across all available inventory and automatically optimize based on your goals to help drive the best conversions and value.
+ Review the details below to understand how you can fully harness Google AI to optimize your campaigns.
+ Performance Max setup and features 
+ How you build your campaign 
+ How Google AI supports your campaign 
+ Conversion goals and values 
+ Define what conversion actions you care about and assign an optional ROAS or CPA target.
+ Using Smart Bidding, real-time auctions bid based on your conversion probability.
+ Creative assets 
+ Provide text , images , and videos , then turn on text customization and brand guidelines.
+ Generative AI tools combine your assets and creatives to help generate engaging images and videos. Learn more about Performance Max’s Generative AI tools .
+ Audience signals 
+ Share customer intent preferences to guide learning.
+ Accelerates campaign learning using high-intent audiences.
+ Safety and budgets 
+ Set daily spend targets and brand safety settings, such as brand exclusions, placement exclusions, and content suitability filters.
+ Automatically funnels your budget toward the highest performing inventory and placements.
+ Get started with Ask Advisor
+ You can use Ask Advisor to save time to analyze changes to your account performance. Ask Advisor is an agentic conversational experience built with Gemini in Google Ads. You can use Ask Advisor to maximize performance based on your unique business goals. Ask Advisor can also get personalized answers to your questions, understand and improve campaign performance, troubleshoot performance or ads policy issues, and suggest new text and creatives. Learn more About Ask Advisor (beta) .
+ When to use Performance Max
+ Performance Max leverages Google AI to find converting customers across Google’s channels based on your specific goals. As a result, it’s the recommended option when:
+ Your business has specific conversion goals such as to increase online sales or to generate leads.
+ You want to maximize the performance of your campaign without restricting where your ads appear.
+ You want to access all of Google’s advertising channels using a single campaign.
+ You want to increase reach and conversion value beyond keyword-based Search campaigns.
+ If you’re using Performance Max through Google Ad Grants, your campaign may not be eligible to serve on all inventory. New channels and inventory may come over time to help you drive results across all of Google. Visit the Google Ad Grants setup guide to learn more.
+ Keep in mind
+ You can create a Performance Max campaign if your campaign objective is "Sales", "Leads", "Website traffic", "Local store visits and promotions", or if you create a campaign without a goal’s guidance.
+ Search integration and campaign controls
+ After you choose to create a Performance Max campaign, you can set up your search and campaign controls. Search campaigns containing an exact match keyword are prioritized to serve over Performance Max when a query hits an exact match keyword. Search themes carry the same priority as phrase and broad match keywords. Learn more About ad group and asset group prioritization within a Google Ads account .
+ If your Search campaign is budget-limited, Performance Max may occasionally serve on exact match terms. Use the following controls to refine campaign reach:
+ Brand exclusions and negative keywords : Prevent overlaps and block unwanted queries.
+ Search themes and keywordless targeting : Guide AI toward high-value search intent.
+ Final URL expansion : Allow Google to match queries to relevant landing pages and auto-generate dynamic assets. Note that you remain responsible for reviewing and ensuring compliance and accuracy of landing page content, and all dynamically generated assets.
+ Budget recommendations : Utilize built-in daily recommendations (Low, Medium, High) and performance forecasts during setup to prevent low starts. Learn more about viewing budget details .
+ Creative controls
+ Text customization
+ Text customization is a campaign-level setting that generates additional text assets. Google AI generates headlines and descriptions from your landing page content, domain, and current ads. The system combines these automated assets with your provided assets to improve campaign performance. Learn more About text customization in Performance Max campaigns .
+ Final URL expansion
+ If you turn on Final URL expansion, Google may replace your Final URL with a more relevant landing page based on the user’s search query, and generate a dynamic headline and description to match your landing page content.
+ Video assets
+ Auto-generated videos are a campaign-level setting that help you generate additional video assets. These assets will appear in campaign-level settings. Learn more About video assets for Performance Max campaigns .
+ Note: When using auto-generated videos, ensure that the products featured in the generated video assets align with the inventory on your specified landing page. Discrepancies between the product shown in your video ad and the product linked in your Final URL can lead to poor user experiences. To help customers land on the exact product they viewed, use product filters to restrict the items shown in your asset groups to match your landing page.
+ Frequently asked questions
+ What campaign-level controls are available for Performance Max?
+ Performance Max has several campaign-level controls to help you achieve your goals:
+ Keywordless targeting
+ Final URL expansion or asset optimization
+ Search themes
+ Negative keywords
+ Brand exclusions
+ Learn more about Search targeting & controls for Performance Max .
+ What are Performance Max asset groups?
+ Asset groups are collections of creative assets, like images, text, logos, and videos, centered on a specific theme or target audience. Google AI mixes and matches these assets to render tailored ads across all inventory. Learn more about How asset groups work .
+ How can I view details about my Performance Max budget? 
+ You can view budget details using the budget panel in Google Ads. The budget panel, found on the campaign review page, provides customized budget recommendations to help optimize performance and to help prevent low starts. This panel provides the following data-driven insights about your campaigns:
+ Recommended budget level : The panel displays up to 3 daily budget suggestions (Low, Medium, and High), based on your campaign settings and account history. The lower level is the minimum recommended budget for your campaign, and selecting a higher budget level may further increase its overall effectiveness.
+ Performance forecasting : You can understand the potential reach and performance gains associated with each budget level. This transparency helps you align your investment with targeted goals.
+ What reporting options are available for Performance Max campaigns?
+ Performance Max campaigns offer several reporting options depending on your campaign and goals. These include:
+ Assets-level metrics 
+ Asset group reporting 
+ Channel performance 
+ Integrate Google Analytics 
+ Advanced reporting and controls for creative video 
+ Placement reports 
+ Conversion tracking 
+ Learn more about Performance Max reporting .
+ Next steps
+ Create a campaign 
+ Setup & management 
+ Retail & omnichannel 
+ Reporting & optimization 
+ Creatives & assets 
+ Best practices 
+ Troubleshooting 
+ Key policies 
+ Related links
+ About Smart Bidding and Smart Creative solutions with Google Ads 
+ Google Network 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Grow your business with Google Ads Get in front of millions of customers when they're searching for businesses like yours on Google Search, YouTube, Maps and more.
+ Sign Up Today 
+ Or get free, personalized support with a Google Ads Expert .
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 2089808860728676392
+ true
+ Search Help Center
+ true
+ true
+ true
+ true
+ true
+ true
+ 73067
+ false
+ false
+ true
+ true
+ false
+ false

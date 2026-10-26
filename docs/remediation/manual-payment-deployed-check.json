@@ -1,0 +1,38 @@
+[
+  {
+    "deployed": {
+      "bucket": {
+        "public": false,
+        "file_size_limit": 5242880,
+        "allowed_mime_types": [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "application/pdf"
+        ]
+      },
+      "counts": {
+        "orders": 1,
+        "proofs": 0,
+        "payments": 1,
+        "entitlements": 0,
+        "seller_ledger": 0
+      },
+      "migration": {
+        "name": "manual_payment_boundary",
+        "version": "20261002110000"
+      },
+      "permissions": {
+        "anon_submit": false,
+        "anon_verify": false,
+        "anon_direct_insert": false,
+        "authenticated_submit": true,
+        "authenticated_verify": true,
+        "authenticated_direct_insert": false
+      },
+      "manual_active": true,
+      "proof_objects_remaining": 0,
+      "configured_reupload_limit": 3
+    }
+  }
+]

@@ -1,0 +1,23 @@
+-- Koreksi penting: pencabutan GRANT UPDATE level tabel pada public.stores juga
+-- memblokir ADMIN, karena grant kolom yang diberikan setelahnya hanya mencakup
+-- kolom profil. Akibatnya alur resmi admin (menyetujui/mensuspend toko) mati.
+--
+-- Desain yang benar: pisahkan jalur berdasarkan peran, bukan dengan mencabut
+-- seluruh UPDATE.
+--   - Kolom profil (name, description, logo_url, contact_phone, contact_email):
+--     boleh seller.
+--   - Kolom kewenangan (status, is_platform, reviewed_by, reviewed_at,
+--     suspended_reason, owner_id, slug): hanya admin, dan admin memerlukannya
+--     untuk tugas resminya.
+--
+-- Karena grant kolom tidak dapat dibatasi per peran tambahan (authenticated
+-- mencakup seller dan admin), maka:
+--   1. Grant UPDATE tabel dikembalikan ke authenticated (agar admin bekerja).
+--   2. Trigger stores_protect_privileged tetap menjadi penegak sebenarnya:
+--      ia mengembalikan kolom kewenangan ke nilai lama untuk non-admin.
+--
+-- Ini mengembalikan desain awal dengan alasan yang lebih kuat: trigger, bukan
+-- grant, adalah batas yang tepat untuk kasus "kolom yang sama boleh diubah dua
+-- peran berbeda dengan hak berbeda".
+
+GRANT UPDATE ON public.stores TO authenticated;

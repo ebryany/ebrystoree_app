@@ -1,0 +1,102 @@
+[UA] Collect campaign data with custom URLs [Legacy] - Analytics Help Skip to main content 
+ Google Help 
+ Help Center
+ Get started with Analytics
+ Collect and manage data
+ Report and explore
+ Advertising and attribution
+ Audiences and remarketing
+ Manage accounts, properties, and users
+ Google Analytics 360
+ Policies and data privacy
+ Community
+ Analytics 
+ Privacy Policy 
+ Terms of Service 
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Analytics Contact us 
+ [UA] Collect campaign data with custom URLs [Legacy]
+ Add parameters to URLs to identify the campaigns that refer traffic.
+ You are viewing a legacy article about Universal Analytics. Learn more about Google Analytics 4 replacing Universal Analytics .
+ By adding campaign parameters to the destination URLs you use in your ad campaigns, you can collect information about the overall efficacy of those campaigns, and also understand where the campaigns are more effective. For example, your Summer Sale campaign might be generating lots of revenue, but if you're running the campaign in several different social apps, you want to know which of them is sending you the customers who generate the most revenue. Or if you're running different versions of the campaign via email, video ads, and in-app ads, you can compare the results to see where your marketing is most effective.
+ When a user clicks a referral link, the parameters you add are sent to Analytics, and the related data is available in the Campaigns reports.
+ In this article : 
+ Parameters 
+ How to set up custom campaigns 
+ Example URLs 
+ See custom-campaign data 
+ Parameters
+ There are 5 parameters you can add to your URLs:
+ utm_source : Identify the advertiser, site, publication, etc. that is sending traffic to your property, for example: google, newsletter4, billboard.
+ utm_medium : The advertising or marketing medium, for example: cpc, banner, email newsletter.
+ utm_campaign : The individual campaign name, slogan, promo code, etc. for a product.
+ utm_term : Identify paid search keywords. If you're manually tagging paid keyword campaigns, you should also use utm_term to specify the keyword.
+ utm_content : Used to differentiate similar content, or links within the same ad. For example, if you have two call-to-action links within the same email message, you can use utm_content and set different values for each so you can tell which version is more effective.
+ Each parameter must be paired with a value that you assign. Each parameter-value pair then contains campaign-related information.
+ For example, you might use the following parameter-value pairs for your Summer Sale campaign:
+ utm_source = summer-mailer to identify traffic that results from your Summer Sale email campaign
+ utm_medium = email to identify traffic from the email campaign vs. the in-app campaign
+ utm_campaign = summer-sale to identify the overall campaign
+ If you used these parameters, your custom-campaign URL would be:
+ https://www.example.com/?utm_source=summer-mailer&utm_medium=email&utm_campaign=summer-sale 
+ When you add parameters to a URL, you should always use utm_source , utm_medium , and utm_campaign .
+ utm_term and utm_content are optional.
+ utm_ is simply the required prefix for these parameters.
+ How to set up custom campaigns
+ You can add parameters and values to your URLs manually, or you can use one of the following platform-specific URL-builder tools to create your URLs and append the parameters.
+ Links to websites : Use the Campaign URL Builder on the Google Analytics Demos & Tools site.
+ Android-app ads : Use the Google Play URL Builder .
+ You must also have Google Play Campaign Attribution set up in your SDK. If you didn’t complete this during your initial set up, use our Developer Guide to learn how to implement Google Play Attribution in your Android SDK.
+ iOS- app ads : Use the iOS Campaign Tracking URL Builder .
+ You must be using Analytics iOS SDK v3 or higher, but you don’t have to make any changes in the SDK for this feature to work.
+ Important: If you are advertising an Android app, use the Google Play URL Builder . If you are advertising an iOS app, use the iOS Campaign Tracking URL Builder . Otherwise, you should use the Google Analytics Campaign URL Builder . 
+ Manual set up
+ If you want to set up your custom campaigns manually, make sure you separate the parameters from the URL with a question mark. List the parameters and values as pairs separated by an equal sign. Separate each parameter-value pair with an ampersand. For example:
+ https://www.example.com/ ? utm_source=email_campaign & utm_medium=email & utm_campaign=summer-sale 
+ You can add parameters to a URL in any order. Note that Analytics is case sensitive, so utm_source=google is different from utm_source=Google . Case sensitivity applies for each value you define.
+ Refer to Campaigns and traffic sources for a technical overview.
+ Example URLs
+ http://www.example.com/?utm_source=exampleblog&utm_medium=referral&utm_campaign=summer-sale 
+ http://www.example.com/?utm_source=newsletter1&utm_medium=email&utm_campaign=summer-sale 
+ http://www.example.com/?utm_source=newsletter1&utm_medium=email&utm_campaign=summer-sale&utm_content=toplink 
+ See custom-campaign data
+ To see the Campaigns reports:
+ Sign in to Google Analytics. 
+ Navigate to your view .
+ Open Reports .
+ Select Acquisition > Campaigns .
+ Was this helpful?
+ How can we improve it?
+ Submit 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 10803411523513721650
+ true
+ Search Help Center
+ false
+ true
+ true
+ true
+ true
+ true
+ 69256
+ false
+ false
+ false
+ false
+ false

@@ -1,0 +1,48 @@
+[
+  {
+    "runtime": {
+      "after": {
+        "audit": 40,
+        "tasks": 6,
+        "ledger": 0,
+        "orders": 1,
+        "proofs": 0,
+        "storage": 0,
+        "payments": 1,
+        "entitlements": 0,
+        "notifications": 11
+      },
+      "before": {
+        "audit": 40,
+        "tasks": 6,
+        "ledger": 0,
+        "orders": 1,
+        "proofs": 0,
+        "storage": 0,
+        "payments": 1,
+        "entitlements": 0,
+        "notifications": 11
+      },
+      "method": "deployed RPCs, SET LOCAL ROLE authenticated, existing buyer/finance auth.uid; fixture objects metadata only; all data rolled back",
+      "passed": [
+        "direct authenticated proof INSERT blocked",
+        "other buyer cannot submit",
+        "buyer cannot approve",
+        "submit and verify reject gateway row",
+        "payment and order expiry enforced",
+        "disabled manual payment rejected",
+        "payment path, missing object, size and MIME metadata mismatch rejected",
+        "oversize and forbidden object MIME rejected",
+        "submission creates review, task, history and audit; no paid, entitlement or seller credit",
+        "double submit during review rejected",
+        "approval compares expected_amount 8000, not order total 10000; mismatch remains unpaid",
+        "approval requires submitted proof and valid object",
+        "initial submission plus three reuploads accepted; reject and reupload transitions preserved",
+        "fifth submission rejected",
+        "digital approval pays invoice, completes order, grants entitlement, credits seller once and records audit/history; repeated approval blocked",
+        "service approval waiting_assignment; academic approval academic_review"
+      ],
+      "rollback_verified": true
+    }
+  }
+]

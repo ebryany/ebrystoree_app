@@ -1,0 +1,131 @@
+Get started with attribution - Analytics Help Skip to main content 
+ Google Help 
+ Help Center
+ Get started with Analytics
+ Collect and manage data
+ Report and explore
+ Advertising and attribution
+ Audiences and remarketing
+ Manage accounts, properties, and users
+ Google Analytics 360
+ Policies and data privacy
+ Community
+ Analytics 
+ Privacy Policy 
+ Terms of Service 
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Analytics Contact us 
+ Understand attribution 
+ Get started with attribution 
+ Advertising and attribution
+ Get started with attribution
+ Analyze how your ads drive users to perform meaningful actions on your website or app
+ Next: All channels performance report 
+ Overview
+ Customers may do several searches and click several of your ads before making a purchase or completing another important action on your website or app. Typically, all credit for the important action, called a key event , is given to the last ad customers clicked. But was it solely that ad that made them decide to interact with a key event on the path to a key event? What about the other ads they clicked on before it?
+ Attribution is the act of assigning credit for important user actions to different ads, clicks, and factors along the user's path to completing the action.
+ An attribution model can be a rule, a set of rules, or a data-driven algorithm that determines how credit is assigned to touchpoints along a user's path to completing important actions.
+ There are 3 attribution models available in the Attribution reports in Google Analytics properties:
+ Data-driven attribution
+ Paid and organic last click
+ Google paid channels last click
+ Note : All attribution models exclude direct visits from receiving attribution credit, unless the path to key event consists entirely of direct visits.
+ Reach your marketing goals
+ Put your insights from Google Analytics to work with Google Ads to help get your business in front of the right customers across Search, YouTube, and more.
+ Get started 
+ Access the Attribution reports
+ To access the Attribution reports:
+ In Google Analytics, click Advertising on the left.
+ Under Attribution , click Attribution models or Attribution paths .
+ Data-driven attribution
+ Data-driven : Data-driven attribution distributes credit for the key event based on data for each key event. It's different from the other models because it uses your account's data to calculate the actual contribution of each click interaction.
+ Each Data-driven model is specific to each advertiser and each key event.
+ How data-driven attribution works
+ Attribution uses machine learning algorithms to evaluate both converting and non-converting paths. The resulting Data-driven model learns how different touchpoints impact key event outcomes. The model incorporates factors such as time from key event, device type, number of ad interactions, the order of ad exposure, and the type of creative assets. Using a counterfactual approach, the model contrasts what happened with what could have occurred to determine which touchpoints are most likely to drive key events. The model attributes credit to these touchpoints based on this likelihood.
+ Notes :
+ Depending on data availability, data-driven attribution models may leverage aggregate data from Data sharing settings .
+ Conversions can be reattributed for up to 7 days after the conversion. 
+ The methodology behind data-driven attribution (advanced)
+ There are 2 main parts to the data-driven attribution methodology:
+ Analyzing the available path data to develop key event rate models for each of your key events
+ Using the key event rate model predictions as input to an algorithm that attributes credit to ad interactions
+ Develop key event probability models from available path data 
+ Data-driven attribution uses path data, including data from both converting and non-converting users, to understand how the presence and timing of particular marketing touchpoints may impact your users’ probability of key events. The resulting models assess how likely a user is to interact with a key event on the path to a key event at any particular point in the path, given exposure to a particular ad interaction.
+ The models compare the key event probability of users who were exposed to the ad, to the key event probability of similar users in a holdback group. (In more technical terms, the models compute the counterfactual gains of Google ad exposures by training on data from randomized controlled trials.)
+ Algorithmically assign fractional credit to marketing touchpoints 
+ The data-driven attribution model assigns credit based on how the addition of each ad interaction to the path changes the estimated key event probability. The data-driven attribution algorithm uses features including time between the ad interaction and the key event, format type, and other query signals to calculate this credit.
+ Example 
+ In the following high-level illustration, the combination of Ad Exposure #1 (Paid search), Ad Exposure #2 (Social), Ad Exposure #3 (Affiliate), and Ad Exposure #4 (Search) leads to a 3% probability of key event. When Ad Exposure #4 doesn't occur, the probability drops to 2%, so we know that Ad Exposure #4 drives +50% key event probability. We repeat this for each ad interaction and use the learned contributions as attribution weights.
+ Paid and organic last click
+ Note : The first click, linear, time decay, and position-based attribution models are no longer available as of November 2023. Learn more About the deprecated models .
+ Paid and organic last click : Ignores direct traffic and attributes 100% of the key event value to the last channel that the customer clicked through (or engaged view through for YouTube) before converting. See examples below of how key event value is allocated:
+ Examples 
+ Display > Social > Paid Search > Organic Search → 100% to Organic Search
+ Display > Social > Paid Search > Email → 100% to Email
+ Display > Social > Paid Search > Direct → 100% to Paid Search
+ Direct → 100% Direct traffic
+ Note :
+ Paid and organic last click and Last non-direct click are two names for the same attribution model.
+ An engaged view is counted in data-driven attribution when a user:
+ Watches an ad for 30 seconds (or until the end if it is less than 30 seconds)
+ Clicks on a teaser card
+ Clicks a companion banner or video wall
+ Clicks on a phrase that is a call to action
+ Clicks on the end screen
+ Clicks to visit the advertiser’s website
+ Google paid channels last click
+ Google paid channels last click : Attributes 100% of the key event value to the last Google Ads channel that the customer clicked through before converting. If there is no Google Ads click in the path, as in Example 6, the attribution model falls back to Paid and organic last click.
+ Examples 
+ Display > Social > Paid Search > Organic Search → 100% to Paid Search
+ Display > Social > YouTube EVC > Email → 100% to YouTube
+ Display > Social > Email > Direct → 100% to Email (fallback to last non-direct click)
+ Direct → 100% Direct traffic
+ Select attribution settings
+ The Attribution settings page lets you choose how key event reports in Google Analytics assign credit to different ads, clicks, and other factors before users trigger key events. Google Analytics provides a streamlined process for managing cross-channel conversions. Key events in Google Analytics are the primary source for creating conversions that can be shared with Google Ads.
+ To select key event attribution settings:
+ Sign in to Google Analytics .
+ In Admin , under Data display , click Events .
+ Note : The previous link opens to the last Google Analytics property you accessed. You must be signed in to a Google Account to open the property. You can change the property using the property selector.
+ You must be a Marketer or above at the property level to select the attribution settings.
+ Click Attribution settings .
+ Review these attribution settings:
+ Reporting attribution model 
+ Channels that can receive credit 
+ Key event lookback window 
+ Click Save .
+ Next: All channels performance report 
+ Was this helpful?
+ How can we improve it?
+ Submit 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 8619345020813793478
+ true
+ Search Help Center
+ false
+ true
+ true
+ true
+ true
+ true
+ 69256
+ false
+ false
+ false
+ false
+ false

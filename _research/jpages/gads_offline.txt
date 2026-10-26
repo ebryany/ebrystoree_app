@@ -1,0 +1,71 @@
+Title: About offline conversion imports - Google Ads Help
+
+URL Source: https://support.google.com/google-ads/answer/2998031?hl=en
+
+Markdown Content:
+Starting June 15, 2026, offline conversions import and enhanced conversions for leads uploads will be migrated to the Data Manager API and blocked in the Google Ads API. Developer tokens that haven’t sent a request between January 2026 through June 2026 will not be allowlisted for legacy access. To avoid interruption, you can use the Data Manager API for current and future offline conversions and enhanced conversions for leads data uploads. Learn more about [Updating your enhanced conversions settings](https://support.google.com/google-ads/answer/16884284).
+
+**Important**: Enhanced conversions for web and leads are now combined into a single on/off setting. Starting from April 2026, Google Ads accepts user-provided data from website tags, Data Manager, and API connections, and you will no longer need to choose between different implementation methods. Existing users will be automatically migrated to the new unified setting. Learn more about the [Updates to your enhanced conversions settings](https://support.google.com/google-ads/answer/16884284).
+
+If you have not already adopted offline conversion import, we recommend starting with enhanced conversions for leads instead. Enhanced conversions for leads is an upgraded offline conversion import that is easier to set up and offers benefits like durable, more accurate reporting, engaged-view conversions, cross-device conversions.
+
+Sometimes, an ad doesn't lead directly to an online sale, but instead starts a customer down a path that ultimately leads to a sale in the offline world, such as at your office or over the phone. By importing offline [conversions](https://support.google.com/google-ads/answer/6365), you can measure what happens in the offline world after your ad results in a click or call to your business.
+
+## Benefits of enhanced conversions for leads
+
+[Enhanced conversions for leads](https://support.google.com/google-ads/answer/15713840) is an upgraded version of offline conversion import that uses user-provided data, such as email addresses, to supplement imported offline conversion data to improve accuracy and bidding performance. When you import your offline conversions, the provided hashed customer data is used to attribute back to the Google Ads campaign by matching to the same data collected on your website (for example, lead form) and to signed-in customers who engaged with your ad.
+
+If you already use offline conversions, you can upgrade to enhanced conversions for leads to import user-provided data in addition to the identifiers you already import (GCLID).Learn more about [how Google used enhanced conversions for leads data](https://support.google.com/adspolicy/answer/9755941#leads).
+
+Benefits:
+
+*   **Durable**: Get more reliable results. Enhanced conversions for leads adheres to stricter privacy regulations.
+*   **Easy to set up**: Configure measurement entirely from your Google Ads account.
+*   **Enhanced performance**: See more accurate conversion reporting compared to standard offline conversion import. This upgrade also enables engaged-view conversions and cross-device conversions.
+*   **Simplified Setup**: Streamlined tagging and data sharing, utilizing the [Data manager](https://support.google.com/google-ads/answer/14639041).
+*   **Flexible**: Implement using the Google tag or with Google Tag Manager.
+
+Advertisers who utilized first-party data (such as email addresses and phone numbers) alongside GCLIDs imported using offline import for offline measurement saw a median 10% increase in conversions compared to those using standard offline conversion imports.
+
+The fastest and easiest way to set up or upgrade to enhanced conversions for leads is by using [Data Manager](https://support.google.com/google-ads/answer/14639041), where GCLID and user-provided data can both be used as match keys for data imports. Learn how to [Set up enhanced conversions for leads with Google Tag Manager](https://support.google.com/google-ads/answer/11347292) or [Set up enhanced conversions for leads with the Google tag](https://support.google.com/google-ads/answer/11021502).
+
+## How it works
+
+Offline conversion imports works a little differently depending on whether you’re tracking conversions that start with an ad click or call from your ad.
+
+### [Recommended] Conversions from clicks using enhanced conversions for leads
+
+Enhanced conversions for leads relies on a tag to capture first party data to enable durable, more accurate, and higher quality measurement. With enhanced conversions for leads, you can upload deeper lead data back into Google in a durable way, to further drive reporting and optimization insights. Once you’re ready, you can [set up enhanced conversions for leads](https://support.google.com/google-ads/answer/11021502).
+
+### Conversions from clicks using GCLID
+
+Google Ads provides you with unique IDs, called Google Click ID (GCLID), for every click that comes to your website from an ad. To track offline conversions from clicks, you'll save these IDs along with whatever lead information you collect from the person who clicked your ad.
+
+Later, when that person "converts" in the offline world, by signing a contract, for example, you give that GCLID back to Google Ads along with a few details about the type of conversion it was and when it happened. Then Google Ads records this conversion along with your other conversion tracking data.
+
+### Conversions from calls
+
+By importing call conversion information into Google Ads, you can track which of your ads and keywords result in the most sales calls for your business.
+
+For more information about how this option works, read [about importing phone call conversions](https://support.google.com/google-ads/answer/6301373).
+
+## [Security and privacy for conversion and event tracking](https://support.google.com/google-ads/answer/2998031?hl=en)
+
+Google has strict security standards. Google Ads only collects data on sites and apps where you have configured tracking.
+
+*   Ensure that you provide users with clear and comprehensive information about the data you collect on your sites, apps, and other properties. Make sure that you also get consent where required by law or any applicable Google policies governing user consent, including [Google’s EU user consent policy](https://www.google.com/about/company/user-consent-policy.html).
+*   Confirm that your government ID exactly matches your billing settings to ensure a smooth verification process. If you use a "Doing Business As" (DBA) name, provide a business license linking your name to the entity. For document quality, upload clear PDF, JPG, or PNG files where all four corners are visible.
+*   When requesting a payments profile account, your new Authorization to Offer (ATO) document must exactly match the name on the new payments profile. Any naming discrepancies will result in the request being rejected by the verification system. For more information, refer to [Edit your payments profile account](http://support.google.com/google-ads/answer/16305669).
+
+### Supplementing your online website measurement and offline conversion imports
+
+Combine your online website measurements with your offline first-party data (from order management or data platforms) in Google Ads to improve campaign performance. This integration, done securely within the Google Ads interface without developer help, allows you to supplement online conversions with offline data. Learn how to[Boost your website measurement using additional data sources](https://support.google.com/google-ads-data-manager/answer/16542291).
+
+### Related links
+
+*   [Upgrade offline conversion import to enhanced conversion for leads](https://support.google.com/google-ads/answer/14274408)
+*   [Set up enhanced conversions for leads with the Google tag](https://support.google.com/google-ads/answer/11021502)
+*   [Set up enhanced conversions for leads with Google Tag Manager](https://support.google.com/google-ads/answer/11347292)
+*   [Your guide to conversion modeling](https://support.google.com/google-ads/answer/12284070)
+*   [About importing call conversions](https://support.google.com/google-ads/answer/6301373)
+*   [Boost your website measurement using additional data sources (Beta)](https://support.google.com/google-ads-data-manager/answer/16542291)

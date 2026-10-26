@@ -1,0 +1,52 @@
+Title: Adjust Help Center
+
+URL Source: https://help.adjust.com/en/article/deep-linking
+
+Markdown Content:
+We constantly publish updates to our documentation, which may not yet be available in your language. For the most current information, use the [English version.](https://help.adjust.com/en)
+
+[Help Center](https://help.adjust.com/en)
+
+[Search](https://help.adjust.com/en/search?query=&page=1&limit=15)[Go to Adjust](https://suite.adjust.com/login)
+
+![Image 2](https://help.adjust.com/error-page_Astronaut.svg)
+
+404
+
+### We can’t find that page.
+
+Go back to the [homepage](https://help.adjust.com/) or use the search and let’s try again.
+
+Featured Articles
+
+[![Image 3](https://images.ctfassets.net/5s247im0esyq/cRehURINqnZ3uOwEef5FI/5654fc1b95c639090427b45e355e3dd9/Get_Started.svg) Get Started Marketer Getting started with Adjust Welcome to the Adjust suite, your control center for managing app settings, tracking in-app events, measuring campaigns, and evaluating user performance.](https://help.adjust.com/en/article/getting-started-with-adjust)
+
+[![Image 4](https://images.ctfassets.net/5s247im0esyq/45l2LErwj3wcXNReLpKBxj/090272ae469743a60d195fddafb232d1/Deep_Links_32.svg) Deep Links & Engagement Marketer Deep link support Find out which campaigns support deep linking and deferred deep linking.](https://help.adjust.com/en/article/deep-link-support)
+
+[![Image 5](https://images.ctfassets.net/5s247im0esyq/4YdjcUYIMMGsElcQLSbrXn/427427fc5e1c5b3fba1075c7aa94caf1/SKAN_conversion_hub.svg) ATT & SKAN solutions Marketer Quickstart guide to SKAN campaigns Get up and running with SKAN campaigns by following our quickstart guide.](https://help.adjust.com/en/article/quickstart-guide-to-skan-campaigns)
+
+[![Image 6](https://images.ctfassets.net/5s247im0esyq/5yGFqnhL0hJtPd05N3r2Ej/b378af1e5c765f9ee3517bfc4b6a5626/Property_1_32x32.svg) Partner & Campaign Setup Marketer Set up an app in your Meta developer account Before you set up Facebook in Adjust and start measuring campaigns, you need to create an app in your Facebook Developer account.](https://help.adjust.com/en/article/set-up-an-app-in-your-facebook-developer-account)
+
+Have a question? Get in touch
+
+[Contact Us](https://help.adjust.com/en/support)
+
+* * *
+
+[About Us](https://www.adjust.com/company/)
+
+[Security](https://www.adjust.com/security/)
+
+[Privacy Policy](https://www.adjust.com/terms/privacy-policy/)
+
+[Terms & Conditions](https://www.adjust.com/terms/general-terms-and-conditions/)
+
+[CCPA & GDPR](https://www.adjust.com/terms/ccpa/)
+
+[Legal Notice](https://www.adjust.com/terms/impressum/)
+
+[](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzIzODg5ODQwMg==)[](https://www.facebook.com/adjustcom)[](https://twitter.com/adjustcom)[](https://www.instagram.com/adjustcom/)[](https://www.linkedin.com/company/adjustcom/)[](https://www.youtube.com/channel/UCLxY21pzKyjTuODjUytJIsA)
+
+[![Image 7: Prefer Adjust in Google](https://help.adjust.com/images/preferred-sources/preferred-sources-light-en.png)](https://google.com/preferences/source?q=help.adjust.com)
+
+© 2026 Adjust GmbH. All rights reserved

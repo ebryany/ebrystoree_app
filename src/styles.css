@@ -1,0 +1,606 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-selected: var(--surface-selected);
+  --color-aurora: var(--aurora);
+  --color-aurora-foreground: var(--aurora-foreground);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-glass-border: var(--glass-border);
+  --color-price: var(--price);
+  --color-price-foreground: var(--price-foreground);
+  --color-discount: var(--discount);
+  --color-discount-foreground: var(--discount-foreground);
+  --color-selected: var(--selected);
+  --ease-ebry: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Marketplace density scale — jarak/ritme konsisten untuk layout padat. */
+  --spacing-gutter: 0.75rem; /* jarak antar kartu katalog */
+  --spacing-section: 1.25rem; /* jarak antar blok/section */
+  --spacing-block: 1rem; /* padding dalam panel */
+  --spacing-tight: 0.5rem; /* dalam kartu: antar baris teks */
+  --spacing-hair: 0.25rem; /* antar badge/label mikro */
+
+  /* Radius scale — sudut agak tajam khas katalog padat. */
+  --radius-tile: 0.25rem; /* badge, chip, thumb kecil */
+  --radius-card: 0.5rem; /* kartu produk/layanan */
+  --radius-panel: 0.75rem; /* panel, sub-section */
+  --radius-modal: 1rem; /* dialog, sheet */
+  /* Tombol: siku, mengikuti pola kontrol iOS (Apple memakai 0, ini 8px supaya
+     tetap satu bahasa dengan token lain). Dipakai lewat utility `rounded-control`. */
+  --radius-control: 0.5rem;
+
+  /* Elevation — marketplace minim bayangan; sisakan 3 tingkat. */
+  --elev-0: none;
+  --elev-1: 0 1px 2px oklch(0.22 0.03 205 / 5%);
+  --elev-2: 0 2px 8px oklch(0.22 0.03 205 / 8%);
+  --elev-3: 0 6px 20px oklch(0.22 0.03 205 / 12%);
+
+  /* Ukuran komponen padat. */
+  --tap-min: 2.75rem; /* target sentuh minimum 44px */
+  --row-compact: 2.25rem; /* tinggi baris padat */
+  --badge-h: 1.25rem; /* tinggi badge/chip */
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Ebrystore: ink teal gelap + aksen amber hangat */
+  --background: oklch(0.985 0.006 95);
+  --foreground: oklch(0.22 0.03 205);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 205);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.03 205);
+  --primary: oklch(0.33 0.062 200);
+  --primary-foreground: oklch(0.98 0.008 95);
+  --secondary: oklch(0.94 0.014 195);
+  --secondary-foreground: oklch(0.3 0.05 200);
+  --muted: oklch(0.95 0.009 190);
+  --muted-foreground: oklch(0.5 0.024 205);
+  --accent: oklch(0.52 0.098 195);
+  --accent-foreground: oklch(0.99 0.005 195);
+  --destructive: oklch(0.55 0.21 27);
+  --destructive-foreground: oklch(0.98 0.005 95);
+  --success: oklch(0.6 0.13 158);
+  --success-foreground: oklch(0.99 0.005 158);
+  --warning: oklch(0.78 0.15 78);
+  --warning-foreground: oklch(0.26 0.05 78);
+  --info: oklch(0.6 0.11 235);
+  --info-foreground: oklch(0.99 0.004 235);
+  --surface: oklch(0.965 0.01 95);
+  --surface-foreground: oklch(0.22 0.03 205);
+  --surface-raised: oklch(1 0 0);
+  --surface-selected: oklch(0.94 0.024 195);
+  --aurora: oklch(0.82 0.15 82);
+  --aurora-foreground: oklch(0.19 0.03 205);
+  --glass: oklch(1 0 0 / 7%);
+  --glass-strong: oklch(1 0 0 / 11%);
+  --glass-border: oklch(1 0 0 / 14%);
+  --price: oklch(0.48 0.16 32);
+  --price-foreground: oklch(0.99 0.005 95);
+  --discount: oklch(0.58 0.18 30);
+  --discount-foreground: oklch(0.99 0.005 95);
+  --selected: oklch(0.94 0.024 195);
+  --border: oklch(0.9 0.012 195);
+  --input: oklch(0.9 0.012 195);
+  --ring: oklch(0.52 0.098 195);
+  --chart-1: oklch(0.62 0.14 200);
+  --chart-2: oklch(0.52 0.098 195);
+  --chart-3: oklch(0.6 0.13 158);
+  --chart-4: oklch(0.6 0.11 235);
+  --chart-5: oklch(0.55 0.16 20);
+  --sidebar: oklch(0.26 0.045 202);
+  --sidebar-foreground: oklch(0.95 0.01 95);
+  --sidebar-primary: oklch(0.66 0.11 192);
+  --sidebar-primary-foreground: oklch(0.16 0.03 200);
+  --sidebar-accent: oklch(0.32 0.05 202);
+  --sidebar-accent-foreground: oklch(0.96 0.01 95);
+  --sidebar-border: oklch(0.36 0.04 202);
+  --sidebar-ring: oklch(0.66 0.11 192);
+
+  --gradient-hero: linear-gradient(
+    155deg,
+    oklch(0.28 0.055 203) 0%,
+    oklch(0.36 0.07 196) 55%,
+    oklch(0.44 0.08 205) 100%
+  );
+  --gradient-accent: linear-gradient(100deg, oklch(0.56 0.098 192) 0%, oklch(0.44 0.09 205) 100%);
+  --gradient-auth: linear-gradient(
+    150deg,
+    oklch(0.2 0.04 204) 0%,
+    oklch(0.28 0.06 198) 55%,
+    oklch(0.34 0.07 205) 100%
+  );
+  --gradient-aurora: linear-gradient(110deg, oklch(0.87 0.13 86) 0%, oklch(0.76 0.16 69) 100%);
+
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --shadow-card: 0 1px 2px oklch(0.22 0.03 205 / 6%), 0 8px 24px oklch(0.22 0.03 205 / 7%);
+  --shadow-lifted: 0 2px 4px oklch(0.22 0.03 205 / 8%), 0 18px 40px oklch(0.22 0.03 205 / 12%);
+}
+
+.dark {
+  --background: oklch(0.19 0.03 205);
+  --foreground: oklch(0.96 0.008 95);
+  --card: oklch(0.24 0.035 203);
+  --card-foreground: oklch(0.96 0.008 95);
+  --popover: oklch(0.24 0.035 203);
+  --popover-foreground: oklch(0.96 0.008 95);
+  --primary: oklch(0.8 0.09 190);
+  --primary-foreground: oklch(0.19 0.03 205);
+  --secondary: oklch(0.29 0.04 203);
+  --secondary-foreground: oklch(0.96 0.008 95);
+  --muted: oklch(0.28 0.032 203);
+  --muted-foreground: oklch(0.72 0.022 200);
+  --accent: oklch(0.68 0.1 192);
+  --accent-foreground: oklch(0.16 0.03 200);
+  --destructive: oklch(0.66 0.19 25);
+  --destructive-foreground: oklch(0.98 0.005 95);
+  --success: oklch(0.68 0.13 158);
+  --success-foreground: oklch(0.18 0.03 158);
+  --warning: oklch(0.8 0.14 78);
+  --warning-foreground: oklch(0.22 0.05 78);
+  --info: oklch(0.7 0.1 235);
+  --info-foreground: oklch(0.18 0.03 235);
+  --surface: oklch(0.23 0.033 203);
+  --surface-foreground: oklch(0.96 0.008 95);
+  --surface-raised: oklch(0.27 0.038 203);
+  --surface-selected: oklch(0.31 0.045 200);
+  --aurora: oklch(0.82 0.15 82);
+  --aurora-foreground: oklch(0.19 0.03 205);
+  --glass: oklch(1 0 0 / 7%);
+  --glass-strong: oklch(1 0 0 / 11%);
+  --glass-border: oklch(1 0 0 / 14%);
+  --price: oklch(0.72 0.15 40);
+  --price-foreground: oklch(0.16 0.02 32);
+  --discount: oklch(0.68 0.16 32);
+  --discount-foreground: oklch(0.98 0.005 95);
+  --selected: oklch(0.31 0.045 200);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.68 0.1 192);
+  --chart-1: oklch(0.72 0.11 200);
+  --chart-2: oklch(0.68 0.1 192);
+  --chart-3: oklch(0.68 0.13 158);
+  --chart-4: oklch(0.7 0.1 235);
+  --chart-5: oklch(0.66 0.16 20);
+  --sidebar: oklch(0.22 0.035 203);
+  --sidebar-foreground: oklch(0.95 0.01 95);
+  --sidebar-primary: oklch(0.68 0.1 192);
+  --sidebar-primary-foreground: oklch(0.16 0.03 200);
+  --sidebar-accent: oklch(0.29 0.04 203);
+  --sidebar-accent-foreground: oklch(0.96 0.01 95);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.68 0.1 192);
+
+  --gradient-hero: linear-gradient(
+    155deg,
+    oklch(0.2 0.035 205) 0%,
+    oklch(0.27 0.05 198) 55%,
+    oklch(0.32 0.06 205) 100%
+  );
+  --gradient-accent: linear-gradient(100deg, oklch(0.5 0.1 192) 0%, oklch(0.38 0.08 205) 100%);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 30%), 0 8px 24px oklch(0 0 0 / 28%);
+  --shadow-lifted: 0 2px 4px oklch(0 0 0 / 34%), 0 18px 40px oklch(0 0 0 / 40%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility bg-hero-gradient {
+  background-image: var(--gradient-hero);
+}
+
+@utility bg-accent-gradient {
+  background-image: var(--gradient-accent);
+}
+
+@utility bg-auth-gradient {
+  background-image: var(--gradient-auth);
+}
+
+@utility bg-aurora-gradient {
+  background-image: var(--gradient-aurora);
+}
+
+@utility auth-grid {
+  background-image:
+    linear-gradient(var(--glass) 1px, transparent 1px),
+    linear-gradient(90deg, var(--glass) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-lifted {
+  box-shadow: var(--shadow-lifted);
+}
+
+/* Elevation tier marketplace — pengganti shadow ad-hoc pada kartu padat. */
+@utility elev-0 {
+  box-shadow: var(--elev-0);
+}
+
+@utility elev-1 {
+  box-shadow: var(--elev-1);
+}
+
+@utility elev-2 {
+  box-shadow: var(--elev-2);
+}
+
+@utility elev-3 {
+  box-shadow: var(--elev-3);
+}
+
+/* Glow halus satu lapis — hanya untuk kartu saldo agar sedikit terangkat.
+   Sengaja minimal: satu lapis, opacity rendah, tanpa warna berlebih. */
+@utility glow-soft {
+  box-shadow:
+    0 1px 2px oklch(0.22 0.03 205 / 5%),
+    0 0 20px -4px oklch(0.52 0.098 195 / 16%);
+}
+
+/* Kartu katalog padat: border tipis + elevasi rendah + hover ring. */
+@utility tile {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  transition:
+    border-color var(--motion-fast) var(--ease-ebry),
+    box-shadow var(--motion-fast) var(--ease-ebry);
+  &:hover {
+    border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border));
+    box-shadow: var(--elev-2);
+  }
+}
+
+/* Panel dalam halaman (sub-section, group kartu). */
+@utility panel {
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+}
+
+/* Grid katalog padat dengan skala kolom seragam. */
+@utility catalog-grid {
+  display: grid;
+  gap: var(--spacing-gutter);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Badge/chip padat untuk harga, diskon, label. */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: var(--badge-h);
+  padding-inline: 0.375rem;
+  border-radius: var(--radius-tile);
+  font-size: 0.6875rem;
+  line-height: 1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Timpa target sentuh minimum pada kontrol padat (keyboard/touch). */
+@utility tap-target {
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+}
+
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+/* Padding atas aman untuk perangkat berponi. Di perangkat tanpa inset nilainya 0,
+   jadi tinggi header tidak berubah. */
+@utility pt-safe {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+
+/* Jarak tepi yang menghormati notch pada mode lanskap. */
+@utility px-safe {
+  padding-left: max(env(safe-area-inset-left), 1rem);
+  padding-right: max(env(safe-area-inset-right), 1rem);
+}
+
+/* Radius tombol: siku (8px), bukan pill. Mengikuti pola kontrol iOS.
+   `!important` dipakai karena komponen Button membawa `rounded-md` (10px) di
+   layer yang sama, dan urutan menangnya tidak dapat dipastikan. */
+@utility rounded-control {
+  border-radius: var(--radius-control) !important;
+}
+
+@utility press-scale {
+  transition: transform var(--motion-fast) var(--ease-ebry);
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Permukaan pop-up bergaya kaca (iOS-inspired, dikendalikan).
+ *
+ * Kenapa ada: dialog Ebrystore sebelumnya hanya `bg-background` datar, jadi
+ * semua pop-up terasa seperti panel admin yang sama. Utility ini memberi satu
+ * material bersama tanpa menyentuh Radix.
+ *
+ * Batas dosis (DESIGN.md + antislop R-10/R-13):
+ * - Glass hanya dipakai pada pop-up pendek: inquiry, chat, pengumuman,
+ *   hasil aksi, dan struk. Form panjang dan konfirmasi destruktif tetap
+ *   memakai permukaan opak default.
+ * - Blur maksimum `md` (12px). Lebih dari itu teks di belakang ikut terbaca
+ *   dan kontras turun.
+ * - Glow luar hanya 1px border + satu shadow ambient tipis. Tidak ada
+ *   animasi glow, tidak ada warna neon.
+ *
+ * Fallback: bila `backdrop-filter` tidak didukung, permukaan menjadi opak
+ * (98% card) sehingga teks tetap lolos WCAG AA. Kontras teks tidak
+ * bergantung pada blur.
+ * ------------------------------------------------------------------------- */
+@utility popup-glass {
+  /* Latar hampir opak: cukup tembus untuk terasa kaca, cukup pekat agar
+     teks tetap 4.5:1 terhadap konten apa pun di belakangnya. */
+  background-color: color-mix(in oklab, var(--card) 88%, transparent);
+  /* Tepi memakai campuran border + sedikit foreground: cukup terbaca sebagai
+     batas material (bukan 1.27:1 yang nyaris hilang) tanpa menjadi garis tegas. */
+  border: 1px solid color-mix(in oklab, var(--border) 70%, var(--foreground) 12%);
+  backdrop-filter: blur(12px) saturate(120%);
+  /* Garis cahaya tipis di tepi atas + bayangan dalam sangat lembut: inilah
+     "specular edge" yang membuat material terbaca sebagai kaca. */
+  box-shadow:
+    inset 0 1px 0 0 oklch(1 0 0 / 55%),
+    inset 0 -1px 0 0 oklch(0 0 0 / 4%),
+    0 1px 2px oklch(0.22 0.03 205 / 8%),
+    0 12px 32px -12px oklch(0.22 0.03 205 / 22%);
+}
+
+/* Glow ambient di sekitar tepi: satu lapisan tipis memakai aksen ink-teal.
+   Hanya untuk pop-up yang memang butuh penanda fokus. */
+@utility popup-glass-glow {
+  box-shadow:
+    inset 0 1px 0 0 oklch(1 0 0 / 60%),
+    inset 0 -1px 0 0 oklch(0 0 0 / 5%),
+    0 1px 2px oklch(0.22 0.03 205 / 10%),
+    0 16px 40px -14px oklch(0.22 0.03 205 / 26%),
+    0 0 0 1px oklch(0.52 0.098 195 / 14%),
+    0 0 24px -10px oklch(0.52 0.098 195 / 26%);
+}
+
+/* Fallback tanpa backdrop-filter: naikkan opasitas agar kontras aman. */
+@supports not (backdrop-filter: blur(1px)) {
+  .popup-glass,
+  .popup-glass-glow {
+    background-color: color-mix(in oklab, var(--card) 98%, transparent);
+  }
+}
+
+/* Mode gelap: kaca putih 55% terlalu terang di atas surface gelap; turunkan. */
+.dark .popup-glass {
+  background-color: color-mix(in oklab, var(--card) 90%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 oklch(1 0 0 / 12%),
+    inset 0 -1px 0 0 oklch(0 0 0 / 20%),
+    0 1px 2px oklch(0 0 0 / 30%),
+    0 12px 32px -12px oklch(0 0 0 / 45%);
+}
+.dark .popup-glass-glow {
+  box-shadow:
+    inset 0 1px 0 0 oklch(1 0 0 / 14%),
+    inset 0 -1px 0 0 oklch(0 0 0 / 20%),
+    0 1px 2px oklch(0 0 0 / 30%),
+    0 16px 40px -14px oklch(0 0 0 / 50%),
+    0 0 0 1px oklch(0.68 0.1 192 / 18%),
+    0 0 24px -10px oklch(0.68 0.1 192 / 22%);
+}
+
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Animasi line-fill satu kali untuk diagram alur hero. */
+@keyframes ebry-line-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@utility ebry-line-fill {
+  transform-origin: top;
+  animation: ebry-line-fill 900ms var(--ease-ebry) both;
+}
+
+/* Kilau berjalan pada tombol hero (ShimmerButton). Satu lapisan conic-gradient
+   berputar penuh; permukaan tombol menutupinya sehingga yang terlihat hanya
+   tepi kilau yang lewat. Dimatikan oleh motion-reduce di komponen. */
+@keyframes shimmer-slide {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-shimmer-slide {
+  animation: shimmer-slide var(--speed) linear infinite;
+}
+
+/* Kata berganti di judul hero: masuk halus, tidak ada lompatan tata letak
+   karena lebar sudah ditahan oleh kata terpanjang. */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Marquee berjalan terus untuk pita review di home.
+   Gerakan linear tanpa henti; durasi diatur lewat --marquee-duration.
+   Dimatikan oleh motion-reduce:animate-none di komponen. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--marquee-gap)));
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(calc(-100% - var(--marquee-gap)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--marquee-gap)));
+  }
+}
+
+@keyframes marquee-vertical-reverse {
+  from {
+    transform: translateY(calc(-100% - var(--marquee-gap)));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee var(--marquee-duration) linear infinite;
+}
+
+@utility animate-marquee-reverse {
+  animation: marquee-reverse var(--marquee-duration) linear infinite;
+}
+
+@utility animate-marquee-vertical {
+  animation: marquee-vertical var(--marquee-duration) linear infinite;
+}
+
+@utility animate-marquee-vertical-reverse {
+  animation: marquee-vertical-reverse var(--marquee-duration) linear infinite;
+}

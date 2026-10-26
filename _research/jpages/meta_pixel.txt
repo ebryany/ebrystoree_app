@@ -1,0 +1,108 @@
+Title: Set up and install the Meta Pixel
+
+URL Source: https://www.facebook.com/business/help/952192354843755
+
+Markdown Content:
+[![Image 1: Meta for Business (formerly Facebook for Business)](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=369852008357062&version=1789737248)](https://www.facebook.com/business)
+
+[![Image 2](https://scontent-sea5-1.xx.fbcdn.net/v/t39.8562-6/445356466_1170799447379124_1827778994453747726_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=VMgCS1Q33X4Q7kNvwFV5vPo&_nc_oc=AdpUawpfKu8amzGwgm9Q453R_wefqdcm41y-THKHKTCCf53J72hhf0TI8S5vov4XJb0&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=gFbKThyE6L1mPCqHevlt3A&_nc_ss=7b289&oh=00_AQPhZwiI6gMR8CG2dPD9oMT4LtP1PBckPzKgM6zesInWXQ&oe=6AC8D282)](https://www.facebook.com/business/help/952192354843755#)
+
+[![Image 3](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1389774634917761&version=1788927509)](https://www.facebook.com/business/help/952192354843755#)
+
+![Image 4](https://scontent-sea5-1.xx.fbcdn.net/v/t39.8562-6/315221436_683202276756209_1888406246823173964_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=f537c7&_nc_ohc=gG5q99Pe4KgQ7kNvwHhGXT3&_nc_oc=AdpMF8LTEVcTdFl3M2jwBZmDRXOObrkdkeaJI7H7rTj76wC93z2fB_woxw4u614a6So&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=gFbKThyE6L1mPCqHevlt3A&_nc_ss=7b289&oh=00_AQOcEEyIEOmtpI5zZ22uOikY5P5lRtFvoAhGAGg01xP8HA&oe=6AC8FD4A)
+
+## Log in to Meta for Business
+
+Manage your ad accounts and get personalized support.
+
+Chat with Meta AI business assistant for support around the clock Still need help? Your business assistant can help resolve account issues and unblock your business.
+
+Start chat
+
+![Image 5](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+The Meta Pixel is a piece of code that you put on your website. The Meta Pixel allows you to measure the effectiveness of your Meta advertising by understanding the actions people take on your website. This article covers how to set up a [Meta Pixel](https://www.facebook.com/business/help/742478679120153) on your website.
+
+Setting up a pixel involves 2 steps:
+
+1.   Create your pixel in [Events Manager](https://www.facebook.com/events_manager2/) and set up the base code on your website. You can use a partner integration, if available, or add code manually to your website.
+2.   Set up events on your website to measure actions like making a purchase. You can use a partner integration, the point-and-click event setup tool, or add code manually to your website.
+
+There are several options for how to set up your pixel and events, and you’ll be guided through the available options during setup. If you set up your pixel or events manually, you may need a developer's help to add the code to your website.
+
+If you share events with Meta using your pixel, we also recommend using the Conversions API. The Conversions API helps improve the performance and measurement of your Meta ad campaigns by working with your Meta Pixel. Learn more [about the Conversions API](https://www.facebook.com/business/help/2041148702652965) and how it works.
+
+## Before you begin
+
+Before you can set up and install your Meta Pixel:
+
+*   You need a business website or app.
+
+*   You or your developer must be able to update your website's code or the tag manager you use, if applicable, for manual pixel setup using code.
+
+## Set up the Meta Pixel and events on your website
+
+1.    Go to [**Meta Events Manager**](https://www.facebook.com/events_manager2/). 
+2.   Click **Connect data** and select **Web**.
+3.   Click **Connect**.
+4.   Enter a name for your pixel, then click **Create pixel**. This creates a new ID, viewable in Events Manager.
+5.   Your next steps depend on whether you have a website:
+    *   
+**If you have a website**, enter your website URL to check for easy partner integration setup options, then click **Check**.
+
+        *   If a partner integration is available to you, you’ll see it on the screen. Click **Next** and follow the onscreen instructions to set up your pixel and events through your partner’s website.
+
+        *   If a partner integration is not available, click **Next**.
+
+    *   **If you don’t have a website**, click to check the box next to **I don't have a website** and click **Continue.**
+
+6.   Select how you would like to connect your data with Meta: **Get guidance** or **Do it yourself**. **Note:** We recommend **Get guidance**.
+    *   Select **Get guidance** if you would like setup recommendations. You can skip the rest of the instructions in this article if you select this option, and you can follow the onscreen instructions in Events Manager instead.
+
+    *   Select **Do it yourself** if you already know how you’d like to connect your data and don’t want setup recommendations. If you select this option, follow the rest of the instructions in this article.
+
+7.   Select **Conversions API and Meta Pixel** or **Meta Pixel only** as your setup option, then click **Next**.
+    *   
+If you select **Conversions API and Meta Pixel**, choose how you want to set up the Conversions API and pixel. You can choose either **Set up with partner integration**, **Set up with Meta-enabled, web-only Conversions API** or **Set up manually**. If you’re not sure which option to choose, you can
+
+[compare Conversions API setup options by cost and complexity](https://www.facebook.com/business/help/433493041367251)
+.
+
+        *   If you select **Set up with partner integration**, select your partner and follow the onscreen instructions to set up the pixel, Conversions API and events.
+
+        *   If you select **Meta-enabled Conversions API**, follow the onscreen instructions to set up the pixel, Conversions API and events.
+
+        *   If you select **Set up manually**, follow the onscreen instructions to create personalized instructions to set up the pixel, Conversions API and events. On the last screen, you’ll have the option to set up the Conversions API yourself using the personalized instructions or send the instructions to a developer. If you need help creating the instructions, you can learn [how to set up the Conversions API using personalized instructions](https://www.facebook.com/business/help/232481544843294).
+
+    *   If you select **Meta Pixel only**, choose how you want to set up your pixel code: **Install code manually** or **Check for partner**. If you have a developer who will set up your pixel for you, you can click **Email instructions** instead.
+
+After you set up the pixel on your website, learn [how to make sure that your pixel is working correctly](https://www.facebook.com/business/help/218844828315224). Then, learn [how to add people to your pixel](https://www.facebook.com/business/help/279059996069252).
+
+You may be able to speak with a Meta Technical Pro for step-by-step guidance to install the Meta Pixel. Learn how to [schedule a call with a Meta Pro](https://www.facebook.com/business/meta-pro-team/technical-pro?lead_source=%20sbg_2025_q4_ou_specialist_technical_helpcenter_xyz).
+
+## Learn more
+
+![Image 6](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1124271668792488&version=1771391301)
+##### Common support topics
+
+##### Business Help Center
+
+![Image 7](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 8](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 9](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+##### Business Help Center
+
+![Image 10](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[![Image 11](https://scontent-sea5-1.xx.fbcdn.net/v/t39.8562-6/321383695_1761464880891846_7163045669980296910_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=4esgfue7nsUQ7kNvwFmiYdB&_nc_oc=Adqqpth3rUO2QfWtGxRQn-Nhg5dCplebue99Y_kZOH0YAoJkJ1DGebbJXViNtZP_te4xW0uxrjS7W0WoyNn_C1of&_nc_zt=14&_nc_ht=scontent-sea5-1.xx&_nc_gid=-wg9CEZkJkbfVvGChYh7ag&_nc_ss=7b289&oh=00_AQOWWCihklR0FdeH4GE-veYrUxR978o-tMfzYAUclH97Rw&oe=6AC8DCB8)](https://www.facebook.com/business/help/952192354843755#)
+
+[![Image 12: Permalink](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=514159977391799&version=1666676243&transcode_extension=webp)](https://www.facebook.com/business/help/952192354843755?helpref=uf_permalink)[![Image 13: Share](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=814226356566295&version=1666676243&transcode_extension=webp)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fhelp%2F952192354843755)
+
+More in this section: Events

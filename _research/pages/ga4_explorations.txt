@@ -1,0 +1,229 @@
+[GA4] Funnel exploration - Analytics Help Skip to main content 
+ Google Help 
+ Help Center
+ Get started with Analytics
+ Collect and manage data
+ Report and explore
+ Advertising and attribution
+ Audiences and remarketing
+ Manage accounts, properties, and users
+ Google Analytics 360
+ Policies and data privacy
+ Community
+ Analytics 
+ Privacy Policy 
+ Terms of Service 
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Analytics Contact us 
+ Explorations 
+ [GA4] Funnel exploration 
+ [GA4] Funnel exploration
+ Funnel exploration lets you visualize the steps your users take to complete a task and quickly see how well they are succeeding or failing at each step. For example, how do prospects become shoppers and then become buyers? How do one time buyers become repeat buyers? With this information, you can improve inefficient or abandoned customer journeys.
+ Create a funnel exploration
+ In Explore , under Start a new exploration , click Funnel exploration template.
+ Note : The previous link opens to the last Google Analytics property you accessed. You must be signed in to a Google Account to open the property. You can change the property using the property selector.
+ Until you add your funnel steps, you'll see the following notice: No data for this combination of segments, values, filters, and date range. Try editing the variables or settings or remove them. 
+ Create a funnel report
+ You can select Save to create a funnel report using the data in your funnel exploration. The funnel report enables you to access the information in your funnel more quickly. Learn more 
+ Visualization
+ Select either a standard (stepped) funnel, or a trended (line chart) funnel. In a trended funnel, you can see all the steps simultaneously, or dive into a specific step by clicking the step names at the top of the visualization.
+ "Make open funnel" toggle
+ Funnels can be "open" or "closed," which determines how users can enter the funnel:
+ In an open funnel, users can enter the funnel in any step.
+ In a closed funnel, users must enter the funnel in the first step.
+ Users are only counted in the steps they complete in the specified sequence. If the user misses a step, they fall out of the funnel and aren't counted in any subsequent steps. If a single user completes the steps of the funnel multiple times during the specified date range, only the first sequence of steps will be reported. In other words, a user can only enter the funnel once. The example below explains this behavior.
+ Example 1
+ Suppose you have 2 funnels configured as follows:
+ Funnel 
+ Steps 
+ Open/Closed 
+ Funnel 1
+ A, B, C
+ Open
+ Funnel 2
+ A, B
+ Closed
+ 4 users visit your site in the funnel timeframe and meet these step requirements:
+ User 
+ Step requirements met 
+ 1
+ A, B, C
+ 2
+ B, C
+ 3
+ A, C
+ 4
+ C
+ Here's how these users are counted in each funnel:
+ Funnel 1 :
+ User 
+ Counted in step 
+ 1
+ A, B, C
+ 2
+ B, C
+ 3
+ A
+ 4
+ C
+ Funnel 2 :
+ User 
+ Counted in step 
+ 1
+ A, B, C
+ 3
+ A
+ Explanation :
+ Since funnel 1 is open, users can enter at any step. All 4 users are counted, but since users must complete the steps in the order specified, user 3 is only counted in step A (they skipped step B and so, fell out of the funnel).
+ Since funnel 2 is closed, users must enter the funnel at the first step (A). Only users 1 and 3 are counted.
+ If a user starts the funnel from any step other than the first step, and then navigates to the first step before proceeding along the funnel, this user will be counted in the first step for closed funnels. This is because closed funnels look for the first instance of step 1 in the user event stream, but they won't be counted in the first step for open funnels. Open funnels insert the user in the funnel with their first qualifying action, and then look at if the user completes the funnel from that point onward. If the user navigates back to step 1 after they have entered mid funnel, the action is ignored. The example below explains this behavior.
+ Example 2
+ Suppose you have 2 funnels configured as follows:
+ Funnel 
+ Steps 
+ Open/Closed 
+ Funnel 1
+ A, B, C
+ Closed
+ Funnel 2
+ A, B, C
+ Open
+ 5 users visit your site in the funnel timeframe and meet these step requirements:
+ User 
+ Step requirements met 
+ 1
+ A, B, C
+ 2
+ B, C
+ 3
+ A, C
+ 4
+ C
+ 5
+ B, A, B, C
+ Here's how these users are counted in each funnel:
+ Funnel 1: Closed funnel
+ User 
+ Counted in step 
+ 1
+ A, B, C
+ 2
+ -
+ 3
+ A
+ 4
+ -
+ 5
+ A, B, C
+ Funnel 2: Open funnel
+ User 
+ Counted in step 
+ 1
+ A, B, C
+ 2
+ B, C
+ 3
+ A
+ 4
+ C
+ 5
+ B, C
+ Explanation :
+ Since funnel 1 is closed, users must enter the funnel at the first step (A). Only users 1, 3 and 5 are counted.
+ Since funnel 2 is open, users can enter at any step. All 5 users are counted as all of them qualify for at least 1 of the funnel steps. However, since users must complete the steps in the order specified, and the first qualifying action for user 5 makes them enter the funnel at step B, this user is not counted in step A.
+ Segment comparisons
+ Apply up to 4 segments to focus on specific sets of users. Right-click in the data table to create segments from the data.
+ Steps
+ Steps define the user journey you want to measure. You can define up to 10 steps in the funnel.
+ To reorder the steps, in Tab Settings , drag the steps to a new position.
+ Edit funnel steps
+ To add or edit steps, click the edit pencil , then:
+ Give each step a distinctive name.
+ Add one or more conditions that your users must meet to be included in that step of the funnel journey.
+ Conditions can be based on events your users trigger or dimension values they share. For example, the dimension User acquired campaign equals "Summer Sale" or the purchase event with the parameter value >= 100.
+ You can't define funnel steps based on metrics.
+ To add more clauses to a condition, click AND or OR .
+ To add steps to the funnel, click Add step .
+ Select whether the previous step is indirectly followed by or is directly followed by the new step.
+ Steps that indirectly follow the previous step can have other intervening actions.
+ Steps that directly follow the previous step must occur immediately after the previous step.
+ To set a time frame within which this step must follow, click Within and set the time frame.
+ Click APPLY .
+ The Summary card on the right updates as you create your funnel to show you how your conditions match your data.
+ To copy, remove, or add steps above or below a selected step, click More .
+ Breakdown
+ Select a dimension to use to provide the breakdown data series for the table. For example, if you select the "Device category" dimension, you will see each step broken down by the different device categories (e.g., desktop, mobile).
+ When you include a breakdown dimension, users are only attributed to the first instance of the breakdown value that applies to them. For example, say User A enters the funnel using a mobile device but completes all the subsequent steps using a desktop. If Device category is used as the breakdown dimension, you will see User A in all the steps of the funnel but only under the mobile breakdown, as that was the device they used when they first entered the funnel.
+ This behavior also applies to trended funnels. In a trended funnel, users are only attributed to the first date when they were active in each step.
+ Rows per dimension
+ Set the number of data series displayed in the table.
+ "Show elapsed time" toggle
+ Turn this on to show the average time elapsed between funnel steps. For each funnel step this is the sum of the time elapsed, in microseconds, between the previous and the current step and divided by the number of users who reached the current step.
+ Note : If there are multiple counts of the same event where the user completes the same steps, only the first one will be counted.
+ Example
+ User 
+ Step 
+ Timestamp 
+ 1
+ 1
+ 10:00:00
+ 1
+ 2
+ 10:00:10
+ 1
+ 3
+ 10:00:20
+ 1
+ 3
+ 10:00:30
+ 2
+ 1
+ 11:00:00
+ 2
+ 2
+ 11:00:20
+ In this example:
+ The elapsed time for step 2 is the average of the elapsed time for user 1 and user 2, calculated as (10s + 20s) / 2 = 15s.
+ The elapsed time for step 3 applies only to user 1 and to the first occurrence of step 3 at 10:00:20, calculated as (20s / 1 = 20s).
+ Next action
+ Select a dimension to show the most common user actions following each funnel step in the "Top 5 Next Actions" card.
+ The (no next action) entry appears in the "Top 5 Next Actions" card when a significant portion of users completing the funnel step didn’t proceed to a subsequent step, as defined by the dimension in the "Next action" section.
+ Note : When using page or screen-related dimensions in the "Next action" section, the (no next action) entry doesn't always imply a drop-off in the funnel. Rather, this may indicate that the "Next action" dimension value remained the same after users completed the current step.
+ For example, a (no next action) entry when using the "Page title" dimension may indicate that the page title didn’t change as users proceeded to the next funnel step.
+ Filters
+ Restrict the data shown in the exploration according to the conditions you provide. If your filter has multiple conditions, all of the conditions must be met to apply the filter. Learn more 
+ Was this helpful?
+ How can we improve it?
+ Submit 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 4559447897561915078
+ true
+ Search Help Center
+ false
+ true
+ true
+ true
+ true
+ true
+ 69256
+ false
+ false
+ false
+ false
+ false

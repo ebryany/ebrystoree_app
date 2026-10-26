@@ -1,0 +1,41 @@
+Title: Discounts
+
+URL Source: https://help.shopify.com/en/manual/discounts
+
+Markdown Content:
+Offering discounts can be a marketing strategy that you use to drive sales in your Shopify store. To offer discounts, you can create discount codes or set up automatic discounts, or you can alternatively [set sale prices for individual products](https://help.shopify.com/en/manual/products/details/product-pricing/sale-pricing).
+
+You can create codes for a monetary value discount, a percentage discount, a buy X get Y discount, or a free shipping discount. Customers can enter discount codes online at checkout, or in person if you're using [Shopify POS](https://help.shopify.com/en/manual/sell-in-person/shopify-pos/discount-management).
+
+You can also create other types of discount by using a [third-party app from the Shopify App Store](https://apps.shopify.com/categories/marketing-and-conversion-promotions-discounts/all). Some third-party apps let you manage discounts directly in your Shopify admin, or you might need to create your discounts in the app's settings.
+
+If your store is on the Shopify Plus plan, then you can [create your own custom discounts app](https://help.shopify.com/en/manual/apps/about-apps#custom-apps).
+
+When you offer a discount on an order, the discount is applied to the subtotal of the order before taxes, and then any applicable tax is applied afterwards.
+
+You can update and manage existing discounts from the **Discounts** page in your Shopify admin. Before you update a discount, check if another staff member might also be making changes to the same discount.
+
+You can also use a [rollout](https://help.shopify.com/en/manual/markets/rollouts) to schedule when a discount is activated or deactivated, or to test a discount against the discounts that your store offers already. Learn more about [discounts in a rollout](https://help.shopify.com/en/manual/discounts/managing-discounts#rollouts).
+
+You can also ask [Sidekick](https://help.shopify.com/en/manual/ai-powered-tools/sidekick), Shopify's built-in, free AI commerce assistant, to help create, edit, or troubleshoot discounts in your Shopify admin. For example, ask: "Create a 15% discount code for my summer collection, one use per customer, ending Sunday."
+
+[Video 3](https://www.youtube.com/watch?v=xPh847CVqy8)
+### In this section
+
+*   [Discount types](https://help.shopify.com/en/manual/discounts/discount-types)
+
+*   [Discount methods](https://help.shopify.com/en/manual/discounts/discount-methods)
+
+*   [Managing and editing your discounts](https://help.shopify.com/en/manual/discounts/managing-discounts)
+
+*   [Combining discounts](https://help.shopify.com/en/manual/discounts/discount-combinations)
+
+*   [Automatically apply discounts to abandoned checkout recovery emails](https://help.shopify.com/en/manual/discounts/discounts-for-abandoned-checkout-recovery-emails)
+
+*   [Exporting discounts](https://help.shopify.com/en/manual/discounts/export-discount-codes)
+
+*   [Add a discount to a gift card](https://help.shopify.com/en/manual/discounts/discount-gift-card)
+
+*   [Managing sales channel settings for discounts](https://help.shopify.com/en/manual/discounts/sales-channel-discounts)
+
+*   [Discount codes FAQ](https://help.shopify.com/en/manual/discounts/discounts-faq)

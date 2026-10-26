@@ -1,0 +1,160 @@
+Title: About Lookalike Audiences | Meta Business Help Center
+
+URL Source: https://www.facebook.com/business/help/164749007013531
+
+Markdown Content:
+[![Image 4: Meta for Business (formerly Facebook for Business)](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=369852008357062&version=1789737248)](https://www.facebook.com/business)
+
+[Get started](https://www.facebook.com/business/help/164749007013531#)
+
+[Advertise](https://www.facebook.com/business/help/164749007013531#)
+
+[Learn](https://www.facebook.com/business/help/164749007013531#)
+
+[Support](https://www.facebook.com/business/help/164749007013531#)
+
+[![Image 5](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/445356466_1170799447379124_1827778994453747726_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=VMgCS1Q33X4Q7kNvwEVDm0H&_nc_oc=AdpiVxfwlqGDlhGq6v-YJcQCwOcgH5W_a22YPtyXVlGM5gniL_pS--oAlva-c05pL1U&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=e8nziUwAMtfUXtnzuRu1FQ&_nc_ss=7b289&oh=00_AQPjqPROQgZ3qizMN81cmJzxIPPkCK4fyyGA-XzwadB9Wg&oe=6AC8D282)](https://www.facebook.com/business/help/164749007013531#)
+
+[![Image 6](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1389774634917761&version=1788927509)](https://www.facebook.com/business/help/164749007013531#)
+
+![Image 7](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/315221436_683202276756209_1888406246823173964_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=f537c7&_nc_ohc=gG5q99Pe4KgQ7kNvwFJMc7A&_nc_oc=AdpGJCKCrtghNyVt0zRdCA7sEDtCqtp14SLjOtvPcD_9MBTlg_tDx7TBec4C7odniXE&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=e8nziUwAMtfUXtnzuRu1FQ&_nc_ss=7b289&oh=00_AQOCoVGfdVDZdA8D85q2WHeERVXzjTQJyIybNSgOWq0Pog&oe=6AC8C50A)
+
+## Log in to Meta for Business
+
+Manage your ad accounts and get personalized support.
+
+[![Image 8](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2375113342667919&version=1790880614) Log in with Facebook](https://www.facebook.com/login/?privacy_mutation_token=eyJ0eXBlIjo1LCJjcmVhdGlvbl90aW1lIjoxNzkxMTY2MTYwfQ%3D%3D&next=https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fhelp%2F164749007013531)
+
+[Start now](https://www.facebook.com/business/mfb_login_redirect_logging/?redirect_destination=ads_manager)
+
+Go to Ads Manager
+
+[_chevron-down_](https://www.facebook.com/business/help/164749007013531#)
+
+[Create a Page](https://www.facebook.com/business/redirect/pages/creation/?campaign_id=163681540489385&creative&placement=%2Fbusiness%2Fhelp%2F164749007013531)
+
+[Business Help Center](https://www.facebook.com/business/help)
+
+[![Image 9](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=753484536890446&version=1740493453)Get support](https://www.facebook.com/business/help/support)
+
+# About lookalike audiences
+
+![Image 10](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+Changes driven by ongoing efforts to align our products with evolving privacy rules in Europe may impact campaigns advertising to [people](https://www.facebook.com/business/help/283579896000936) in the European Region. Learn more about [how European privacy directives may affect your ads and reporting](https://www.facebook.com/business/help/171174698192658). 
+
+![Image 11](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=438223955063449&version=1666716831&transcode_extension=webp)
+
+Lookalike audiences are limited or unavailable for some ads about financial products and services, employment or housing opportunities. [Learn more](https://www.facebook.com/business/help/298000447747885).
+
+A lookalike audience is a way your ads can reach new people who are likely to be interested in your business because they share similar characteristics to your existing customers.
+
+To create a lookalike audience, our system leverages information such as demographics, interests and behaviors from your [**source** audience](https://www.facebook.com/business/help/475669712534537) to find new people who share similar qualities. When you use a lookalike audience, your ad is delivered to an audience of people who are similar to (or "look like") your existing customers.
+
+When you [create your lookalike audience](https://www.facebook.com/business/help/465262276878947), you can use a percentage range to choose how closely you want your new audience to match your **source** audience. The size you choose depends on your goals. Smaller percentages more closely match your source audience, but larger percentages create a bigger, broader audience.   
+  
+However, the quality of your audience also matters. For example, you may get better results depending on your goals if you use an audience made from your best customers rather than one that includes all your customers.
+
+**Note:** Targeting options are limited for audiences that include [people](https://www.facebook.com/business/help/283579896000936) under 18 (or older in some countries). Learn more about [targeting options to reach teens](https://www.facebook.com/business/help/229435355723442) and how this update may impact your ad sets.
+
+## Learn more
+
+*   [Create a lookalike audience](https://www.facebook.com/business/help/465262276878947) 
+*   [Create a custom or lookalike audience in the leads center](https://www.facebook.com/business/help/640692283205096) 
+*   [Create a value-based lookalike audience](https://www.facebook.com/business/help/458132024732845) 
+*   [About Advantage lookalike](https://www.facebook.com/business/help/1212225059146059) 
+
+![Image 12](http://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1124271668792488&version=1771391301)
+##### Common support topics
+
+[About advertising restrictions](https://www.facebook.com/business/help/975570072950669)
+
+##### Business Help Center
+
+![Image 13](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[Troubleshoot a disabled or restricted account](https://www.facebook.com/business/help/422289316306981)
+
+##### Business Help Center
+
+![Image 14](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[About Meta Business Support Home](https://www.facebook.com/business/help/254088759757736)
+
+##### Business Help Center
+
+![Image 15](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[Fix a failed payment issue on Meta](https://www.facebook.com/business/help/268196136699959)
+
+##### Business Help Center
+
+![Image 16](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2189607951385194&version=1716504911)
+
+[![Image 17](https://scontent-atl3-2.xx.fbcdn.net/v/t39.8562-6/321383695_1761464880891846_7163045669980296910_n.svg?_nc_cat=1&ccb=1-7&_nc_sid=28b1f4&_nc_ohc=4esgfue7nsUQ7kNvwH_uZh_&_nc_oc=Adq-AMwcYzIOtLgW0X3SUTqNVPv3jorEGerL14Zq0nnY3Pd_tUh5QZS8CDUqAQF7sXxO_sdmdxI6tNzRoG_RGSL6&_nc_zt=14&_nc_ht=scontent-atl3-2.xx&_nc_gid=JFEY1o09ny_7QsnXKyCZ9w&_nc_ss=7b289&oh=00_AQOxWV-aig1wUKXMwKdKEhQ4VJYLlFVWhqK5xJ3m7IueQA&oe=6AC8DCB8)](https://www.facebook.com/business/help/164749007013531#)
+
+[![Image 18: Permalink](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=514159977391799&version=1666676243&transcode_extension=webp)](https://www.facebook.com/business/help/164749007013531?helpref=uf_permalink)[![Image 19: Share](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=814226356566295&version=1666676243&transcode_extension=webp)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fhelp%2F164749007013531)
+
+Feedback
+
+More in this section: Audiences
+
+### [Basics](https://www.facebook.com/business/help/164749007013531#)
+
+[About lookalike audiences](https://www.facebook.com/business/help/164749007013531)
+
+### [Set Up](https://www.facebook.com/business/help/164749007013531#)
+
+[How to use custom or lookalike audiences](https://www.facebook.com/business/help/572787736078838)
+
+### [Create](https://www.facebook.com/business/help/164749007013531#)
+
+[Create a lookalike audience](https://www.facebook.com/business/help/465262276878947)[Create a value-based lookalike audience](https://www.facebook.com/business/help/458132024732845)[Create lookalike audience sets to optimize your bids](https://www.facebook.com/business/help/924049801000037)
+
+![Image 20](https://static.xx.fbcdn.net/rsrc.php/yZ/r/HKn8jf_T3_F.svg)
+
+#### Have a moment?
+
+Tell us how we're doing
+
+[Take Survey](https://www.facebook.com/ajax/rapidfeedback/?__rf__s=Aeg9m9SFCXcwCw7NxzrdC01CH4TZ2qQmYhCdywqTDWw91MLkSBk1P7_Qjm5avZTX0OwKehByD7roaCHIopG6dcPleeBOrvx6LBjCgRN5Yj4kWuOHyDX70hFRFsbeXR7K28GW56Mxy0ZZcAa_YaJSdMhDhrp-ZBVUrsgAmVk7ha3ovgL0JYU85i3V2QBMsZSl5I0vUOn8cg9UrHpMVB2aaDqmTGdyIZiA6oSyerZEr63RSd7fIdToiPZVkhMeeP27hreIWwlIbDj_9SXBSz6e1eyDKLdKtvOW9CnQQi-ylDR2I1JYlhJn7ZOXs1op7TGjPFYConJx3klEJDi5fWRDAKEv7TLf3j98tIfMOPIDdg7ogYHycY0k9XyIHvK-NqeG1lBMnkV04olRnqp_5PI9OUKnT3q8XVKAbI9dJ6-A1V8jQ2AgXRWU)
+
+[](https://www.facebook.com/business/help/164749007013531#)
+
+## Get the latest updates from Meta for Business.
+
+Provide your email address to receive the latest updates from Meta for Business, including news, events and product updates.
+
+By submitting this form, you agree to receive marketing related electronic communications from Meta, including news, events, updates and promotional emails. You may withdraw your consent and unsubscribe from these at any time, for example, by clicking the unsubscribe link included on our emails. For more information about how Meta handles your data please read our [Data Policy](https://www.facebook.com/about/privacy).
+
+form origin
+
+ 
+
+lead_source
+
+ 
+
+optin__c
+
+ 
+
+Campaign_ID
+
+ 
+
+Subscribe
+
+[© 2026 Meta](https://www.facebook.com/)
+
+[About](https://www.meta.com/about/ "Read our blog, discover the resource center, and find job opportunities.")[Developers](https://developers.meta.com/ "Develop on our platform.")[Careers](https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.metacareers.com%2F&h=AUAlDsiUv976QQCbL2Snr0KSS1yHFJZPLuTD6px7NY5dr9yIi6lov0R7pc_IMrTzVUid6x7NSdhmccsOVULbleCoio5Byy3XPXVgbxYDewznWdMnM5PQICLBgtb2ReEajIfDxti8gvwNPQ "Make your next career move to our awesome company.")[Privacy](https://www.facebook.com/privacy/explanation "Learn about your privacy and Facebook.")[Cookies](https://www.facebook.com/help/cookies "Learn about cookies and Facebook.")[Terms](https://www.facebook.com/policies/ "Review our terms and policies.")[Help Center](https://www.facebook.com/business/help/ "Visit our Help Center.")
+
+[English (US)](https://www.facebook.com/business/help/164749007013531 "English (US)")[English (UK)](https://en-gb.facebook.com/business/help/164749007013531 "English (UK)")[Español](https://es-la.facebook.com/business/help/164749007013531 "Spanish")[Português (Brasil)](https://pt-br.facebook.com/business/help/164749007013531 "Portuguese (Brazil)")[Français (France)](https://fr-fr.facebook.com/business/help/164749007013531 "French (France)")[Español (España)](https://es-es.facebook.com/business/help/164749007013531 "Spanish (Spain)")[More languages](https://www.facebook.com/business/help/164749007013531#)
+
+[![Image 21](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1315151719256614&version=1784669297&transcode_extension=webp)](https://www.facebook.com/business/help/164749007013531#)
+
+#### ![Image 22](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=1389774634917761&version=1788927509)Log in to Meta for Business
+
+Manage your ad accounts and get personalized support.
+
+[](https://www.facebook.com/business/help/164749007013531#)[![Image 23](https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=2375113342667919&version=1790880614) Log in with Facebook](https://www.facebook.com/login/?privacy_mutation_token=eyJ0eXBlIjo1LCJjcmVhdGlvbl90aW1lIjoxNzkxMTY2MTYwfQ%3D%3D&next=https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fhelp%2F164749007013531)

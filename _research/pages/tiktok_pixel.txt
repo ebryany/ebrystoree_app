@@ -1,0 +1,23 @@
+About TikTok Pixel | TikTok Ads Manager 
+ About TikTok Pixel
+ Last updated: June 2026
+ TikTok Pixel is a piece of code that you can place on your website that allows you to share website events with TikTok. The Pixel can be used with any TikTok for Business tools to:
+ Measure traffic on your website
+ Measure ad campaign performance
+ Optimize your campaigns and find new customers
+ Benefits and features
+ Once you've successfully set up and verified the pixel on your site, it will share information on when an action is taken on your website, based on the events you've set up. We recommend you set up events that reflect a full customer journey on your site, from viewing a product details page to adding an item to a cart and making a purchase. 
+ Learn more about the Events Manager .
+ Key terms
+ The pixel collects information available via standard web browsers, like Chrome. This includes:
+ Ad/Event information: Information about the ad a person on TikTok has clicked on or an event that was initiated.
+ Timestamp: Used to determine when website actions took place, like when a page was viewed or when a product was purchased.
+ IP Address: Used to determine the geographic location of an event.
+ User Agent: Used to determine the device make, model, operating system, and browser information.
+ Cookies: Used to help with the measurement, optimization, and targeting of your campaigns. First-party cookies are optional, but third-party cookies are on by default with the TikTok Pixel. Performance is boosted when first- and third-party cookies are paired with Advanced matching. Learn more about using cookies with TikTok Pixel .
+ Metadata & Button Clicks: Includes descriptive page metadata, structured microdata, page performance data, and button clicks. In the future, this information will enable TikTok to provide recommendations on how to enhance our pixel event setup and offer automated solutions. This information can also be used to personalize ad campaigns for people on TikTok and improve TikTok's ad delivery systems. Learn more about how to enhance data postback with TikTok Pixel .
+ Next steps
+ We recommend utilizing Pixel Helper to view the data being sent to TikTok to ensure it aligns with data-sharing policies and does not include data that may be deemed sensitive. 
+ Learn more about TikTok Business product terms and TikTok privacy policy for data collection policies.
+ Log in for a personalised experience
+ Sign up

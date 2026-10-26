@@ -1,0 +1,513 @@
+Title: Set up and Verify Pixel | TikTok Ads Manager
+
+URL Source: https://ads.tiktok.com/help/article/get-started-pixel
+
+Markdown Content:
+[![Image 1](https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tt4b_help_center/img/logo.91d36c0.svg)Business Resource Center](https://ads.tiktok.com/resources/help)
+
+[Business Help Center](https://ads.tiktok.com/resources/help)[Partner enablement](https://ads.tiktok.com/resources/partners)[What's new](https://ads.tiktok.com/resources/blog)
+
+ English 
+
+[Create an Ad](https://ads.tiktok.com/i18n/?refer=from_help_create)
+
+ Go to Ads Manager 
+
+ Log in 
+
+ Advertisers 
+
+Advertisers
+
+Advertisers
+
+Sellers
+
+Creators & Partners
+
+### Advertising on TikTok
+
+[* The TikTok marketing platform](https://ads.tiktok.com/resources/help/article/full-funnel-marketing-tiktok?lang=en)[* Advertising on TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/tiktok-ads-manager-intro?lang=en)[* Promote on TikTok](https://ads.tiktok.com/resources/help/article/about-promote-on-tiktok?lang=en)[* TikTok Beta Tester Program](https://ads.tiktok.com/resources/help/article/about-tiktoks-beta-tester-program?lang=en)[* Ad Assistant](https://ads.tiktok.com/resources/help/article/about-the-ad-assistant?lang=en)
+
+### TikTok accounts
+
+[* TikTok accounts overview](https://ads.tiktok.com/resources/help/article/tiktok-and-tiktok-business-account-types?lang=en)[* Create a TikTok ad account](https://ads.tiktok.com/resources/help/article/create-tiktok-ads-manager-account?lang=en)[* Business Verification](https://ads.tiktok.com/resources/help/article/about-mandatory-business-verification-for-businesses?lang=en)[* TikTok Shop and Seller Center](https://ads.tiktok.com/resources/help/article/set-up-tiktok-shop-using-tiktok-seller-center?lang=en)[* TikTok Organization Account](https://ads.tiktok.com/resources/help/article/about-organization-accounts?lang=en)
+
+### Managing your Business Center
+
+[* Business Center overview](https://ads.tiktok.com/resources/help/article/tiktok-business-center?lang=en)[* Access and Permissions](https://ads.tiktok.com/resources/help/article/about-business-center-roles-and-permissions?lang=en)[* Accounts and assets](https://ads.tiktok.com/resources/help/article/manage-ad-accounts-business-center?lang=en)[* Creative library](https://ads.tiktok.com/resources/help/article/about-creative-library-in-business-center?lang=en)[* Brand safety](https://ads.tiktok.com/resources/help/article/about-brand-safety-controls-within-tiktok-business-center?lang=en)[* Finance](https://ads.tiktok.com/resources/help/article/about-finance-tiktok-business-center?lang=en)[* Planning inspiration](https://ads.tiktok.com/resources/help/article/about-the-planning-inspiration-page-in-tiktok-business-center?lang=en)[* Enterprise Business Center](https://ads.tiktok.com/resources/help/article/about-enterprise-business-center?lang=en)
+
+### TikTok E-Commerce Partner Platforms
+
+[* About TikTok E-Commerce Partner Platform Integrations](https://ads.tiktok.com/resources/help/article/about-tiktok-e-commerce-partner-platform-integrations?lang=en)[* Adobe Commerce](https://ads.tiktok.com/resources/help/article/about-tiktok-for-adobe-commerce?lang=en)[* Amazon](https://ads.tiktok.com/resources/help/article/how-to-set-up-amazon-buy-with-prime-on-tiktok?lang=en)[* BASE](https://ads.tiktok.com/resources/help/article/tiktok-base?lang=en)[* BigCommerce](https://ads.tiktok.com/resources/help/article/tiktok-bigcommerce?lang=en)[* Cafe24](https://ads.tiktok.com/resources/help/article/tiktok-on-cafe24?lang=en)[* Ecwid](https://ads.tiktok.com/resources/help/article/tiktok-ecwid?lang=en)[* FutureShop](https://ads.tiktok.com/resources/help/article/about-tiktok-on-futureshop?lang=en)[* Haravan](https://ads.tiktok.com/resources/help/article/about-tiktok-on-haravan?lang=en)[* Kyte](https://ads.tiktok.com/resources/help/article/tiktok-kyte?lang=en)[* Loja Integrada](https://ads.tiktok.com/resources/help/article/tiktok-loja-integrada?lang=en)[* Mercado Shops](https://ads.tiktok.com/resources/help/article/about-tiktok-for-mercado-shops?lang=en)[* Nuvemshop](https://ads.tiktok.com/resources/help/article/about-tiktok-on-nuvemshop?lang=en)[* OpenCart](https://ads.tiktok.com/resources/help/article/tiktok-app-opencart?lang=en)[* PrestaShop](https://ads.tiktok.com/resources/help/article/tiktok-prestashop?lang=en)[* Salesforce Commerce Cloud](https://ads.tiktok.com/resources/help/article/tiktok-salesforce-commerce-cloud?lang=en)[* Shopify](https://ads.tiktok.com/resources/help/article/tiktok-app-shopify?lang=en)[* Shoplazza](https://ads.tiktok.com/resources/help/article/about-tiktok-on-shoplazza?lang=en)[* Shopline](https://ads.tiktok.com/resources/help/article/tiktok-on-shopline?lang=en)[* Tiendanube](https://ads.tiktok.com/resources/help/article/about-tiktok-on-tiendanube?lang=en)[* TRAY](https://ads.tiktok.com/resources/help/article/tiktok-tray?lang=en)[* VTEX](https://ads.tiktok.com/resources/help/article/tiktok-vtex?lang=en)[* Wix](https://ads.tiktok.com/resources/help/article/about-tiktok-on-wix?lang=en)[* WooCommerce](https://ads.tiktok.com/resources/help/article/tiktok-woocommerce?lang=en)
+
+### Developers
+
+[* MCP Server and Agentic Hub](https://ads.tiktok.com/resources/help/article/about-tiktok-for-business-mcp-server?lang=en)[* API for Business](https://ads.tiktok.com/resources/help/article/marketing-api?lang=en)[* App Center](https://ads.tiktok.com/resources/help/article/about-tiktok-app-center?lang=en)[* App Events SDK](https://ads.tiktok.com/resources/help/article/about-the-tiktok-app-events-sdk?lang=en)
+
+### Marketing Partners
+
+[* TikTok Partner Enablement Center](https://ads.tiktok.com/resources/help/article/tiktok-partner-enablement-center?lang=en)[* Channel Sales Partner Enablement](https://ads.tiktok.com/resources/help/article/tiktok-channel-sales-partner-enablement-center?lang=en)
+
+[Getting started](https://ads.tiktok.com/resources/help/category?id=5pc1e9Q09towekjAqXm8b1)
+
+### Create a campaign
+
+[* Ad campaign structure](https://ads.tiktok.com/resources/help/article/tiktok-ads-structure?lang=en)[* How to create a campaign](https://ads.tiktok.com/resources/help/article/campaign-set-up?lang=en)[* Budget and scheduling](https://ads.tiktok.com/resources/help/article/budget?lang=en)[* Special ad categories](https://ads.tiktok.com/resources/help/article/choosing-special-ad-category?lang=en)[* Split Testing](https://ads.tiktok.com/resources/help/article/split-testing?lang=en)
+
+### Create an ad group
+
+[* How to create an ad group](https://ads.tiktok.com/resources/help/article/create-ad-group?lang=en)[* Placements overview](https://ads.tiktok.com/resources/help/article/tiktok-placement?lang=en)[* Ad Targeting](https://ads.tiktok.com/resources/help/article/ad-targeting?lang=en)[* Audiences](https://ads.tiktok.com/resources/help/article/audiences?lang=en)[* Bidding and optimization](https://ads.tiktok.com/resources/help/article/bidding-methods?lang=en)[* Brand safety and suitability](https://ads.tiktok.com/resources/help/article/about-brand-safety-hub?lang=en)[* Delivery type](https://ads.tiktok.com/resources/help/article/delivery-type?lang=en)
+
+### Create an ad
+
+[* How to create an ad](https://ads.tiktok.com/resources/help/article/ad-set-up?lang=en)[* Bulk edit ads](https://ads.tiktok.com/resources/help/article/bulk-import-export?lang=en)[* Preview ads](https://ads.tiktok.com/resources/help/article/preview-ads?lang=en)[* Call to Action buttons](https://ads.tiktok.com/resources/help/article/in-app-behavior-call-to-action-button?lang=en)[* Instant Pages](https://ads.tiktok.com/resources/help/article/instant-pages?lang=en)
+
+### Ad creation best practices
+
+[* Industry best practices](https://ads.tiktok.com/resources/help/article/tiktok-industry-best-practices?lang=en)[* General best practices](https://ads.tiktok.com/resources/help/article/tiktok-ads-best-practices?lang=en)
+
+### Manage ads
+
+[* Ad reviews and status](https://ads.tiktok.com/resources/help/article/ad-review-checklist?lang=en)[* Edit ad settings](https://ads.tiktok.com/resources/help/article/edit-ad-settings?lang=en)[* Automated Rules](https://ads.tiktok.com/resources/help/article/automated-rules?lang=en)[* Comment management](https://ads.tiktok.com/resources/help/article/manage-comments-tiktok-ads-manager?lang=en)[* App Center](https://ads.tiktok.com/resources/help/article/about-tiktok-app-center?lang=en)
+
+### Creating ads in other TikTok tools
+
+[* Promote on TikTok](https://ads.tiktok.com/resources/help/article/about-promote-on-tiktok?lang=en)[* TikTok Shop and Seller Center](https://ads.tiktok.com/resources/help/article/set-up-tiktok-shop-using-tiktok-seller-center?lang=en)
+
+[Ad creation](https://ads.tiktok.com/resources/help/category?id=4vtMvaC8OcjlLiL20rm434)
+
+### In-feed video
+
+[* TopView](https://ads.tiktok.com/resources/help/article/about-topview?lang=en)[* Top Feed](https://ads.tiktok.com/resources/help/article/reach-frequency-campaigns-top-feed?lang=en)[* TopReach](https://ads.tiktok.com/resources/help/article/about-topreach?lang=en)[* Standard feed](https://ads.tiktok.com/resources/help/article/tiktok-auction-in-feed-ads?lang=en)[* Branded Buzz](https://ads.tiktok.com/resources/help/article/about-branded-buzz-for-advertisers?lang=en)[* Spark Ads](https://ads.tiktok.com/resources/help/article/spark-ads?lang=en)[* TikTok Pulse suite](https://ads.tiktok.com/resources/help/article/tiktok-pulse?lang=en)[* Branded Mission](https://ads.tiktok.com/resources/help/article/about-branded-mission?lang=en)
+
+### In-feed interactive
+
+[* Playable ads](https://ads.tiktok.com/resources/help/article/playable-ads?lang=en)[* Carousel ads](https://ads.tiktok.com/resources/help/article/carousel-ads?lang=en)
+
+### Non-feed placement
+
+[* Automatic Search Placement](https://ads.tiktok.com/resources/help/article/about-automatic-search-placement?lang=en)[* Search Ads Campaign](https://ads.tiktok.com/resources/help/article/about-search-ads-campaign?lang=en)[* TopSearch](https://ads.tiktok.com/resources/help/article/about-topsearch?lang=en)[* Lemon8](https://ads.tiktok.com/resources/help/article/about-lemon8-in-tiktok-ads-manager?lang=en)[* Messaging Ads](https://ads.tiktok.com/resources/help/article/about-tiktok-messaging-ads?lang=en)[* Global App Bundle](https://ads.tiktok.com/resources/help/article/global-app-bundle-placement?lang=en)[* TikTok Ad Network (formerly TikTok Pangle)](https://ads.tiktok.com/resources/help/article/pangle-placement?lang=en)[* TikTok Out of Phone](https://ads.tiktok.com/resources/help/article/about-tiktok-out-of-phone?lang=en)
+
+### Interactive enhancements
+
+[* Interactive add-ons](https://ads.tiktok.com/resources/help/article/about-interactive-add-ons?lang=en)[* Branded Effect](https://ads.tiktok.com/resources/help/article/tiktok-branded-effect-asset-commercial-benefits-specs?lang=en)[* Ad Variations](https://ads.tiktok.com/resources/help/article/about-product-information-and-ad-format-variations?lang=en)
+
+### Industry ad solutions
+
+[* Showtimes](https://ads.tiktok.com/resources/help/article/about-showtimes?lang=en)[* E-commerce](https://ads.tiktok.com/resources/help/article/tiktok-commerce?lang=en)[* Automotive ads](https://ads.tiktok.com/resources/help/article/about-automotive-ads?lang=en)[* Travel ads](https://ads.tiktok.com/resources/help/article/about-travel-ads?lang=en)[* Streaming ads](https://ads.tiktok.com/resources/help/article/about-streaming-ads?lang=en)[* Generic Catalog ads](https://ads.tiktok.com/resources/help/article/about-generic-catalog?lang=en)[* App Online-to-Offline Vertical Catalog ads](https://ads.tiktok.com/resources/help/article/about-online-to-offline-o2o-catalog?lang=en)
+
+[Ad formats](https://ads.tiktok.com/resources/help/category?id=6dGs4bNMAZSdPr4pQ0KFuX)
+
+### Reach
+
+[* About reach](https://ads.tiktok.com/resources/help/article/reach-objective?lang=en)[* Reach & Frequency buying](https://ads.tiktok.com/resources/help/article/reach-frequency-ad-buying-type?lang=en)
+
+### Consideration objectives
+
+[* Traffic](https://ads.tiktok.com/resources/help/article/traffic-objective?lang=en)[* Video views](https://ads.tiktok.com/resources/help/article/video-views-objective?lang=en)[* Community interaction](https://ads.tiktok.com/resources/help/article/community-interaction-objective?lang=en)[* Brand consideration](https://ads.tiktok.com/resources/help/article/about-the-brand-consideration-objective?lang=en)[* Branded Mission](https://ads.tiktok.com/resources/help/article/about-branded-mission?lang=en)
+
+### App promotion
+
+[* App promotion objective](https://ads.tiktok.com/resources/help/article/app-installs-objective?lang=en)[* App Event Optimization](https://ads.tiktok.com/resources/help/article/app-event-optimization?lang=en)[* App VBO](https://ads.tiktok.com/resources/help/article/value-based-optimization-app?lang=en)[* iOS 14.5+ Guidance](https://ads.tiktok.com/resources/help/article/account-objective-considerations-ios14?lang=en)[* App Profile Page](https://ads.tiktok.com/resources/help/article/app-profile-page?lang=en)[* App retargeting](https://ads.tiktok.com/resources/help/article/app-retargeting?lang=en)[* iOS custom product page](https://ads.tiktok.com/resources/help/article/about-ios-custom-product-pages?lang=en)
+
+### Lead Generation
+
+[* Lead generation campaigns](https://ads.tiktok.com/resources/help/article/lead-generation-objective?lang=en)[* Instant Forms](https://ads.tiktok.com/resources/help/article/set-up-lead-generation-with-instant-form?lang=en)[* Leads Center](https://ads.tiktok.com/resources/help/article/tiktok-leads-center?lang=en)[* CRM integration](https://ads.tiktok.com/resources/help/article/available-crm-integrations-tiktok-lead-generation?lang=en)[* Messaging Ads](https://ads.tiktok.com/resources/help/article/about-tiktok-messaging-ads?lang=en)[* Call Ads](https://ads.tiktok.com/resources/help/article/about-call-ads?lang=en)[* Verified Business Account Lead Generation](https://ads.tiktok.com/resources/help/article/business-account-lead-generation?lang=en)[* Lead quality optimization](https://ads.tiktok.com/resources/help/article/about-lead-quality-optimization?lang=en)
+
+### Sales
+
+[* Sales objective](https://ads.tiktok.com/resources/help/article/sales-advertising-objective-tiktok?lang=en)[* Catalog setup](https://ads.tiktok.com/resources/help/article/catalogs?lang=en)[* Catalog Ads](https://ads.tiktok.com/resources/help/article/about-catalog-ads-in-tiktok-ads-manager?lang=en)[* Website](https://ads.tiktok.com/resources/help/article/about-the-website-sales-destination?lang=en)[* Web VBO](https://ads.tiktok.com/resources/help/article/value-based-optimization-web?lang=en)
+
+### TikTok Shop Ads
+
+[* GMV Max](https://ads.tiktok.com/resources/help/article/gmv-max-migration-tiktok-shop-ads?lang=en)[* LIVE GMV Max](https://ads.tiktok.com/resources/help/article/about-live-gmv-max?lang=en)[* Product GMV Max](https://ads.tiktok.com/resources/help/article/about-product-gmv-max?lang=en)[* Custom Ads](https://ads.tiktok.com/resources/help/article/set-up-tiktok-shopping?lang=en)[* Affiliate Creatives for Ads](https://ads.tiktok.com/resources/help/article/about-affiliate-creatives-for-tiktok-shop-ads?lang=en)
+
+### TikTok Growth Max
+
+[* TikTok Growth Max](https://ads.tiktok.com/resources/help/article/about-tiktok-growth-max?lang=en)[* TikTok Growth Max for Micro-series](https://ads.tiktok.com/resources/help/article/about-tiktok-growth-max-mini-drama-ads?lang=en)[* TikTok Growth Max: Mini Games](https://ads.tiktok.com/resources/help/article/about-tiktok-mini-games?lang=en)
+
+[Ad objectives](https://ads.tiktok.com/resources/help/category?id=6ipj7wgtz4Un4D8Bkmufkd)
+
+### Ad auction optimization
+
+[* Bidding and optimization](https://ads.tiktok.com/resources/help/article/bidding-methods?lang=en)[* Split Testing](https://ads.tiktok.com/resources/help/article/split-testing?lang=en)[* Auction best practices](https://ads.tiktok.com/resources/help/article/auction-ads-best-practices?lang=en)
+
+### Creative optimization
+
+[* Creative inspiration](https://ads.tiktok.com/resources/help/article/creative-center?lang=en)[* Symphony Creative Studio](https://ads.tiktok.com/resources/help/article/about-symphony-creative-studio?lang=en)[* TikTok Ads Manager Video Editor](https://ads.tiktok.com/resources/help/article/about-tiktok-video-editor?lang=en)[* Generate with AI](https://ads.tiktok.com/resources/help/article/about-generate-with-ai-in-tiktok-ads-manager?lang=en)[* Content Suite](https://ads.tiktok.com/resources/help/article/about-tiktok-content-suite?lang=en)[* Other creative tools](https://ads.tiktok.com/resources/help/article/about-creative-library?lang=en)[* Creative best practices](https://ads.tiktok.com/resources/help/article/creative-best-practices?lang=en)[* Commercial Music Library](https://ads.tiktok.com/resources/help/article/commercial-music-library?lang=en)
+
+### Creative partnerships
+
+[* TikTok Creative Exchange](https://ads.tiktok.com/resources/help/article/tiktok-creative-exchange?lang=en)[* Get Started with TikTok One for advertisers](https://ads.tiktok.com/resources/help/article/about-tiktok-one?lang=en)[* Collaborating with Creators in TikTok One](https://ads.tiktok.com/resources/help/article/about-working-with-creators-on-tiktok-one-campaigns?lang=en)[* Create a TikTok One project](https://ads.tiktok.com/resources/help/article/how-to-set-up-your-tiktok-one-brand-profile?lang=en)[* Manage projects in TikTok One for advertisers](https://ads.tiktok.com/resources/help/article/how-to-manage-tiktok-one-members?lang=en)[* TikTok One support](https://ads.tiktok.com/resources/help/article/how-to-get-support-on-tiktok-one?lang=en)
+
+### Smart+ Campaigns
+
+[* Smart+ Campaigns](https://ads.tiktok.com/resources/help/article/about-smart-plus-campaign?lang=en)[* Upgraded Smart+ experience](https://ads.tiktok.com/resources/help/article/about-updates-to-smart-plus?lang=en)
+
+[Ad optimization](https://ads.tiktok.com/resources/help/category?id=79iQ84FDPgWbtbDy1zeRmg)
+
+### App Measurement
+
+[* In-app Events](https://ads.tiktok.com/resources/help/article/attribution-overview?lang=en)[* Self-Attribution Network (SAN)](https://ads.tiktok.com/resources/help/article/about-self-attribution-transition?lang=en)[* SKAN 4.0](https://ads.tiktok.com/resources/help/article/about-skan-4-0-and-tiktok?lang=en)[* Mobile Measurement Partners](https://ads.tiktok.com/resources/help/article/mobile-measurement-partner-mmp-tracking?lang=en)[* App Events SDK](https://ads.tiktok.com/resources/help/article/about-the-tiktok-app-events-sdk?lang=en)
+
+### Offline conversions
+
+[* Set up offline measurement](https://ads.tiktok.com/resources/help/article/about-offline-conversions?lang=en)
+
+### Web measurement
+
+[* Web Data Connections](https://ads.tiktok.com/resources/help/article/web-attribution?lang=en)[* Web Events & Parameters](https://ads.tiktok.com/resources/help/article/standard-events-parameters?lang=en)[* TikTok Web Measurement Tools](https://ads.tiktok.com/resources/help/article/tiktok-pixel?lang=en)[* TikTok Events Manager](https://ads.tiktok.com/resources/help/article/about-tiktok-events-manager?lang=en)[* Event Matching](https://ads.tiktok.com/resources/help/article/how-to-set-up-matching-events-with-events-api?lang=en)[* TikTok Post Purchase Surveys](https://ads.tiktok.com/resources/help/article/about-post-purchase-survey?lang=en)[* IAB Features](https://ads.tiktok.com/resources/help/article/about-clear-cookies-and-cache-in-tiktoks-in-app-browser?lang=en)
+
+### Insights and reporting
+
+[* Reports](https://ads.tiktok.com/resources/help/article/view-data?lang=en)[* Audience Insights](https://ads.tiktok.com/resources/help/article/audience-insights?lang=en)[* Video Insights](https://ads.tiktok.com/resources/help/article/video-insights?lang=en)[* About Attribution Analytics](https://ads.tiktok.com/resources/help/article/about-attribution-analytics?lang=en)[* Attribution Settings](https://ads.tiktok.com/resources/help/article/about-attribution-windows-at-the-ad-group-level?lang=en)[* Lift studies](https://ads.tiktok.com/resources/help/article/tiktok-brand-lift-studies?lang=en)[* Cross-media measurement](https://ads.tiktok.com/resources/help/article/about-tiktoks-partnership-with-ispot-for-cross-media-measurement?lang=en)[* Metrics glossary](https://ads.tiktok.com/resources/help/article/all-metrics?lang=en)[* TikTok supported third-party measurement](https://ads.tiktok.com/resources/help/article/tiktok-ads-manager-supported-3rd-party-measurement?lang=en)
+
+### Shop Ads Measurement
+
+[* Shop Ads Measurement](https://ads.tiktok.com/resources/help/article/about-tiktok-shop-ads-attribution?lang=en)
+
+### TikTok Market Scope
+
+[* TikTok Market Scope](https://ads.tiktok.com/resources/help/article/about-tiktok-market-scope?lang=en)
+
+[Measurement](https://ads.tiktok.com/resources/help/category?id=4lc0aCQeinkF936Ulb3Tiw)
+
+### Billing options
+
+[* TikTok billing options](https://ads.tiktok.com/resources/help/article/tiktok-billing-options?lang=en)[* Manual Payment](https://ads.tiktok.com/resources/help/article/manual-payment?lang=en)[* Automatic Payment](https://ads.tiktok.com/resources/help/article/automatic-payment?lang=en)[* Monthly Invoicing](https://ads.tiktok.com/resources/help/article/about-monthly-invoicing?lang=en)
+
+### Payment
+
+[* Payment methods](https://ads.tiktok.com/resources/help/article/supported-payment-methods?lang=en)[* GMV Pay](https://ads.tiktok.com/resources/help/article/about-gmv-pay?lang=en)[* Making payments](https://ads.tiktok.com/resources/help/article/manage-payment-agency-business-center?lang=en)[* Refunds](https://ads.tiktok.com/resources/help/article/refund-faq?lang=en)[* Payment Portfolio](https://ads.tiktok.com/resources/help/article/about-payment-portfolio?lang=en)
+
+### Billing management
+
+[* Taxes](https://ads.tiktok.com/resources/help/article/account-balance-tax-deduction?lang=en)[* Invoices](https://ads.tiktok.com/resources/help/article/manage-invoices-business-center?lang=en)[* Transactions](https://ads.tiktok.com/resources/help/article/about-transaction?lang=en)[* Billing information](https://ads.tiktok.com/resources/help/article/track-your-billing-threshold-and-bill-date-in-tiktok-business-center?lang=en)
+
+### Promotions, Ad Credits and Coupons
+
+[* Promotions, Ad Credits and Coupons](https://ads.tiktok.com/resources/help/article/tiktok-ads-promotional-codes?lang=en)
+
+### Troubleshooting billing and payment
+
+[* Troubleshooting billing](https://ads.tiktok.com/resources/help/article/troubleshooting-payment-failure-checklist?lang=en)
+
+[Payment and billing](https://ads.tiktok.com/resources/help/category?id=72Zi2CfIYTaDuOwzHsFf5f)
+
+### Advertising Policies
+
+[* Advertising policies](https://ads.tiktok.com/resources/help/article/tiktok-advertising-policies?lang=en)[* Advertising policy resources](https://ads.tiktok.com/resources/help/article/advertising-on-tiktok-first-things-to-note?lang=en)
+
+### Privacy practices and policies
+
+[* TikTok's Privacy Policies](https://ads.tiktok.com/resources/help/article/about-tiktoks-privacy-policy?lang=en)
+
+### Account security
+
+[* Security overview](https://ads.tiktok.com/resources/help/article/identifying-genuine-outreach-if-contacted-by-tiktok-for-business?lang=en)[* Securing your TikTok for Business account](https://ads.tiktok.com/resources/help/article/protect-account-tiktok-for-business?lang=en)[* Securing your Business Center](https://ads.tiktok.com/resources/help/article/best-practices-for-securing-your-business-center?lang=en)
+
+[Policies and security](https://ads.tiktok.com/resources/help/category?id=535nt8Z20sG4lW62MZPJvL)
+
+### Web measurement
+
+*   Web Data Connections
+
+  
+    *    
+        [* About TikTok Web Data Connection](https://ads.tiktok.com/resources/help/article/web-attribution?lang=en)
+        [* About website Data Connection setup methods](https://ads.tiktok.com/resources/help/article/website-data-connection-setup-methods?lang=en)
+        [* About data connection for website optimization](https://ads.tiktok.com/resources/help/article/about-data-connection-for-website-optimization?lang=en)
+        [* How to update a web data connection](https://ads.tiktok.com/resources/help/article/how-to-update-a-web-data-connection?lang=en)
+
+*   Web Events & Parameters
+
+  
+    *    
+        [* About Standard Events in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/standard-events-parameters?lang=en)
+        [* How to Adopt TikTok’s Updated Standard Events](https://ads.tiktok.com/resources/help/article/how-to-adopt-tiktoks-updated-standard-events?lang=en)
+        [* How to map CRM events in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/how-to-map-crm-events-to-standard-events-in-tiktok-events-manager?lang=en)
+        [* About Parameters](https://ads.tiktok.com/resources/help/article/about-parameters?lang=en)
+        [* About Custom Events in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/custom-events?lang=en)
+        [* About event deduplication](https://ads.tiktok.com/resources/help/article/event-deduplication?lang=en)
+        [* About reserved events](https://ads.tiktok.com/resources/help/article/reserved-events?lang=en)
+
+*   TikTok Web Measurement Tools
+
+  
+    *    
+        [* About TikTok Pixel](https://ads.tiktok.com/resources/help/article/tiktok-pixel?lang=en)
+        [* How to Set Up and Verify TikTok Web Data Connection](https://ads.tiktok.com/resources/help/article/get-started-pixel?lang=en)
+        [* Troubleshoot with Pixel Helper](https://ads.tiktok.com/resources/help/article/tiktok-pixel-helper-2.0?lang=en)
+        [* How to troubleshoot Pixel activations not showing in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/how-to-troubleshoot-pixel-activations-not-showing-in-tiktok-ads-manager?lang=en)
+        [* About using cookies with TikTok Pixel](https://ads.tiktok.com/resources/help/article/using-cookies-with-tiktok-pixel?lang=en)
+        [* About Web Modeled Conversions](https://ads.tiktok.com/resources/help/article/about-web-modelled-conversions?lang=en)
+        [* About TikTok Pixel for Ecwid](https://ads.tiktok.com/resources/help/article/about-tiktok-pixel-for-ecwid?lang=en)
+        [* About Single Page Application Pageview Measurement for TikTok Pixel](https://ads.tiktok.com/resources/help/article/about-single-page-application-pageview-measurement-for-tiktok-pixel?lang=en)
+        [* How to troubleshoot Pixel visibility in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/how-to-troubleshoot-pixel-visibility-in-tiktok-ads-manager?lang=en)
+        [* About Events API](https://ads.tiktok.com/resources/help/article/events-api?lang=en)
+        [* How to get started with Events API](https://ads.tiktok.com/resources/help/article/getting-started-events-api?lang=en)
+        [* About Events API Payload Converter](https://ads.tiktok.com/resources/help/article/about-events-api-payload-converter?lang=en)
+        [* About the TikTok Event Builder](https://ads.tiktok.com/resources/help/article/create-events?lang=en)
+        [* How to Set Up Events and Parameters with Events Builder](https://ads.tiktok.com/resources/help/article/how-to-set-up-events-and-parameters?lang=en)
+        [* Partner Integrations for Web Events](https://ads.tiktok.com/resources/help/article/partner-integrations-for-web-tracking?lang=en)
+        [* How to set up TikTok Pixel with Google Tag Manager in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/get-started-google-tag-manager?lang=en)
+        [* How to set up Events API for server-side tagging in Google Tag Manager](https://ads.tiktok.com/resources/help/article/how-to-set-up-events-api-for-server-side-tagging-in-google-tag-manager?lang=en)
+        [* How to create TikTok Event Tags with Google Tag Manager](https://ads.tiktok.com/resources/help/article/how-to-create-tiktok-event-tags-with-google-tag-manager?lang=en)
+        [* Troubleshooting Google Tag Manager and TikTok Pixel Integration](https://ads.tiktok.com/resources/help/article/troubleshooting-google-tag-manager-and-tiktok-pixel-integration?lang=en)
+        [* How to set up pixel signal postback](https://ads.tiktok.com/resources/help/article/how-to-set-up-pixel-signal-postback?lang=en)
+        [* How to set up a secure data connection with TikTok through SignalSight](https://ads.tiktok.com/resources/help/article/tiktok-signalsight-eapi-implementation-guide?lang=en)
+        [* How to set up a TikTok conversions destination with Twilio Segment](https://ads.tiktok.com/resources/help/article/tiktok-segment-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Tealium](https://ads.tiktok.com/resources/help/article/tiktok-tealium-pixel-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through DataHash](https://ads.tiktok.com/resources/help/article/tiktok-datahash-eapi-implementation-guide?lang=en)
+        [* How to set up a TikTok conversions destination with Adobe](https://ads.tiktok.com/resources/help/article/tiktok-adobe-eapi-implementation-guide?lang=en)
+        [* How to set up a TikTok conversions destination with Tealium](https://ads.tiktok.com/resources/help/article/tiktok-tealium-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through mParticle](https://ads.tiktok.com/resources/help/article/tiktok-mparticle-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Hightouch](https://ads.tiktok.com/resources/help/article/tiktok-hightouch-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Blotout](https://ads.tiktok.com/resources/help/article/tiktok-blotout-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Grivy](https://ads.tiktok.com/resources/help/article/tiktok-givy-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Anytrack](https://ads.tiktok.com/resources/help/article/tiktok-anytrackio-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Gamesight](https://ads.tiktok.com/resources/help/article/tiktok-gamesight-eapi-implementation-guide?lang=en)
+        [* How to set up a secure data connection with TikTok through Elevar](https://ads.tiktok.com/resources/help/article/tiktok-elevar-eapi-implementation-guide?lang=en)
+        [* How to set up a pixel implementation with TikTok through TicketMaster](https://ads.tiktok.com/resources/help/article/tiktok-ticketmaster-pixel-implementation-guide?lang=en)
+        [* About Media Mix Modeling in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/about-media-mix-modeling-in-tiktok-ads-manager?lang=en)
+        [* How to pull Media Mix Modeling (MMM) data in TikTok Ads Manager](https://ads.tiktok.com/resources/help/article/how-to-pull-media-mix-modeling-mmm-data-in-tiktok-ads-manager?lang=en)
+        [* Enhanced Data Postback with the TikTok Pixel](https://ads.tiktok.com/resources/help/article/enhanced-data-postback-with-the-tiktok-pixel?lang=en)
+        [* How to transfer a Pixel to Business Center](https://ads.tiktok.com/resources/help/article/how-to-transfer-a-pixel-to-business-center?lang=en)
+        [* About IPv6 Support for TikTok Pixel](https://ads.tiktok.com/resources/help/article/about-ipv6-support-for-tiktok-pixel?lang=en)
+        [* How to use cookies with TikTok Pixel](https://ads.tiktok.com/resources/help/article/how-to-use-cookies-with-tiktok-pixel?lang=en)
+        [* How to set up TikTok Pixel in Google Tag Manager](https://ads.tiktok.com/resources/help/article/how-to-set-up-tiktok-pixel-in-google-tag-manager?lang=en)
+        [* How to share a Pixel in Business Center with an ad account](https://ads.tiktok.com/resources/help/article/how-to-share-a-pixel-in-business-center-with-an-ad-account?lang=en)
+        [* How to share a Pixel in Business Center with a member](https://ads.tiktok.com/resources/help/article/how-to-share-a-pixel-in-business-center-with-a-member?lang=en)
+        [* How to share a Pixel in Business Center with a partner](https://ads.tiktok.com/resources/help/article/how-to-share-a-pixel-in-business-center-with-a-partner?lang=en)
+        [* How to access a shared Pixel in Events Manager](https://ads.tiktok.com/resources/help/article/how-to-access-a-shared-pixel-in-events-manager?lang=en)
+        [* How to create an ad with a Shared Pixel](https://ads.tiktok.com/resources/help/article/how-to-create-an-ad-with-a-shared-pixel?lang=en)
+        [* How to delete TikTok Pixel](https://ads.tiktok.com/resources/help/article/how-to-delete-tiktok-pixel?lang=en)
+        [* How to change Pixel name](https://ads.tiktok.com/resources/help/article/how-to-change-pixel-name?lang=en)
+        [* Best practices for your Google Analytics connection](https://ads.tiktok.com/resources/help/article/best-practices-for-your-google-analytics-connection?lang=en)
+        [* How to connect Google Analytics with TikTok Events Manager](https://ads.tiktok.com/resources/help/article/how-to-connect-google-analytics-with-tiktok-events-manager?lang=en)
+
+*   TikTok Events Manager
+
+  
+    *    
+        [* About TikTok Events Manager](https://ads.tiktok.com/resources/help/article/about-tiktok-events-manager?lang=en)
+        [* How to Create a Data Connection in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/tiktok-events-manager-creating-a-data-connection?lang=en)
+        [* Add or Edit Events](https://ads.tiktok.com/resources/help/article/tiktok-events-manager-add-or-edit-events?lang=en)
+        [* About diagnostic and monitoring tools in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/tiktok-events-manager-monitor-and-diagnose?lang=en)
+        [* How to manage Web Diagnostics in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/web-diagnostics?lang=en)
+        [* How to Add or Edit Events (Event Builder and Custom Code)](https://ads.tiktok.com/resources/help/article/how-to-add-or-edit-events-event-builder-and-custom-code?lang=en)
+        [* How to setup Assisted Events in TikTok Events Manager](https://ads.tiktok.com/resources/help/article/how-to-setup-assisted-events-in-tiktok-events-manager?lang=en)
+
+*   Event Matching
+
+  
+    *    
+        [* How to set up matching events with Events API](https://ads.tiktok.com/resources/help/article/how-to-set-up-matching-events-with-events-api?lang=en)
+        [* About Advanced Matching for Web](https://ads.tiktok.com/resources/help/article/advanced-matching-web?lang=en)
+        [* Best practices for Advanced Matching for Web](https://ads.tiktok.com/resources/help/article/best-practices-for-advanced-matching-for-web?lang=en)
+        [* How to set up Manual Advanced Matching](https://ads.tiktok.com/resources/help/article/how-to-set-up-manual-advanced-matching?lang=en)
+        [* How to set up Automatic Advanced Matching](https://ads.tiktok.com/resources/help/article/how-to-set-up-automatic-advanced-matching?lang=en)
+        [* About Events API Gateway](https://ads.tiktok.com/resources/help/article/about-events-api-gateway?lang=en)
+
+*   TikTok Post Purchase Surveys
+
+  
+    *    
+        [* About TikTok Post Purchase Surveys](https://ads.tiktok.com/resources/help/article/about-post-purchase-survey?lang=en)
+        [* How to set up TikTok Post Purchase Surveys](https://ads.tiktok.com/resources/help/article/how-to-set-up-tiktok-post-purchase-surveys?lang=en)
+
+*   IAB Features
+
+  
+    *    
+        [* About Clear Cookies and Cache in TikTok’s In-App Browser](https://ads.tiktok.com/resources/help/article/about-clear-cookies-and-cache-in-tiktoks-in-app-browser?lang=en)
+        [* About ad link history for TikTok's in-app browser](https://ads.tiktok.com/resources/help/article/about-ad-link-history-for-tiktoks-in-app-browser?lang=en)
+
+1.   Advertisers /
+2.   Measurement /
+3.   Web measurement /
+4.   TikTok Web Measurement Tools /
+
+# How to Set Up and Verify TikTok Web Data Connection
+
+ Last updated: June 2026 
+
+TikTok for Business offers tools that allow businesses to share marketing data with TikTok for measurement and ad performance. These data connections can be setup for web via a TikTok Pixel or Events API integration.
+
+  
+
+Both options are available via selected third party partners or through a manual setup.
+
+*   **TikTok Pixel** is a piece of code that you can place on your website that allows you to share website events with TikTok. Learn more [about TikTok Pixel](https://ads.tiktok.com/help/article/tiktok-pixel).
+
+*   **TikTok Events API** provides advertisers with a reliable connection between TikTok and advertiser's marketing data, across web, app, and offline (eg. Store, CRM) channels with the ability to customize the information they share with TikTok. Learn more about [Events API](https://ads.tiktok.com/help/article/events-api?lang=en)
+
+  
+
+## How to set up TikTok Data Connection
+
+To set up TikTok Pixel:
+
+1.   Log in to TikTok Ads Manager and go to Tools.
+
+2.   Click **Events Manager**to enter [TikTok Events Manager](https://ads.tiktok.com/help/article/about-tiktok-events-manager).
+
+3.   Click Connect Data Source.
+
+4.   Select Web.
+
+5.   Input your URL.
+
+6.   Select **Partner Integration** or **Manual Setup** as your connection method.
+
+Learn more about [TikTok Events Manager](https://ads.tiktok.com/help/article/about-tiktok-events-manager).
+
+**Note**: If you select Partner Setup, you will be directed to a page where you can select different supported TikTok partners for your integration, [like Shopify and Google Tag Manager](https://ads.tiktok.com/help/article/partner-integrations-for-web-tracking?lang=en).
+
+  
+
+#### For Partner Integrations
+
+1.   Select your preferred third party partner for your data connection
+
+2.   Create and name your pixel. All the events sent to this Pixel Code will show up under this Pixel. We recommend creating a pixel name that corresponds to your website or domain name. The maximum character length is 128 characters, including spaces
+
+3.   Follow steps outlined for the partner within the setup flow
+
+  
+
+#### For Manual Setup
+
+1.   Select your preferred manual connection method*
+
+2.   Create and name your pixel. All the events sent to this Pixel Code will show up under this Pixel. We recommend creating a pixel name that corresponds to your website or domain name. The maximum character length is 128 characters, including spaces
+
+3.   Install the base code onto your website
+
+4.   Manage configurations and desired settings
+
+5.   Follow steps outlined within the setup guide to configure your events. Learn more about [Event Builder](https://ads.tiktok.com/help/article/create-events?lang=en)
+
+  
+
+**Note**: We recommend setting up both the TikTok Pixel and Events API together to maximize measurement and performance of your campaigns
+
+  
+
+We recommend setting up all events throughout the user journey to maximize measurement and optimization opportunities for your campaign
+
+  
+
+### Verify your set up
+
+There are three ways to verify pixel and events set up:
+
+1.   Download [TikTok Pixel Helper](https://chrome.google.com/webstore/detail/tiktok-pixel-helper/aelgobmabdmlfmiblddjfnjodalhidnn?hl=en)) in the Chrome Store and check for any errors. Learn more about Pixel Helper on the [TikTok Pixel Helper page](https://ads.tiktok.com/help/article/tiktok-pixel-helper-2.0?lang=en).
+
+2.   Test pixel events with the Test Events feature in Events manager. Learn more about [Test Events](https://ads.tiktok.com/help/article/test-tiktok-pixel-events-video-walkthrough?lang=en).
+
+3.   Use the Diagnostics tab in Events Manager to resolve any issues presented. Learn more about [Web Diagnostics](https://ads.tiktok.com/help/article/web-diagnostics?lang=en).
+
+  
+
+![Image 2](https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tt4b_help_center/img/feedback-icon.be0e957.svg)
+
+Related Articles
+
+ Hide content 
+
+[About TikTok Pixel](https://ads.tiktok.com/resources/help/article/tiktok-pixel?lang=en)
+
+[Enhanced Data Postback with the TikTok Pixel](https://ads.tiktok.com/resources/help/article/enhanced-data-postback-with-the-tiktok-pixel?lang=en)
+
+[Troubleshoot with Pixel Helper](https://ads.tiktok.com/resources/help/article/tiktok-pixel-helper-2.0?lang=en)
+
+Log in for a personalized experience
+
+[Sign up](https://ads.tiktok.com/i18n/signup/?refer=from_help_create)
+
+ Log in 
+
+Resources
+
+*   [TikTok Shop Academy](https://seller-us.tiktok.com/university/home?identity=1&role=seller&refer=help_center)
+*   [TikTok Help Center](https://support.tiktok.com/en/?refer=help_center)
+*   [TikTok Academy](https://www.tiktokacademy.com/student/catalog?utm_source=platform&utm_medium=helpcenter)
+*   [TikTok for Business](https://ads.tiktok.com/business/?refer=help_center)
+*   [Creative Center](https://ads.tiktok.com/business/creativecenter?refer=help_center)
+
+[![Image 3](https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tt4b_help_center/img/white-logo.ddb3522.png)](https://ads.tiktok.com/resources/help)
+
+*   [Terms & Policies](https://ads.tiktok.com/i18n/official/policy/terms)
+*   [Privacy](https://www.tiktok.com/legal/partner-privacy-policy)
+
+ ©2026 TikTok For Business 
+
+Log in for personalized support
+
+ Log in 
+
+Language
+
+ 中文（简体） 
+
+ 日本語 
+
+ English 
+
+ Español 
+
+ Français 
+
+ Deutsch 
+
+ Pусский 
+
+ Italiano 
+
+ 한국어 
+
+ Türkçe 
+
+ ภาษาไทย 
+
+ Tiếng Việt 
+
+ Bahasa Indonesia 
+
+ Bahasa Melayu 
+
+ العربية 
+
+ Português (Brasil) 
+
+ Svenska 
+
+ Polski 
+
+ Čeština 
+
+ Ελληνικά 
+
+ Eesti 
+
+ Български 
+
+ Latviešu 
+
+ Lietuvių 
+
+ Slovenščina 
+
+ Hrvatski 
+
+ Slovenčina 
+
+ Nederlands 
+
+ English (UK) 
+
+ Español (Latinoamérica) 
+
+This article is available in languages other than those in the default language list.

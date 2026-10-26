@@ -1,0 +1,107 @@
+Acquisition and Marketing Channels User Guide - Analytics Platform - Matomo 
+ Skip to content 
+ Home 
+ Help 
+ Reports 
+ Matomo helps you understand how visitors arrive at your website by tracking their acquisition sources and marketing channels . This includes identifying whether a visit came from a search engine, a social media platform, a paid campaign, a link on another website, or by typing your URL directly into the browser.
+ Understanding acquisition is essential for evaluating the effectiveness of your marketing efforts and optimising your channels. Matomo groups visits by Channel Type to give you a high-level view of traffic sources, and uses Referrer information to attribute visits and conversions to specific campaigns or sites. This page contains a collection of guides that explain how Acquisition reports work in Matomo:
+ Attribution logic and how Matomo tracks source information.
+ Search engine and keyword reporting.
+ Referrer websites and UTM-tagged campaign tracking.
+ Marketing channels such as paid search, social networks, and email.
+ Segmenting traffic based on acquisition data.
+ Common troubleshooting tips.
+ 2 min introduction video 
+ Filter All Categories Getting started Attribution Referrers Search Engines Social Networks Campaigns Segments How to Troubleshoot On-Premise FAQs 
+ Getting started
+ How do I measure marketing campaigns performance? (emails, ads, paid search, social media) What is Campaign Tracking? 
+ Attribution
+ What is the default attribution model used in Matomo? What does Multi Channel Conversion Attribution do? Which attribution models does the multi attribution feature support? Create a new visit when a user visits my website using a new campaign or a new website referrer Enable the Multi Channel Conversion Attribution for a goal or ecommerce order When cookies are disabled by a visitor (cookieless tracking), how does it impact Matomo reports accuracy? Why are there sometimes 0 visits, but some conversions recorded, for example for a Keyword, a Website or a Custom Dimension? Matomo attributes conversions to the last seen referrer by default. How do I credit conversions to the first referrer instead? 
+ Referrers
+ Analyse the Acquisition Overview report What are Referrers and Channel Types? Track and analyse traffic from AI Assistants (like ChatGPT) in Matomo reports Create a new visit when a user visits my website using a new campaign or a new website referrer Add a referral exclusion in Matomo What does &#8216;Keyword not defined&#8217; mean in the Referrers > Search Engines keywords report? Matomo attributes conversions to the last seen referrer by default. How do I credit conversions to the first referrer instead? Referrer links are not showing in the Acquisition Websites; Direct Entry is too high Visits from search engines or campaigns are not recorded, Matomo shows &#8220;There is no data for this report&#8221; for all Referrers reports. Create the equivalent Google Analytics Source/Medium report in Matomo 
+ Search Engines
+ Does Matomo track search engine bots or other spider / robots? Where are my search keywords displayed? View my SEO search rankings evolution over time What are the metrics available for each Search keyword? Report on keywords that lead to conversions 
+ Social Networks
+ Track user acquisition and social media activity with Matomo Track visitors from TikTok in Matomo 
+ Campaigns
+ What is Campaign Tracking? Build campaign tracking URLs URL Builder &#8211; Marketing Campaign Tracking Common campaign tracking use cases and examples Advanced: How to manually build campaign tracking URLs Customise the Matomo Campaign parameters Analyse marketing campaign reports Track Ad Click IDs in Matomo (Google, Facebook, Bing &#038; LinkedIn) Track Google Ads Campaigns with Matomo Track Adobe Campaign URLs in Matomo Track Mailchimp email clicks in Matomo using UTM parameters Disadvantages of Campaign Tracking URLs Does Matomo support Google Analytics campaign parameters? Why does Matomo click data differ from search engines, ad networks, or affiliates? 
+ Segments
+ How do I get the most popular landing pages viewed by visitors coming through a specific channel type? (direct, website, AI, social or campaign) Create a segment using the Acquisition Date condition 
+ How to
+ Identify Paid vs Organic traffic in Matomo Create a simple affiliates system and track new customers and new revenue for each affiliate 
+ Troubleshoot
+ Visits from search engines or campaigns are not recorded, Matomo shows &#8220;There is no data for this report&#8221; for all Referrers reports. Referrer links are not showing in the Acquisition Websites; Direct Entry is too high Missing campaign links in Campaign Reports 
+ On-Premise FAQs
+ What is Search Engine Keywords Performance? Add the dimensions Campaign name, Campaign medium, Campaign source, Campaign keyword, Campaign content to a custom report Install the Marketing Campaigns Reporting plugin 
+ In essence, Matomo is:
+ Built on open source.
+Governed by ethics.
+Powered by insight. 
+ Company
+ About Matomo 
+ History 
+ Contributors 
+ Hiring 
+ Contact Us 
+ Partner Programme 
+ Support
+ Help Centre 
+ Developers 
+ Contact support 
+ Sales
+ Contact Sales 
+ Plans &#038; Pricing 
+ Features
+ Tag Manager 
+ WordPress Plugin 
+ URL Campaign Builder 
+ Integrations 
+ Open Source 
+ Download Matomo 
+ Changelog 
+ Issue Tracker 
+ GitHub 
+ Feedback Panel 
+ Data Warehouse Connector 
+ Industries
+ Banks  
+ Enterprise  
+ Financial Institutions  
+ Fintech 
+ Legal
+ Cookie Notice 
+ Matomo Cloud Privacy Policy 
+ Website Privacy Policy 
+ Website Terms of use 
+ Matomo Cloud Terms of Service 
+ Matomo Cloud Data Processing Agreement (DPA) 
+ Matomo Marketplace Terms and Conditions 
+ Support Plan Services Terms and Conditions 
+ Resources
+ Blog 
+ Case Studies 
+ Newsletter 
+ Guides 
+ Masterclasses 
+ Matomo in the Press 
+ Press Enquiries 
+ GDPR Timeline 
+ How to Check Website Traffic 
+ Comparisons
+ vs Google Analytics 
+ vs Piano Analytics 
+ vs Amplitude 
+ vs Adobe Analytics vs Google Analytics 
+ vs Piwik PRO 
+ vs Firebase 
+ vs Plausible 
+ vs Fathom 
+ vs Hotjar 
+ vs WP-Statistics 
+ vs Mixpanel 
+ Top Web Analytics Tools 
+ Privacy
+ Data ownership 
+ GDPR 
+ Security 
+ Matomo Trust Center

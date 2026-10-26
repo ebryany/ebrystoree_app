@@ -1,0 +1,229 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+const listInput = z
+  .object({
+    q: z.string().trim().max(80).optional(),
+    category: z.string().trim().max(80).optional(),
+    page: z.number().int().min(0).max(500).optional(),
+    pageSize: z.number().int().min(1).max(48).optional(),
+  })
+  .optional();
+
+function pageRange(data: { page?: number; pageSize?: number } | undefined) {
+  const pageSize = data?.pageSize ?? 48;
+  const page = data?.page ?? 0;
+  return { page, pageSize, from: page * pageSize, to: page * pageSize + pageSize - 1 };
+}
+
+function escapeLike(value: string) {
+  return value.replace(/[%_,]/g, " ").trim();
+}
+
+export const listCatalogCategories = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ kind: z.string().trim().max(20) }).parse(data))
+  .handler(async ({ data }) => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const supabase = createPublicClient();
+    const { data: rows, error } = await supabase
+      .from("categories")
+      .select("id, name, slug")
+      .eq("kind", data.kind)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.error("[catalog] listCatalogCategories gagal:", error.message);
+      return {
+        items: [] as { id: string; name: string; slug: string }[],
+        error: "Kategori sedang tidak dapat dimuat.",
+      };
+    }
+    return { items: rows ?? [], error: null };
+  });
+
+async function resolveCategoryId(
+  supabase: { from: (t: "categories") => any },
+  slug: string | undefined,
+) {
+  if (!slug) return null;
+  const { data } = await supabase.from("categories").select("id").eq("slug", slug).maybeSingle();
+  return (data?.id as string | undefined) ?? null;
+}
+
+const listInputExt = z
+  .object({
+    q: z.string().trim().max(80).optional(),
+    category: z.string().trim().max(80).optional(),
+    store: z.string().trim().max(80).optional(),
+    page: z.number().int().min(0).max(500).optional(),
+    pageSize: z.number().int().min(1).max(48).optional(),
+  })
+  .optional();
+
+export const listProducts = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listInputExt.parse(data))
+  .handler(async ({ data }) => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const supabase = createPublicClient();
+    const { page, pageSize } = pageRange(data);
+
+    const { data: rows, error } = await supabase.rpc("search_products_fts", {
+      _query: data?.q ?? "",
+      _category_slug: data?.category ?? "",
+      _store_slug: data?.store ?? "",
+      _limit: pageSize,
+      _offset: page * pageSize,
+    });
+
+    if (error) {
+      console.error("[catalog] listProducts FTS gagal:", error.message);
+      return {
+        items: [],
+        error: "Katalog produk sedang tidak dapat dimuat." as const,
+        total: 0,
+        page,
+        nextPage: null,
+      };
+    }
+    const items = (rows ?? []) as Array<{
+      id: string;
+      name: string;
+      slug: string;
+      short_description: string | null;
+      thumbnail_url: string | null;
+      price: number;
+      discount_price: number | null;
+      category_id: string | null;
+      store_name: string | null;
+      store_slug: string | null;
+      is_official: boolean;
+      rank: number;
+    }>;
+    return {
+      items,
+      error: null,
+      total: items.length,
+      page,
+      nextPage: items.length === pageSize ? page + 1 : null,
+    };
+  });
+
+export const listPublicMarketplaceServices = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listInput.parse(data))
+  .handler(async ({ data }) => {
+    const { readPublicMarketplaceServices } = await import("./marketplace-service-catalog.server");
+    return readPublicMarketplaceServices(data);
+  });
+
+export const listServices = createServerFn({ method: "GET" })
+  .validator((data: unknown) => listInput.parse(data))
+  .handler(async ({ data }) => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const supabase = createPublicClient();
+    const { page, pageSize, from, to } = pageRange(data);
+    const categoryId = await resolveCategoryId(supabase as never, data?.category);
+    if (data?.category && !categoryId) {
+      return { items: [], error: null, total: 0, page, nextPage: null };
+    }
+
+    let query = supabase
+      .from("services")
+      .select(
+        "id, name, slug, short_description, thumbnail_url, service_packages(id, name, price, estimated_days, free_revisions, is_active)",
+        { count: "exact" },
+      )
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    const term = data?.q ? escapeLike(data.q) : "";
+    if (term) query = query.or(`name.ilike.%${term}%,short_description.ilike.%${term}%`);
+    if (categoryId)
+      query = query.or(`academic_category_id.eq.${categoryId},category_id.eq.${categoryId}`);
+
+    const { data: rows, error, count } = await query;
+    if (error) {
+      console.error("[catalog] listServices gagal:", error.message);
+      return {
+        items: [],
+        error: "Katalog layanan sedang tidak dapat dimuat." as const,
+        total: 0,
+        page,
+        nextPage: null,
+      };
+    }
+    const items = rows ?? [];
+    const total = count ?? items.length;
+    return {
+      items,
+      error: null,
+      total,
+      page,
+      nextPage: items.length === pageSize && (page + 1) * pageSize < total ? page + 1 : null,
+    };
+  });
+
+export const getStorefrontSummary = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicClient } = await import("./supabase-public.server");
+  const supabase = createPublicClient();
+
+  const [products, services] = await Promise.all([
+    supabase
+      .from("digital_products")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published")
+      .is("deleted_at", null),
+    supabase
+      .from("services")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published")
+      .is("deleted_at", null),
+  ]);
+
+  return {
+    productCount: products.count ?? 0,
+    serviceCount: services.count ?? 0,
+    error:
+      products.error || services.error ? ("Ringkasan katalog tidak dapat dimuat." as const) : null,
+  };
+});
+
+const slugInput = z.object({ slug: z.string().trim().min(1).max(120) });
+
+export const getServiceDetail = createServerFn({ method: "GET" })
+  .validator((data: unknown) => slugInput.parse(data))
+  .handler(async ({ data }) => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const supabase = createPublicClient();
+
+    const { data: row, error } = await supabase
+      .from("services")
+      .select(
+        "id, name, slug, short_description, description, thumbnail_url, requirements_note, order_capacity, supported_education_levels, supported_outputs, supported_citation_styles, requires_quality_review, allows_attachments, requires_rubric, requires_dataset, default_revision_limit, categories:academic_category_id(slug, name), service_packages(id, name, description, price, estimated_days, free_revisions, sla_hours, priority, is_active, sort_order, urgency_supported, quality_review_included, maximum_pages), service_addons(id, name, description, price, is_active, sort_order)",
+      )
+      .eq("slug", data.slug)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[catalog] getServiceDetail gagal:", error.message);
+      return { service: null, error: "Detail layanan sedang tidak dapat dimuat." as const };
+    }
+    if (!row) return { service: null, error: null };
+
+    const packages = (row.service_packages ?? [])
+      .filter((p) => p.is_active !== false)
+      .sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || Number(a.price) - Number(b.price),
+      );
+    const addons = (row.service_addons ?? [])
+      .filter((a) => a.is_active !== false)
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+    return { service: { ...row, service_packages: packages, service_addons: addons }, error: null };
+  });

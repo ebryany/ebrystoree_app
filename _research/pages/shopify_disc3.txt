@@ -1,0 +1,20 @@
+Shopify Help Center | Discount types Help 
+ Start for free 
+ Log in 
+ Contents 
+ Discount types
+ You can create flexible discount options to help boost sales, reward customers, and manage promotions in your Shopify store. These discounts can be used in your advertising campaigns, website copy, and upsell strategies on product pages or in your online store cart.
+ You can provide discounts in many different ways, such as offering specific amounts off an order, providing free shipping, or offering discounts only at certain order volumes. Review the following types to learn what discounts you can offer through your store:
+ Amount off discounts : These discounts provide a percentage or a fixed amount off an order, such as 25% or $50 USD. This discount can apply to a specific product, a collection of products, or an entire order.
+ Buy X get Y discounts : These discounts let you set specific purchase requirements for a customer to receive a discount. These can be applied as discount codes or as discounts that automatically apply to a customer&#x27;s cart when they meet the requirements.
+ Free shipping discounts : This lets you set up free shipping for customers that meet certain criteria. You can also exclude shipping rates that cost over a specific amount to avoid discounting very expensive shipping options.
+ If your store requires more advanced discount solutions, such as tiered discounts, multi-logic step discounts, or custom eligibility requirements, then review the following options:
+ You can use discount code apps from the Shopify App Store .
+ If your store is on the Shopify Plus plan, then consider using Checkout Blocks .
+ You can also use a compatible third-party discounts app, or create your own custom app, to offer your customers a single automatic discount or a single discount code that applies more than one discount saving to an order . For example, you can have a single discount that gives 10% off the order and free shipping at the same time.
+ In this section
+ Amount off discounts 
+ Free shipping discounts 
+ Buy X get Y discounts 
+ Creating discounts with apps 
+ Leave feedback

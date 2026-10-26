@@ -1,0 +1,130 @@
+About attribution models - Google Ads Help Skip to main content 
+ Google Help 
+ Help Center
+ Start advertising
+ Campaigns
+ Explore features
+ Optimize performance
+ Account & billing
+ Fix issues
+ Google Partners
+ Community
+ Google Ads
+ Privacy Policy
+ Terms of Service
+ Submit feedback
+ Send feedback on...
+This help content & information 
+General Help Center experience 
+ Close Next 
+ Help Center 
+ Community 
+ Announcements 
+ Google Ads 
+ Help Center Topics 
+ Optimize performance 
+ Measure results 
+ Track sales and other conversions 
+ Attribution reports and attribution models 
+ About attribution models 
+ About attribution models
+ Note : The first click, linear, time decay, and position-based attribution models are no longer supported by Google . Conversion actions that used the deprecated attribution models have been upgraded to use data-driven attribution. You can also switch to the last click model, which is still supported.
+ On the path to conversion, customers may interact with multiple ads from the same advertiser. Attribution models let you choose how much credit each ad interaction gets for your conversions.
+ Attribution models can give you a better understanding of how your ads perform and can help you optimize across conversion journeys.
+ This article describes the various attribution models and how to use them in Google Ads. You'll learn how to set an attribution model for conversion tracking and bidding, and how to compare models with the "Model comparison" attribution report.
+ Benefits
+ Most advertisers are used to measuring the success of their online advertising on a "last click" basis. This means they give all the credit for a conversion to the last-clicked ad and corresponding keyword. However, this ignores the other ad interactions customers may have had along the way.
+ Attribution models give you more control over how much credit each ad interaction gets for your conversions. This allows you to:
+ Reach customers earlier in the purchase cycle: Find opportunities to influence customers earlier on their path to conversion.
+ Match your business: Use a model that works best for how people search for what you offer.
+ Improve your bidding: Optimize your bids based on a better understanding of how your ads perform.
+ About the different attribution models
+ Google Ads currently offers several attribution models:
+ Last click: Gives all credit for the conversion to the last-clicked ad and corresponding keyword.
+ Data-driven: Distributes credit for the conversion based on your past data for this conversion action. It's different from the other models, in that it uses your account's data to calculate the actual contribution of each interaction across the conversion path. The "Data-driven" model is the default attribution model for most conversion actions. Learn more about data-driven attribution . 
+ Note : When you convert in-app, we may attribute it to App campaigns for reporting purposes.
+ Example
+ You own a restaurant called Ristorante Abigaille in Florence, Italy. A customer finds your site by clicking on your ads after performing each of these searches: "restaurant tuscany," "restaurant florence," "3 star restaurant florence," and then "3 star restaurant abigaille florence." She makes a reservation after clicking on your ad that appeared with "3 star restaurant abigaille florence."
+ In the "Last click" attribution model, the last keyword, "3 star restaurant abigaille florence," would receive 100% of the credit for the conversion.
+ In the "Data-driven" attribution model, each keyword would receive part of the credit, depending on how much it contributed to driving the conversion.
+ To learn how to compare these attribution models and view how they'd affect your data, check the section on the "Model comparison" report below.
+ Your account can contain conversions with the following creditable channels:
+ Google paid channels: Google Ads channels can receive credit for a conversion.
+ Paid channels: Paid media channels can receive credit for a conversion.
+ Paid and organic channels: Both paid and organic channels can receive credit for a conversion.
+ [Publisher] channels: Only [publisher] channels can receive credit for a conversion.
+ Unknown channels: These conversions are assigned credit by their data source.
+ Creditable channels are those that are eligible to receive credit for a conversion. If you set up conversions in multiple Google products, your creditable channels for those conversions may differ depending on the other activity measured in that account. You can find the creditable channels for your conversions alongside the "Attribution Model" setting in Google Ads, Google Analytics, Search Ads 360, Display & Video 360, and Campaign Manager.
+ About attribution models for conversions and bidding
+ The "Attribution model" setting in conversion tracking lets you decide how to attribute conversions for each conversion action. You can use this setting for website and Google Analytics conversion actions. Learn How to find and set an attribution model for your conversions .
+ This setting affects how conversions are counted in your "Conversions" and "All conversions" columns. (Keep in mind that the "Conversions" column only includes those conversion actions you've marked as primary conversions .)
+ The attribution model you choose only affects the conversion action to which it's applied. The setting also affects any bid strategies that use the data in the "Conversions" column. This means that if you use an automated bid strategy that optimizes for conversions, such as Target cost per action ( Target CPA ), Enhanced cost-per-click ( ECPC ), or Target return on ad spend ( Target ROAS ), the attribution model you select will affect how your bids are optimized.
+ If you use manual bidding strategies, you can change your attribution model to help you set your bids.
+ If you're not sure what model to choose, check the section below on the "Model comparison" report , which lets you compare different attribution models. When you're trying a new non-last click attribution model, we recommend that you test the model first and assess how it affects your return on investment.
+ If you experience issues like conversions not being recorded, or an “Inactive” status for your conversion actions after changing models or during setup, verify that your Google tags are correctly implemented on all relevant pages, especially thank you/confirmation pages. Use Google Tag Assistant to diagnose tag issues and ensure the Conversion Linker tag is active if you're using Google Tag Manager. Performing test conversions can also help identify problems.
+ Note : Changing your attribution model from "Last click" to "Data-driven" helps determine which of your ad interactions are most impactful. Data-driven attribution assigns a value to each ad interaction that has contributed to the conversion process and helps drive additional conversions at the same CPA. Learn How to change bids and targets after switching models from "Last click" to "Data-driven" .
+ About the "Model comparison" report
+ Note : In the "Model comparison report," you might notice a message about historical data being only partially available for your selected date range. This could be because your account has only recently become eligible for cross-network attribution . To provide accurate performance metrics, the report filters out any network or campaign without enough data. Select a more recent date range to get complete data.
+ The "Model comparison" report lets you compare 2 different attribution models side-by-side. To find keywords, ad groups, campaigns, or devices that are undervalued on a last-click basis, you can compare the "Last click" model to the "Data-driven" model to view the value of keywords as determined by Google AI, which looks at how your customers convert to allocate credit. Data-driven attribution also gives you a sense of the value of ad interactions along the entire conversion path.
+ Tip: Analyze your CPA or ROAS for different attribution models
+ You can use the "Cost / conv." and "Conv. value / cost" columns in the "Model comparison" report to compare your CPA and ROAS for different attribution models. This allows you to identify campaigns or keywords that are undervalued using the "Last click" attribution model. You can then change your bids based on the actual value of your campaigns and keywords across the full conversion path.
+ How to find and set an attribution model for your conversions
+ You can set the attribution model when you're setting up your conversion action, or follow the instructions below to compare attribution models and change the attribution model for an existing conversion action:
+ Compare attribution models
+ Go to Attribution within the Goals menu .
+ In the page menu on the left, select Model comparison .
+ Select an option from the "Dimension" drop-down menu.
+ Use the "Compare" and "With" drop-down menus to select the attribution models you want to view and compare.
+ You can search for specific keywords, ad groups, campaigns, or accounts from the search box above the table.
+ Change the attribution model for an existing conversion action
+ Go to Summary within the Goals menu .
+ In the table, choose the conversion you want to edit by selecting the conversion name.
+ Select Edit settings .
+ Select Attribution model , and select an attribution model from the drop-down menu.
+ Select Save , and then select Done .
+ Cross-account conversion tracking
+ If you use cross-account conversion tracking to track conversions at the manager account level, you must select your attribution model in the manager account.
+ Attribution models in your reporting columns
+ When you change the "Attribution model" setting for a conversion action, it only changes the way your conversions are counted in your "Conversions" and "All conversions" columns going forward. If you want to check how your historic conversions data would look with the attribution model you've just selected, you can add the "current model" columns (located in the "Attribution" section of the "Columns" menu):
+ Conversions (current model)
+ Cost / conv. (current model)
+ Conv. rate (current model)
+ Conv. value (current model)
+ Conv. value / cost (current model)
+ Conv. value / click (current model)
+ Value / conv. (current model)
+ These columns can be helpful if you've just changed your attribution model and you want to get a sense of how it will affect your conversion data. You can compare these columns to your regular conversion tracking columns to check how your data would have differed if you'd been using the attribution model you've now selected.
+ Like the regular "Conversions" columns, these columns won't include any conversion actions that you've chosen not to mark as primary conversions. However, cross-device conversions are included by default.
+ Keep in mind that these columns include data that isn't affected by your attribution model selection, such as data from Display Network campaigns using pay for conversions billing .
+ Related links
+ About data-driven attribution 
+ About attribution reports 
+ Set up conversion tracking 
+ Need more help?
+ Try these next steps:
+ Post to the help community Get answers from community members 
+ Contact us Tell us more and we’ll help you get there 
+ false
+ Achieve your advertising goals today! Attend our Performance Max Masterclass, a livestream workshop session bringing together industry and Google ads PMax experts.
+ Register now 
+ Search
+ Clear search
+ Close search
+ Google apps
+ Main menu
+ 12377994966122978837
+ true
+ Search Help Center
+ true
+ true
+ true
+ true
+ true
+ true
+ 73067
+ false
+ false
+ true
+ true
+ false
+ false

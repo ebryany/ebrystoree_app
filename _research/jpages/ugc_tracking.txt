@@ -1,0 +1,10 @@
+Title: 404: Page not found
+
+URL Source: https://www.shopify.com/blog/ugc-tools
+
+Warning: Target URL returned error 404: Not Found
+
+Markdown Content:
+## Page not found
+
+Time is money, so we won’t waste yours. This page doesn’t exist. Check out the [Help Center](https://help.shopify.com/en/) to find what you’re looking for.

@@ -1,0 +1,413 @@
+Title: Page not found | Klaviyo Help Center
+
+URL Source: https://help.klaviyo.com/hc/en-us/articles/115005070187
+
+Markdown Content:
+[___](https://help.klaviyo.com/hc/en-us/articles/115005070187#)[Skip to main content](https://help.klaviyo.com/hc/en-us/articles/115005070187#site-content)
+
+[](https://help.klaviyo.com/hc/en-us "Go to the Klaviyo home page")
+*   Help center 
+
+    *           *   [Help center Find step-by-step instructions and troubleshooting solutions in our knowledge base.](https://help.klaviyo.com/hc/en-us)
+
+    *   POPULAR TOPICS 
+        *   [Integrations](https://help.klaviyo.com/hc/en-us/categories/115000032731)
+        *   [Flows](https://help.klaviyo.com/hc/en-us/categories/115000312411)
+        *   [Audience](https://help.klaviyo.com/hc/en-us/categories/115000867867)
+        *   [Campaigns](https://help.klaviyo.com/hc/en-us/categories/115000867667)
+        *   [Sign-up forms](https://help.klaviyo.com/hc/en-us/categories/360000190711)
+        *   [Deliverability & compliance](https://help.klaviyo.com/hc/en-us/categories/115000873988)
+
+    *   HELP BY PRODUCT 
+        *   [SMS](https://help.klaviyo.com/hc/en-us/categories/29173800271259)
+        *   [Reviews](https://help.klaviyo.com/hc/en-us/categories/16638219724187)
+        *   [Marketing Analytics](https://help.klaviyo.com/hc/en-us/categories/18073014919195)
+        *   [Customer Hub](https://help.klaviyo.com/hc/en-us/categories/34141283979931)
+        *   [Customer Agent](https://help.klaviyo.com/hc/en-us/sections/37659126754075)
+        *   [Helpdesk](https://help.klaviyo.com/hc/en-us/sections/33948021740315)
+        *   [WhatsApp](https://help.klaviyo.com/hc/en-us/categories/39746685522331)
+
+*   Academy 
+
+    *           *   [Klaviyo Academy Expert training and education to help you succeed with Klaviyo, and beyond.](https://academy.klaviyo.com/)
+
+    *   ON-DEMAND LEARNING 
+        *   [Quick guides Learn marketing strategies and concepts in 15 minutes or less.](https://academy.klaviyo.com/en-us/search?select=Quick+guide&resource=academy_courses)
+        *   [Courses Master key marketing topics through structured lessons and exams.](https://academy.klaviyo.com/en-us/search?select=Course&resource=academy_courses)
+        *   [Best practices Discover top product and marketing strategies for your business.](https://academy.klaviyo.com/en-us/best-practices)
+        *   [Learning paths Complete curated learning journeys tailored to your marketing goals.](https://academy.klaviyo.com/en-us/learning-paths)
+        *   [Explore all resources](https://academy.klaviyo.com/en-us/search?resource=academy_courses)
+
+    *   LIVE LEARNING 
+        *   [Live trainings Build confidence through hands-on interactive workshops and thought-provoking strategy sessions.](https://academy.klaviyo.com/en-us/search?select=Live+training&resource=academy_courses)
+        *   [Live office hours Join a strategic discussion where you can ask questions and get answers in real-time.](https://www.bigmarker.com/klaviyo-customer-education/Office-hours-Getting-started-with-Klaviyo)
+        *   [1:1 Live training Book a private training session with an expert to jumpstart your platform knowledge and confidence.](https://academy.klaviyo.com/en-us/private-live-training)
+
+    *   CREDENTIALS 
+        *   [Klaviyo credentials Dig deeper into select topics and showcase your expertise with a final exam to earn a certificate and digital badge.](https://academy.klaviyo.com/en-us/credentials)
+        *   [Klaviyo practitioner certificate](https://academy.klaviyo.com/en-us/certificates/klaviyo-practitioner-certificate)
+        *   [Deliverability certificate](https://academy.klaviyo.com/en-us/collections/deliverability-certificate)
+        *   [Klaviyo developer certificate](https://academy.klaviyo.com/en-us/collections/developer-certificate)
+        *   [See all certificates](https://academy.klaviyo.com/en-us/search?resource=academy_courses&select=Certificate)
+
+*   Community 
+
+    *           *   [Klaviyo Community Join our thriving community network to connect with brands like yours—online and in person.](https://community.klaviyo.com/)
+
+    *   JOIN THE CONVERSATION 
+        *   [Ask a question Post a question and get thoughtful answers from Klaviyo power users.](https://community.klaviyo.com/topic/new)
+        *   [Announcements](https://community.klaviyo.com/product-updates-and-announcements-51)
+        *   [Recent threads](https://community.klaviyo.com/search/activity/recent)
+        *   [Strategic advice](https://community.klaviyo.com/strategic-advice-27)
+
+    *   JOIN A USER GROUP 
+        *   [Browse all groups Your people are waiting. New ideas and connections are a click away.](https://community.klaviyo.com/groups)
+        *   [Developer group](https://community.klaviyo.com/groups/developer-group-64)
+        *   [Entrepreneur group](https://community.klaviyo.com/groups/entrepreneur-user-group-118)
+        *   [WooCommerce group](https://community.klaviyo.com/groups/woo-user-group-87)
+
+    *   JOIN COMMUNITY ACTIVITIES 
+        *   [Events](https://community.klaviyo.com/events?tab=upcoming)
+        *   [Composer community](https://community.klaviyo.com/groups/composer-community-group-145)
+        *   [Job board](https://community.klaviyo.com/job-board-55)
+        *   [Live training recordings](https://community.klaviyo.com/live-training-recordings-42)
+
+*   Developers 
+
+    *           *   [Klaviyo Developers Access API documentation and developer guides to help you build with Klaviyo.](https://developers.klaviyo.com/en)
+
+    *   TOP RESOURCES 
+        *   [Get started Access key resources and a step-by-step checklist for how to start developing with Klaviyo.](https://developers.klaviyo.com/en/docs/get_started)
+        *   [Grow your app's reach Learn how to join our ecosystem and get your app listed on our marketplace.](https://developers.klaviyo.com/en/docs/build_your_integration)
+        *   [Developer tools Generate sample data, monitor your API usage, and access our Postman collections.](https://developers.klaviyo.com/en/docs/developer-tools)
+
+    *   KLAVIYO APIS 
+        *   [API reference Browse our full catalog of API docs.](https://developers.klaviyo.com/en/reference/api_overview)
+        *   [Changelog](https://developers.klaviyo.com/en/docs/changelog_)
+        *   [Versioning & deprecation policy](https://developers.klaviyo.com/en/docs/api_versioning_and_deprecation_policy)
+        *   [Rate limits & error handling](https://developers.klaviyo.com/en/docs/rate_limits_and_error_handling)
+
+    *   VIDEO TUTORIALS 
+        *   [![Image 2](https://cdn.sanity.io/images/6ct6b26e/help-center-prod/7ff492c2b417b7ecfe572f839a8a81398693c1f7-1920x1080.webp) API tutorials on YouTube Subscribe to our Klaviyo API Tutorials playlist for easy access to step-by-step developer walkthroughs.](https://youtube.com/playlist?list=PLHkNfHgtxcUanrkMnKPdkRzuWU7MGv_xM&si=pkG-KH7IT_TUHOGC)
+
+[](https://www.klaviyo.com/login)
+
+*   [United States -EN](https://help.klaviyo.com/en-us)
+*   [Deutschland -DE](https://help.klaviyo.com/de-de)
+*   [España -ES](https://help.klaviyo.com/es-es)
+*   [México -ES](https://help.klaviyo.com/es-mx)
+*   [France -FR](https://help.klaviyo.com/fr-fr)
+*   [Italia -IT](https://help.klaviyo.com/it-it)
+*   [한국 -KO](https://help.klaviyo.com/ko-kr)
+*   [Nederland -NL](https://help.klaviyo.com/nl-nl)
+*   [Polska -PL](https://help.klaviyo.com/pl-pl)
+*   [Brasil -PT](https://help.klaviyo.com/pt-br)
+*   [Sverige -SV](https://help.klaviyo.com/sv-se)
+
+*   [](https://help.klaviyo.com/hc/en-us/search)
+
+*   [Log in](https://www.klaviyo.com/login)
+
+*   [Contact us](https://www.klaviyo.com/contact-us)
+*   [Sign up](https://www.klaviyo.com/sign-up)
+
+*   
+Help center 
+
+    *           *   [Help center Find step-by-step instructions and troubleshooting solutions in our knowledge base.](https://help.klaviyo.com/hc/en-us)
+
+    *   POPULAR TOPICS 
+        *   [Integrations](https://help.klaviyo.com/hc/en-us/categories/115000032731)
+        *   [Flows](https://help.klaviyo.com/hc/en-us/categories/115000312411)
+        *   [Audience](https://help.klaviyo.com/hc/en-us/categories/115000867867)
+        *   [Campaigns](https://help.klaviyo.com/hc/en-us/categories/115000867667)
+        *   [Sign-up forms](https://help.klaviyo.com/hc/en-us/categories/360000190711)
+        *   [Deliverability & compliance](https://help.klaviyo.com/hc/en-us/categories/115000873988)
+
+    *   HELP BY PRODUCT 
+        *   [SMS](https://help.klaviyo.com/hc/en-us/categories/29173800271259)
+        *   [Reviews](https://help.klaviyo.com/hc/en-us/categories/16638219724187)
+        *   [Marketing Analytics](https://help.klaviyo.com/hc/en-us/categories/18073014919195)
+        *   [Customer Hub](https://help.klaviyo.com/hc/en-us/categories/34141283979931)
+        *   [Customer Agent](https://help.klaviyo.com/hc/en-us/sections/37659126754075)
+        *   [Helpdesk](https://help.klaviyo.com/hc/en-us/sections/33948021740315)
+        *   [WhatsApp](https://help.klaviyo.com/hc/en-us/categories/39746685522331)
+
+*   
+Academy 
+
+    *           *   [Klaviyo Academy Expert training and education to help you succeed with Klaviyo, and beyond.](https://academy.klaviyo.com/)
+
+    *   ON-DEMAND LEARNING 
+        *   [Quick guides Learn marketing strategies and concepts in 15 minutes or less.](https://academy.klaviyo.com/en-us/search?select=Quick+guide&resource=academy_courses)
+        *   [Courses Master key marketing topics through structured lessons and exams.](https://academy.klaviyo.com/en-us/search?select=Course&resource=academy_courses)
+        *   [Best practices Discover top product and marketing strategies for your business.](https://academy.klaviyo.com/en-us/best-practices)
+        *   [Learning paths Complete curated learning journeys tailored to your marketing goals.](https://academy.klaviyo.com/en-us/learning-paths)
+        *   [Explore all resources](https://academy.klaviyo.com/en-us/search?resource=academy_courses)
+
+    *   LIVE LEARNING 
+        *   [Live trainings Build confidence through hands-on interactive workshops and thought-provoking strategy sessions.](https://academy.klaviyo.com/en-us/search?select=Live+training&resource=academy_courses)
+        *   [Live office hours Join a strategic discussion where you can ask questions and get answers in real-time.](https://www.bigmarker.com/klaviyo-customer-education/Office-hours-Getting-started-with-Klaviyo)
+        *   [1:1 Live training Book a private training session with an expert to jumpstart your platform knowledge and confidence.](https://academy.klaviyo.com/en-us/private-live-training)
+
+    *   CREDENTIALS 
+        *   [Klaviyo credentials Dig deeper into select topics and showcase your expertise with a final exam to earn a certificate and digital badge.](https://academy.klaviyo.com/en-us/credentials)
+        *   [Klaviyo practitioner certificate](https://academy.klaviyo.com/en-us/certificates/klaviyo-practitioner-certificate)
+        *   [Deliverability certificate](https://academy.klaviyo.com/en-us/collections/deliverability-certificate)
+        *   [Klaviyo developer certificate](https://academy.klaviyo.com/en-us/collections/developer-certificate)
+        *   [See all certificates](https://academy.klaviyo.com/en-us/search?resource=academy_courses&select=Certificate)
+
+*   
+Community 
+
+    *           *   [Klaviyo Community Join our thriving community network to connect with brands like yours—online and in person.](https://community.klaviyo.com/)
+
+    *   JOIN THE CONVERSATION 
+        *   [Ask a question Post a question and get thoughtful answers from Klaviyo power users.](https://community.klaviyo.com/topic/new)
+        *   [Announcements](https://community.klaviyo.com/product-updates-and-announcements-51)
+        *   [Recent threads](https://community.klaviyo.com/search/activity/recent)
+        *   [Strategic advice](https://community.klaviyo.com/strategic-advice-27)
+
+    *   JOIN A USER GROUP 
+        *   [Browse all groups Your people are waiting. New ideas and connections are a click away.](https://community.klaviyo.com/groups)
+        *   [Developer group](https://community.klaviyo.com/groups/developer-group-64)
+        *   [Entrepreneur group](https://community.klaviyo.com/groups/entrepreneur-user-group-118)
+        *   [WooCommerce group](https://community.klaviyo.com/groups/woo-user-group-87)
+
+    *   JOIN COMMUNITY ACTIVITIES 
+        *   [Events](https://community.klaviyo.com/events?tab=upcoming)
+        *   [Composer community](https://community.klaviyo.com/groups/composer-community-group-145)
+        *   [Job board](https://community.klaviyo.com/job-board-55)
+        *   [Live training recordings](https://community.klaviyo.com/live-training-recordings-42)
+
+*   
+Developers 
+
+    *           *   [Klaviyo Developers Access API documentation and developer guides to help you build with Klaviyo.](https://developers.klaviyo.com/en)
+
+    *   TOP RESOURCES 
+        *   [Get started Access key resources and a step-by-step checklist for how to start developing with Klaviyo.](https://developers.klaviyo.com/en/docs/get_started)
+        *   [Grow your app's reach Learn how to join our ecosystem and get your app listed on our marketplace.](https://developers.klaviyo.com/en/docs/build_your_integration)
+        *   [Developer tools Generate sample data, monitor your API usage, and access our Postman collections.](https://developers.klaviyo.com/en/docs/developer-tools)
+
+    *   KLAVIYO APIS 
+        *   [API reference Browse our full catalog of API docs.](https://developers.klaviyo.com/en/reference/api_overview)
+        *   [Changelog](https://developers.klaviyo.com/en/docs/changelog_)
+        *   [Versioning & deprecation policy](https://developers.klaviyo.com/en/docs/api_versioning_and_deprecation_policy)
+        *   [Rate limits & error handling](https://developers.klaviyo.com/en/docs/rate_limits_and_error_handling)
+
+    *   VIDEO TUTORIALS 
+        *   [![Image 3](https://cdn.sanity.io/images/6ct6b26e/help-center-prod/7ff492c2b417b7ecfe572f839a8a81398693c1f7-1920x1080.webp) API tutorials on YouTube Subscribe to our Klaviyo API Tutorials playlist for easy access to step-by-step developer walkthroughs.](https://youtube.com/playlist?list=PLHkNfHgtxcUanrkMnKPdkRzuWU7MGv_xM&si=pkG-KH7IT_TUHOGC)
+
+*   [Search](https://help.klaviyo.com/hc/en-us/search)
+*   
+United States -EN
+    *   [United States -EN](https://help.klaviyo.com/en-us)
+    *   [Deutschland -DE](https://help.klaviyo.com/de-de)
+    *   [España -ES](https://help.klaviyo.com/es-es)
+    *   [México -ES](https://help.klaviyo.com/es-mx)
+    *   [France -FR](https://help.klaviyo.com/fr-fr)
+    *   [Italia -IT](https://help.klaviyo.com/it-it)
+    *   [한국 -KO](https://help.klaviyo.com/ko-kr)
+    *   [Nederland -NL](https://help.klaviyo.com/nl-nl)
+    *   [Polska -PL](https://help.klaviyo.com/pl-pl)
+    *   [Brasil -PT](https://help.klaviyo.com/pt-br)
+    *   [Sverige -SV](https://help.klaviyo.com/sv-se)
+
+*   [Contact us](https://www.klaviyo.com/contact-us)
+*   [Sign up](https://www.klaviyo.com/sign-up)
+*   [Log in](https://www.klaviyo.com/login)
+
+Page not found
+
+# It’s pronounced  
+**Clay-vee–oh.**  
+_Clay_-vee-oh.  
+Claaay-vee-oh.
+
+Not what you were looking for? Head over to the [email page](https://help.klaviyo.com/email-marketing), [SMS page](https://help.klaviyo.com/sms-marketing), or visit the [home page](https://help.klaviyo.com/).
+
+[Go home](https://help.klaviyo.com/)
+
+*   
+Company
+    *   [About Klaviyo](https://www.klaviyo.com/about)
+    *   [Newsroom](https://www.klaviyo.com/newsroom)
+    *   [Investor relations](https://investors.klaviyo.com/overview/default.aspx)
+    *   [Contact us](https://www.klaviyo.com/contact-us)
+    *   [Careers](https://www.klaviyo.com/careers)
+
+Klaviyo for
+    *   [Enterprise](https://www.klaviyo.com/enterprise)
+    *   [Agency and tech partners](https://www.klaviyo.com/partners)
+    *   [Developers](https://developers.klaviyo.com/en)
+    *   [Retail and ecommerce](https://www.klaviyo.com/industry/retail)
+    *   [Restaurant marketing](https://www.klaviyo.com/industry/restaurants)
+    *   [Wellness](https://www.klaviyo.com/industry/wellness)
+
+*   
+Platform
+    *   [B2C CRM overview](https://www.klaviyo.com/platform)
+    *   [Klaviyo AI (K:AI)](https://www.klaviyo.com/solutions/ai)
+    *   [Klaviyo Marketing](https://www.klaviyo.com/solutions/marketing-automation)
+    *   [Klaviyo Service](https://www.klaviyo.com/solutions/customer-service)
+    *   [Klaviyo Analytics](https://www.klaviyo.com/solutions/analytics)
+    *   [Klaviyo Data Platform](https://www.klaviyo.com/solutions/customer-data-platform)
+
+Why Klaviyo
+    *   [Klaviyo vs. Klaviyo alternatives](https://www.klaviyo.com/compare)
+    *   [Klaviyo vs. Mailchimp](https://www.klaviyo.com/compare/klaviyo-vs-mailchimp)
+    *   [Klaviyo vs. Postscript](https://www.klaviyo.com/compare/klaviyo-vs-postscript)
+    *   [Klaviyo vs. Attentive](https://www.klaviyo.com/compare/klaviyo-vs-attentive)
+    *   [Klaviyo vs. Salesforce](https://www.klaviyo.com/compare/klaviyo-vs-salesforce-marketing-cloud)
+    *   [Klaviyo vs. Listrak](https://www.klaviyo.com/compare/klaviyo-vs-listrak)
+
+*   
+Channels
+    *   [Omnichannel marketing](https://www.klaviyo.com/solutions/omnichannel)
+    *   [Email marketing](https://www.klaviyo.com/products/email-marketing)
+    *   [SMS marketing](https://www.klaviyo.com/products/sms-marketing)
+    *   [RCS for Business](https://www.klaviyo.com/products/sms-marketing/rcs)
+    *   [Mobile app marketing](https://www.klaviyo.com/products/mobile-app-marketing)
+    *   [WhatsApp marketing](https://www.klaviyo.com/products/whatsapp)
+    *   [Social marketing](https://www.klaviyo.com/products/social)
+
+Tools + Resources
+    *   [Marketing resources](https://www.klaviyo.com/marketing-resources)
+    *   [Marketing campaign calendar](https://www.klaviyo.com/marketing-resources/marketing-campaign-calendar)
+    *   [Marketing glossary](https://www.klaviyo.com/glossary)
+    *   [Subject line generator](https://www.klaviyo.com/tools/email-subject-line-generator)
+    *   [ROI calculator](https://www.klaviyo.com/tools/roi-calculator)
+    *   [Case studies](https://www.klaviyo.com/customers)
+
+*   
+Top Products + Features
+    *   [Composer Beta](https://www.klaviyo.com/composer)
+    *   [Marketing Agent](https://www.klaviyo.com/solutions/ai/marketing-agent)
+    *   [Customer Agent](https://www.klaviyo.com/solutions/ai/customer-agent)
+    *   [Customer Hub](https://www.klaviyo.com/products/customer-experience-hub)
+    *   [Helpdesk](https://www.klaviyo.com/products/helpdesk)
+    *   [Marketing Analytics](https://www.klaviyo.com/products/marketing-analytics)
+    *   [Advanced Klaviyo Data Platform](https://www.klaviyo.com/products/advanced-cdp)
+    *   [Web forms](https://www.klaviyo.com/features/web-forms)
+    *   [Email templates](https://www.klaviyo.com/features/email-templates)
+
+*   
+Company
+    *   [About Klaviyo](https://www.klaviyo.com/about)
+    *   [Newsroom](https://www.klaviyo.com/newsroom)
+    *   [Investor relations](https://investors.klaviyo.com/overview/default.aspx)
+    *   [Contact us](https://www.klaviyo.com/contact-us)
+    *   [Careers](https://www.klaviyo.com/careers)
+
+*   
+Platform
+    *   [B2C CRM overview](https://www.klaviyo.com/platform)
+    *   [Klaviyo AI (K:AI)](https://www.klaviyo.com/solutions/ai)
+    *   [Klaviyo Marketing](https://www.klaviyo.com/solutions/marketing-automation)
+    *   [Klaviyo Service](https://www.klaviyo.com/solutions/customer-service)
+    *   [Klaviyo Analytics](https://www.klaviyo.com/solutions/analytics)
+    *   [Klaviyo Data Platform](https://www.klaviyo.com/solutions/customer-data-platform)
+
+*   
+Channels
+    *   [Omnichannel marketing](https://www.klaviyo.com/solutions/omnichannel)
+    *   [Email marketing](https://www.klaviyo.com/products/email-marketing)
+    *   [SMS marketing](https://www.klaviyo.com/products/sms-marketing)
+    *   [RCS for Business](https://www.klaviyo.com/products/sms-marketing/rcs)
+    *   [Mobile app marketing](https://www.klaviyo.com/products/mobile-app-marketing)
+    *   [WhatsApp marketing](https://www.klaviyo.com/products/whatsapp)
+    *   [Social marketing](https://www.klaviyo.com/products/social)
+
+*   
+Top Products + Features
+    *   [Composer Beta](https://www.klaviyo.com/composer)
+    *   [Marketing Agent](https://www.klaviyo.com/solutions/ai/marketing-agent)
+    *   [Customer Agent](https://www.klaviyo.com/solutions/ai/customer-agent)
+    *   [Customer Hub](https://www.klaviyo.com/products/customer-experience-hub)
+    *   [Helpdesk](https://www.klaviyo.com/products/helpdesk)
+    *   [Marketing Analytics](https://www.klaviyo.com/products/marketing-analytics)
+    *   [Advanced Klaviyo Data Platform](https://www.klaviyo.com/products/advanced-cdp)
+    *   [Web forms](https://www.klaviyo.com/features/web-forms)
+    *   [Email templates](https://www.klaviyo.com/features/email-templates)
+
+*   
+Klaviyo for
+    *   [Enterprise](https://www.klaviyo.com/enterprise)
+    *   [Agency and tech partners](https://www.klaviyo.com/partners)
+    *   [Developers](https://developers.klaviyo.com/en)
+    *   [Retail and ecommerce](https://www.klaviyo.com/industry/retail)
+    *   [Restaurant marketing](https://www.klaviyo.com/industry/restaurants)
+    *   [Wellness](https://www.klaviyo.com/industry/wellness)
+
+*   
+Why Klaviyo
+    *   [Klaviyo vs. Klaviyo alternatives](https://www.klaviyo.com/compare)
+    *   [Klaviyo vs. Mailchimp](https://www.klaviyo.com/compare/klaviyo-vs-mailchimp)
+    *   [Klaviyo vs. Postscript](https://www.klaviyo.com/compare/klaviyo-vs-postscript)
+    *   [Klaviyo vs. Attentive](https://www.klaviyo.com/compare/klaviyo-vs-attentive)
+    *   [Klaviyo vs. Salesforce](https://www.klaviyo.com/compare/klaviyo-vs-salesforce-marketing-cloud)
+    *   [Klaviyo vs. Listrak](https://www.klaviyo.com/compare/klaviyo-vs-listrak)
+
+*   
+Tools + Resources
+    *   [Marketing resources](https://www.klaviyo.com/marketing-resources)
+    *   [Marketing campaign calendar](https://www.klaviyo.com/marketing-resources/marketing-campaign-calendar)
+    *   [Marketing glossary](https://www.klaviyo.com/glossary)
+    *   [Subject line generator](https://www.klaviyo.com/tools/email-subject-line-generator)
+    *   [ROI calculator](https://www.klaviyo.com/tools/roi-calculator)
+    *   [Case studies](https://www.klaviyo.com/customers)
+
+*   
+Explore more
+    *   [Portfolio](https://www.klaviyo.com/features/portfolio)
+    *   [Apps and Integrations](https://www.klaviyo.com/platform-integrations)
+    *   [Features](https://www.klaviyo.com/features)
+    *   [What's new](https://www.klaviyo.com/whats-new)
+    *   [Events](https://www.klaviyo.com/events)
+    *   [Help Center](https://help.klaviyo.com/hc/en-us)
+    *   [Academy](https://academy.klaviyo.com/en-us)
+    *   [Community](https://community.klaviyo.com/)
+
+United States -EN
+*   [United States -EN](https://help.klaviyo.com/en-us)
+*   [Deutschland -DE](https://help.klaviyo.com/de-de)
+*   [España -ES](https://help.klaviyo.com/es-es)
+*   [México -ES](https://help.klaviyo.com/es-mx)
+*   [France -FR](https://help.klaviyo.com/fr-fr)
+*   [Italia -IT](https://help.klaviyo.com/it-it)
+*   [한국 -KO](https://help.klaviyo.com/ko-kr)
+*   [Nederland -NL](https://help.klaviyo.com/nl-nl)
+*   [Polska -PL](https://help.klaviyo.com/pl-pl)
+*   [Brasil -PT](https://help.klaviyo.com/pt-br)
+*   [Sverige -SV](https://help.klaviyo.com/sv-se)
+
+The B2C CRM
+
+[Facebook](https://www.facebook.com/Klaviyo/)[Twitter](https://twitter.com/klaviyo/)[LinkedIn](https://www.linkedin.com/company/klaviyo/)[Instagram](https://www.instagram.com/klaviyo/)[Google](https://google.com/preferences/source?q=https://www.klaviyo.com)
+
+![Image 4: AICPA SOC](https://help.klaviyo.com/_astro/aicpa-soc.DCgGzBwT.png)
+
+![Image 5: ISO 27001](https://help.klaviyo.com/_astro/iso-27001.OTQvciKr.png)
+
+![Image 6: ISO 27017](https://help.klaviyo.com/_astro/iso-27017.Bl-329_5.png)
+
+![Image 7: PCI DSS](https://help.klaviyo.com/_astro/pci-dss.BwnxerlJ.png)
+
+![Image 8: CCPA](https://help.klaviyo.com/_astro/ccpa.CrUQ2j0e.png)
+
+[![Image 9](https://help.klaviyo.com/_astro/gdpr.CD3GhNA9.png)](https://help.klaviyo.com/gdpr)
+
+Copyright © 2026 Klaviyo. All rights reserved.
+
+[Site Map](https://www.klaviyo.com/sitemap)[Terms and Privacy](https://www.klaviyo.com/legal)[Security](https://www.klaviyo.com/security)[Trust](https://www.klaviyo.com/trust)[Intellectual Property Notices](https://www.klaviyo.com/legal/intellectual-property-notices)
+
+Do Not Sell or Share My Personal Information
+
+Cookie Settings
+
+[Your Privacy Preferences](https://privacy.klaviyo.com/en-US)
+
+![Image 10](https://www.googleadservices.com/pagead/conversion/607008856/?label=EUbhCLyAj7oZENjwuKEC&guid=ON&script=0)
+
+![Image 11](https://bat.bing.com/action/0?ti=73007428&Ver=2&mid=4235f3d1-f1f3-4b77-b289-c8694ccc197c&bo=2&sid=ea8f1d20c06811f1a6c2df966a967f3b&vid=ea8f43c0c06811f182e8b9e66dde962c&vids=1&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=Page%20not%20found%20%7C%20Klaviyo%20Help%20Center&p=https%3A%2F%2Fhelp.klaviyo.com%2Fhc%2Fen-us%2Farticles%2F115005070187&r=&lt=1575&evt=pageLoad&sv=2&asc=G&cdb=AQAS&rn=598238)![Image 12](https://bat.bing.com/action/0?ti=73007428&Ver=2&mid=4235f3d1-f1f3-4b77-b289-c8694ccc197c&bo=3&sid=ea8f1d20c06811f1a6c2df966a967f3b&vid=ea8f43c0c06811f182e8b9e66dde962c&vids=0&msclkid=N&ec=CHEQ&el=Invalid_Users&ev=0&ea=Invalid_Users&en=Y&p=https%3A%2F%2Fhelp.klaviyo.com%2Fhc%2Fen-us%2Farticles%2F115005070187&sw=1280&sh=1280&sc=24&evt=custom&asc=G&cdb=AQAS&rn=176848)

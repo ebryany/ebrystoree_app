@@ -1,0 +1,150 @@
+Attribution: Marketing Attribution Software that Works Agentic Marketing Analytics
+ Agentic Marketing Analytics that match your bank account.
+ Ask your marketing data anything. Get recommendations grounded in user-level cost data, deduplicated revenue, and every touchpoint, not platform-reported estimates. Multi-touch attribution, media mix modeling, and incrementality testing in one platform, with a native MCP server for Claude and any MCP-compatible AI.
+ Recommendations you can trust, because you can audit every number behind them.
+ Start Free Trial Book Demo 
+ C
+ Claude
+ &middot; Attribution MCP
+ connected 
+ Y
+ Three high-impact moves. The biggest opportunity is reallocating X spend, which is returning $0.70 on the dollar. Shifting that to Meta and Google should lift blended ROAS from 9.6x to ~12.1x.
+ 9.6x
+ Current ROAS
+ 12.1x
+ Projected ROAS
+ +$960K
+ Proj. Revenue
+ Recommended Reallocation
+ Google +$42K 
+ Now 
+ $156K 
+ Rec 
+ $198K 
+ Meta +$35K 
+ Now 
+ $61K 
+ Rec 
+ $96K 
+ X -$67K 
+ Now 
+ $107K 
+ Rec 
+ $40K 
+ HIGH Cut X spend by 63% 
+ 0.7x ROAS. Reallocate $67K to Google and Meta which both show 8x+ returns.
+ 1 Grounded in real data 
+ Built on user-level data, not platform-reported estimates.
+ Every recommendation traces back to a real person, a real ad dollar, and a real revenue event. Not to a campaign-level conversion count that double-counts every time two platforms touch the same user. The recommendation can only be as accurate as the data underneath, so we start with the data.
+ 2 Work with the model 
+ Tune the model with AI, side by side.
+ You stay in control of how attribution gets calculated, and the AI helps you get it right. Compare models side by side. Ask which one fits your business. Get help tuning lookback windows, direct traffic handling, and cutoff events. No black box. Your model, your decisions, an expert in the room.
+ 3 Fully auditable 
+ Verify every number before you act.
+ When the AI tells you to shift $67K from one channel to another, you can drill into the underlying users, clicks, and revenue events that produced the recommendation. No black box. No proprietary model you can't inspect. Every dollar of reallocation defensible to your CFO.
+ The bar for AI in marketing is whether you can act on what it says. Attribution is built for that bar.
+ Platform API Confusion
+ Platform APIs don't lie. They just can't see everything.
+ Conversion APIs report at the campaign level, not the user level. When Meta's API says a campaign generated $8 in revenue, it claims credit for every conversion that touched that campaign — even if Google also touched the same user. The data from conversion APIs will never add up to your bank account because the APIs were never designed to reconcile across platforms. Attribution solves this by tracking the actual user, summing the actual cost of every ad that user clicked across every platform, and comparing it to the actual revenue that user generated. That is why Attribution's numbers match the bank account — and why an AI recommendation built on Attribution data is something you can act on.
+ We fix the double-counting problem 
+ Meta Ad
+ $5.00
+ Google Ad
+ $5.00
+ &#10003;
+ Converts
+ $8.00 rev
+ What each source reports Meta Ads $8 rev on $5 spend +$3 profit 
+ Google Ads $8 rev on $5 spend +$3 profit 
+ Bank account $8 in, $10 out -$2 loss 
+ Attribution $8 rev on $10 spend -$2 loss MATCHES 
+ Attribution tracks cost at the user level , not the campaign level. One user, two ad clicks, $10 in real cost. No double-counting.
+ User-level cost data
+ Attribution calculates the actual cost of acquiring each individual visitor by binding real ad spend to each user's deterministic journey across channels and sessions. Without user-level cost data, ROAS is an estimate — platforms divide total campaign spend by platform-reported conversions, which double-count, over-attribute, and miss cross-channel paths entirely. Attribution eliminates this by tracking every dollar spent at the user and account level, producing true per-user CAC, ROAS, CAC Payback, and LTV:CAC metrics.
+ Learn how user-level cost tracking works 
+ Full data auditability
+ Any metric on any Attribution dashboard — a CAC figure, a ROAS percentage, a conversion count — can be clicked into and traced back to the underlying visits, touchpoints, cost allocations, and credit assignments that produced it. There is no black box. There are no ML layers between the raw data and the reported number. When a VP of Marketing presents attribution data to the CFO, every number can be defended with a clear trail from ad spend to site visit to conversion to revenue.
+ See how auditability works 
+ Customizable models
+ Attribution offers five multi-touch attribution models — first touch, last touch, linear, time decay, and position-based — each configurable in four distinct modes: include all traffic, exclude direct, include direct until a cutoff event, and exclude all after a cutoff event. The cutoff event modes are specifically designed for product-led growth and trial-based businesses where post-signup visits should not receive attribution credit.
+ Explore attribution models 
+ Raw data export
+ Attribution exports full-fidelity, raw visit-level and user-level data directly to Snowflake, BigQuery, and Redshift through a built-in ETL service, and to Amazon S3, Azure Blob Storage, and Google Cloud Storage. This is not aggregated summary data. The export includes every visit with timestamps, source, referrer, UTM parameters, on-site behavior, and user identity. Data teams can query this raw data in SQL, build custom models, and feed events into AI and ML pipelines.
+ See the data export schema 
+ These four capabilities are what make agentic analytics work. When an AI tells you to shift $67K from one channel to another, the recommendation traces back to individual users, individual clicks, and individual revenue events. Not modeled aggregates. Actual data.
+ Most attribution tools give you one or two of these four capabilities. Attribution is the only platform that delivers all four — user-level cost data, full auditability, customizable models, and raw data export — in a single product. That is why more than 1,000 companies trust Attribution to tell them the number that matches their bank account.
+ CRM
+ HubSpot Salesforce Pipedrive 
+ Attribution syncs lifecycle stages, deal/opportunity data, and closed-won revenue bidirectionally. Track which marketing touches influenced each deal through the full sales cycle. Account-based attribution binds user journeys to company accounts.
+ CDP and Analytics
+ Segment RudderStack Amplitude Heap 
+ Attribution sends user traits, conversion events, and cost data to your CDP and receives unified profiles and funnel events back. The Segment integration is bidirectional and deploys in a single click.
+ Ecommerce
+ Shopify BigCommerce 
+ Attribution's Shopify integration and CDP Connector give ecommerce brands full-funnel visibility from first ad click to first purchase to repeat revenue. Separate first-time purchaser costs from returning customer revenue. Plans start at $19/month.
+ Ad Platforms
+ Google Meta LinkedIn TikTok Pinterest Reddit Quora Microsoft + more 
+ Attribution pulls spend data directly from every major ad platform's API — not UTM-based estimates. This is how Attribution binds actual cost to each individual user's journey and produces ROAS numbers that match your bank account.
+ Payments
+ Stripe Recurly Zuora 
+ Attribution connects directly to your payment and subscription platform to pull real revenue data — not self-reported conversion values from ad platforms. This is what makes CAC Payback and LTV:CAC calculations accurate down to the individual user.
+ Data Warehouses
+ Snowflake BigQuery Redshift S3 Azure GCS 
+ Attribution exports raw visit-level and user-level data through built-in ETL. Your data team gets structured, queryable event data with cost, timestamps, and identity resolution — not aggregated summaries. Available as an add-on for any plan.
+ Check out integrations 
+ Attribution’s platform is foundational technology for marketing programs across our portfolio.
+ Aaron Cort 
+ Operating Partner @Craft
+ Attribution provides an additional analytics layer that helps brands investigate and understand how creators impact the greater user journey.
+ Victor Feijó 
+ Head of Engineering @Superfiliate
+ If you’re looking to save time and sanity when trying to knit your marketing data together, Attribution is a useful tool to give you insights and take a lot of that lift off your plate.
+ Perin Adams 
+ GTM Business Systems Manager @Vendr
+ Attribution enables us to understand what role each channel plays in the funnel. A higher CPA might be acceptable because we can see clearly that channel is bringing more people into the funnel.
+ John Gareau
+ CRO @Seraphina Therapeutics
+ Learn About Multi-Touch Attribution
+ Get actionable insights on attribution.
+ We know what you're thinking: "Great, another blog." This blog is different… why? We go deep into tactical, relevant and modern topics on attribution (changes quite often). Don't believe us? Take a look for yourself.
+ Read more topics 
+ $41K in Monthly Ad Spend. 30+ Campaigns. Only 3 Were Working. 
+ A marketplace company running Google Ads across every product vertical discovered that the vast majority of their… 
+ Ryan Koonce
+ 25 Mar 2026 
+ The Gift Box Brand That Stopped Trusting Meta’s Numbers — and Had Their Best Holiday Season Ever 
+ Happy Box was spending on Meta and Google without knowing what was actually working. Six months after implementing… 
+ Ryan Koonce
+ 25 Mar 2026 
+ $5M in Ad Spend. Two Agencies. Only One Could Prove It Was Working. 
+ An IT training school generating 10,000+ leads per month discovered that full-funnel attribution didn’t just optimize… 
+ Ryan Koonce
+ 25 Mar 2026 
+ Read more topics 
+ What is agentic marketing analytics? 
+ Agentic marketing analytics is a new approach to marketing measurement where an AI agent has direct access to your attribution data and can pull reports, analyze performance, compare models, and make optimization recommendations through natural language conversation. Instead of navigating dashboards and selecting from dropdowns, marketers ask questions like "what's my ROAS by channel this quarter" or "what should I change to improve performance next quarter" and receive complete reports and actionable recommendations in seconds. Attribution offers agentic marketing analytics through its native MCP (Model Context Protocol) server, which connects to Claude, Claude Desktop, and any MCP-compatible AI assistant.
+ What is the best AI tool for marketing attribution? 
+ An AI tool for marketing attribution is only as good as the data it works on. AI recommendations built on platform-reported conversion data inherit the structural double-counting problem of conversion APIs — multiple ad platforms each claim credit for the same revenue, so the recommendations are based on a number that doesn't match actual revenue. AI recommendations built on user-level data, where every ad dollar is tied to a specific person and every conversion is counted exactly once, produce numbers that match the payment system. Attribution tracks marketing performance at the user level and exposes that data to AI assistants like Claude through a native MCP server, so the recommendations match the bank account.
+ Can AI optimize my marketing budget? 
+ Yes, AI can analyze marketing performance data and recommend how to reallocate budget across channels, campaigns, and timeframes. The accuracy of those recommendations depends entirely on the underlying data. AI working on platform-reported conversion data inherits the double-counting problem that comes with conversion APIs — multiple platforms claiming credit for the same revenue. AI working on user-level attribution data, where every dollar of spend is tied to a specific person and every conversion is counted once, can produce recommendations that match what you'll actually see in your bank account. Attribution gives AI assistants like Claude direct access to this user-level data through its MCP server.
+ What is multi-touch attribution? 
+ Multi-touch attribution is a marketing measurement method that assigns credit to every touchpoint a customer interacts with before converting — not just the last click. It tracks the full journey across channels like paid search, social ads, email, and organic so marketers can see which combination of touches actually drives revenue. Unlike single-touch models, multi-touch attribution reveals how channels work together. Attribution supports five multi-touch attribution models — first touch, last touch, linear, time decay, and position-based — with configuration modes designed for both B2C ecommerce and B2B SaaS customer journeys.
+ What is the difference between multi-touch attribution and marketing mix modeling? 
+ Multi-touch attribution (MTA) tracks individual user journeys and assigns credit to specific touchpoints using deterministic, user-level data. Marketing mix modeling (MMM) uses aggregate statistical analysis to estimate how budget allocation across channels affects total revenue — it does not track individual users. MTA is precise but limited to trackable digital channels. MMM captures offline and brand effects but produces estimates, not exact measurements. The most complete measurement strategies use both, plus incrementality testing for causal validation. Attribution offers MTA, MMM, and incrementality testing on the same dataset, so teams don't need separate tools or contracts to compare them.
+ What is incrementality testing in marketing? 
+ Incrementality testing measures whether a marketing campaign caused conversions that would not have happened otherwise. The most common methods are geo holdout tests (run the campaign in some regions, pause it in others) and synthetic control tests. By comparing conversion rates between test and control groups, incrementality testing reveals the true causal impact of your spend — not just correlation. It is especially valuable for validating channels where attribution data is limited, like TV or brand campaigns. Attribution includes geo holdout and synthetic control testing alongside its multi-touch attribution and media mix modeling capabilities.
+ How do I measure marketing ROI accurately? 
+ Accurate marketing ROI measurement requires tracking the actual cost of acquiring each customer and the actual revenue they generate, at the user level. The most common reason ROI numbers are wrong is double-counting: when multiple ad platforms each claim credit for the same conversion, the sum of platform-reported revenue exceeds actual revenue. Accurate measurement requires deduplicating spend and revenue across platforms, attributing touchpoints to individual users, and tying both back to the actual payment system. Attribution is built around this approach — pulling spend from ad platform APIs, revenue from payment systems like Stripe, deal data from CRMs like HubSpot and Salesforce, and tying everything to individual user journeys across every channel.
+ Why doesn't my Facebook Ads revenue match my actual revenue? 
+ Facebook (Meta) Ads reports revenue based on its conversion API, which credits the platform for every conversion that touched any Meta campaign — even when Google, email, or organic also touched the same user. Other platforms do the same thing. When you sum platform-reported revenue across Meta, Google, TikTok, and others, the total will always exceed actual revenue in your payment system. This is a structural issue with how conversion APIs are designed, not a tracking error. Independent multi-touch attribution solves this by tracking each user across every channel and counting each revenue event exactly once. Attribution pulls spend directly from Meta, Google, and other ad platforms, deduplicates revenue across them, and ties everything back to the actual user.
+ What is the Model Context Protocol (MCP)? 
+ The Model Context Protocol (MCP) is an open standard, created by Anthropic, that allows AI assistants to securely connect to external data sources and tools. An MCP server exposes specific functions and data that an AI assistant can call during a conversation. For marketing analytics, an MCP server gives AI assistants like Claude direct, real-time access to attribution data — reports, conversion paths, channel performance, model comparisons — through natural language queries. Attribution's MCP server is built natively for marketing measurement and exposes 60+ endpoints covering the full attribution dataset.
+ Does Attribution work with Claude or other AI assistants? 
+ Yes. Attribution's MCP server connects to Claude, Claude Desktop, and any MCP-compatible AI assistant via OAuth. Once connected, the AI can query your live attribution data through 60+ endpoints covering reports, conversion paths, visitor lookup, company journeys, model comparison, and spend. Queries happen through natural language — ask in plain English, get the data back as a response in the conversation. No attribution data is stored by the AI itself. The Model Context Protocol is an open standard created by Anthropic.
+ What integrations does a marketing attribution platform need? 
+ A marketing attribution platform needs direct API connections to four categories of systems: ad platforms (to pull spend data), payment and subscription systems (to pull revenue data), CRM and customer databases (to tie touchpoints to deals and accounts), and data warehouses (to export raw event data for further analysis). UTM-based tracking alone isn't enough because it can't reconcile spend across platforms or tie individual users to real cost. Attribution connects to Google Ads, Meta, LinkedIn, TikTok, Stripe, HubSpot, Salesforce, Segment, Shopify, Snowflake, BigQuery, and more than 20 other systems across these four categories.
+ Now integrated with ChatGPT Ads! 
+ Learn More → 
+ Agentic Marketing Analytics. That matches your bank account.
+ Join 1,000+ companies allocating marketing budget with answers from real user-level data, not platform estimates.
+ Start Free Trial Book Demo

@@ -1,0 +1,159 @@
+Title: Oops, it's a 404 error.
+
+URL Source: https://www.airtable.com/templates/marketing/expn5K0dVW0c5bQzS/marketing-calendar
+
+Warning: Target URL returned error 404: Not Found
+
+Markdown Content:
+*   Platform & Products
+
+* * * 
+    *   [Airtable Platform Unlock the power of a next-gen app-building platform](https://www.airtable.com/platform)
+    *   [AI App Building NEW Enable teams to build custom business apps—no code needed](https://www.airtable.com/platform/app-building)
+    *   [AI Agents NEW Deploy thousands of agents inside your apps](https://www.airtable.com/platform/ai-agents)
+    *   [Portals Collaborate seamlessly with guest users outside your organization](https://www.airtable.com/platform/portals)
+    *   [Scale Build apps on top of massive data sets with 100M records](https://www.airtable.com/platform/hyperdb)
+    *   
+        *   Features
+
+* * * 
+            *   [Automations Achieve more in less time via automations](https://www.airtable.com/platform/automations)
+            *   [Databases Use relational databases to connect data from apps, workflows, and tools](https://www.airtable.com/platform/connected-data)
+            *   [Interfaces Create custom interfaces from your data](https://www.airtable.com/platform/interface-designer)
+            *   [Reporting Measure, analyze, and share insights](https://www.airtable.com/platform/reporting)
+            *   [Governance and Security Centrally manage security, permissions and data protection](https://www.airtable.com/platform/governance)
+            *   [Airtable AI Embed AI throughout end-to-end workflows](https://www.airtable.com/platform/ai)
+            *   [What's New See Airtable's latest product updates](https://www.airtable.com/whatsnew)
+
+*   Tools
+
+* * * 
+    *   
+        *   Integrations
+
+* * * 
+            *   [Slack Add real-time messaging to your workflows](https://www.airtable.com/integrations/slack)
+            *   [Google Drive Sync information and build workflows](https://www.airtable.com/integrations/google-drive)
+            *   [Salesforce Leverage CRM data across teams and tools](https://www.airtable.com/integrations/salesforce)
+            *   [Jira Generate tickets and sync work from Airtable](https://www.airtable.com/integrations/jira)
+            *   [Zendesk Simplify and streamline workflows](https://www.airtable.com/integrations/zendesk)
+            *   [See all integrations](https://www.airtable.com/integrations)
+
+    *   [Download Get the Airtable app for desktop and mobile](https://www.airtable.com/downloads)
+
+*   The Airtable Platform
+
+Propel your business with a next-gen app-building platform. See data move in real-time and securely transform your work with AI.
+
+[Explore the platform](https://www.airtable.com/platform) 
+![Image 1](https://static.airtable.com/images/marketing-nav-platform-graphic.webp) 
+
+*   
+Teams
+
+* * * 
+    *   [Product See what's happening across your portfolio, and ship better products.](https://www.airtable.com/solutions/product)
+    *   [Marketing Plan smarter campaigns and scale impact with unifed marketing workflows.](https://www.airtable.com/solutions/marketing)
+    *   [Project Management Strategic project management built for outcomes, not just to-do lists.](https://www.airtable.com/solutions/project-management)
+    *   [Operations Run operations in one platform that connects workflows, data, and tools.](https://www.airtable.com/solutions/operations)
+    *   [Sales Surface sales opportunities, spot churn risk early, and close more deals faster.](https://www.airtable.com/solutions/sales)
+    *   [Design & Creative Unify design workflows, stay on-brand, and innovate creative quickly.](https://www.airtable.com/solutions/design-creative-project-management)
+    *   [Human Resources Manage and streamline processes from hire to retire](https://www.airtable.com/solutions/hr)
+    *   [Finance Streamline requests, manage budgets, and automate reporting](https://www.airtable.com/solutions/finance)
+
+Industries
+
+* * *
+
+    *   [Media & Entertainment Run content production, digital assets, and crew operations in one place](https://www.airtable.com/solutions/media-entertainment)
+    *   [Retail Power critical retail workflows from product planning to final purchase](https://www.airtable.com/solutions/retail)
+    *   [CPG Manufacturing Keep track of your products, supply chain, and quality assurance](https://www.airtable.com/solutions/manufacturing)
+    *   [Education Manage student services, planning, and grants more efficiently](https://www.airtable.com/solutions/education)
+    *   [Technology Unite your entire SaaS org to drive faster GTM execution and greater impact.](https://www.airtable.com/solutions/saas-project-management)
+    *   [Agency & Professional Services Streamline coordination, protect margins, and deliver better client outcomes.](https://www.airtable.com/solutions/agency)
+
+*   Customer Story
+
+More money, fewer problems 
+How Code and Theory consolidated tooling and saved more than 10,000 hours with Airtable.
+
+[Learn more](https://www.airtable.com/customer-stories/code-and-theory) 
+![Image 2](https://static.airtable.com/images/marketing-nav-solution.webp) 
+
+*   Explore
+
+* * * 
+    *   
+        *   Resources Hub
+
+* * * 
+            *   [Reports](https://www.airtable.com/lp/resources?filter=reports)
+            *   [eBooks](https://www.airtable.com/lp/resources?filter=ebooks)
+            *   [Webinars](https://www.airtable.com/lp/resources?filter=webinars)
+            *   [Quick Reads](https://www.airtable.com/lp/resources?filter=quick-reads)
+            *   [Demos](https://www.airtable.com/lp/resources?filter=demos)
+            *   [See all resources](https://www.airtable.com/lp/resources)
+
+    *   
+        *   Templates
+
+* * * 
+            *   [Project Management New](https://www.airtable.com/templates/project-management/expnPwND0WA2x7nhJ)
+            *   [Content Calendar](https://www.airtable.com/templates/content-calendar/exp3FNmOkdHZvprXB)
+            *   [Event Planning](https://www.airtable.com/templates/event-planning/expKIiL87pUceFRjc)
+            *   [Product Roadmap](https://www.airtable.com/templates/product-roadmap/exphVKuL99S35ZsMi)
+            *   [Organizational Chart](https://www.airtable.com/templates/corporate-organizational-chart/expgMvC4WkxpKviHn)
+            *   [Resource Allocation New](https://www.airtable.com/templates/resource-allocation/expMLg1OTd4pKVxCU)
+            *   [Social Media Calendar](https://www.airtable.com/templates/social-media-calendar/expgEkxMmWRqpa43k)
+            *   [Marketing Campaign Tracker](https://www.airtable.com/templates/marketing-campaign-tracking/expNoL0sYUbOogSCm)
+            *   [Product Launch](https://www.airtable.com/templates/product-launch/expbtFa3nsLpIQfgk)
+            *   [Content Strategy](https://www.airtable.com/templates/content-strategy/exp1nfqhaFgeAyk2f)
+            *   [Product Strategy](https://www.airtable.com/templates/product-strategy/expbov1cc8Qb05egC)
+            *   [Inventory Tracker](https://www.airtable.com/templates/inventory-tracker/expDrHGuyjSQlrKTq)
+            *   [Product Catalog](https://www.airtable.com/templates/product-catalog-and-orders/expZvMLT9L6c4yeBX)
+            *   [See all templates](https://www.airtable.com/templates)
+
+    *   [AI Plays](https://www.airtable.com/ai-plays)
+    *   [Blog](https://www.airtable.com/articles)
+    *   [Customer Stories](https://www.airtable.com/customer-stories)
+    *   [Videos](https://www.airtable.com/videos)
+    *   [Events](https://www.airtable.com/events-webinars)
+
+*   Learn & Support
+
+* * * 
+    *   [Airtable Academy](https://academy.airtable.com/)
+    *   [Airtable Community](https://community.airtable.com/)
+    *   
+        *   Developers
+
+* * * 
+            *   [Dev Community Share ideas and find solutions from peers](https://community.airtable.com/t5/development-apis/bd-p/development)
+            *   [API Docs Build with the Airtable API](https://airtable.com/developers/web/api/introduction)
+            *   [Custom Extensions Create real-time, interactive extensions](https://airtable.com/developers/apps)
+            *   [Scripting Build something custom with scripts](https://airtable.com/developers/scripting)
+
+    *   [How-to guides](https://www.airtable.com/guides)
+    *   
+        *   Support
+
+* * * 
+            *   [Help center](https://support.airtable.com/)
+            *   [Contact Support](https://support.airtable.com/docs/contacting-airtable-support)
+
+*   Ecosystem
+
+* * * 
+    *   [Marketplace](https://airtable.com/marketplace)
+    *   [Partners](https://www.airtable.com/partners)
+    *   [Services](https://www.airtable.com/services)
+
+*   Resource Center
+
+Stay one step ahead of the trends 
+This content is packed with demos, best practices, industry trends, and more. See how to win in a fast-moving market.
+
+[Explore all resources](https://www.airtable.com/lp/resources) 
+![Image 3](https://static.airtable.com/images/marketing-nav-resource.webp) 
+
+[Enterprise](https://www.airtable.com/solutions/enterprise)[Pricing](https://airtable.com/pricing)

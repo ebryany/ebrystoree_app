@@ -1,0 +1,460 @@
+Title: See What GRIN Can Do | Creator Marketing Platform Features
+
+URL Source: https://grin.co/product/
+
+Markdown Content:
+![Image 2: logo](blob:http://localhost/4eb6460ab93a7ae1978320dda45af1eb)
+
+[](https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2)
+
+*   [Consent](https://grin.co/product/#)
+*   [Details](https://grin.co/product/#)
+*   [[#IABV2SETTINGS#]](https://grin.co/product/#)
+*   [About](https://grin.co/product/#)
+
+This website uses cookies
+
+We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information that you’ve provided to them or that they’ve collected from your use of their services.
+
+[[#DSR_FORM_URL_TEXT#]](https://grin.co/product/[#DSR_FORM_URL#])
+
+[#GPC_BANNER_ICON#]
+
+[#GPC_TOAST_TEXT#]
+
+Consent Selection
+
+**Necessary** 
+
+- [x] 
+
+**Preferences** 
+
+- [x] 
+
+**Statistics** 
+
+- [x] 
+
+**Marketing** 
+
+- [x] 
+
+[Show details](https://grin.co/product/#)
+
+Details
+
+*   
+Necessary 48- [x]    Necessary cookies help make a website usable by enabling basic functions like page navigation and access to secure areas of the website. The website cannot function properly without these cookies. 
+
+    *   [Cloudflare 1](https://grin.co/product/#)[Learn more about this provider![Image 3: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.cloudflare.com/privacypolicy/ "Learn more about this provider Cloudflare's privacy policy - opens in a new window")**cf.turnstile.u**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [Cookiebot 1](https://grin.co/product/#)[Learn more about this provider![Image 4: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.cookiebot.com/goto/privacy-policy/ "Learn more about this provider Cookiebot's privacy policy - opens in a new window")**CookieConsent**Stores the user's cookie consent state for the current domain**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [Google 2](https://grin.co/product/#)[Learn more about this provider![Image 5: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://business.safety.google/privacy/ "Learn more about this provider Google's privacy policy - opens in a new window")Some of the data collected by this provider is for the purposes of personalization and measuring advertising effectiveness. The provider may use the IP Addresses for ads measurement and ads personalization.
+
+**test_cookie**Used to check if the user's browser supports cookies.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **_GRECAPTCHA**This cookie is used to distinguish between humans and bots. This is beneficial for the website, in order to make valid reports on the use of their website.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie   
+    *   [HubSpot 6](https://grin.co/product/#)[Learn more about this provider![Image 6: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://legal.hubspot.com/privacy-policy "Learn more about this provider HubSpot's privacy policy - opens in a new window")**cookietest**This cookie is used to determine if the visitor has accepted the cookie consent box.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **rc::a**This cookie is used to distinguish between humans and bots. This is beneficial for the website, in order to make valid reports on the use of their website.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **rc::b**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **rc::c**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **rc::d-15#**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **rc::f**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [Instagram 1](https://grin.co/product/#)[Learn more about this provider![Image 7: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://help.instagram.com/519522125107875 "Learn more about this provider Instagram's privacy policy - opens in a new window")**csrftoken**Helps prevent Cross-Site Request Forgery (CSRF) attacks.**Maximum Storage Duration**: 400 days**Type**: HTTP Cookie   
+    *   [LinkedIn 3](https://grin.co/product/#)[Learn more about this provider![Image 8: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider LinkedIn's privacy policy - opens in a new window")**li_gc**Stores the user's cookie consent state for the current domain**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie  **bscookie**This cookie is used to identify the visitor through an application. This allows the visitor to login to a website through their LinkedIn application for example.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **JSESSIONID**Preserves users states across page requests.**Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [Linkedin 1](https://grin.co/product/#)[Learn more about this provider![Image 9: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider Linkedin's privacy policy - opens in a new window")**testcookie**This cookie determines whether the browser accepts cookies.**Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [Pinterest 1](https://grin.co/product/#)[Learn more about this provider![Image 10: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://policy.pinterest.com/en/privacy-policy "Learn more about this provider Pinterest's privacy policy - opens in a new window")**is_eu**Determines whether the user is located within the EU and therefore is subject to EU's data privacy regulations. **Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [Twitch 5](https://grin.co/product/#)[Learn more about this provider![Image 11: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.twitch.tv/p/legal/privacy-policy/ "Learn more about this provider Twitch's privacy policy - opens in a new window")**session_storage_unique_id**This cookie is necessary for the login function on the website. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **api_token**Necessary for the implementation of video-content on the website.**Maximum Storage Duration**: 13 months**Type**: HTTP Cookie  **server_session_id**Registers which server-cluster is serving the visitor. This is used in context with load balancing, in order to optimize user experience. **Maximum Storage Duration**: Session**Type**: HTTP Cookie  **unique_id**Preserves users states across page requests.**Maximum Storage Duration**: 13 months**Type**: HTTP Cookie  **unique_id_durable**Registers whether the user is logged in. This allows the website owner to make parts of the website inaccessible, based on the user's log-in status. **Maximum Storage Duration**: 13 months**Type**: HTTP Cookie   
+    *   [client.protechts.net 3](https://grin.co/product/#)**_px3**Used in context with the website's BotManager. The BotManager detects, categorizes and compiles reports on potential bots trying to access the website.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **_pxvid**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **pxcts**This cookie is used to distinguish between humans and bots. **Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [g2.com g2crowd.com grin.co hsadspixel.net hs-banner.com hubspotusercontent-na1.net linkedin.com newspapers.com ploy.ai t.co x.com 20](https://grin.co/product/#)**__cf_bm[x20]**This cookie is used to distinguish between humans and bots. This is beneficial for the website, in order to make valid reports on the use of their website.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie   
+    *   [grin.co 3](https://grin.co/product/#)**unifiedScriptVerified**Verifies the status of a script.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **user_agent**Used to store the user agent of the user**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **wpEmojiSettingsSupports**This cookie is part of a bundle of cookies which serve the purpose of content delivery and presentation. The cookies keep the correct state of font, blog/picture sliders, color themes and other website settings.**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [zoominfo.com 1](https://grin.co/product/#)**_cfuvid**This cookie is a part of the services provided by Cloudflare - Including load-balancing, deliverance of website content and serving DNS connection for website operators. **Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+
+*   
+Preferences 5- [x]    Preference cookies enable a website to remember information that changes the way the website behaves or looks, like your preferred language or the region that you are in. 
+
+    *   [Acast 1](https://grin.co/product/#)[Learn more about this provider![Image 12: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.acast.com/privacy "Learn more about this provider Acast's privacy policy - opens in a new window")**AcastLang**This cookie is used to determine the preferred language of the visitor and sets the language accordingly on the website, if possible.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [LinkedIn 1](https://grin.co/product/#)[Learn more about this provider![Image 13: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider LinkedIn's privacy policy - opens in a new window")**li_alerts**Used to determine when and where certain pop-ups on the website should be presented for the user and remember whether the user has closed these, to keep them from showing multiple times.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [Twitch 2](https://grin.co/product/#)[Learn more about this provider![Image 14: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.twitch.tv/p/legal/privacy-policy/ "Learn more about this provider Twitch's privacy policy - opens in a new window")**local_copy_unique_id[x2]**Contains data on visitor's video-content preferences - This allows the website to remember parameters such as preferred volume or video quality. The service is provided by Vimeo.com.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [Vidyard 1](https://grin.co/product/#)[Learn more about this provider![Image 15: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.vidyard.com/privacy/ "Learn more about this provider Vidyard's privacy policy - opens in a new window")**vidyardSettings**Used to determine the optimal video quality based on the visitor's device and network settings. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+
+*   
+Statistics 37- [x]    Statistic cookies help website owners to understand how visitors interact with websites by collecting and reporting information anonymously. 
+
+    *   [G2Crowd 1](https://grin.co/product/#)[Learn more about this provider![Image 16: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.g2crowd.com/static/privacy "Learn more about this provider G2Crowd's privacy policy - opens in a new window")**g2tracking**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [Google 2](https://grin.co/product/#)[Learn more about this provider![Image 17: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://business.safety.google/privacy/ "Learn more about this provider Google's privacy policy - opens in a new window")Some of the data collected by this provider is for the purposes of personalization and measuring advertising effectiveness. The provider may use the IP Addresses for ads measurement and ads personalization.
+
+**_ga**Registers a unique ID that is used to generate statistical data on how the visitor uses the website.**Maximum Storage Duration**: 2 years**Type**: HTTP Cookie  **_ga_#**Used by Google Analytics to collect data on the number of times a user has visited the website as well as dates for the first and most recent visit. **Maximum Storage Duration**: 2 years**Type**: HTTP Cookie   
+    *   [Greenhouse 2](https://grin.co/product/#)[Learn more about this provider![Image 18: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.greenhouse.io/privacy-policy "Learn more about this provider Greenhouse's privacy policy - opens in a new window")**_sp_root_domain_test_#[x2]**Registers statistical data on users' behaviour on the website. Used for internal analytics by the website operator. **Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [HubSpot 5](https://grin.co/product/#)[Learn more about this provider![Image 19: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://legal.hubspot.com/privacy-policy "Learn more about this provider HubSpot's privacy policy - opens in a new window")**sentryReplaySession**Registers data on visitors' website-behaviour. This is used for internal analysis and website optimization. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **__hssc**Identifies if the cookie data needs to be updated in the visitor's browser.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **__hssrc**Used to recognise the visitor's browser upon reentry on the website.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__hstc**Sets a unique ID for the session. This allows the website to obtain data on visitor behaviour for statistical purposes.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie  **hubspotutk**Sets a unique ID for the session. This allows the website to obtain data on visitor behaviour for statistical purposes.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie   
+    *   [LinkedIn 2](https://grin.co/product/#)[Learn more about this provider![Image 20: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider LinkedIn's privacy policy - opens in a new window")**browser_id**Used to recognise the visitor's browser upon reentry on the website.**Maximum Storage Duration**: 5 years**Type**: HTTP Cookie  **sequenceNumber#sequenceNumber**Used to track which sequence of events was done by the user during a session**Maximum Storage Duration**: Persistent**Type**: IndexedDB   
+    *   [Microsoft 4](https://grin.co/product/#)[Learn more about this provider![Image 21: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://privacy.microsoft.com/en-us/privacystatement "Learn more about this provider Microsoft's privacy policy - opens in a new window")**c.gif**Collects data on the user’s navigation and behavior on the website. This is used to compile statistical reports and heatmaps for the website owner.**Maximum Storage Duration**: Session**Type**: Pixel Tracker  **_clck**Collects data on the user’s navigation and behavior on the website. This is used to compile statistical reports and heatmaps for the website owner.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **_clsk**Registers statistical data on users' behaviour on the website. Used for internal analytics by the website operator. **Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **_cltk**Registers statistical data on users' behaviour on the website. Used for internal analytics by the website operator. **Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [SalesLoft 2](https://grin.co/product/#)[Learn more about this provider![Image 22: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://salesloft.com/privacy-policies/ "Learn more about this provider SalesLoft's privacy policy - opens in a new window")**sliguid**Contains an visitor ID - This is used to track visitors' navigation and interaction on the website for internal website-optimization. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **slirequested**Contains an visitor ID - This is used to track visitors' navigation and interaction on the website for internal website-optimization. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [TikTok 1](https://grin.co/product/#)[Learn more about this provider![Image 23: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.tiktok.com/legal/privacy-policy?lang=en "Learn more about this provider TikTok's privacy policy - opens in a new window")**_tt_enable_cookie**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [Twitter Inc.1](https://grin.co/product/#)[Learn more about this provider![Image 24: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://twitter.com/en/privacy "Learn more about this provider Twitter Inc.'s privacy policy - opens in a new window")**personalization_id**This cookie is set by Twitter - The cookie allows the visitor to share content from the website onto their Twitter profile. **Maximum Storage Duration**: 400 days**Type**: HTTP Cookie   
+    *   [Vidyard 2](https://grin.co/product/#)[Learn more about this provider![Image 25: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.vidyard.com/privacy/ "Learn more about this provider Vidyard's privacy policy - opens in a new window")**{"words":[#,#,#,#,#],"sigBytes":20}**Used by Vidyard. Registers statistical data on users' behaviour on the website. Used for internal analytics by the website operator.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **visitorId**Registers statistical data on users' behaviour on the website. Used for internal analytics by the website operator. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [YouTube 1](https://grin.co/product/#)[Learn more about this provider![Image 26: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://business.safety.google/privacy/ "Learn more about this provider YouTube's privacy policy - opens in a new window")**LogsDatabaseV2:V#||LogsRequestsStore**Used by Youtube for logging events**Maximum Storage Duration**: Persistent**Type**: IndexedDB   
+    *   [ZoomInfo 1](https://grin.co/product/#)[Learn more about this provider![Image 27: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.zoominfo.com/legal/privacy-policy "Learn more about this provider ZoomInfo's privacy policy - opens in a new window")**_zitok**First-party cookie set by ZoomInfo to identify unique visitors.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [grin.co 13](https://grin.co/product/#)**ziwsSession**Collects statistics on the user's visits to the website, such as the number of visits, average time spent on the website and what pages have been read.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **ziwsSessionId**Collects statistics on the user's visits to the website, such as the number of visits, average time spent on the website and what pages have been read.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **cookiecookie**This cookie is used by the website’s operator in context with multi-variate testing. This is a tool used to combine or change content on the website. This allows the website to find the best variation/edition of the site.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **first_traffic_source**Used to track how a user initially arrived at the website.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_landing_page**Used by the website's owners to identify how the visitor accessed the website. This is used for statistical purposes. **Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_landing_page_base**Used to track the landing page that a user first visited when they arrived at the website.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_ref_domain**Used to contain an ID for referral partners.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_url**Used by the website's owners to identify how the visitor accessed the website. This is used for statistical purposes. **Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_url_base**Detects how the user reached the website by registering their last URL-address.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handlID**Assigns a specific ID to the visitor. This allows the website to determine the number of specific user-visits for analysis and statistics.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **organic_source**Detects how the user reached the website by registering their last URL-address.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **organic_source_str**Detects how the user reached the website by registering their last URL-address.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **traffic_source**Used by the website's owners to identify how the visitor accessed the website. This is used for statistical purposes. **Maximum Storage Duration**: 30 days**Type**: HTTP Cookie   
+
+*   
+Marketing 77- [x]    Marketing cookies are used to track visitors across websites. The intention is to display ads that are relevant and engaging for the individual user and thereby more valuable for publishers and third party advertisers. 
+
+    *   [Google 4](https://grin.co/product/#)[Learn more about this provider![Image 28: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://business.safety.google/privacy/ "Learn more about this provider Google's privacy policy - opens in a new window")Some of the data collected by this provider is for the purposes of personalization and measuring advertising effectiveness. The provider may use the IP Addresses for ads measurement and ads personalization.
+
+**IDE**Used by Google DoubleClick to register and report the website user's actions after viewing or clicking one of the advertiser's ads with the purpose of measuring the efficacy of an ad and to present targeted ads to the user.**Maximum Storage Duration**: 400 days**Type**: HTTP Cookie  **pagead/1p-user-list/#**Tracks if the user has shown interest in specific products or events across multiple websites and detects how the user navigates between sites. This is used for measurement of advertisement efforts and facilitates payment of referral-fees between websites.**Maximum Storage Duration**: Session**Type**: Pixel Tracker  **_gcl_au**Used by Google AdSense for experimenting with advertisement efficiency across websites using their services. **Maximum Storage Duration**: 3 months**Type**: HTTP Cookie  **_gcl_ls**Tracks the conversion rate between the user and the advertisement banners on the website - This serves to optimise the relevance of the advertisements on the website. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [HubSpot 1](https://grin.co/product/#)[Learn more about this provider![Image 29: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://legal.hubspot.com/privacy-policy "Learn more about this provider HubSpot's privacy policy - opens in a new window")**__ptq.gif**Sends data to the marketing platform Hubspot about the visitor's device and behaviour. Tracks the visitor across devices and marketing channels.**Maximum Storage Duration**: Session**Type**: Pixel Tracker   
+    *   [LinkedIn 3](https://grin.co/product/#)[Learn more about this provider![Image 30: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider LinkedIn's privacy policy - opens in a new window")**bcookie**Used by the social networking service, LinkedIn, for tracking the use of embedded services.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **lang**Set by LinkedIn when a web page contains an embedded "Follow us" panel.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **lidc**Used by the social networking service, LinkedIn, for tracking the use of embedded services.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie   
+    *   [Microsoft 13](https://grin.co/product/#)[Learn more about this provider![Image 31: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://privacy.microsoft.com/en-US/privacystatement "Learn more about this provider Microsoft's privacy policy - opens in a new window")**_uetsid**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **_uetsid_exp**Contains the expiry-date for the cookie with corresponding name. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **_uetvid**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **_uetvid_exp**Contains the expiry-date for the cookie with corresponding name. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **MR[x2]**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: 7 days**Type**: HTTP Cookie  **MUID[x2]**Used widely by Microsoft as a unique user ID. The cookie enables user tracking by synchronising the ID across many Microsoft domains.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **SRM_B**Tracks the user’s interaction with the website’s search-bar-function. This data can be used to present the user with relevant products or services. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **ANONCHK**Registers data on visitors from multiple visits and on multiple websites. This information is used to measure the efficiency of advertisement on websites. **Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **SM**Registers a unique ID that identifies the user's device during return visits across websites that use the same ad network. The ID is used to allow targeted ads.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **_uetsid**Collects data on visitor behaviour from multiple websites, in order to present more relevant advertisement - This also allows the website to limit the number of times that they are shown the same advertisement. **Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **_uetvid**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [Pinterest 2](https://grin.co/product/#)[Learn more about this provider![Image 32: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://policy.pinterest.com/en/privacy-policy "Learn more about this provider Pinterest's privacy policy - opens in a new window")**_pin_unauth**Used by Pinterest to track the usage of services.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **v3/**Used by Pinterest to track the usage of services.**Maximum Storage Duration**: Session**Type**: Pixel Tracker   
+    *   [Quora 1](https://grin.co/product/#)[Learn more about this provider![Image 33: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://nl.quora.com/about/privacy "Learn more about this provider Quora's privacy policy - opens in a new window")**_/ad/75aa344edeef4dbfa3b3dd7cb5f40e6f/pixel**Collects data on user behaviour and interaction in order to optimize the website and make advertisement on the website more relevant. **Maximum Storage Duration**: Session**Type**: Pixel Tracker   
+    *   [Reddit 1](https://grin.co/product/#)[Learn more about this provider![Image 34: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.redditinc.com/policies/privacy-policy "Learn more about this provider Reddit's privacy policy - opens in a new window")**_rdt_uuid**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: 3 months**Type**: HTTP Cookie   
+    *   [SalesLoft 1](https://grin.co/product/#)[Learn more about this provider![Image 35: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://salesloft.com/privacy-policies/ "Learn more about this provider SalesLoft's privacy policy - opens in a new window")**slireg**Registers user behaviour and navigation on the website, and any interaction with active campaigns. This is used for optimizing advertisement and for efficient retargeting. **Maximum Storage Duration**: 7 days**Type**: HTTP Cookie   
+    *   [Salesloft 1](https://grin.co/product/#)[Learn more about this provider![Image 36: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://salesloft.com/privacy-policies/ "Learn more about this provider Salesloft's privacy policy - opens in a new window")**site_identity**Collects data on user behaviour and interaction in order to optimize the website and make advertisement on the website more relevant. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [Spotify 2](https://grin.co/product/#)[Learn more about this provider![Image 37: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.spotify.com/uk/legal/privacy-policy/ "Learn more about this provider Spotify's privacy policy - opens in a new window")**sp_landing**Used to implement audio-content from Spotify on the website. Can also be used to register user interaction and preferences in context with audio-content - This can serve statistics and marketing purposes. **Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **sp_t**Used to implement audio-content from Spotify on the website. Can also be used to register user interaction and preferences in context with audio-content - This can serve statistics and marketing purposes. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie   
+    *   [TikTok 10](https://grin.co/product/#)[Learn more about this provider![Image 38: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.tiktok.com/legal/privacy-policy?lang=en "Learn more about this provider TikTok's privacy policy - opens in a new window")**tt_appInfo**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **tt_pixel_session_index**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **tt_sessionId**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **_ttp[x2]**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **ttcsid**Used to track visitors on multiple websites, in order to present relevant advertisement based on the visitor's preferences. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **ttcsid_#**Tracks the conversion rate between the user and the advertisement banners on the website - This serves to optimise the relevance of the advertisements on the website. **Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **ttwid**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: 1 year**Type**: HTTP Cookie  **__tt_embed__mounting**Registers data on the performance of the website’s embedded video-content. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **__tt_embed__storage_test**Registers data on the performance of the website’s embedded video-content. **Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [Twitch 8](https://grin.co/product/#)[Learn more about this provider![Image 39: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.twitch.tv/p/legal/privacy-policy/ "Learn more about this provider Twitch's privacy policy - opens in a new window")**local_storage_app_session_id[x2]**Necessary for the implementation and functionality of Twitch video-content on the website. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **local_storage_device_id[x2]**Necessary for the implementation and functionality of Twitch video-content on the website. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **sentry_device_id[x2]**Required for the embedded media player to operate. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **session_storage_last_visited_twitch_url**Necessary for the implementation and functionality of Twitch video-content on the website. **Maximum Storage Duration**: Session**Type**: HTML Local Storage  **experiment_overrides**Collects data on the user across websites - This data is used to make advertisement more relevant.**Maximum Storage Duration**: 13 months**Type**: HTTP Cookie   
+    *   [Twitter Inc.3](https://grin.co/product/#)[Learn more about this provider![Image 40: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://twitter.com/en/privacy "Learn more about this provider Twitter Inc.'s privacy policy - opens in a new window")**i/adsct[x2]**The cookie is used by Twitter.com in order to determine the number of visitors accessing the website through Twitter advertisement content. **Maximum Storage Duration**: Session**Type**: Pixel Tracker  **muc_ads**Collects data on user behaviour and interaction in order to optimize the website and make advertisement on the website more relevant. **Maximum Storage Duration**: 400 days**Type**: HTTP Cookie   
+    *   [YouTube 11](https://grin.co/product/#)[Learn more about this provider![Image 41: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://business.safety.google/privacy/ "Learn more about this provider YouTube's privacy policy - opens in a new window")**__Secure-ROLLOUT_TOKEN**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie  **__Secure-YEC**Stores the user's video player preferences using embedded YouTube video**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__Secure-YNID**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie  **LAST_RESULT_ENTRY_KEY**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **ServiceWorkerLogsDatabase#SWHealthLog**Necessary for the implementation and functionality of YouTube video-content on the website. **Maximum Storage Duration**: Persistent**Type**: IndexedDB  **TESTCOOKIESENABLED**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **VISITOR_INFO1_LIVE**Tries to estimate the users' bandwidth on pages with integrated YouTube videos.**Maximum Storage Duration**: 180 days**Type**: HTTP Cookie  **YSC**Registers a unique ID to keep statistics of what videos from YouTube the user has seen.**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **yt-icons-last-purged**Necessary for the implementation and functionality of YouTube video-content on the website. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **ytidb::LAST_RESULT_ENTRY_KEY**Stores the user's video player preferences using embedded YouTube video**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **YtIdbMeta#databases**Used to track user’s interaction with embedded content.**Maximum Storage Duration**: Persistent**Type**: IndexedDB   
+    *   [client.protechts.net 1](https://grin.co/product/#)**pxsid**Registers data on visitor such as IP addresses, geographical location and advertisement interaction. This information is used optimize the advertisement on websites that make use of Rubicon Project-services. **Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [grin.co 2](https://grin.co/product/#)**handl_original_ref**Registers how the user has reached the website to enable pay-out of referral commission fees to partners.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie  **handl_ref**Registers how the user has reached the website to enable pay-out of referral commission fees to partners.**Maximum Storage Duration**: 30 days**Type**: HTTP Cookie   
+    *   [k.twitchcdn.net 1](https://grin.co/product/#)**KP_UIDz-ssn**Necessary for the implementation and functionality of Twitch video-content on the website. **Maximum Storage Duration**: 1 day**Type**: HTTP Cookie   
+    *   [sf16-website-login.neutral.tiktokcdn-eu.com 7](https://grin.co/product/#)**__tea_cache_first_#**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **__tea_cache_tokens_#**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **__tea_sdk_ab_version_#**Collects data on visitors' preferences and behaviour on the website - This information is used make content and advertisement more relevant to the specific visitor. **Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **PUMBAA_FREQ**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **SLARDARtiktok_web_embed**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **xmsi**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **xmst**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [sf16-website-login.neutral.ttwstatic.com 1](https://grin.co/product/#)**__tea_session_id_#**Used by the social networking service, TikTok, for tracking the use of embedded services.**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [sf16-website-login.neutral.ttwstatic.com sf16-website-login.neutral.tiktokcdn-eu.com 2](https://grin.co/product/#)**msToken[x2]**Collects information on user behaviour on multiple websites. This information is used in order to optimize the relevance of advertisement on the website.**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [tiktokw.eu sf16-website-login.neutral.ttwstatic.com 2](https://grin.co/product/#)**msToken[x2]**Collects information on user behaviour on multiple websites. This information is used in order to optimize the relevance of advertisement on the website.**Maximum Storage Duration**: 10 days**Type**: HTTP Cookie   
+
+*   Unclassified 88 Unclassified cookies are cookies that we are in the process of classifying, together with the providers of individual cookies.  
+
+    *   [Greenhouse 2](https://grin.co/product/#)[Learn more about this provider![Image 42: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.greenhouse.io/privacy-policy "Learn more about this provider Greenhouse's privacy policy - opens in a new window")**gh-test**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **snowplowOutQueue_job-board-renderer-tracker**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [LinkedIn 3](https://grin.co/product/#)[Learn more about this provider![Image 43: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider LinkedIn's privacy policy - opens in a new window")**li_apfcdc[x2]**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **dms/image/sync/v2/C4D27AQE708ka9Raxlg/articleshare-shrink_800/articleshare-shrink_800/0/1651547324278**Pending**Maximum Storage Duration**: Session**Type**: Pixel Tracker   
+    *   [Linkedin 1](https://grin.co/product/#)[Learn more about this provider![Image 44: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.linkedin.com/legal/privacy-policy "Learn more about this provider Linkedin's privacy policy - opens in a new window")**_fs_ch_st_FSBmUei20MqUiJb9**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [Twitch 5](https://grin.co/product/#)[Learn more about this provider![Image 45: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.twitch.tv/p/legal/privacy-policy/ "Learn more about this provider Twitch's privacy policy - opens in a new window")**_amazon_ivs_dc_player-web-v1_b8e4f7c1[x2]**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **amazon_ivs_device_config_v1_player-web-v1_data**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **amazon_ivs_device_config_v1_player-web-v1_state**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **KP_UIDz**Pending**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie   
+    *   [Twitter Inc.1](https://grin.co/product/#)[Learn more about this provider![Image 46: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://twitter.com/en/privacy "Learn more about this provider Twitter Inc.'s privacy policy - opens in a new window")**i/jot/embeds**Pending**Maximum Storage Duration**: Session**Type**: Pixel Tracker   
+    *   [ZoomInfo 2](https://grin.co/product/#)[Learn more about this provider![Image 47: opens in a new window](blob:http://localhost/7c37f61654102a88a9be209f9569ef78)](https://www.zoominfo.com/legal/privacy-policy "Learn more about this provider ZoomInfo's privacy policy - opens in a new window")**ziPendingTelemetry**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **ziScriptSession**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [client.protechts.net 6](https://grin.co/product/#)**PXdOjV695v_px_c_p_PXdOjV695v**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **PXdOjV695v_px_hvd**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **PXdOjV695v_px_nfsp**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **PXdOjV695v_px-ff**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **_pxttld[x2]**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+    *   [formfacade.com 2](https://grin.co/product/#)**ff_did**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **ff_sess**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [grin.co 58](https://grin.co/product/#)**__ploy_tld_0ht9gce6xz1**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_4jy0n6t86fu**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_5cfibporqv9**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_5fktfdph6hi**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_6y895ax6rzw**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_7ldqpszief8**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_8f0hyscziip**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_8shnkonvahv**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_8tm2nglewa2**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_8wqsyva7cmb**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_95exps6548e**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_9q4j60r6tgv**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_a0yel7ubwp**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_aga9m59hxr**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_aog21kb72qw**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_evq572evvr4**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_hc0es0kojch**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_io9a3ogkpz7**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_jhswlay2p2s**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_jmurgr3eccj**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_jse0yq055ho**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_jsiys77n42l**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_jw9d7fam14c**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_krewpydon1l**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_ky9y4av217**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_l6jtsvb5dp**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_lvp91q0va4**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_mnw5aj1nx6l**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_mw9binsdjk**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_najx46rnbjg**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_ntidjpzno3**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_o9uh0pswbxn**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_orotwrl6gq**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_oyv8bd1qqfs**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_p0tx8e8nyx**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_p35gbi4wt1**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_prtbv58s9nl**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_ptaqduml9fg**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_rakib9hevkh**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_s71lip6k38m**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_sove5unhjha**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_tl4vu0g14d**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_umezytdd958**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_upjgy9hb2wp**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_upnfhuuu7vq**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_utloe88ge2t**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_vvsvsgasuqc**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_x2keno4kr5p**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_xr6hre8sikk**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_zh4x84lcxip**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_zqo79zqzoz**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **__ploy_tld_zqtwi24dis**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **HandLtestDomainNameServer**Pending**Maximum Storage Duration**: 1 day**Type**: HTTP Cookie  **ploy_anon_id**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **ploy_anon_id**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **ploy_session**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **ref_url**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage  **visitedPages**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [sf16-website-login.neutral.tiktokcdn-eu.com 5](https://grin.co/product/#)**__tea_cache_first_345918**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **HYBRID_SLARDAR_WEBtiktok_pns_web_runtime**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **LOCAL_IS_EFFECTIVE**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **SLARDARpns_consent_system**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage  **SLARDARpns_cookie_banner_slardar**Pending**Maximum Storage Duration**: Persistent**Type**: HTML Local Storage   
+    *   [sf16-website-login.neutral.ttwstatic.com 1](https://grin.co/product/#)**__tea_session_id_345918**Pending**Maximum Storage Duration**: Session**Type**: HTML Local Storage   
+    *   [static.ads-twitter.com 2](https://grin.co/product/#)**_twpid**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie  **_twsid**Pending**Maximum Storage Duration**: Session**Type**: HTTP Cookie   
+
+[Cross-domain consent[#BULK_CONSENT_DOMAINS_COUNT#]](https://grin.co/product/#)
+
+[#BULK_CONSENT_TITLE#]
+
+List of domains your consent applies to: [#BULK_CONSENT_DOMAINS#]
+
+Cookie declaration last updated on 9/17/26 by [Cookiebot](https://www.cookiebot.com/)
+
+[#IABV2_TITLE#]
+
+[#IABV2_BODY_INTRO#]
+
+[#IABV2_BODY_LEGITIMATE_INTEREST_INTRO#]
+
+[#IABV2_BODY_PREFERENCE_INTRO#]
+
+[#IABV2_LABEL_PURPOSES#]
+
+[#IABV2_BODY_PURPOSES_INTRO#]
+
+[#IABV2_BODY_PURPOSES#]
+
+[#IABV2_LABEL_FEATURES#]
+
+[#IABV2_BODY_FEATURES_INTRO#]
+
+[#IABV2_BODY_FEATURES#]
+
+[#IABV2_LABEL_PARTNERS#]
+
+[#IABV2_BODY_PARTNERS_INTRO#]
+
+[#IABV2_BODY_PARTNERS#]
+
+About
+
+Cookies are small text files that can be used by websites to make a user's experience more efficient.  
+  
+The law states that we can store cookies on your device if they are strictly necessary for the operation of this site. For all other types of cookies we need your permission.  
+  
+This site uses different types of cookies. Some cookies are placed by third party services that appear on our pages.  
+  
+You can at any time change or withdraw your consent from the Cookie Declaration on our website.  
+  
+Learn more about who we are, how you can contact us and how we process personal data in our Privacy Policy.  
+  
+ Please state your consent ID and date when you contact us regarding your consent.
+
+- [x] 
+
+**Do not sell or share my personal information** 
+
+OK Customize Allow selection Do not sell or share my personal information
+
+[![Image 48: GRIN Logo](https://grin.co/wp-content/uploads/2022/07/2022_GRIN_Logo_Black_Transparent-Bkgnd.webp)](https://grin.co/)
+
+![Image 49](https://grin.co/product/)
+
+Back Back
+
+[![Image 50: GRIN Logo in Footer](https://grin.co/wp-content/uploads/2022/11/2022_GRIN_Logo_White_Transparent-Bkgnd-1024x271-small-2.webp)](https://grin.co/)
+*   [Products](https://grin.co/product)[Creator Discovery](https://grin.co/product/influencer-discovery-platform/) [Social Listening](https://grin.co/social-listening/) [Content Management](https://grin.co/product/influencer-content-management-platform/) [Relationship Management](https://grin.co/product/influencer-crm-platform/) [Software Integrations](https://grin.co/integrations/) [Reporting & Analytics](https://grin.co/product/influencer-marketing-reporting-platform/) [Creator Payments](https://grin.co/product/influencer-payment-platform/)  [![Image 51](https://grin.co/wp-content/uploads/2025/06/Gia-Logo-1.svg)Built for Brands to automate their creator programs. ![Image 52](https://grin.co/wp-content/uploads/2025/11/Outward-Arrow.svg)](https://grin.ai/)[![Image 53](https://grin.co/wp-content/uploads/2024/08/GRINLogo.svg) ###### GRIN For Creators Get paid to post. ![Image 54](https://grin.co/wp-content/uploads/2025/11/Outward-Arrow.svg)](https://grin.co/grin-for-creators)    
+*   [Programs](https://grin.co/programs)
+
+    *   [Creator Management](https://grin.co/programs/influencer-marketing-platform-solution/)
+    *   [Product Gifting](https://grin.co/product/influencer-gifting-platform/)
+    *   [UGC Campaigns](https://grin.co/ugc/)
+    *   [Affiliate Marketing](https://grin.co/programs/affiliate-marketing-platform-solution/)
+    *   [By Industry](https://grin.co/industries/)
+
+*   [Resources](https://grin.co/learning-center/)
+
+    *   [Blog](https://grin.co/blog)
+    *   [Free Tools](https://grin.co/influencer-marketing-tools/)
+    *   [News](https://grin.co/news)
+    *   [Resource Hub](https://grin.co/learning-center/)
+
+*   [Why GRIN](https://grin.co/about)
+
+    *   [Customer Success](https://grin.co/customer-success-stories/)
+    *   [Creator Love](https://grin.co/creator-experience/)
+    *   [Reviews & Testimonials](https://grin.co/reviews-and-testimonials/)
+    *   [GRIN Community](https://grin.co/community/)
+
+*   [Products](https://grin.co/product)
+*   [Creator Discovery](https://grin.co/product/influencer-discovery-platform/)
+*   [Social Listening](https://grin.co/social-listening/)
+*   [Content Management](https://grin.co/product/influencer-content-management-platform/)
+*   [Relationship Management](https://grin.co/product/influencer-crm-platform/)
+*   [Software Integrations](https://grin.co/integrations/)
+*   [Reporting & Analytics](https://grin.co/product/influencer-marketing-reporting-platform/)
+*   [Creator Payments](https://grin.co/product/influencer-payment-platform/)
+*   [Gia — A new innovation from GRIN. Powered by AI.](https://grin.ai/)
+*   [GRIN For Creators. Creator monetization made easy.](https://grin.co/grin-for-creators)
+*   [Programs](https://grin.co/programs)
+*   [Creator Management](https://grin.co/programs/influencer-marketing-platform-solution/)
+*   [Product Gifting](https://grin.co/product/influencer-gifting-platform/)
+*   [UGC Campaigns](https://grin.co/ugc/)
+*   [Affiliate Marketing](https://grin.co/programs/affiliate-marketing-platform-solution/)
+*   [By Industry](https://grin.co/industries/)
+*   [Resources](https://grin.co/learning-center/)
+*   [Blog](https://grin.co/blog)
+*   [Free Tools](https://grin.co/influencer-marketing-tools/)
+*   [News](https://grin.co/news)
+*   [Resource Hub](https://grin.co/learning-center/)
+*   [Why GRIN](https://grin.co/about)
+*   [Customer Success](https://grin.co/customer-success-stories/)
+*   [Creator Love](https://grin.co/creator-experience/)
+*   [Reviews & Testimonials](https://grin.co/reviews-and-testimonials/)
+*   [GRIN Community](https://grin.co/community/)
+*   Login
+*   [GRIN Classic](https://app.grin.co/login)
+*   [GRIN AI](https://app.grin.ai/v2/login)
+
+[](https://grin.co/product/#)
+
+![Image 55](https://grin.co/product/)
+
+Back Back
+
+*   Login 
+
+    *   [GRIN Classic](https://app.grin.co/login)
+    *   [GRIN AI](https://app.grin.ai/v2/login)
+
+[](https://grin.co/product/#)
+
+Login
+
+[GRIN](https://app.grin.ai/v2/login)[GRIN Classic](https://app.grin.co/login)
+
+[Get Started Free](https://app.grin.ai/v2/login)[Get Started Free](https://grin.co/get-started)
+
+# Scrap your   
+spreadsheets
+
+## GRIN is all you need to manage your entire influencer marketing program, from recruiting new ambassadors to proving true ROI.
+
+[Try for free](https://grin.co/get-started/)[Take a look](https://grin.co/quick-demo-gated/)
+
+### Built for speed. Powered by AI.  
+Trusted by the world’s top brands.
+
+![Image 56: Product Overview 17](https://grin.co/wp-content/uploads/2024/08/Nutpods-logo-white-copy.webp)
+
+![Image 57: Product Overview 1](https://grin.co/wp-content/uploads/2024/09/ASRV_logo_white.webp)
+
+![Image 58: Product Overview 2](https://grin.co/wp-content/uploads/2024/09/colorpop-white-logo-2.webp)
+
+![Image 59: Product Overview 3](https://grin.co/wp-content/uploads/2024/09/youswim-logo-white.webp)
+
+![Image 60: Product Overview 4](https://grin.co/wp-content/uploads/2024/09/skims-logo-white.webp)
+
+![Image 61: Product Overview 5](https://grin.co/wp-content/uploads/2024/09/VeraBradley-logo-white.webp)
+
+![Image 62: Product Overview 6](https://grin.co/wp-content/uploads/2024/09/ipsy-logo-white.webp)
+
+![Image 63: Product Overview 7](https://grin.co/wp-content/uploads/2024/09/Alphalete-logo-white.webp)
+
+![Image 64: Product Overview 8](https://grin.co/wp-content/uploads/2024/09/G-Fuel-logo-white.webp)
+
+![Image 65: Product Overview 9](https://grin.co/wp-content/uploads/2024/09/siksilk.webp)
+
+![Image 66: Product Overview 10](https://grin.co/wp-content/uploads/2024/09/branchbasics-logo-white.webp)
+
+![Image 67: Product Overview 11](https://grin.co/wp-content/uploads/2024/09/Hooey-logo-white-scaled.webp)
+
+![Image 68: Product Overview 12](https://grin.co/wp-content/uploads/2024/09/Primal-pet-foods-logo-white.webp)
+
+![Image 69: Product Overview 13](https://grin.co/wp-content/uploads/2024/09/ilia-logo-white.webp)
+
+![Image 70: Product Overview 14](https://grin.co/wp-content/uploads/2024/09/lovevery-logo-white.webp)
+
+![Image 71: Product Overview 15](https://grin.co/wp-content/uploads/2024/09/ABLE-logo-white.webp)
+
+![Image 72: Product Overview 16](https://grin.co/wp-content/uploads/2024/11/liquidiv-logo-white-e1726772213356-6725bd9fc21ea.webp)
+
+![Image 73: Product Overview 17](https://grin.co/wp-content/uploads/2024/08/Nutpods-logo-white-copy.webp)
+
+![Image 74: Product Overview 1](https://grin.co/wp-content/uploads/2024/09/ASRV_logo_white.webp)
+
+![Image 75: Product Overview 2](https://grin.co/wp-content/uploads/2024/09/colorpop-white-logo-2.webp)
+
+![Image 76: Product Overview 3](https://grin.co/wp-content/uploads/2024/09/youswim-logo-white.webp)
+
+![Image 77: Product Overview 4](https://grin.co/wp-content/uploads/2024/09/skims-logo-white.webp)
+
+![Image 78: Product Overview 5](https://grin.co/wp-content/uploads/2024/09/VeraBradley-logo-white.webp)
+
+![Image 79: Product Overview 6](https://grin.co/wp-content/uploads/2024/09/ipsy-logo-white.webp)
+
+![Image 80: Product Overview 7](https://grin.co/wp-content/uploads/2024/09/Alphalete-logo-white.webp)
+
+![Image 81: Product Overview 8](https://grin.co/wp-content/uploads/2024/09/G-Fuel-logo-white.webp)
+
+![Image 82: Product Overview 9](https://grin.co/wp-content/uploads/2024/09/siksilk.webp)
+
+![Image 83: Product Overview 10](https://grin.co/wp-content/uploads/2024/09/branchbasics-logo-white.webp)
+
+![Image 84: Product Overview 11](https://grin.co/wp-content/uploads/2024/09/Hooey-logo-white-scaled.webp)
+
+![Image 85: Product Overview 12](https://grin.co/wp-content/uploads/2024/09/Primal-pet-foods-logo-white.webp)
+
+![Image 86: Product Overview 13](https://grin.co/wp-content/uploads/2024/09/ilia-logo-white.webp)
+
+![Image 87: Product Overview 14](https://grin.co/wp-content/uploads/2024/09/lovevery-logo-white.webp)
+
+![Image 88: Product Overview 15](https://grin.co/wp-content/uploads/2024/09/ABLE-logo-white.webp)
+
+![Image 89: Product Overview 16](https://grin.co/wp-content/uploads/2024/11/liquidiv-logo-white-e1726772213356-6725bd9fc21ea.webp)
+
+![Image 90: Product Overview 17](https://grin.co/wp-content/uploads/2024/08/Nutpods-logo-white-copy.webp)
+
+## Manage your Creator  
+program end-to-end
+
+## GRIN features
+
+##### [CREATOR DISCOVERY #### Find the perfect creators faster Ready to build your dream team? GRIN offers multiple ways to discover and recruit creators who know your brand, love your products, and genuinely believe in both. ![Image 91: GRIN- Find perfect creator partner](https://grin.co/wp-content/uploads/2024/08/Discovery-and-Recruitment.webp)](https://grin.co/product/influencer-discovery-platform/)
+
+##### [Relationship Management #### Build stronger relationships at scale Manage every step of the creator journey—from outreach to campaign execution—in one organized, collaborative workspace. ![Image 92: Icon of a plant](https://grin.co/wp-content/uploads/2023/05/icon-growth.webp)](https://grin.co/product/influencer-relationship-management-platform/)
+
+##### [CREATOR PAYMENTS #### Manage payments with ease Remove “accountant” from your job description. GRIN helps make sure your whole roster gets paid on time, every time. We’ll even handle the 1099s. ![Image 93: GRIN- Manage payments with ease](https://grin.co/wp-content/uploads/2024/08/Relationship-Management.webp)](https://grin.co/product/)
+
+##### [Social Listening #### Turn conversations into conversions. Track brand mentions, monitor sentiment, and uncover creator-driven trends across social. Understand how your brand shows up online—and where to double down. ![Image 94: Icon of a plant](https://grin.co/wp-content/uploads/2023/05/icon-growth.webp)](https://grin.co/social-listening/)
+
+##### [GRIN Intelligent Assistant (Gia) #### Supercharge your skills and efficiency Gia is the first AI assistant built for creator marketers. Trained on the industry’s largest dataset, Gia powers works across every GRIN solution, making you faster and more strategic. ![Image 95: Icon of a dollar sign in a circle](https://grin.co/wp-content/uploads/2025/06/Gia-Logo.svg)](https://grin.ai/)
+
+##### [CONTENT MANAGEMENT #### Organize & amplify creator content Store, tag, and repurpose creator content across your entire marketing mix. Make it easy for every team to find what they need, when they need it. ![Image 96: Stylized image of two content creators by a button that says "Add to library" above logos of document-sharing programs](https://grin.co/wp-content/uploads/2024/08/Content-Management.webp)](https://grin.co/product/influencer-content-management-platform/)
+
+##### [Software Integrations #### Centralize your tech stack GRIN integrates with ecommerce, communication, storage, and more—so everything works together, seamlessly. ![Image 97: Icon of a dollar sign in a circle](https://grin.co/wp-content/uploads/2025/01/icon_follower-heart-1.svg)](https://grin.co/integrations)
+
+##### [REPORTING & ANALYTICS #### Let data guide your strategy GRIN turns raw data into actionable insights, so you can optimize what’s working, course-correct faster, and show stakeholders the value of your program. ![Image 98: Image of Key Performance Indicators examples](https://grin.co/wp-content/uploads/2024/08/Reporting-Analytics.webp)](https://grin.co/product/influencer-marketing-reporting-platform/)
+
+## Want to take a quick product tour?
+
+[Watch the 3-min demo](https://grin.co/quick-demo-gated/)
+
+## Integrate with everything.
+
+### No more bouncing between apps and inboxes. GRIN brings your entire marketing stack together under one roof.
+
+[See integrations](https://grin.co/integrations/)
+
+#### Email
+
+Manage all creator comms in GRIN. Use ready-made email templates, automate sequences, and track every click, open, and reply.
+
+![Image 99: Gmail icon](https://grin.co/wp-content/uploads/2022/05/int-gmail.webp)
+
+![Image 100: Outlook icon](https://grin.co/wp-content/uploads/2024/08/outlook.svg)
+
+![Image 101: Klaviyo icon](https://grin.co/wp-content/uploads/2024/08/redRibbon.svg)
+
+#### Ecommerce
+
+Ship products to creators, create and manage discount codes, pay commission on sales, and so much more.
+
+![Image 102: Shopify icon](https://grin.co/wp-content/uploads/2022/05/int-shopify.webp)
+
+#### Workflow Efficiency
+
+Pay creators via PayPal, manage all your contracts via DocuSign, and even get a Slack notification whenever a creator takes an action.
+
+![Image 103: Slack icon](https://grin.co/wp-content/uploads/2022/05/int-slack.webp)
+
+![Image 104: Docusign icon](https://grin.co/wp-content/uploads/2024/08/ploygonsLogo.svg)
+
+![Image 105: PayPal icon](https://grin.co/wp-content/uploads/2022/05/int-paypal.webp)
+
+[![Image 106: GRIN Logo in Footer](https://grin.co/wp-content/uploads/2022/11/2022_GRIN_Logo_White_Transparent-Bkgnd-1024x271-small-2.webp)](https://grin.co/)## [Get Started](https://grin.co/get-started/)
+
+© Grin Technologies Inc. 2026. All rights reserved.
+
+### Platform
+
+*   [Platform Login](https://app.grin.co/login)
+*   [Platform Status](https://status.grin.co/)
+*   [Sign Up for Gia](https://grin.ai/)
+*   [Customer Support](https://help.grin.co/)
+*   [G2](https://www.g2.com/products/grin/reviews)
+
+### Company
+
+*   [Community](https://community.grin.co/)
+*   [Careers](https://grin.co/careers/)
+*   [GRIN Help](https://help.grin.co/)
+
+### Follow Us
+
+[](https://www.linkedin.com/company/grin-inc-/)
+
+[](https://www.tiktok.com/@grin.co)
+
+[](https://www.youtube.com/c/GRINInfluencerMarketing)
+
+[](https://www.instagram.com/growwithgrin/)
+
+![Image 107: Summer 2025 Grid Leader Icon](https://grin.co/wp-content/uploads/2025/06/summer2025-Grid-leader-G2-badge.webp)
+
+### Legal & Policies
+
+ All Legal ▼
+
+[Affiliate Revshare Terms of Service](https://grin.co/legal-revshare-terms/)[AI Supplementary Terms of Service](https://grin.co/terms-of-service-ai-supplementary/)[AI Terms of Use](https://grin.co/legal-ai-terms/)[Community Terms of Service](https://grin.co/grin-community-terms-of-service/)[Cookies Notice](https://grin.co/cookie-notice)[Creator Terms of Use](https://grin.co/terms-of-use-influencers/)[Data Processing Addendum](https://grin.co/legal-dpa/)[Data Security Policy](https://grin.co/legal-data-security/)[Privacy Policy](https://grin.co/privacy/)[Privacy Policy (UK/EU)](https://grin.co/privacy-uk/)[Privacy Request Portal](https://grin.co/data-privacy-form/)[Professional Services Agreement](https://grin.co/legal-professional-services-agreement/)[Security Vulnerability Disclosure](https://grin.co/security-vulnerability-disclosure/)[SubProcessor List](https://grin.co/legal-subprocessors/)[Subscription Services Agreement](https://grin.co/legal-subscription-services-agreement/)[Support Terms](https://grin.co/legal-support-terms/)[Terms of Use](https://grin.co/terms/)
+
+*   [GRIN Trust Center](https://grin.co/security/)
+*   [Terms of Service](https://grin.co/terms/)
+*   [Privacy Policies](https://grin.co/privacy/)
+*   [Privacy Request](https://grin.co/data-privacy-form/)
+*   [Cookie Notice](https://grin.co/cookie-notice/)
+*   [Creator Terms of Service](https://grin.co/terms-of-use-influencers/)
+
+### SUBSCRIBE TO GRIN'S NEWSLETTER
+
+Work email* 
+
+*   - [x] Get emails from GRIN about product updates, industry news, and events. If you change your mind, you can unsubscribe at any time. View the [GRIN privacy policy](https://grin.co/privacy/) for details on how your data is managed.* 
+
+This site is protected by reCAPTCHA and the Google [Privacy Policy](https://www.google.com/intl/en/policies/privacy/) and [Terms of Service](https://www.google.com/intl/en/policies/terms/) apply.
+
+*   [Do Not Sell My Personal Information](https://grin.co/data-privacy-form/)
+
+![Image 108](https://dashboard.whoisvisiting.com/who.ashx?Type=Hit&Data=1280|1280||D442D8C1-4A2B-4795-A3FD-4881FA646F18|https%3A%2F%2Fgrin.co%2Fproduct%2F|Mozilla/5.0%20(X11;%20Linux%20x86_64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/154.0.0.0%20Safari/537.36)![Image 109](https://t.co/i/adsct?bci=3&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=2&event_id=afe56c9d-e295-41fb-9415-d6cfaca4296a&events=%5B%5B%22pageview%22%2C%7B%7D%5D%5D&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=d367087c-8103-427a-83a8-8e831cf95c3a&tw_ch_fvl=Chromium%2F154.0.8037.92%2CGoogle%20Chrome%2F154.0.8037.92%2CNot%20A(Brand%2F99.0.0.0&tw_document_href=https%3A%2F%2Fgrin.co%2Fproduct%2F&tw_engaged_ms=6&tw_iframe_status=0&tw_order_quantity=0&tw_pid_src=1&tw_sale_amount=0&tw_session_count=1&tw_session_id=1791169434183-723189869&tw_session_start=1&twpid=tw.1791169434182.118611515348765765&txn_id=o002r&type=javascript&version=2.4.11)![Image 110](https://analytics.twitter.com/i/adsct?bci=3&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=2&event_id=afe56c9d-e295-41fb-9415-d6cfaca4296a&events=%5B%5B%22pageview%22%2C%7B%7D%5D%5D&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=d367087c-8103-427a-83a8-8e831cf95c3a&tw_ch_fvl=Chromium%2F154.0.8037.92%2CGoogle%20Chrome%2F154.0.8037.92%2CNot%20A(Brand%2F99.0.0.0&tw_document_href=https%3A%2F%2Fgrin.co%2Fproduct%2F&tw_engaged_ms=6&tw_iframe_status=0&tw_order_quantity=0&tw_pid_src=1&tw_sale_amount=0&tw_session_count=1&tw_session_id=1791169434183-723189869&tw_session_start=1&twpid=tw.1791169434182.118611515348765765&txn_id=o002r&type=javascript&version=2.4.11)
+
+![Image 111](https://bat.bing.com/action/0?ti=25062576&tm=gtm002&Ver=2&mid=f28e57b0-230a-4cb4-9555-f17c4e30337c&bo=1&sid=666ef930c06911f1a5d1c1eb93544578&vid=666f1500c06911f1920507f519591566&vids=1&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=See%20What%20GRIN%20Can%20Do%20%7C%20Creator%20Marketing%20Platform%20Features&p=https%3A%2F%2Fgrin.co%2Fproduct%2F&r=&lt=1097&evt=pageLoad&sv=2&cdb=AQIR&rn=949964)

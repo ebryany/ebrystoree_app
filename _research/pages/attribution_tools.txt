@@ -1,0 +1,209 @@
+Marketing Attribution: Models and Best Practices - Shopify Skip to Content 
+ Start selling with Shopify today
+ Start your free trial with Shopify today—then use these resources to guide you through every step of the process.
+ Enter your email address 
+ You agree to receive Shopify marketing emails. 
+ Start for free 
+ Start for free How does Shopify work 
+ Marketing Attribution: Models and Best Practices 
+ The goal of marketing attribution is to help answer that question. But it all starts with laying the foundation for better attribution and understanding how different models will shape the way you view your marketing.
+ by Marc Weisinger Apr 26, 2023 • 15 min read 
+ What led a customer to buy from you?
+ It’s a simple question that becomes difficult to answer the more you start digging into it.
+ Did they see an Instagram post or TikTok video, search for your product on Google, or open a promotional email?
+ Marketing attribution only gets more complicated the bigger your business becomes, with a website, social media properties, influencer programs, offline interactions, and other touchpoints to consider. And as consumer behavior evolves with the times, it becomes even trickier.
+ While it’s not a perfect science, the more marketing attribution data you can see across the customer journey, the better decisions you can make for your business. Ahead, learn the basics of marketing attribution, the different attribution models, and how to track and measure your marketing channels effectively.
+ What is marketing attribution?
+ Marketing attribution is the process of evaluating and tracking the performance of your marketing channels.
+ The goal of marketing attribution, of course, is to gain a clearer understanding of all the different interactions and touchpoints that customers have with your brand on the path to conversion.
+ It allows you to credit the channels and specific campaigns that contribute to a conversion, which, in turn, helps you understand how and where to invest your money and attention.
+ Why marketing attribution is only getting harder
+ While the marketing attribution definition sounds straightforward in theory, tracking your marketing touchpoints effectively can be quite complicated in practice. As technology progresses and consumer trends change, so do the ways we track attribution. Consider the following factors:
+ We live in a multi-device world. People sometimes have more than one smartphone, a tablet, a work computer, a home computer, and even a smart home device. Each of these might appear as a unique visitor to your site when, in reality, they all belong to the same customer. 
+ The world is getting stricter about privacy and tracking. Devices and browsers are more careful with what user information and tracking they allow to be stored. With GDPR and privacy concerns top of mind, consumers will increasingly have to opt in to be tracked online.
+ Most attribution models are click-based. Since most attribution and reporting is grounded in click-based behavior and UTM tracking (as we’ll outline below), it misses the impact of viewing ads or content but not clicking on them.
+ Laying the foundation for better attribution
+ Before we talk about how attribution works or the different marketing attribution models, we need to make one thing clear: There’s no such thing as 100% “true” marketing attribution.
+ You can never fully understand exactly how each marketing touchpoint individually affected each customer journey, even when using the best marketing attribution software. All marketing attribution models and tools are merely an approximation of the real world.
+ The only accuracy you can strive for is in: 
+ Correctly setting up pixels and conversion tracking (such as the Meta pixel , Google Ads conversion tracking , and goals/events in Google Analytics ) 
+ Creating a consistent system for UTM (Urchin Tracking Module) tagging and tracking that prioritizes clean, complete data about your customer’s journeys
+ Understanding the worldview of different attribution models and how they affect your marketing decisions
+ About UTM parameters
+ UTM parameters are a string of labels beginning with a “?” or “&” that you might find after a URL:
+ www.yourstore.com?utm_source=facebook&utm_medium=cpc 
+ While it may look and sound foreign, UTM is a standardized system of tagging in digital marketing. Tags are easy enough to create using Google’s own Campaign URL Builder or a Chrome extension like UTM.io . Google’s Campaign URL Builder will automatically encode special characters such as spaces or question marks that might otherwise break your URL.
+ There are five standard types of UTM parameters that can be used to describe incoming traffic for analytics tools so they can be grouped, organized, and analyzed in buckets. 
+ You can choose when and how to use them, but be sure to be consistent in your UTM labeling and tracking:
+ Campaign source (utm_source) describes the website or main source in which the link will be placed (e.g., if I’m promoting a link to my store in an Instagram bio and I do a lot of social media marketing, I might tag it utm_source=instagram). 
+ Campaign medium (utm_medium) describes the marketing activity (e.g., if I’m using the link to track traffic from a Google Ads campaign , I might label it utm_medium=cpc so you know it’s from cost-per-click advertising). 
+ Campaign name (utm_campaign) lets you identify traffic from a specific campaign you’re running, even if it’s from the same source (e.g., for a branded search campaign, you might use utm_campaign=branded%20search%20exact. Spaces can be encoded as "%20" to avoid breaking the URL).
+ Campaign term (utm_term) is used for tracking particular keywords you’re targeting if you’re running a Google Ads campaign .
+ Campaign content (utm_content) is helpful if you’re split testing ads. In this case, you could track each ad to see which was most effective for driving traffic.
+ Custom UTM parameters
+ You can also create your own custom UTM parameters to get even more granular with how you bucket your traffic. You could use “utm_season=fall” to track a specific seasonal campaign.
+ Additionally, you can also use any of the valuetrack parameters to dynamically tag different marketing campaign settings or user attributes. For example, &utm_device={device} would automatically change {device} to identify what browser a user is visiting your site with.
+ Here’s an example of what this looks like. If I wanted to track the traffic and sales from a Google Ads search campaign for winter jackets by targeting the non-branded keyword “winter jackets,” my URL with UTM tracking might look like this:
+ www.mystore.com?utm_source=google&utm_medium=cpc&utm_campaign=nonbranded 
+ %20search%20winter%20jackets&utm_term=winter%20jackets 
+ Breaking that down, each parameter tells you something about the traffic:
+ Source: Google
+ Medium: CPC (cost per click)
+ Campaign: non-branded search campaign advertising winter jackets
+ Term: bidding on the keyword “winter jackets”
+ UTMs help you track your traffic down to specific sources so you can analyze how it performs on a more granular level—but only when you keep the following in mind:
+ UTMs are subjective and defined by you. While there are common practices for naming your UTMs, use what makes sense for you. As long as you’re consistent and it is easy for your team to understand what you’re using, you should be in great shape.
+ UTM parameters are case sensitive. “utm_source=Facebook” and “utm_source=facebook” will show up as two different sources in Google Analytics.
+ Maintain a record of your parameters. Create a consistent system for recording your UTM parameters so you and your team know what’s in use and can understand what they mean when you see them.
+ Be consistent with your tags. Onboard any new team members to your UTM system and double-check your UTMs before you use them.
+ Test your final URLs. Sometimes your final URL might break. Get in the habit of double-checking your landing pages before spending money on ads, and encoding any special characters (you can use URL Encoder ).
+ Use a URL shortener when appropriate. UTM parameters can make links long and unappealing to click. If you’re displaying your links publicly, such as in a social media bio or even a display at a tradeshow to track traffic and sales, use a URL shortener like bit.ly to shorten them.
+ When properly implemented, you can group and analyze traffic from different sources in Google Analytics and other reporting tools.
+ Grouping user journeys across devices with User-IDs
+ Proper UTM tracking is a step in the right direction, but by default, if the same user visits your site on multiple devices, each “visit” will be attributed as a separate user and a separate “journey.”
+ For example, if a user sees an Instagram Story about a product, they may view the product but not buy it right away. Instead, they may research the product on their phone on the way home, before finally searching for it again on their laptop before bed and converting on a Google Shopping ad.
+ To get around this and group all behavior coming from the same user, you’ll need to enable User-IDs in Google Analytics and integrate your CRM.
+ User-IDs in Google Analytics create unique non-PII (not personally identifiable) IDs for each user, which gets included wherever their data is sent from. You can then use the ID to unify interactions across devices, as well as online and offline touchpoints, for each customer.
+ The ability to turn what may look like many independent user journeys across different devices into a series of interactions from one user with your brand is crucial for painting a clearer picture of how your customers engage with you across different devices and campaigns.
+ Drive your business forward with Shopify’s analytics
+ Shopify's user-friendly reports and analytics capabilities help you make better decisions, faster. Choose from pre-built dashboards and reports or build your own to spot trends, capitalize on opportunities, and supercharge your decision-making.
+ Explore Shopify’s analytics 
+ 7 marketing attribution models
+ There are generally considered to be seven different types of marketing attribution models you can choose from based on the goals of your business and where in the funnel you want to place the most value:
+ Last click
+ First click
+ Last non-direct click
+ Linear
+ Time decay
+ Position-based
+ Algorithmic (custom)
+ Each model is outlined below to help you understand each attribution model across your marketing touchpoints. Note how the exact same customer journey can be interpreted differently depending on the model used.
+ 1. Last click attribution 
+ Last-click attribution is the most commonly used model and is the default for most marketing platforms and marketing attribution tools. This single-touch model is useful when you are aggressively trying to convert traffic into customers.
+ It gives 100% of the conversion credit to the last-clicked ad and corresponding keyword. As such, lower-funnel campaigns, such as branded search or retargeting campaigns, will be given more value while brand awareness and upper-funnel campaigns may receive none.
+ 2. First click attribution
+ This single-touch attribution model sees the first touchpoint as the most important, as it gets 100% credit for bringing customers into your funnel in the first place. This is useful when you’re prioritizing spending money on campaigns that build traffic and find new audiences.
+ It gives all conversion credit to the ad or corresponding keyword that gets the first click. As such, high-value bottom-of-the-funnel activities, like remarketing, are missed in this model, potentially leading to a reduced investment in these efforts that actually drops your overall conversions and top-line revenue.
+ 3. Last non-direct click attribution
+ The last non-direct click model gives credit to the last click event before a buyer comes directly to your store to make a purchase. It gives 100% of the credit to the last, non-direct touchpoint.
+ In the example above, that would be Email. 
+ Direct traffic is often from customers who have already made the decision to purchase because of marketing on a different channel. Last non-direct click attribution helps you filter out direct traffic and focus on the last marketing activity before conversion.
+ Using last non-direct click attribution, you learn that it was actually Email that drove the final conversion. Direct will be an attributed channel in this model when the customers only trackable event is coming directly to your store.
+ 4. Linear attribution
+ A linear attribution model distributes conversion credit equally across all clicks on the customer’s path to purchase. This is the simplest form of multi-touch attribution. With this model, you don’t miss out on crediting any interactions. However, it doesn’t tell you exactly what marketing channel had the most impact.
+ 5. Time decay attribution
+ The time decay attribution model is similar to last click. However, it also gives some credit to the interactions that led up to the conversion, with more weight given to clicks that happened closer in time to the conversion.
+ 6. Position-based attribution
+ A position-based (or U-shaped) attribution model gives equal weight to the first and last click—each of these interactions gets 40% of the credit. The remaining 20% is spread out across the other clicks in between.
+ The assumption here, however, is that the first and last click are the most valuable interactions, while there may be campaigns or touchpoints in the middle that also play a significant factor.
+ 7. Algorithmic attribution
+ This model is often referred to as custom attribution. When you have enough data available, you can allow machine learning to dictate which touchpoints deserve the most amount of credit in a customer’s journey. 
+ Theoretically, this is the best model, but it relies on having enough historical data for machine learning to distribute weight across different touchpoints.
+ Attribution model differences between platforms
+ When you examine marketing attribution in Google Ads, Facebook Ads, Google Analytics, or Shopify reports , you might notice discrepancies. Which is the source of truth? Technically, all are “correct”—they just view marketing differently. Here’s a primer on how each one works.
+ Shopify 
+ In Shopify’s Channel Performance report, marketing attribution models provide a holistic understanding of your customers’ journey to conversion. Through the report, you can toggle to the attribution model you prefer: 
+ Conversion by last click
+ Conversion by last non-direct click
+ Conversion by first click
+ Shopify’s Marketing Insights tools and reports help you better understand your business. See insights at a glance, analyze marketing channel performance, and choose the attribution model that’s best for your business. 
+ Google Ads
+ Google Ads only tracks Google Ads traffic. It doesn’t deduplicate conversions from other advertising campaigns on different platforms because it doesn’t “see” those touchpoints. Instead, it will take credit for any user who touches a Google campaign at any point—even if they later touch Facebook/Instagram, email, or visit your website directly and convert.
+ By default, the Google Ads attribution window setting shows actions taken within 30 days of clicking on your ads using last-click attribution.
+ Facebook Ads
+ The Meta advertising platform tracks only Facebook ads traffic and interactions (which also includes Meta-owned properties like Instagram ). 
+ It also does not deduplicate data from other advertising campaigns on different platforms and will take credit for any user who sees or clicks a Facebook ad within a certain time span, even if they later interact with a Google Ads campaign or email, or visit your website directly and convert. 
+ Facebook defaults to last-click attribution with attribution windows of within 24 hours of viewing your ad and within 28 days of clicking your ad. 
+ Facebook Ads is the only one of the more detailed advertising platforms that will take credit for users who potentially “see” an ad (even without clicking it) and convert in another way. It’s recommended that you change the settings to be click-based if you’re looking for a better comparison of your results across platforms.
+ Google Analytics 
+ Google Analytics and other analytics platforms will track clickable actions across different paid and unpaid channels. Generally, analytics platforms can be configured to connect external/offline data sources, User-ID, and/or other web properties that are not directly part of your online store.
+ Google Analytics offers a Data Import feature that lets you upload data from other sources so you can analyze it all in Google Analytics. Adding additional data sources and incorporating User-ID are the best ways to include the majority of your customer interactions across platforms in one place.
+ Google Analytics will also deduplicate conversions from all channels and will give credit to the last touchpoint in a conversion journey, unless it was a direct visit to your site. In that case, it will give credit to the last non-direct touchpoint.
+ About ad servers and impression-based attribution
+ While most attribution is click-based, impression-based attribution and reporting is also possible.
+ Think about your own experience. Do you click on every ad that captures your interest? Even when you don’t, those ads can still impact your decision to buy a product in the future.
+ An ad server allows you to consolidate and deduplicate all your marketing data in one platform, while also giving you access to impressions-level data. This data allows you to more clearly see your customer’s path to purchase and which channels you should invest in.
+ For example, you may see great performance from your search ads at a click level. However, when you look at impression-level data, you see that those that convert on search were actually exposed to a video ad on YouTube beforehand and later searched for your product on Google.
+ The Google Marketing Platform is one example of this type of technology, where you can have access to impression-level data for channels such as search, video, display, Gmail-sponsored ads, and some social media platforms.
+ Understand attribution to make your marketing dollars work
+ Understanding the landscape of marketing attribution, the holes in it, and the different models you can apply are a good first step toward better tracking, cleaner customer databases, and smarter decision making. Despite marketing attribution becoming increasingly complex, there’s no denying the many benefits of marketing attribution.
+ Marketing attribution can offer invaluable insights about how and where customers are interacting with your brand on their path to making a purchase. This attribution data can help inform marketing campaigns and your overall marketing strategy to maximize ROI. 
+ Read more
+ Affiliate Marketing on Instagram: 7 Ways To Make Money (2024) 
+ 20 About Us Page Examples With Templates 
+ Five Ways to Grow the Average Order Value of Your Online Store 
+ 16 Strong Abandoned Cart Emails Examples 
+ Five Realities That Sum Up The Struggles of Entrepreneurship—And How to Overcome Them 
+ 20 Email Marketing Best Practices to Turn Campaigns Into Sales 
+ How To Use Ecommerce Analytics For Your Online Store 
+ Announcing New Customer Segmentation and Marketing Automation Tools—Plus 10,000 Free Emails 
+ Learn the Difference Between Sales and Marketing 
+ Faster Checkout on Instagram and Facebook with Shop Pay 
+ Marketing attribution FAQ
+ What are the 4 attribution types in marketing?
+ The most popular attribution models in marketing include:
+ Last-click attribution model: This type of attribution gives credit to the last touchpoint of the user journey before they make a purchase.
+ First-click attribution model: This type of attribution gives credit to the first touchpoint of the user journey before they make a purchase.
+ Linear attribution model: This type of attribution gives equal credit to all touchpoints along the user journey before they make a purchase.
+ Time-decay attribution model: This type of attribution gives more credit to touchpoints closer to the time of purchase.
+ Why is marketing attribution important?
+ Marketing attribution is important because it allows marketers to measure the effectiveness of their campaigns and track the customer journey. Attribution helps marketers understand which marketing channels and activities are driving conversions and customer engagement, and which are not. This data can be used to make informed decisions about future marketing strategies, allocate budgets more effectively, and optimize campaigns for better performance across your sales cycle.
+ What is marketing attribution?
+ arketing attribution is the process of assigning credit for sales or leads to the various touch points in the customer journey. It is the practice of analyzing the impact of each touch point or marketing activity on a customer’s decision to purchase or take action. Different attribution models exist to attribute credit to different parts of the customer journey, depending on your preferences.
+ How do you set up marketing attribution?
+ Define goals: Start by defining the goals you want to track and measure. These can be anything from sales to website visits, lead generation, and more.
+ Select an attribution model: Next, choose an attribution model that best reflects your business goals and objectives. There are several attribution models to choose from, including last click, first click, linear, and time decay.
+ Implement tracking: Set up tracking systems to measure the performance of each marketing channel and activity. This could include website analytics, email marketing, or any other platform or software that you use.
+ Set up reporting: Configure your reporting systems to view the data in a way that is useful for making decisions. This will likely include setting up dashboards, creating reporting templates, and more.
+ Monitor and adjust: Monitor the data over time to identify trends and areas of improvement. Make adjustments to your campaigns and strategies as needed.
+ by Marc Weisinger Published on Apr 26, 2023 
+ Share article
+ Share on Facebook 
+ Share on X 
+ Share on LinkedIn 
+ by Marc Weisinger Apr 26, 2023 • 15 min read 
+ The newsletter for entrepreneurs
+ Join millions of self-starters in getting business resources, tips, and inspiring stories in your inbox.
+ Enter email 
+ Unsubscribe anytime. By entering your email, you agree to receive marketing emails from Shopify. By proceeding, you agree to the Terms and Conditions and Privacy Policy .
+ popular posts
+ Social Media Optimization
+ How To Make Money on Instagram in 2025 (9 Actionable Ideas) 
+ Starting Up
+ How To Start an Ecommerce Business: Guide for 2025 
+ Guides
+ What Is Dropshipping and How Does It Work? (2025) 
+ Find an Idea
+ What Is Print on Demand & How To Start a Business (2025) 
+ The point of sale for every sale.
+ Start for free 
+ popular posts
+ Sell Online
+ How To Create a Website in 9 Steps (2025) 
+ Starting Up
+ How To Start an Online Store in 2025 (Step-by-Step Guide) 
+ Find an Idea
+ How To Make and Sell Merch Your Fans Will Love (2025) 
+ Sell Online
+ 10 Best Ecommerce Website Builders for Your Online Store (2025) 
+ Make Shopify a preferred source
+ Our latest articles will show up more often in Google Top Stories.
+ Add Shopify 
+ popular posts
+ Social Media Optimization How To Make Money on Instagram in 2025 (9 Actionable Ideas) 2023-11-08 
+ Starting Up How To Start an Ecommerce Business: Guide for 2025 2023-09-01 
+ Guides What Is Dropshipping and How Does It Work? (2025) 2023-12-05 
+ Find an Idea What Is Print on Demand & How To Start a Business (2025) 2023-11-09 
+ Sell Online How To Create a Website in 9 Steps (2025) 2023-09-20 
+ Starting Up How To Start an Online Store in 2025 (Step-by-Step Guide) 2023-11-23 
+ Find an Idea How To Make and Sell Merch Your Fans Will Love (2025) 2023-12-02 
+ Sell Online 10 Best Ecommerce Website Builders for Your Online Store (2025) 2023-11-06 
+ The newsletter for entrepreneurs
+ Join millions of self-starters in getting business resources, tips, and inspiring stories in your inbox.
+ Enter email Subscribe 
+ Subscribe 
+ Unsubscribe anytime. By entering your email, you agree to receive marketing emails from Shopify. By proceeding, you agree to the Terms and Conditions and Privacy Policy .
+ Sell anywhere with Shopify
+ Learn on the go. Try Shopify for free, and explore all the tools you need to start, run, and grow your business.
+ Start for free 
+ Start free then enjoy 3 months for $1/month
