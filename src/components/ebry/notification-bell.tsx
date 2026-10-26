@@ -10,12 +10,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSession } from "@/hooks/use-session";
 import { useNotificationSound } from "@/hooks/use-notification-sound";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import { getMyRoles } from "@/lib/admin.functions";
 import {
   listMyNotifications,
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/lib/orders.functions";
-import { notificationTone, relativeTime } from "@/components/ebry/notification-meta";
+import { isPayoutStaff, notificationTone, relativeTime } from "@/components/ebry/notification-meta";
 import { pushNotificationToast } from "@/components/ebry/notification-toast";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,14 @@ export function NotificationBell({ className }: { className?: string }) {
   const { data } = useQuery({
     queryKey: ["my-notifications"],
     queryFn: () => fetchItems({}),
+    enabled: Boolean(user),
+  });
+  // Role dipakai untuk tujuan tautan notifikasi payout (staff → antrean finance,
+  // seller → keuangannya). Query key sama dengan site-header supaya cache gabung.
+  const fetchRoles = useServerFn(getMyRoles);
+  const { data: rolesData } = useQuery({
+    queryKey: ["my-roles"],
+    queryFn: () => fetchRoles({}),
     enabled: Boolean(user),
   });
 
@@ -159,6 +168,7 @@ export function NotificationBell({ className }: { className?: string }) {
               {items.slice(0, 8).map((n) => {
                 const tone = notificationTone(n.type);
                 const Icon = tone.icon;
+                const isPayout = n.related_type === "payout" && n.related_id;
                 return (
                   <li
                     key={n.id}
@@ -212,6 +222,24 @@ export function NotificationBell({ className }: { className?: string }) {
                               Tandai dibaca
                             </button>
                           )}
+                          {isPayout && isPayoutStaff((rolesData as any)?.roles) ? (
+                            <Link
+                              to="/admin/payouts/$id"
+                              params={{ id: n.related_id }}
+                              onClick={() => setOpen(false)}
+                              className="text-[11px] font-medium text-accent hover:underline"
+                            >
+                              Lihat permintaan
+                            </Link>
+                          ) : isPayout ? (
+                            <Link
+                              to="/seller/keuangan"
+                              onClick={() => setOpen(false)}
+                              className="text-[11px] font-medium text-accent hover:underline"
+                            >
+                              Lihat keuangan
+                            </Link>
+                          ) : null}
                         </div>
                       </div>
                     </div>

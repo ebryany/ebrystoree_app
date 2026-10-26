@@ -158,6 +158,15 @@ describe("withdrawal SQL contract — feature gate & lifecycle", () => {
     expect(sql).toContain("public.notify_payout_staff");
   });
 
+  it("persists notifications inside the withdrawal transaction (staff + seller receipt)", () => {
+    const fn = slice("CREATE OR REPLACE FUNCTION public.request_withdrawal");
+    // Notifikasi staff DAN tanda terima seller di dalam transaksi yang sama:
+    // reservasi gagal = notifikasi ikut batal, tidak ada notifikasi palsu.
+    expect(fn).toContain("public.notify_payout_staff('payout.requested'");
+    expect(fn).toContain("INSERT INTO public.notifications");
+    expect(fn).toContain("'payout.requested', 'Pengajuan penarikan terkirim'");
+  });
+
   it("guards refund interplay: payout entries are order-agnostic so process_refund math is untouched", () => {
     const fn = slice("CREATE OR REPLACE FUNCTION public.request_withdrawal");
     // Kolom order_id tidak ada pada INSERT ledger payout (NULL) — debit refund

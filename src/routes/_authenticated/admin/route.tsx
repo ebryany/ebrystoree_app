@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
+import { NotificationBell } from "@/components/ebry/notification-bell";
 import { adminNav, ROLE_LABELS } from "@/lib/admin-nav";
 import { getMyAccess } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +43,15 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-const navigationOrder = ["Ringkasan", "Transaksi", "Layanan Platform", "Marketplace", "Katalog", "Akses", "Website"];
+const navigationOrder = [
+  "Ringkasan",
+  "Transaksi",
+  "Layanan Platform",
+  "Marketplace",
+  "Katalog",
+  "Akses",
+  "Website",
+];
 
 function NavList({
   permissions,
@@ -296,6 +305,7 @@ function AdminLayout() {
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+              <NotificationBell />
               {canViewOrders ? (
                 <Button asChild variant="ghost" className="hidden min-h-11 sm:inline-flex">
                   <Link to="/admin/chat">

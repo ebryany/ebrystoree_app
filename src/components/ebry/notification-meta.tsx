@@ -71,6 +71,16 @@ export function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString("id-ID", { dateStyle: "medium" });
 }
 
+const PAYOUT_STAFF_ROLES = new Set(["finance", "admin", "super_admin"]);
+
+/** Apakah penerima notifikasi termasuk pengelola payout (finance/admin)?
+ *  Dipakai untuk menentukan tujuan tautan notifikasi payout: staff ke antrean
+ *  finance, seller ke halaman keuangan miliknya. Tautan tidak memberi akses
+ *  baru — permission & RLS tetap berlaku di halaman tujuan. */
+export function isPayoutStaff(roles?: string[] | null): boolean {
+  return (roles ?? []).some((role) => PAYOUT_STAFF_ROLES.has(role));
+}
+
 export function dayGroupLabel(iso: string): string {
   const date = new Date(iso);
   const today = new Date();

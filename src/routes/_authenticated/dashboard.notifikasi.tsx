@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Bell, CheckCheck, Volume2, VolumeX } from "lucide-react";
@@ -9,15 +9,28 @@ import { BankListRow, InlineEmpty, PageHeader, SegmentedFilter } from "@/compone
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { useNotificationSound } from "@/hooks/use-notification-sound";
 import { Button } from "@/components/ui/button";
-import { listMyNotifications, markAllNotificationsRead, markNotificationRead } from "@/lib/orders.functions";
-import { dayGroupLabel, notificationTone, relativeTime } from "@/components/ebry/notification-meta";
+import { getMyRoles } from "@/lib/admin.functions";
+import {
+  listMyNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/lib/orders.functions";
+import {
+  dayGroupLabel,
+  isPayoutStaff,
+  notificationTone,
+  relativeTime,
+} from "@/components/ebry/notification-meta";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifikasi")({
   head: () => ({
     meta: [
       { title: "Notifikasi — Ebrystore" },
-      { name: "description", content: "Pemberitahuan pesanan, pembayaran, dan refund akun Ebrystore Anda." },
+      {
+        name: "description",
+        content: "Pemberitahuan pesanan, pembayaran, dan refund akun Ebrystore Anda.",
+      },
       { property: "og:title", content: "Notifikasi — Ebrystore" },
       { property: "og:description", content: "Riwayat pemberitahuan akun Anda." },
       { property: "og:type", content: "website" },
@@ -37,7 +50,13 @@ function Notifikasi() {
   const markAll = useServerFn(markAllNotificationsRead);
   const sound = useNotificationSound();
   const [filter, setFilter] = useState<Filter>("all");
-  const { data, isPending, error } = useQuery({ queryKey: ["my-notifications"], queryFn: () => fetchItems({}) });
+  const { data, isPending, error } = useQuery({
+    queryKey: ["my-notifications"],
+    queryFn: () => fetchItems({}),
+  });
+  const fetchRoles = useServerFn(getMyRoles);
+  const { data: rolesData } = useQuery({ queryKey: ["my-roles"], queryFn: () => fetchRoles({}) });
+  const staff = isPayoutStaff((rolesData as any)?.roles);
 
   useRealtimeRefresh({
     channel: "my-notifications-page",
@@ -77,7 +96,9 @@ function Notifikasi() {
       <PageHeader
         icon={Bell}
         title="Notifikasi"
-        description={unread > 0 ? `${unread} pemberitahuan belum dibaca` : "Semua pemberitahuan sudah dibaca"}
+        description={
+          unread > 0 ? `${unread} pemberitahuan belum dibaca` : "Semua pemberitahuan sudah dibaca"
+        }
         action={
           unread > 0 ? (
             <button
@@ -132,34 +153,68 @@ function Notifikasi() {
         <div className="space-y-4">
           {groups.map(([label, list]) => (
             <section key={label} className="space-y-1.5">
-              <h2 className="px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</h2>
+              <h2 className="px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                {label}
+              </h2>
               <ul className="overflow-hidden rounded-2xl bg-card">
                 {list.map((n: any) => {
                   const tone = notificationTone(n.type);
                   const Icon = tone.icon;
                   const unreadItem = !n.read_at;
+                  const isPayout = n.related_type === "payout" && n.related_id;
                   return (
                     <li key={n.id} className="relative">
                       {unreadItem ? (
-                        <span className="absolute inset-y-3 left-0 w-1 rounded-full bg-accent" aria-hidden="true" />
+                        <span
+                          className="absolute inset-y-3 left-0 w-1 rounded-full bg-accent"
+                          aria-hidden="true"
+                        />
                       ) : null}
                       <BankListRow
                         icon={Icon}
                         title={n.title}
                         subtitle={`${tone.label} · ${relativeTime(n.created_at)}`}
                         value={
-                          unreadItem ? (
-                            <button
-                              type="button"
-                              onClick={() => handleRead(n.id)}
-                              className="rounded-full border border-accent/40 px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            >
-                              Tandai
-                            </button>
-                          ) : undefined
+                          <>
+                            {isPayout ? (
+                              staff ? (
+                                <Button
+                                  asChild
+                                  variant="ghost"
+                                  className="min-h-9 px-2.5 text-[11px] font-semibold text-accent"
+                                >
+                                  <Link to="/admin/payouts/$id" params={{ id: n.related_id }}>
+                                    Lihat
+                                  </Link>
+                                </Button>
+                              ) : (
+                                <Button
+                                  asChild
+                                  variant="ghost"
+                                  className="min-h-9 px-2.5 text-[11px] font-semibold text-accent"
+                                >
+                                  <Link to="/seller/keuangan">Lihat</Link>
+                                </Button>
+                              )
+                            ) : null}
+                            {unreadItem ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRead(n.id)}
+                                className="rounded-full border border-accent/40 px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              >
+                                Tandai
+                              </button>
+                            ) : null}
+                          </>
                         }
                       />
-                      <p className={cn("-mt-1 px-4 pb-3 text-xs leading-relaxed text-muted-foreground", unreadItem && "pl-[4.25rem]")}>
+                      <p
+                        className={cn(
+                          "-mt-1 px-4 pb-3 text-xs leading-relaxed text-muted-foreground",
+                          unreadItem && "pl-[4.25rem]",
+                        )}
+                      >
                         {n.message}
                       </p>
                     </li>

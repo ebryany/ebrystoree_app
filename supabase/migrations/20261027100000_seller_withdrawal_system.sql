@@ -402,6 +402,14 @@ BEGIN
     'Pengajuan ' || v_number || ': bruto ' || v_gross || ', fee ' || v_fee ||
     ' (' || v_bps || ' bps), neto ' || v_net);
 
+  -- Tanda terima untuk seller (pola receipt submit_payment_proof): persisten di
+  -- dalam transaksi yang sama, jadi bila reservasi gagal, notifikasi ikut batal.
+  INSERT INTO public.notifications (recipient_id, type, title, message, related_type, related_id)
+  VALUES (v_user, 'payout.requested', 'Pengajuan penarikan terkirim',
+    v_number || ' menunggu review finance. Saldo bruto ' || v_gross ||
+    ' ditahan; perkiraan diterima ' || v_net || '.',
+    'payout', v_id);
+
   INSERT INTO public.admin_tasks (task_type, source_type, source_id, title, description, priority)
   VALUES ('review_payout', 'withdrawal', v_id,
     'Review penarikan ' || v_number,
