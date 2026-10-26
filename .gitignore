@@ -72,3 +72,13 @@ _sess.json
 _sess-*.json
 *token*.json
 nul
+
+# Artefak sesi kerja lokal (scan results, screenshots tmp, scripts tmp)
+.audit-*.json
+.audit-*.err
+.rl.json
+.img_*
+.ocr*
+.pg_*.html
+ebrystore (1).zip
+nul
