@@ -8,13 +8,20 @@ import { WordAnimator } from "@/components/ui/word-animator";
 /**
  * Hero beranda.
  *
- * Bentuknya pita lebar penuh, bukan kotak berbingkai. Latar gradien bergerak
- * (ShaderGradient) mengisi seluruh lebar, dan lapisan gelap menjaga teks putih
- * tetap terbaca. Kanvas shader `pointer-events-none`, jadi tidak pernah
- * menghalangi klik.
+ * Pita lebar penuh, bukan kotak berbingkai. Latar gradien bergerak mengisi
+ * seluruh lebar, dengan lapisan gelap agar teks putih tetap terbaca.
+ *
+ * Aturan copy: tidak ada istilah internal di sini. "Seller", "vendor",
+ * "multi-vendor", "ledger", "pencairan dana" adalah kosakata operasional yang
+ * tidak dikenal pembeli. Hero hanya menyebut apa yang bisa dibeli dan apa
+ * manfaatnya bagi pembeli.
+ *
+ * Animasi kata dipertahankan karena memberi gerak tanpa menggeser tata letak.
+ * Kedua kata yang berputar sama-sama melengkapi kalimat, jadi headline tetap
+ * terbaca utuh kapan pun animasi berhenti.
  */
 
-const WORDS = ["cepat", "aman", "rapi", "terpercaya"];
+const WORDS = ["produk digital", "jasa kreatif"];
 
 export function HomeHero() {
   return (
@@ -35,24 +42,22 @@ export function HomeHero() {
           id="hero-heading"
           className="mx-auto max-w-4xl text-balance font-display text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-6xl"
         >
-          Belanja produk digital{" "}
-          <span className="inline-flex flex-wrap items-baseline justify-center gap-x-2">
-            <span>yang</span>
-            <WordAnimator
-              words={WORDS}
-              duration={3}
-              className="rounded-lg border border-white/25 bg-white/10 px-2.5 italic text-white sm:px-3"
-            />
-          </span>
+          Belanja{" "}
+          <WordAnimator
+            words={WORDS}
+            duration={3}
+            className="rounded-lg border border-white/25 bg-white/10 px-2.5 text-white sm:px-3"
+          />{" "}
+          di Ebrystore
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-lg">
-          Bandingkan harga dan toko sebelum membeli. Produk digital langsung bisa diunduh setelah
-          pembayaran terverifikasi, dan jasa bisa dipantau progresnya sampai selesai.
+          Belanja produk digital dan jasa dari toko terpilih. Harga jelas di depan, pembayaran
+          terverifikasi, dan setiap pesanan bisa dipantau sampai tuntas.
         </p>
 
-        {/* Di mobile tombol ditumpuk penuh supaya tidak sempit dan mudah dijangkau
-            jempol; sejajar berdampingan baru di layar >= 640px. */}
+        {/* Di mobile tombol ditumpuk penuh supaya mudah dijangkau jempol;
+            sejajar berdampingan baru di layar >= 640px. */}
         <div className="mx-auto mt-6 flex w-full max-w-xs flex-col gap-2.5 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
           <ShimmerButton
             borderRadius="8px"
@@ -61,7 +66,7 @@ export function HomeHero() {
             className="rounded-control w-full justify-center sm:w-auto"
           >
             <Link to="/produk" className="text-sm font-semibold text-foreground lg:text-base">
-              Lihat produk digital
+              Jelajahi produk
             </Link>
           </ShimmerButton>
 
@@ -69,13 +74,13 @@ export function HomeHero() {
             to="/layanan"
             className="rounded-control inline-flex min-h-11 w-full items-center justify-center gap-1.5 border border-white/40 bg-white/5 px-5 text-sm font-medium text-white transition-colors hover:border-white/70 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:w-auto"
           >
-            Cari bantuan tugas
+            Lihat layanan
             <ChevronsRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
 
         <p className="mx-auto mt-5 max-w-md text-xs leading-relaxed text-white/70">
-          Jasa ditinjau admin sebelum tayang, dan pembayaran ditahan sampai kamu menerima hasil.
+          Pembayaran diverifikasi sebelum pesanan diproses. Setiap toko ditinjau sebelum tayang.
         </p>
       </div>
     </section>
