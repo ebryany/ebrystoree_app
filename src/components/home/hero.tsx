@@ -21,7 +21,7 @@ import { WordAnimator } from "@/components/ui/word-animator";
  * terbaca utuh kapan pun animasi berhenti.
  */
 
-const WORDS = ["produk digital", "jasa kreatif"];
+const WORDS = ["produk digital", "jasa"];
 
 export function HomeHero() {
   return (
@@ -37,18 +37,22 @@ export function HomeHero() {
         className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/65"
       />
 
-      <div className="relative px-4 py-16 text-center sm:px-6 sm:py-24 lg:py-28">
+      <div className="relative px-4 py-14 text-center sm:px-6 sm:py-24 lg:py-28">
+        {/* Baris pertama statis, baris kedua berisi kata beranimasi. Di mobile
+            kedua barisnya memang terpisah, jadi kotak animasi tidak pernah
+            memotong kalimat di tengah. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance font-display text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-6xl"
+          className="mx-auto max-w-4xl text-balance font-display text-3xl font-bold leading-[1.2] tracking-tight text-white sm:text-4xl lg:text-6xl"
         >
-          Belanja{" "}
-          <WordAnimator
-            words={WORDS}
-            duration={3}
-            className="rounded-lg border border-white/25 bg-white/10 px-2.5 text-white sm:px-3"
-          />{" "}
-          di Ebrystore
+          Belanja di Ebrystore
+          <span className="mt-3 block sm:mt-4">
+            <WordAnimator
+              words={WORDS}
+              duration={3}
+              className="rounded-lg border border-white/25 bg-white/10 px-3 text-white sm:px-4"
+            />
+          </span>
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-lg">
