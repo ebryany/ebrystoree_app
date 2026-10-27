@@ -120,6 +120,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Beranda() {
+  // Bukti toko untuk section CTA seller: diambil dari katalog jasa yang memang
+  // sudah dimuat homepage (tanpa query baru). De-duplikasi per slug, maks 6.
+  const sellerServices = useSuspenseQuery(sellerServicesQuery);
+  const proofStores = Array.from(
+    new Map(
+      (sellerServices.data.items ?? [])
+        .map((item) => item.store)
+        .filter((store): store is { name: string; slug: string } =>
+          Boolean(store?.slug && store?.name),
+        )
+        .map((store) => [store.slug, store]),
+    ).values(),
+  ).slice(0, 6);
+
   return (
     <PageShell>
       {/* Hero pita lebar penuh: diletakkan di luar wadah berlebar tetap supaya
@@ -196,7 +210,7 @@ function Beranda() {
             className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--color-border)_70%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--color-border)_70%,transparent)_1px,transparent_1px)] bg-[size:54px_54px]"
           />
           <div className="relative">
-            <SellerJoinSection />
+            <SellerJoinSection stores={proofStores} />
             <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-border px-4 pt-5 sm:px-6 lg:px-8">
               <p className="text-sm text-muted-foreground">
                 Belum tahu cara memesan atau menerima produk?
