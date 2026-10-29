@@ -60,6 +60,7 @@ import {
 } from "@/lib/admin.functions";
 import { Switch } from "@/components/ui/switch";
 import { ProductFilesDialog } from "@/components/admin/product-files-dialog";
+import { ProductVariantEditor } from "@/components/product/variant-editor";
 import { CategoryManagerDialog } from "@/components/admin/category-manager-dialog";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { formatRupiah } from "@/lib/format";
@@ -96,6 +97,7 @@ type FormState = {
   downloadLimit: string;
   validityDays: string;
   status: "draft" | "published" | "archived";
+  deliveryMode?: string | null;
 };
 
 const emptyForm: FormState = {
@@ -354,6 +356,7 @@ function AdminProduk() {
                                   downloadLimit: String(p.download_limit ?? 5),
                                   validityDays: String(p.validity_days ?? 365),
                                   status: p.status,
+                                  deliveryMode: p.delivery_mode ?? "shared",
                                 })
                               }
                             >
@@ -520,6 +523,18 @@ function AdminProduk() {
                   </Select>
                 </Field>
               </FormSection>
+
+              {form.id ? (
+                <ProductVariantEditor
+                  productId={form.id}
+                  deliveryMode={form.deliveryMode}
+                  onSaved={() => void qc.invalidateQueries({ queryKey: ["admin-products"] })}
+                />
+              ) : (
+                <p className="rounded-xl border border-dashed border-border p-3 text-xs text-muted-foreground">
+                  Variasi bisa ditambahkan setelah produk disimpan.
+                </p>
+              )}
             </div>
           ) : null}
           <DialogFooter className="gap-2 sm:gap-2">

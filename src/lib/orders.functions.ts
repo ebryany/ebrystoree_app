@@ -9,6 +9,14 @@ const tx = () => import("./transaction.server");
 
 type Ctx = { supabase: any; userId: string };
 
+export type ProductVariant = {
+  id: string;
+  name: string;
+  price: number;
+  discount_price: number | null;
+  sort_order: number;
+};
+
 /* ---------------- Katalog publik: detail produk ---------------- */
 
 export const getProductDetail = createServerFn({ method: "GET" })
@@ -21,7 +29,7 @@ export const getProductDetail = createServerFn({ method: "GET" })
     const { data: row, error } = await supabase
       .from("digital_products")
       .select(
-        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, available_stock, store_id, stores(name, slug, is_platform)",
+        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, available_stock, store_id, stores(name, slug, is_platform), product_variants(id, name, price, discount_price, sort_order)",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -32,7 +40,18 @@ export const getProductDetail = createServerFn({ method: "GET" })
       console.error("[katalog] detail produk gagal:", error.message);
       return { product: null, error: "Produk tidak dapat dimuat." as const };
     }
-    return { product: row, error: null };
+    if (!row) return { product: null, error: null };
+
+    // RLS publik hanya mengembalikan variasi aktif; urutkan dan buang variasi
+    // pada mode kirim yang tidak mendukungnya.
+    const { product_variants: rawVariants, ...rest } = row as typeof row & {
+      product_variants?: ProductVariant[] | null;
+    };
+    const variants =
+      (rest.delivery_mode ?? "shared") === "shared"
+        ? [...(rawVariants ?? [])].sort((a, b) => a.sort_order - b.sort_order)
+        : [];
+    return { product: { ...rest, variants }, error: null };
   });
 
 /** Penegakan feature flag di server: checkout ditutup saat flag dimatikan. */
@@ -54,6 +73,7 @@ export const createDigitalOrder = createServerFn({ method: "POST" })
     z
       .object({
         productId: z.string().uuid(),
+        variantId: z.string().uuid().optional(),
         quantity: z.number().int().min(1).max(10).default(1),
         idempotencyKey: z.string().min(8).max(64),
         note: z.string().trim().max(500).optional(),
@@ -71,6 +91,7 @@ export const createDigitalOrder = createServerFn({ method: "POST" })
       _quantity: data.quantity,
       _idempotency_key: data.idempotencyKey,
       _customer_note: data.note ?? null,
+      _variant_id: data.variantId ?? null,
     });
     if (error) return { ok: false as const, error: helpers.rpcErrorMessage(error.message) };
     return {

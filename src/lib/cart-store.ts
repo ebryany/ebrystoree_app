@@ -20,6 +20,9 @@ import { useSyncExternalStore } from "react";
 
 export type CartItem = {
   productId: string;
+  /** Variasi terpilih (opsional). Harga variasi tetap divalidasi ulang di server. */
+  variantId?: string | null;
+  variantName?: string | null;
   slug: string;
   name: string;
   thumbnailUrl: string | null;
@@ -55,7 +58,13 @@ function readStorage(key: string): CartState {
         typeof (it as CartItem).productId === "string" &&
         typeof (it as CartItem).slug === "string",
     );
-    return { items: clean.slice(0, MAX_ITEMS) };
+    // variantId dari storage tidak dipercaya: selain string dianggap tanpa variasi.
+    const normalized = clean.map((it) => ({
+      ...it,
+      variantId: typeof it.variantId === "string" ? it.variantId : null,
+      variantName: typeof it.variantName === "string" ? it.variantName : null,
+    }));
+    return { items: normalized.slice(0, MAX_ITEMS) };
   } catch {
     return { items: [] };
   }
@@ -108,15 +117,25 @@ export function hydrateCart() {
   emit();
 }
 
+/** Kunci unik baris keranjang: produk yang sama dengan variasi berbeda = baris berbeda. */
+export function cartLineKey(productId: string, variantId?: string | null) {
+  return `${productId}:${variantId ?? ""}`;
+}
+
+const lineKey = (it: Pick<CartItem, "productId" | "variantId">) =>
+  cartLineKey(it.productId, it.variantId);
+
 export function addToCart(item: Omit<CartItem, "addedAt">): "added" | "duplicate" | "full" {
-  if (state.items.some((it) => it.productId === item.productId)) return "duplicate";
+  const key = lineKey(item);
+  if (state.items.some((it) => lineKey(it) === key)) return "duplicate";
   if (state.items.length >= MAX_ITEMS) return "full";
   setState({ items: [...state.items, { ...item, addedAt: Date.now() }] });
   return "added";
 }
 
-export function removeFromCart(productId: string) {
-  setState({ items: state.items.filter((it) => it.productId !== productId) });
+export function removeFromCart(productId: string, variantId?: string | null) {
+  const key = cartLineKey(productId, variantId);
+  setState({ items: state.items.filter((it) => lineKey(it) !== key) });
 }
 
 export function clearCart() {

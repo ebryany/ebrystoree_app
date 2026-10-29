@@ -23,7 +23,7 @@ import { StickyActionBar } from "@/components/ebry/cards";
 import { ProductReviewPanel } from "@/components/product/review-panel";
 import { ProductInquiryButton } from "@/components/product/inquiry-dialog";
 import { addToCart } from "@/lib/cart-store";
-import { getProductDetail } from "@/lib/orders.functions";
+import { getProductDetail, type ProductVariant } from "@/lib/orders.functions";
 import { effectivePrice, formatRupiah } from "@/lib/format";
 import { isRenderableImageUrl } from "@/lib/utils";
 import { recordProductView } from "@/lib/recently-viewed";
@@ -125,13 +125,19 @@ function DetailProduk() {
     });
   }, [p]);
 
+  // Variasi dari server (sudah difilter aktif & terurut). Default: variasi pertama.
+  const variants: ProductVariant[] = p?.variants ?? [];
+  const [variantId, setVariantId] = useState<string | null>(variants[0]?.id ?? null);
+  const selectedVariant = variants.find((v) => v.id === variantId) ?? variants[0] ?? null;
+
   if (!p) return null;
   const thumbnail = isRenderableImageUrl(p.thumbnail_url) ? p.thumbnail_url : null;
-  const price = effectivePrice(
-    Number(p.price),
-    p.discount_price === null ? null : Number(p.discount_price),
-  );
-  const discounted = price < Number(p.price);
+  // Harga tampilan mengikuti variasi terpilih; harga final tetap dihitung server.
+  const basePrice = Number(selectedVariant ? selectedVariant.price : p.price);
+  const baseDiscount = selectedVariant ? selectedVariant.discount_price : p.discount_price;
+  const price = effectivePrice(basePrice, baseDiscount === null ? null : Number(baseDiscount));
+  const discounted = price < basePrice;
+  const checkoutSearch = selectedVariant ? { variant: selectedVariant.id } : {};
   const downloadLimit = p.download_limit ?? 5;
   const uniqueStock = (p as { delivery_mode?: string }).delivery_mode === "unique";
   const stock = Number((p as { available_stock?: number }).available_stock ?? 0);
@@ -153,6 +159,8 @@ function DetailProduk() {
   const handleAddToCart = () => {
     const result = addToCart({
       productId: p.id,
+      variantId: selectedVariant?.id ?? null,
+      variantName: selectedVariant?.name ?? null,
       slug: p.slug,
       name: p.name,
       thumbnailUrl: thumbnail,
@@ -161,7 +169,11 @@ function DetailProduk() {
       priceHint: price,
     });
     if (result === "duplicate") {
-      toast.info("Produk ini sudah ada di keranjang.");
+      toast.info(
+        selectedVariant
+          ? `Variasi ${selectedVariant.name} sudah ada di keranjang.`
+          : "Produk ini sudah ada di keranjang.",
+      );
       return;
     }
     if (result === "full") {
@@ -256,9 +268,9 @@ function DetailProduk() {
             <div className="mt-5">
               {discounted ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="line-through">{formatRupiah(Number(p.price))}</span>
+                  <span className="line-through">{formatRupiah(basePrice)}</span>
                   <span className="bg-warning/20 px-2 py-0.5 text-xs font-semibold text-warning-foreground">
-                    Hemat {Math.round((1 - price / Number(p.price)) * 100)}%
+                    Hemat {Math.round((1 - price / basePrice) * 100)}%
                   </span>
                 </div>
               ) : null}
@@ -270,9 +282,50 @@ function DetailProduk() {
 
             {/* Ringkasan pembelian: hanya ketentuan kritis untuk keputusan beli.
                 Detail teknis lengkap ada di panel Spesifikasi — tidak duplikat. */}
-            <dl className="mt-5 grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm">
+            <dl className="mt-5 grid grid-cols-[88px_minmax(0,1fr)] gap-x-4 gap-y-4 text-sm sm:grid-cols-[110px_minmax(0,1fr)]">
+              {variants.length > 0 ? (
+                <>
+                  <dt id="label-variasi" className="pt-3 text-muted-foreground">
+                    Variasi
+                  </dt>
+                  <dd>
+                    <div
+                      role="radiogroup"
+                      aria-labelledby="label-variasi"
+                      className="flex flex-wrap gap-2"
+                    >
+                      {variants.map((v) => {
+                        const active = v.id === selectedVariant?.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={active}
+                            onClick={() => setVariantId(v.id)}
+                            className={
+                              "min-h-11 max-w-full border px-3.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground " +
+                              (active
+                                ? "border-primary bg-primary/5 text-primary"
+                                : "border-border bg-card text-foreground hover:border-primary/50")
+                            }
+                          >
+                            <span className="line-clamp-2 break-words">{v.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </dd>
+                </>
+              ) : null}
               <dt className="text-muted-foreground">Pengiriman</dt>
-              <dd className="font-medium">Otomatis setelah pembayaran terverifikasi</dd>
+              <dd>
+                <p className="font-medium">Otomatis setelah pembayaran terverifikasi</p>
+                <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+                  <Download className="size-3.5 shrink-0" aria-hidden="true" />
+                  Dikirim ke menu Produk saya · {downloadLimit}x unduh · akses {validityDays} hari
+                </p>
+              </dd>
               {uniqueStock ? (
                 <>
                   <dt className="text-muted-foreground">Ketersediaan</dt>
@@ -310,7 +363,7 @@ function DetailProduk() {
               ) : (
                 <>
                   <Button asChild className="min-h-11">
-                    <Link to="/checkout/produk/$slug" params={{ slug }}>
+                    <Link to="/checkout/produk/$slug" params={{ slug }} search={checkoutSearch}>
                       <ShoppingBag className="size-4" aria-hidden="true" /> Beli langsung
                     </Link>
                   </Button>
@@ -447,7 +500,7 @@ function DetailProduk() {
               {discounted ? (
                 <s className="block text-xs tabular-nums text-muted-foreground">
                   <span className="sr-only">Harga sebelumnya </span>
-                  {formatRupiah(Number(p.price))}
+                  {formatRupiah(basePrice)}
                 </s>
               ) : null}
               <p className="truncate text-base font-bold tabular-nums text-primary">
@@ -471,7 +524,7 @@ function DetailProduk() {
               </Button>
             ) : (
               <Button asChild className="min-h-11 shrink-0 px-5">
-                <Link to="/checkout/produk/$slug" params={{ slug }}>
+                <Link to="/checkout/produk/$slug" params={{ slug }} search={checkoutSearch}>
                   Beli langsung
                 </Link>
               </Button>

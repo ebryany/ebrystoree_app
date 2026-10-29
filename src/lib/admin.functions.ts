@@ -278,7 +278,7 @@ export const listAdminProducts = createServerFn({ method: "POST" })
       let q = context.supabase
         .from("digital_products")
         .select(
-          "id, name, slug, status, price, discount_price, sold_count, updated_at, category_id, short_description, thumbnail_url, download_limit, validity_days",
+          "id, name, slug, status, price, discount_price, sold_count, updated_at, category_id, short_description, thumbnail_url, download_limit, validity_days, delivery_mode",
           {
             count: "exact",
           },

@@ -47,11 +47,19 @@ export const Route = createFileRoute("/_authenticated/checkout/produk/$slug")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  // Hanya uuid yang diteruskan; nilai lain dibuang. Harga variasi tetap dari server.
+  validateSearch: (search: Record<string, unknown>): { variant?: string } => {
+    const raw = typeof search.variant === "string" ? search.variant : "";
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw)
+      ? { variant: raw }
+      : {};
+  },
   component: CheckoutProduk,
 });
 
 function CheckoutProduk() {
   const { slug } = Route.useParams();
+  const { variant: variantParam } = Route.useSearch();
   const navigate = useNavigate();
   const fetchDetail = useServerFn(getProductDetail);
   const submitOrder = useServerFn(createDigitalOrder);
@@ -93,12 +101,15 @@ function CheckoutProduk() {
   const soldOut = (uniqueStock || codeDelivery) && stock < 1;
   const maxQty = uniqueStock || codeDelivery ? 1 : 10;
   const store = (p as any).stores as { name: string; slug: string; is_platform: boolean } | null;
-  const unit = effectivePrice(
-    Number(p.price),
-    p.discount_price === null ? null : Number(p.discount_price),
-  );
+  // Produk bervariasi wajib memilih satu; tanpa param valid jatuh ke variasi pertama
+  // (ditampilkan jelas di item pesanan, dan bisa diubah dari halaman produk).
+  const variants = p.variants ?? [];
+  const variant = variants.find((v) => v.id === variantParam) ?? variants[0] ?? null;
+  const basePrice = Number(variant ? variant.price : p.price);
+  const baseDiscount = variant ? variant.discount_price : p.discount_price;
+  const unit = effectivePrice(basePrice, baseDiscount === null ? null : Number(baseDiscount));
   const subtotal = unit * quantity;
-  const hasDiscount = p.discount_price !== null && Number(p.discount_price) < Number(p.price);
+  const hasDiscount = unit < basePrice;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -110,7 +121,13 @@ function CheckoutProduk() {
       trackEvent("checkout_start", `/checkout/produk/${slug}`),
     );
     const result = await submitOrder({
-      data: { productId: p.id, quantity, idempotencyKey, note: note.trim() || undefined },
+      data: {
+        productId: p.id,
+        variantId: variant?.id,
+        quantity,
+        idempotencyKey,
+        note: note.trim() || undefined,
+      },
     });
 
     if (!result.ok) {
@@ -209,6 +226,21 @@ function CheckoutProduk() {
               )}
               <div className="min-w-0 flex-1">
                 <h3 className="font-display font-semibold leading-tight">{p.name}</h3>
+                {variant ? (
+                  <p className="mt-1 text-sm">
+                    <span className="text-muted-foreground">Variasi: </span>
+                    <span className="font-medium">{variant.name}</span>
+                    {variants.length > 1 ? (
+                      <Link
+                        to="/produk/$slug"
+                        params={{ slug }}
+                        className="ml-2 text-xs font-medium text-primary underline-offset-4 hover:underline"
+                      >
+                        Ubah
+                      </Link>
+                    ) : null}
+                  </p>
+                ) : null}
                 <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                   {p.short_description}
                 </p>
@@ -232,7 +264,7 @@ function CheckoutProduk() {
                   <span className="font-semibold">{formatRupiah(unit)}</span>
                   {hasDiscount ? (
                     <span className="text-sm text-muted-foreground line-through">
-                      {formatRupiah(Number(p.price))}
+                      {formatRupiah(basePrice)}
                     </span>
                   ) : null}
                   <Badge variant="outline" className="gap-1">

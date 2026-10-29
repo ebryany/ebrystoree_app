@@ -8,7 +8,13 @@ import { toast } from "sonner";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
-import { hydrateCart, removeFromCart, setCartOwner, useCart } from "@/lib/cart-store";
+import {
+  cartLineKey,
+  hydrateCart,
+  removeFromCart,
+  setCartOwner,
+  useCart,
+} from "@/lib/cart-store";
 import { validateCartItems } from "@/lib/cart.functions";
 import { formatRupiah } from "@/lib/format";
 
@@ -30,6 +36,8 @@ const REASON_LABEL: Record<string, string> = {
   PRODUCT_GONE: "Produk sudah tidak tersedia.",
   NOT_PUBLISHED: "Produk sedang tidak dijual.",
   STORE_INACTIVE: "Toko sedang tidak aktif.",
+  VARIANT_GONE: "Variasi ini sudah tidak tersedia. Pilih variasi lain di halaman produk.",
+  VARIANT_REQUIRED: "Produk ini sekarang punya variasi. Pilih variasi di halaman produk.",
 };
 
 function CartPage() {
@@ -45,16 +53,19 @@ function CartPage() {
     setReady(true);
   }, [user?.id]);
 
-  const ids = useMemo(() => cart.items.map((it) => it.productId), [cart.items]);
+  const lines = useMemo(
+    () => cart.items.map((it) => ({ productId: it.productId, variantId: it.variantId ?? null })),
+    [cart.items],
+  );
   const fetchValidation = useServerFn(validateCartItems);
   const { data, isPending, error, refetch } = useQuery({
-    queryKey: ["cart-validation", ids],
-    queryFn: () => fetchValidation({ data: { productIds: ids } }),
-    enabled: ready && ids.length > 0,
+    queryKey: ["cart-validation", lines],
+    queryFn: () => fetchValidation({ data: { items: lines } }),
+    enabled: ready && lines.length > 0,
   });
 
   const validated = useMemo(() => ((data?.items ?? []) as any[]), [data?.items]);
-  const byId = new Map(validated.map((v) => [v.productId, v]));
+  const byId = new Map(validated.map((v) => [cartLineKey(v.productId, v.variantId), v]));
 
   // Kelompokkan per toko: checkout tetap per item karena backend belum
   // mendukung multi-item dalam satu order.
@@ -136,9 +147,13 @@ function CartPage() {
                   </div>
                   <ul className="divide-y divide-border">
                     {group.items.map((item) => {
-                      const hint = cart.items.find((c) => c.productId === item.productId);
+                      const key = cartLineKey(item.productId, item.variantId);
+                      const hint = cart.items.find(
+                        (c) => cartLineKey(c.productId, c.variantId) === key,
+                      );
+                      const variantLabel = item.variantName ?? hint?.variantName ?? null;
                       return (
-                        <li key={item.productId} className="flex items-start gap-3 px-4 py-4">
+                        <li key={key} className="flex items-start gap-3 px-4 py-4">
                           <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-surface-selected">
                             {item.thumbnailUrl ? (
                               <img
@@ -162,6 +177,11 @@ function CartPage() {
                             >
                               {item.name}
                             </Link>
+                            {variantLabel ? (
+                              <p className="mt-0.5 text-xs text-muted-foreground">
+                                Variasi: {variantLabel}
+                              </p>
+                            ) : null}
                             {item.available ? (
                               <p className="mt-1 text-sm font-semibold tabular-nums text-price">
                                 {formatRupiah(Number(item.price))}
@@ -193,7 +213,7 @@ function CartPage() {
                               className="min-h-11 min-w-11"
                               aria-label={`Hapus ${item.name} dari keranjang`}
                               onClick={() => {
-                                removeFromCart(item.productId);
+                                removeFromCart(item.productId, item.variantId);
                                 toast.success("Item dihapus dari keranjang.");
                               }}
                             >
@@ -201,7 +221,11 @@ function CartPage() {
                             </Button>
                             {item.available ? (
                               <Button asChild size="sm" className="min-h-11">
-                                <Link to="/checkout/produk/$slug" params={{ slug: item.slug }}>
+                                <Link
+                                  to="/checkout/produk/$slug"
+                                  params={{ slug: item.slug }}
+                                  search={item.variantId ? { variant: item.variantId } : {}}
+                                >
                                   Beli
                                 </Link>
                               </Button>
@@ -245,7 +269,11 @@ function CartPage() {
 
               {availableItems.length > 0 ? (
                 <Button asChild className="mt-3 min-h-11 w-full">
-                  <Link to="/checkout/produk/$slug" params={{ slug: availableItems[0].slug }}>
+                  <Link
+                    to="/checkout/produk/$slug"
+                    params={{ slug: availableItems[0].slug }}
+                    search={availableItems[0].variantId ? { variant: availableItems[0].variantId } : {}}
+                  >
                     Lanjut ke checkout
                   </Link>
                 </Button>

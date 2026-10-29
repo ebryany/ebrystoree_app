@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductVariantEditor } from "@/components/product/variant-editor";
 import {
   archiveMyProduct,
   getMyProduct,
@@ -264,6 +265,16 @@ function EditProduct() {
         </div>
       </form>
 
+      <ProductVariantEditor
+        productId={id}
+        deliveryMode={product.delivery_mode}
+        moderationNotice
+        onSaved={() => {
+          void queryClient.invalidateQueries({ queryKey: ["my-product", id] });
+          void queryClient.invalidateQueries({ queryKey: ["my-store-products"] });
+        }}
+      />
+
       <SellerFilesSection productId={id} />
     </div>
   );
@@ -302,6 +313,8 @@ function SellerFilesSection({ productId }: { productId: string }) {
     void qc.invalidateQueries({ queryKey: ["my-product-files", productId] });
     void qc.invalidateQueries({ queryKey: ["my-stock-codes", productId] });
     void qc.invalidateQueries({ queryKey: ["my-store-products"] });
+    // Mode kirim memengaruhi editor variasi di atas.
+    void qc.invalidateQueries({ queryKey: ["my-product", productId] });
   };
 
   const deliveryMode: "shared" | "unique" | "code" = (data as any)?.deliveryMode ?? "shared";

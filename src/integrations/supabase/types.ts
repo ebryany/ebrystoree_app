@@ -2324,6 +2324,50 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          created_at: string
+          discount_price: number | null
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          product_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          discount_price?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          product_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          discount_price?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          product_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_reviews: {
         Row: {
           body: string | null
@@ -3637,6 +3681,7 @@ export type Database = {
           _idempotency_key: string
           _product_id: string
           _quantity: number
+          _variant_id?: string
         }
         Returns: Json
       }
@@ -4032,6 +4077,10 @@ export type Database = {
       }
       save_seller_bank_account: {
         Args: { _account_holder_name: string; _account_number: string; _bank_name: string }
+        Returns: Json
+      }
+      set_product_variants: {
+        Args: { _product_id: string; _variants: Json }
         Returns: Json
       }
       set_seller_suspended: {
