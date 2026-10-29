@@ -26,6 +26,7 @@ import {
 
 import { listCatalogCategories } from "@/lib/catalog.functions";
 import { cn } from "@/lib/utils";
+import { SectionHeader } from "@/components/home/section-header";
 
 const categoriesQuery = queryOptions({
   queryKey: ["categories", "service", "home"],
@@ -122,45 +123,43 @@ export function CategoryRail() {
   ];
 
   return (
-    <section
-      aria-labelledby="kategori-heading"
-      className="rounded-2xl border border-border bg-card py-4"
-    >
-      <h2
+    <section aria-labelledby="kategori-heading">
+      <SectionHeader
         id="kategori-heading"
-        className="flex items-center gap-2 px-4 text-base font-bold text-foreground sm:px-5 sm:text-lg"
-      >
-        <span className="h-4 w-1 rounded-full bg-accent" aria-hidden="true" />
-        Kategori
-      </h2>
+        title="Jelajahi kategori"
+        desc="Produk siap pakai dan jasa yang dikerjakan seller."
+      />
       <div
         role="region"
         aria-label="Daftar kategori"
         tabIndex={0}
-        className="mt-3 overflow-x-auto px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 overflow-x-auto px-4 pb-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:-mx-6 sm:px-6 lg:mx-0 lg:overflow-visible lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {/* Selalu dua baris penuh mengalir ke samping, jadi tidak ada baris
-            yang setengah kosong. HP: kolom terpotong = tanda bisa digeser.
-            Desktop: kolom melebar rata mengisi lebar kartu (min 104px);
-            kategori sangat banyak tetap bisa digeser. */}
-        <ul className="grid w-max snap-x grid-flow-col grid-rows-2 auto-cols-[76px] gap-x-1 gap-y-2 sm:auto-cols-[92px] lg:w-full lg:min-w-max lg:auto-cols-[minmax(104px,1fr)] lg:gap-y-3">
+        {/* HP/tablet: 2 baris mengalir ke samping (kolom terpotong = bisa digeser).
+            Desktop: grid rata 6 kolom tanpa geser. */}
+        <ul className="grid w-max grid-flow-col grid-rows-2 auto-cols-[11.5rem] gap-2.5 lg:w-full lg:grid-flow-row lg:grid-cols-4 lg:grid-rows-none xl:grid-cols-6">
           {tiles.map((t) => (
-            <li key={t.key} className="snap-start">
+            <li key={t.key} className="min-w-0">
               <Link
                 to={t.to}
                 search={t.kategori ? ({ kategori: t.kategori } as never) : undefined}
-                className="group flex min-h-11 flex-col items-center gap-1.5 rounded-xl p-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="group flex min-h-14 items-center gap-3 rounded-xl border border-border bg-card p-2.5 transition-[border-color,box-shadow] duration-200 hover:border-accent/40 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
               >
                 <span
                   className={cn(
-                    "grid size-12 place-items-center rounded-2xl transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 sm:size-14",
+                    "grid size-10 shrink-0 place-items-center rounded-lg",
                     TONES[t.tone],
                   )}
                 >
-                  <t.icon className="size-6 sm:size-7" strokeWidth={1.75} aria-hidden="true" />
+                  <t.icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
                 </span>
-                <span className="line-clamp-2 text-[11px] font-medium capitalize leading-tight text-foreground group-hover:text-accent sm:text-xs">
-                  {t.label}
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-medium capitalize text-foreground group-hover:text-accent">
+                    {t.label.toLowerCase()}
+                  </span>
+                  <span className="block text-[11px] text-muted-foreground">
+                    {t.to === "/produk" ? "Produk" : "Jasa"}
+                  </span>
                 </span>
               </Link>
             </li>

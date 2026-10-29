@@ -115,9 +115,12 @@ export function ReviewMarqueeSection() {
   const secondRow = useTwoRows ? reviews.slice(half) : [];
 
   return (
-    <section aria-labelledby="review-pembeli-heading" className="pt-8 sm:pt-10">
-      <div className="mb-4">
-        <h2 id="review-pembeli-heading" className="text-xl font-bold sm:text-2xl">
+    <section aria-labelledby="review-pembeli-heading">
+      <div className="mb-5">
+        <h2
+          id="review-pembeli-heading"
+          className="font-display text-xl font-bold tracking-tight sm:text-2xl"
+        >
           Kata pembeli
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">

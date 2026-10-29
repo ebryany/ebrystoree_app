@@ -62,7 +62,7 @@ export function SellerJoinSection({
   return (
     <motion.section
       aria-labelledby="seller-join-heading"
-      className="relative mt-10 overflow-hidden rounded-2xl border border-border bg-card sm:mt-12"
+      className="relative overflow-hidden rounded-2xl border border-border bg-card"
       initial={reduced ? false : "hidden"}
       whileInView={reduced ? undefined : "show"}
       viewport={{ once: true, margin: "-60px" }}

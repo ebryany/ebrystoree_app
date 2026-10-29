@@ -11,9 +11,10 @@ import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { SellerServiceCard } from "@/components/home/seller-service-card";
 import { MarketplaceServiceCard } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
-import { PRODUCT_GRID, SeeAllLink, Shelf } from "@/components/ebry/product-shelf";
-import { cn } from "@/lib/utils";
-import { PopularSellers } from "@/components/ebry/popular-sellers";
+import { SeeAllLink } from "@/components/ebry/product-shelf";
+import { FeaturedSellers } from "@/components/home/featured-sellers";
+import { ProductTabs, type ProductTab } from "@/components/home/product-tabs";
+import { SectionHeader } from "@/components/home/section-header";
 import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import {
   listProductShelves,
@@ -146,64 +147,40 @@ function Beranda() {
       {/* Hero pita lebar penuh: diletakkan di luar wadah berlebar tetap supaya
           latar gradiennya menyentuh tepi layar, bukan terkurung kotak. */}
       <HomeHero />
-      <div className="bg-surface">
-        {/* Lebar penuh dengan padding, sama seperti navbar: tepi kiri konten
-            sejajar dengan logo di navbar, bukan lagi terkurung 1152px. */}
-        <div className="w-full px-4 pb-10 pt-5 sm:px-6 sm:pt-6 lg:px-8">
-          {/* Kategori jasa: pintu eksplorasi pertama setelah hero. Gagal/ kosong
-              → tidak dirender (fallback minimal), navigasi tetap via /layanan. */}
+      {/* Satu kolom lebar penuh, tepi kiri sejajar navbar. Antar-section diberi
+          jarak lega; tidak ada kartu pembungkus per rak. */}
+      <div className="w-full space-y-12 px-4 pb-16 pt-10 sm:space-y-16 sm:px-6 sm:pt-12 lg:px-8">
+        <SectionSuspense
+          fallback={
+            <div className="h-32 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
+          }
+          queryKey={homeCategoriesQuery.queryKey}
+        >
+          <CategoryRail />
+        </SectionSuspense>
+        <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
+          <ProductShelves />
+        </SectionSuspense>
+        <section aria-labelledby="jasa-heading">
+          <SectionHeader
+            id="jasa-heading"
+            title="Jasa seller"
+            desc="Dikerjakan seller sesuai kesepakatan. Dana ditahan sampai hasil Anda terima."
+            action={<SeeAllLink to="/layanan" />}
+          />
           <SectionSuspense
-            fallback={
-              <div className="h-14 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
-            }
-            queryKey={homeCategoriesQuery.queryKey}
+            fallback={<CardsSkeleton count={3} />}
+            queryKey={sellerServicesQuery.queryKey}
           >
-            <CategoryRail />
+            <SellerServicesSection />
           </SectionSuspense>
-          {/* Rak-rak ala marketplace: tiap rak bisa di-swipe, 2 kartu per layar di HP. */}
-          <div className="mt-4 space-y-4">
-            <RecentlyViewedShelf />
-            <SectionSuspense
-              fallback={<CardsSkeleton count={4} />}
-              queryKey={shelvesQuery.queryKey}
-            >
-              <ProductShelves />
-            </SectionSuspense>
-            <PopularSellers />
-            <section
-              aria-labelledby="jasa-heading"
-              className="@container rounded-2xl bg-card py-3.5 sm:py-4"
-            >
-              <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
-                <h2
-                  id="jasa-heading"
-                  className="flex items-center gap-2 text-base font-bold text-foreground sm:text-lg"
-                >
-                  <span className="h-4 w-1 rounded-full bg-accent" aria-hidden="true" />
-                  Jasa seller
-                </h2>
-                <SeeAllLink to="/layanan" />
-              </div>
-              <SectionSuspense
-                fallback={<CardsSkeleton count={3} />}
-                queryKey={sellerServicesQuery.queryKey}
-              >
-                <SellerServicesSection />
-              </SectionSuspense>
-            </section>
-          </div>
-          <div className="defer-render">
-            <ReviewMarqueeSection />
-            {/* Layanan platform disembunyikan saat belum ada paket aktif: menampilkan
-                section berisi "belum ada layanan" lebih merugikan daripada tidak tampil. */}
-            <PlatformServicesSection />
-          </div>
-        </div>
-
-        {/* Penutup homepage: ajakan seller dalam kartu ber-gutter, sama dengan
-            container katalog di atasnya. Section "Cara memesan" dihapus karena
-            mengganggu; pusat bantuan tetap terjangkau lewat menu navigasi. */}
-        <div className="defer-render w-full px-4 pb-14 sm:px-6 lg:px-8">
+        </section>
+        <FeaturedSellers />
+        <RecentlyViewedShelf />
+        <div className="defer-render space-y-12 sm:space-y-16">
+          <ReviewMarqueeSection />
+          {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
+          <PlatformServicesSection />
           <SellerJoinSection stores={proofStores} />
         </div>
       </div>
@@ -229,36 +206,21 @@ function ProductShelves() {
       />
     );
   }
-  // Rak kategori dengan 1–3 produk terlihat kosong di desktop dan produknya
-  // sudah muncul di grid terbaru, jadi hanya kategori yang cukup isi ditampilkan.
-  const categoryShelves = data.shelves.filter((s) => s.items.length >= MIN_CATEGORY_SHELF);
-  return (
-    <>
-      <Shelf
-        title="Produk terlaris"
-        items={data.bestSellers}
-        ranked
-        action={<SeeAllLink to="/produk" />}
-      />
-      {categoryShelves.map((s) => (
-        <Shelf
-          key={s.slug}
-          title={s.name}
-          items={s.items}
-          action={<SeeAllLink to="/produk" kategori={s.slug} />}
-        />
-      ))}
-      <Shelf
-        title="Produk terbaru"
-        items={data.latest}
-        layout="grid"
-        action={<SeeAllLink to="/produk" />}
-      />
-    </>
-  );
+  // Satu section bertab menggantikan rak bertumpuk. Tab kategori hanya untuk
+  // kategori yang cukup isi; sisanya tetap muncul di tab "Terbaru".
+  const tabs: ProductTab[] = [
+    { key: "latest", label: "Terbaru", items: data.latest },
+    ...(data.bestSellers.length
+      ? [{ key: "best", label: "Terlaris", items: data.bestSellers, ranked: true }]
+      : []),
+    ...data.shelves
+      .filter((s) => s.items.length >= MIN_CATEGORY_TAB)
+      .map((s) => ({ key: `c-${s.slug}`, label: s.name, items: s.items, kategori: s.slug })),
+  ];
+  return <ProductTabs tabs={tabs} />;
 }
 
-const MIN_CATEGORY_SHELF = 4;
+const MIN_CATEGORY_TAB = 2;
 
 function SellerServicesSection() {
   const query = useSuspenseQuery(sellerServicesQuery);
@@ -272,11 +234,10 @@ function SellerServicesSection() {
       />
     );
   return (
-    // Grid sama dengan kartu produk supaya ukuran kartu seragam di seluruh beranda.
-    <ul className={cn("mt-1 px-4 sm:px-5", PRODUCT_GRID)}>
+    <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {query.data.items.map((item) => (
         <li key={item.id} className="min-w-0">
-          <SellerServiceCard item={item} />
+          <SellerServiceCard item={item} variant="home" />
         </li>
       ))}
     </ul>
@@ -293,23 +254,16 @@ function PlatformServicesSection() {
   const query = useSuspenseQuery(servicesQuery);
   if (query.data.error || query.data.items.length === 0) return null;
   return (
-    <section
-      aria-labelledby="layanan-heading"
-      className="mt-10 border-t border-border pt-8 sm:mt-12"
-    >
-      <div className="mb-5 max-w-xl">
-        <p className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <GraduationCap className="size-4" aria-hidden="true" /> Layanan dari platform
-        </p>
-        <h2 id="layanan-heading" className="text-xl font-bold sm:text-2xl">
-          Pendampingan akademik
-        </h2>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          Berbeda dari produk siap pakai. Pilih paket, kirim kebutuhan, dan pantau progres
-          pengerjaan.
-        </p>
-      </div>
-      <div className="mx-auto grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <section aria-labelledby="layanan-heading">
+      <p className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+        <GraduationCap className="size-4" aria-hidden="true" /> Layanan dari platform
+      </p>
+      <SectionHeader
+        id="layanan-heading"
+        title="Pendampingan akademik"
+        desc="Pilih paket, kirim kebutuhan, dan pantau progres pengerjaan."
+      />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {query.data.items.map((item) => (
           <MarketplaceServiceCard key={item.id} item={item} />
         ))}
