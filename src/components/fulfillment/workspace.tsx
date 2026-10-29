@@ -38,7 +38,12 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
-import { getOrderFulfillment, listMyAssignments, operatorAction, submitJobResult } from "@/lib/fulfillment.functions";
+import {
+  getOrderFulfillment,
+  listMyAssignments,
+  operatorAction,
+  submitJobResult,
+} from "@/lib/fulfillment.functions";
 import { cn } from "@/lib/utils";
 
 export type WorkspaceBase = "admin" | "operator";
@@ -62,12 +67,24 @@ const ASSIGNMENT_LABEL: Record<string, string> = {
 function deadlineState(deadline: string | null) {
   if (!deadline) return { tone: "muted", text: "Tanpa deadline" } as const;
   const diffH = (new Date(deadline).getTime() - Date.now()) / 36e5;
-  if (diffH < 0) return { tone: "danger", text: `Lewat deadline · ${formatWhen(deadline)}` } as const;
-  if (diffH < 24) return { tone: "warn", text: `Kurang ${Math.max(1, Math.round(diffH))} jam lagi` } as const;
+  if (diffH < 0)
+    return { tone: "danger", text: `Lewat deadline · ${formatWhen(deadline)}` } as const;
+  if (diffH < 24)
+    return { tone: "warn", text: `Kurang ${Math.max(1, Math.round(diffH))} jam lagi` } as const;
   return { tone: "muted", text: `Deadline ${formatWhen(deadline)}` } as const;
 }
 
-function DetailLink({ base, id, children, className }: { base: WorkspaceBase; id: string; children: React.ReactNode; className?: string }) {
+function DetailLink({
+  base,
+  id,
+  children,
+  className,
+}: {
+  base: WorkspaceBase;
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return base === "admin" ? (
     <Link to="/admin/pengerjaan/$id" params={{ id }} className={className}>
       {children}
@@ -79,7 +96,15 @@ function DetailLink({ base, id, children, className }: { base: WorkspaceBase; id
   );
 }
 
-function ListLink({ base, children, className }: { base: WorkspaceBase; children: React.ReactNode; className?: string }) {
+function ListLink({
+  base,
+  children,
+  className,
+}: {
+  base: WorkspaceBase;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return base === "admin" ? (
     <Link to="/admin/pengerjaan" className={className}>
       {children}
@@ -132,19 +157,41 @@ export function FulfillmentBoard({ base, hero = true }: { base: WorkspaceBase; h
     { label: "Deadline < 24 jam", value: dueSoon, icon: AlarmClock, tone: "warning" },
     { label: "Selesai", value: done, icon: CheckCircle2, tone: "success" },
   ] as const;
+  const isAdmin = base === "admin";
+  const emptyCopy = {
+    active: {
+      title: "Belum ada tugas aktif",
+      description: statItems.length
+        ? "Tidak ada pekerjaan yang sedang berjalan. Periksa tab Selesai atau Semua untuk melihat tugas lainnya."
+        : "Tugas yang perlu ditangani akan muncul setelah order jasa ditugaskan kepada operator.",
+    },
+    done: {
+      title: "Belum ada tugas selesai",
+      description: "Tugas yang telah diselesaikan atau dirilis akan tercatat di sini.",
+    },
+    all: {
+      title: "Belum ada tugas pengerjaan",
+      description: "Tugas akan muncul setelah order jasa ditugaskan kepada operator.",
+    },
+  }[filter];
 
   return (
-    <div className="space-y-5">
+    <div className={cn("space-y-5", isAdmin && "space-y-4")}>
       {hero ? (
         <header className="relative overflow-hidden rounded-3xl bg-hero-gradient p-5 text-primary-foreground sm:p-7">
           <span
             aria-hidden
             className="pointer-events-none absolute -right-10 -top-14 size-40 rounded-full bg-primary-foreground/10 blur-2xl"
           />
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] opacity-80">Workspace pengerjaan</p>
-          <h1 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl">Tugas pengerjaan jasa</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] opacity-80">
+            Workspace pengerjaan
+          </p>
+          <h1 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl">
+            Tugas pengerjaan jasa
+          </h1>
           <p className="mt-2 max-w-md text-sm opacity-90">
-            Terima tugas, catat progres, lalu kirim hasil. Semua status tersinkron realtime dengan pelanggan dan admin.
+            Terima tugas, catat progres, lalu kirim hasil. Semua status tersinkron realtime dengan
+            pelanggan dan admin.
           </p>
           {!isPending && !error && needAction > 0 ? (
             <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-3 py-1.5 text-xs font-semibold">
@@ -155,79 +202,157 @@ export function FulfillmentBoard({ base, hero = true }: { base: WorkspaceBase; h
         </header>
       ) : null}
 
-      {base === "admin" ? <PendingAssignmentQueue /> : null}
+      {isAdmin ? (
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight">Pengerjaan Jasa</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Kelola tugas, pantau progres, dan selesaikan pekerjaan tepat waktu.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full shrink-0 sm:w-auto"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={cn("size-4", isFetching && "animate-spin")} aria-hidden />
+            {isFetching ? "Menyegarkan…" : "Segarkan"}
+          </Button>
+        </header>
+      ) : null}
+
+      {isAdmin ? <PendingAssignmentQueue /> : null}
 
       <section aria-label="Ringkasan tugas" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-            <span
-              className={cn(
-                "grid size-8 place-items-center rounded-lg",
-                s.tone === "accent" && "bg-accent/15 text-accent",
-                s.tone === "info" && "bg-info/12 text-info",
-                s.tone === "warning" && "bg-warning/20 text-warning-foreground",
-                s.tone === "success" && "bg-success/12 text-success",
-              )}
-            >
-              <s.icon className="size-4" aria-hidden />
-            </span>
-        <p className="mt-2.5 font-display text-2xl font-bold tabular-nums">{allData ? s.value : "–"}</p>
-            <p className="text-xs text-muted-foreground">{s.label}</p>
+          <div
+            key={s.label}
+            className={cn(
+              "rounded-2xl border border-border bg-card p-4 shadow-sm",
+              isAdmin && "rounded-xl p-3 shadow-none sm:p-3.5",
+            )}
+          >
+            <div className={cn(isAdmin && "flex items-center justify-between gap-2")}>
+              <span
+                className={cn(
+                  "grid size-8 place-items-center rounded-lg",
+                  isAdmin && "order-2 size-7 bg-transparent",
+                  s.tone === "accent" && "bg-accent/15 text-accent",
+                  s.tone === "info" && "bg-info/12 text-info",
+                  s.tone === "warning" && "bg-warning/20 text-warning-foreground",
+                  s.tone === "success" && "bg-success/12 text-success",
+                )}
+              >
+                <s.icon className="size-4" aria-hidden />
+              </span>
+              <p
+                className={cn(
+                  "mt-2.5 font-display text-2xl font-bold tabular-nums",
+                  isAdmin && "mt-0",
+                )}
+              >
+                {allData ? s.value : "–"}
+              </p>
+            </div>
+            <p className="mt-1 text-xs leading-4 text-muted-foreground">{s.label}</p>
           </div>
         ))}
       </section>
 
-      <div className="flex items-center gap-2">
-        <div
-          role="tablist"
-          aria-label="Filter tugas"
-          className="flex flex-1 gap-1 rounded-full border border-border bg-surface p-1"
-        >
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              role="tab"
-              aria-selected={filter === f.key}
-              onClick={() => setFilter(f.key)}
-              className={cn(
-                "min-h-9 flex-1 rounded-full px-3 text-sm font-medium transition-colors",
-                filter === f.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
+      {isAdmin ? (
+        <section aria-label="Daftar tugas" className="space-y-3">
+          <div className="flex flex-col gap-2 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-sm font-semibold">Daftar tugas</h2>
+            <div
+              role="tablist"
+              aria-label="Filter tugas"
+              className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-surface p-1 sm:flex sm:w-auto"
             >
-              {f.label}
-            </button>
-          ))}
+              {FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={filter === f.key}
+                  onClick={() => setFilter(f.key)}
+                  className={cn(
+                    "min-h-11 rounded-md px-4 text-sm font-medium transition-colors sm:min-h-9",
+                    filter === f.key
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div className="flex items-center gap-2">
+          <div
+            role="tablist"
+            aria-label="Filter tugas"
+            className="flex flex-1 gap-1 rounded-full border border-border bg-surface p-1"
+          >
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                role="tab"
+                aria-selected={filter === f.key}
+                onClick={() => setFilter(f.key)}
+                className={cn(
+                  "min-h-9 flex-1 rounded-full px-3 text-sm font-medium transition-colors",
+                  filter === f.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <Button
+            size="icon"
+            variant="outline"
+            className="size-10 shrink-0 rounded-full"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            aria-label="Segarkan daftar tugas"
+          >
+            <RefreshCw className={cn("size-4", isFetching && "animate-spin")} aria-hidden />
+          </Button>
         </div>
-        <Button
-          size="icon"
-          variant="outline"
-          className="size-10 shrink-0 rounded-full"
-          onClick={() => refetch()}
-          disabled={isFetching}
-          aria-label="Segarkan daftar tugas"
-        >
-          <RefreshCw className={cn("size-4", isFetching && "animate-spin")} aria-hidden />
-        </Button>
-      </div>
+      )}
 
       {isPending ? (
         <CardSkeleton rows={3} />
       ) : error ? (
-        <ErrorState onRetry={() => refetch()} />
+        <ErrorState
+          title={isAdmin ? "Daftar tugas belum bisa dimuat" : undefined}
+          description={isAdmin ? "Periksa koneksi, lalu coba muat ulang daftar tugas." : undefined}
+          onRetry={() => refetch()}
+          className={cn(isAdmin && "rounded-xl py-5")}
+        />
       ) : forbidden ? (
         <EmptyState
+          className={cn(isAdmin && "rounded-xl py-8")}
           icon={Lock}
           title="Akses pengerjaan dibutuhkan"
           description="Akun Anda belum memiliki izin orders.fulfill. Hubungi super admin untuk mendapatkan peran operator."
         />
       ) : !items.length ? (
         <EmptyState
+          className={cn(isAdmin && "rounded-xl px-5 py-8")}
           icon={Inbox}
-          title="Belum ada tugas di filter ini"
-          description="Tugas baru muncul otomatis di sini begitu order jasa ditugaskan kepada Anda."
+          title={isAdmin ? emptyCopy.title : "Belum ada tugas di filter ini"}
+          description={
+            isAdmin
+              ? emptyCopy.description
+              : "Tugas baru muncul otomatis di sini begitu order jasa ditugaskan kepada Anda."
+          }
         />
       ) : (
         <ul className="grid gap-3 lg:grid-cols-2">
@@ -239,19 +364,31 @@ export function FulfillmentBoard({ base, hero = true }: { base: WorkspaceBase; h
                 key={a.id}
                 className={cn(
                   "relative overflow-hidden rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md",
+                  isAdmin &&
+                    "rounded-xl p-3.5 shadow-none transition-colors hover:border-foreground/20 hover:shadow-none",
                   isNew ? "border-accent/50" : "border-border",
                 )}
               >
-                {isNew ? <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-accent" /> : null}
+                {isNew && !isAdmin ? (
+                  <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-accent" />
+                ) : null}
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-muted-foreground">{a.order?.order_number ?? "-"}</span>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {a.order?.order_number ?? "-"}
+                  </span>
                   <div className="flex items-center gap-1.5">
-                    {a.openRevisions > 0 ? <Badge variant="destructive">{a.openRevisions} revisi</Badge> : null}
-                    <Badge variant={isNew ? "default" : "secondary"}>{ASSIGNMENT_LABEL[a.status] ?? a.status}</Badge>
+                    {a.openRevisions > 0 ? (
+                      <Badge variant="destructive">{a.openRevisions} revisi</Badge>
+                    ) : null}
+                    <Badge variant={isNew ? "default" : "secondary"}>
+                      {ASSIGNMENT_LABEL[a.status] ?? a.status}
+                    </Badge>
                   </div>
                 </div>
 
-                <p className="mt-2 font-display text-base font-semibold leading-snug">{a.serviceName ?? "Layanan"}</p>
+                <p className="mt-2 font-display text-base font-semibold leading-snug">
+                  {a.serviceName ?? "Layanan"}
+                </p>
                 {base === "admin" && a.operatorName ? (
                   <p className="mt-1 text-xs text-muted-foreground">
                     Operator: {a.operatorName}
@@ -261,37 +398,53 @@ export function FulfillmentBoard({ base, hero = true }: { base: WorkspaceBase; h
 
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {a.order?.status ? <StatusPill value={a.order.status} kind="order" /> : null}
-                  <span className="text-sm font-semibold tabular-nums">{formatIDR(a.order?.total)}</span>
+                  <span className="text-sm font-semibold tabular-nums">
+                    {formatIDR(a.order?.total)}
+                  </span>
                 </div>
 
-                <div className="mt-3 space-y-1">
+                <div className={cn("mt-3 space-y-1", isAdmin && "mt-2.5")}>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Progres</span>
                     <span className="font-semibold tabular-nums">{a.percent ?? 0}%</span>
                   </div>
-                  <Progress value={a.percent ?? 0} className="h-2" />
+                  <Progress value={a.percent ?? 0} className={cn("h-2", isAdmin && "h-1.5")} />
                 </div>
 
-                <p
+                <div
                   className={cn(
-                    "mt-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs",
-                    dl.tone === "danger"
-                      ? "bg-destructive/10 font-semibold text-destructive"
-                      : dl.tone === "warn"
-                        ? "bg-warning/20 font-semibold text-warning-foreground"
-                        : "text-muted-foreground",
+                    isAdmin &&
+                      "mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
                   )}
                 >
-                  <AlarmClock className="size-3.5" aria-hidden />
-                  {dl.text}
-                </p>
+                  <p
+                    className={cn(
+                      "mt-3 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs",
+                      isAdmin && "mt-0 px-0 py-0",
+                      dl.tone === "danger"
+                        ? "bg-destructive/10 font-semibold text-destructive"
+                        : dl.tone === "warn"
+                          ? "bg-warning/20 font-semibold text-warning-foreground"
+                          : "text-muted-foreground",
+                      isAdmin && dl.tone !== "muted" && "bg-transparent",
+                    )}
+                  >
+                    <AlarmClock className="size-3.5" aria-hidden />
+                    {dl.text}
+                  </p>
 
-                <Button asChild size="lg" variant={isNew ? "default" : "outline"} className="mt-3 w-full">
-                  <DetailLink base={base} id={a.order_id}>
-                    {isNew ? "Terima tugas" : "Buka tugas"}
-                    <ArrowRight className="size-4" aria-hidden />
-                  </DetailLink>
-                </Button>
+                  <Button
+                    asChild
+                    size={isAdmin ? "default" : "lg"}
+                    variant={isNew ? "default" : "outline"}
+                    className={cn("mt-3 w-full", isAdmin && "mt-0 sm:w-auto")}
+                  >
+                    <DetailLink base={base} id={a.order_id}>
+                      {isNew ? "Terima tugas" : "Buka tugas"}
+                      <ArrowRight className="size-4" aria-hidden />
+                    </DetailLink>
+                  </Button>
+                </div>
               </li>
             );
           })}
@@ -345,10 +498,7 @@ export function FulfillmentDetail({ base, orderId }: { base: WorkspaceBase; orde
   useRealtimeRefresh({
     channel: `fulfillment-detail-${base}-${id}`,
     tables: ["orders", "operator_assignments", "job_progress", "job_results", "job_revisions"],
-    keys: [
-      ["order-fulfillment", id],
-      ["my-assignments"],
-    ],
+    keys: [["order-fulfillment", id], ["my-assignments"]],
   });
 
   if (isPending) return <CardSkeleton rows={4} />;
@@ -396,7 +546,11 @@ export function FulfillmentDetail({ base, orderId }: { base: WorkspaceBase; orde
     setBusy(false);
     if (!result.ok) return toast.error(result.error);
     toast.success(
-      action === "accept" ? "Tugas diterima." : action === "start" ? "Pengerjaan dimulai." : "Progres tersimpan.",
+      action === "accept"
+        ? "Tugas diterima."
+        : action === "start"
+          ? "Pengerjaan dimulai."
+          : "Progres tersimpan.",
     );
     setNote("");
     await refresh();
@@ -462,7 +616,8 @@ export function FulfillmentDetail({ base, orderId }: { base: WorkspaceBase; orde
                   {(d.serviceDetail.package_snapshot as any)?.name}
                 </p>
                 <p className="text-muted-foreground">
-                  Estimasi {d.serviceDetail.estimated_days} hari · jatah revisi {d.serviceDetail.revision_allowance}
+                  Estimasi {d.serviceDetail.estimated_days} hari · jatah revisi{" "}
+                  {d.serviceDetail.revision_allowance}
                 </p>
                 {d.serviceDetail.requirements_note ? (
                   <p className="rounded-lg bg-secondary p-3">{d.serviceDetail.requirements_note}</p>
@@ -531,14 +686,21 @@ export function FulfillmentDetail({ base, orderId }: { base: WorkspaceBase; orde
                       />
                       Tampilkan ke pelanggan
                     </label>
-                    <Button size="sm" disabled={busy || note.trim().length < 3} onClick={() => run("progress")}>
+                    <Button
+                      size="sm"
+                      disabled={busy || note.trim().length < 3}
+                      onClick={() => run("progress")}
+                    >
                       Simpan progres
                     </Button>
                   </div>
                 ) : null}
 
                 {canSubmit ? (
-                  <form onSubmit={handleSubmitResult} className="space-y-3 rounded-lg border border-border p-3">
+                  <form
+                    onSubmit={handleSubmitResult}
+                    className="space-y-3 rounded-lg border border-border p-3"
+                  >
                     <p className="text-sm font-semibold">Kirim hasil pekerjaan</p>
                     <div>
                       <Label htmlFor="summary">Ringkasan hasil</Label>
