@@ -55,6 +55,60 @@ export const listRecentReviews = createServerFn({ method: "GET" }).handler(async
   return { items, average, total, error: null };
 });
 
+export type PopularSeller = {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  rating: number;
+  reviews: number;
+};
+
+/**
+ * Penjual populer: toko aktif diurutkan dari jumlah ulasan lalu rata-rata bintang.
+ * Agregasi di server dari ulasan yang tampil; toko tanpa ulasan tidak ikut.
+ */
+export const listPopularSellers = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicClient } = await import("./supabase-public.server");
+  const supabase = createPublicClient();
+
+  const { data: rows, error } = await supabase
+    .from("product_reviews")
+    .select("store_id, rating")
+    .eq("is_visible", true)
+    .not("store_id", "is", null)
+    .limit(2000);
+  if (error) {
+    console.error("[reviews] listPopularSellers gagal:", error.message);
+    return { items: [] as PopularSeller[] };
+  }
+
+  const agg = new Map<string, { sum: number; n: number }>();
+  for (const r of rows ?? []) {
+    const id = r.store_id as string;
+    const cur = agg.get(id) ?? { sum: 0, n: 0 };
+    cur.sum += Number(r.rating);
+    cur.n += 1;
+    agg.set(id, cur);
+  }
+  if (!agg.size) return { items: [] as PopularSeller[] };
+
+  const { data: stores } = await supabase
+    .from("stores")
+    .select("id, name, slug, logo_url")
+    .in("id", [...agg.keys()])
+    .eq("status", "active");
+
+  const items: PopularSeller[] = (stores ?? [])
+    .map((s) => {
+      const a = agg.get(s.id)!;
+      return { ...s, rating: a.sum / a.n, reviews: a.n };
+    })
+    .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
+    .slice(0, 12);
+  return { items };
+});
+
 /** Ulasan untuk satu produk (publik). */
 export const listProductReviews = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({ productId: z.string().uuid() }).parse(data))

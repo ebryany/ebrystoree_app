@@ -1,32 +1,31 @@
 import { Component, Suspense, type ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronRight, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { HomeHero } from "@/components/home/hero";
 import { SellerJoinSection } from "@/components/home/home-hero";
 import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { SellerServiceCard } from "@/components/home/seller-service-card";
-import { CompactProductCard } from "@/components/home/compact-product-card";
-import { MarketplaceProductCard, MarketplaceServiceCard } from "@/components/home/catalog-cards";
+import { MarketplaceServiceCard } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
-import { Button } from "@/components/ui/button";
-import { listProducts, listServices, listPublicMarketplaceServices, listCatalogCategories } from "@/lib/catalog.functions";
+import { SeeAllLink, Shelf } from "@/components/ebry/product-shelf";
+import { PopularSellers } from "@/components/ebry/popular-sellers";
+import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
+import {
+  listProductShelves,
+  listServices,
+  listPublicMarketplaceServices,
+  listCatalogCategories,
+} from "@/lib/catalog.functions";
 import { CategoryRail } from "@/components/home/category-rail";
 
-const productsQuery = queryOptions({
-  queryKey: ["storefront-products", 12],
-  queryFn: () => listProducts({ data: { pageSize: 12 } }),
+const shelvesQuery = queryOptions({
+  queryKey: ["storefront-shelves"],
+  queryFn: () => listProductShelves(),
+  staleTime: 60_000,
 });
 
 const servicesQuery = queryOptions({
@@ -104,7 +103,7 @@ export const Route = createFileRoute("/")({
   }),
   loader: async ({ context }) => {
     await Promise.allSettled([
-      context.queryClient.ensureQueryData(productsQuery),
+      context.queryClient.ensureQueryData(shelvesQuery),
       context.queryClient.ensureQueryData(servicesQuery),
       context.queryClient.ensureQueryData(sellerServicesQuery),
       context.queryClient.ensureQueryData(homeCategoriesQuery),
@@ -158,57 +157,32 @@ function Beranda() {
           >
             <CategoryRail />
           </SectionSuspense>
-          <ReviewMarqueeSection />
-          <section aria-labelledby="produk-heading" className="pt-8 sm:pt-10">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-              <div>
-                <h2 id="produk-heading" className="text-xl font-bold sm:text-2xl">
-                  Produk digital
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Lihat harga dan toko, lalu cek detail sebelum membeli.
-                </p>
-              </div>
-              {/* Teks link, bukan tombol: aksi sekunder di header section. */}
-              <Link
-                to="/produk"
-                className="group inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Lihat semua
-                <ChevronRight
-                  className="size-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                  aria-hidden="true"
-                />
-              </Link>
-            </div>
+          {/* Rak-rak ala marketplace: tiap rak bisa di-swipe, 2 kartu per layar di HP. */}
+          <div className="mt-4 space-y-4">
+            <RecentlyViewedShelf />
             <SectionSuspense
               fallback={<CardsSkeleton count={4} />}
-              queryKey={productsQuery.queryKey}
+              queryKey={shelvesQuery.queryKey}
             >
-              <ProductsSection />
+              <ProductShelves />
             </SectionSuspense>
-          </section>
-          <section aria-labelledby="jasa-heading" className="pt-8 sm:pt-10">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 id="jasa-heading" className="text-xl font-bold sm:text-2xl">
+            <PopularSellers />
+            <section aria-labelledby="jasa-heading" className="@container rounded-2xl bg-card py-3.5 sm:py-4">
+              <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
+                <h2 id="jasa-heading" className="text-sm font-bold text-foreground sm:text-base">
                   Jasa seller
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Bandingkan harga, durasi, dan kesepakatan jasa dari toko sebelum memesan.
-                </p>
+                <SeeAllLink to="/layanan" />
               </div>
-              <Button asChild variant="outline" className="min-h-11 rounded-control">
-                <Link to="/layanan">Semua jasa</Link>
-              </Button>
-            </div>
-            <SectionSuspense
-              fallback={<CardsSkeleton count={3} />}
-              queryKey={sellerServicesQuery.queryKey}
-            >
-              <SellerServicesSection />
-            </SectionSuspense>
-          </section>
+              <SectionSuspense
+                fallback={<CardsSkeleton count={3} />}
+                queryKey={sellerServicesQuery.queryKey}
+              >
+                <SellerServicesSection />
+              </SectionSuspense>
+            </section>
+          </div>
+          <ReviewMarqueeSection />
           {/* Layanan platform disembunyikan saat belum ada paket aktif: menampilkan
               section berisi "belum ada layanan" lebih merugikan daripada tidak tampil. */}
           <PlatformServicesSection />
@@ -226,27 +200,16 @@ function Beranda() {
 }
 
 /**
- * Deret kartu produk di beranda.
- *
- * Dua mode, dipilih dari JUMLAH item (bukan ditebak dari lebar layar):
- *
- * 1. Sedikit (<= 4 item): grid. Carousel dengan 2 kartu menyisakan ruang kosong
- *    selebar ~50% container dan menampilkan panah yang keduanya `disabled`,
- *    karena tidak ada yang bisa digulir. Grid membuat kartu mengisi baris
- *    dengan proporsi wajar, tanpa navigasi palsu.
- *
- * 2. Banyak (> 4 item): carousel. Kartu memakai lebar tetap dan sisanya
- *    digulir, sehingga tidak ada kartu yang membengkak memenuhi layar.
- *
- * Ambang 4 dipilih karena itu jumlah kolom maksimum di desktop: dengan <= 4
- * item semuanya muat satu baris sehingga tidak ada yang perlu digulir.
+ * Rak produk beranda: Terlaris, Terbaru, lalu satu rak per kategori.
+ * Rak kosong tidak dirender, jadi beranda tetap rapi saat katalog masih sedikit.
  */
-function ProductsSection() {
-  const query = useSuspenseQuery(productsQuery);
-  if (query.data.error) {
-    return <SectionError message={query.data.error} onRetry={() => query.refetch()} />;
+function ProductShelves() {
+  const query = useSuspenseQuery(shelvesQuery);
+  const data = query.data;
+  if (data.error) {
+    return <SectionError message={data.error} onRetry={() => query.refetch()} />;
   }
-  if (query.data.items.length === 0) {
+  if (!data.latest.length) {
     return (
       <SectionEmpty
         title="Belum ada produk tersedia."
@@ -254,60 +217,23 @@ function ProductsSection() {
       />
     );
   }
-
-  const items = query.data.items;
-  const useGrid = items.length <= 4;
-
   return (
     <>
-      {/* Mobile (<640px): rail scroll native tanpa JS carousel — kartu compact
-          dengan snap, kartu berikutnya terlihat sebagian sebagai affordance
-          swipe. Full-bleed -mx-4 supaya kartu pertama sejajar konten sambil
-          menyisakan peek kartu berikutnya. */}
-      <div
-        role="region"
-        aria-label="Daftar produk digital"
-        tabIndex={0}
-        className="relative -mx-4 snap-x snap-proximity overflow-x-auto overscroll-x-contain scroll-px-4 px-4 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden"
-      >
-        <ul className="flex w-max gap-2.5">
-          {items.map((item) => (
-            <li key={item.id} className="w-[clamp(205px,68vw,252px)] shrink-0 snap-start">
-              <CompactProductCard item={item} />
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Tablet/desktop (>=640px): perilaku existing dipertahankan — grid
-          untuk <=4 produk, carousel dengan panah untuk lebih dari itu. */}
-      {useGrid ? (
-        <div className="hidden sm:flex flex-wrap justify-center gap-4">
-          {items.map((item) => (
-            <div key={item.id} className="w-[272px]">
-              <MarketplaceProductCard item={item} variant="home" spotlight />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="relative hidden sm:block">
-          <Carousel opts={{ align: "start", slidesToScroll: 1 }} className="w-full">
-            <CarouselContent className="-ml-4">
-              {items.map((item) => (
-                <CarouselItem
-                  key={item.id}
-                  className="basis-full pl-4 sm:basis-[288px]"
-                >
-                  <MarketplaceProductCard item={item} variant="home" spotlight />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {/* Panah melayang di tepi kiri/kanan, setengah keluar dari deret kartu. */}
-            <CarouselPrevious className="-left-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-left-5" />
-            <CarouselNext className="-right-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-right-5" />
-          </Carousel>
-        </div>
-      )}
+      <Shelf
+        title="Produk terlaris"
+        items={data.bestSellers}
+        ranked
+        action={<SeeAllLink to="/produk" />}
+      />
+      <Shelf title="Produk terbaru" items={data.latest} action={<SeeAllLink to="/produk" />} />
+      {data.shelves.map((s) => (
+        <Shelf
+          key={s.slug}
+          title={s.name}
+          items={s.items}
+          action={<SeeAllLink to="/produk" kategori={s.slug} />}
+        />
+      ))}
     </>
   );
 }
@@ -324,14 +250,17 @@ function SellerServicesSection() {
       />
     );
   return (
-    <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+    // Kartu jasa lebih padat isinya: 1 kartu + intip di HP, 2–5 kolom mengikuti lebar rak.
+    <ul className="flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto scroll-px-4 px-4 pb-1 sm:scroll-px-5 sm:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {query.data.items.map((item) => (
-        // Sama seperti kartu produk: satu kolom di mobile, lebar tetap mulai sm.
-        <div key={item.id} className="w-full sm:w-[272px]">
+        <li
+          key={item.id}
+          className="w-[78%] shrink-0 snap-start @xl:w-[calc((100%-0.75rem)/2)] @3xl:w-[calc((100%-1.5rem)/3)] @5xl:w-[calc((100%-2.25rem)/4)] @7xl:w-[calc((100%-3rem)/5)]"
+        >
           <SellerServiceCard item={item} variant="home" />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 

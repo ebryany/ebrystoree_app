@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronDown, FileText, Plus, Video } from "lucide-react";
+import { ChevronDown, FileText, Info, Plus, Video } from "lucide-react";
 
 import { ServiceDraftWizard } from "@/components/seller/service-draft-wizard";
 
@@ -161,17 +161,26 @@ export function MarketplaceServiceCatalog() {
         </div>
       </header>
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
-        Jasa yang disetujui dapat dipesan selama toko dan kategori aktif serta checkout diaktifkan
-        admin. Mengedit jasa mengembalikannya ke draft; arsip menghapusnya dari katalog. Pesanan
-        yang sudah dibuat tetap mengikuti kesepakatan tersimpan.
-      </p>
+      <details className="group rounded-xl border border-border bg-card text-sm">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
+          <Info className="size-4 shrink-0 text-accent" aria-hidden="true" />
+          <span className="flex-1">Aturan tayang & edit jasa</span>
+          <ChevronDown
+            className="size-4 shrink-0 transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
+        </summary>
+        <p className="border-t border-border px-4 py-3 text-muted-foreground">
+          Jasa yang disetujui dapat dipesan selama toko dan kategori aktif serta checkout diaktifkan
+          admin. Mengedit jasa mengembalikannya ke draft; arsip menghapusnya dari katalog. Pesanan
+          yang sudah dibuat tetap mengikuti kesepakatan tersimpan.
+        </p>
+      </details>
 
-      {/* Animated pill tabs */}
       <div
         role="tablist"
         aria-label="Filter status jasa"
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0"
+        className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {TABS.map((entry) => {
           const active = tab === entry.key;
@@ -179,35 +188,26 @@ export function MarketplaceServiceCatalog() {
           return (
             <button
               key={entry.key}
+              type="button"
               role="tab"
               aria-selected={active}
+              title={entry.hint}
               onClick={() => switchTab(entry.key)}
-              className="relative flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent/50 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring aria-selected:border-transparent"
+              className={cn(
+                "relative flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                active
+                  ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-accent"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              {active ? (
-                <motion.span
-                  layoutId="seller-jasa-tab"
-                  className="absolute inset-0 rounded-full bg-primary"
-                  transition={{ duration: reduced ? 0 : 0.18, ease: [0.16, 1, 0.3, 1] }}
-                />
-              ) : null}
-              <span className={active ? "relative text-primary-foreground" : "relative"}>
-                {entry.label}
-              </span>
-              <span
-                className={
-                  active
-                    ? "relative text-primary-foreground tabular-nums"
-                    : "relative tabular-nums text-muted-foreground"
-                }
-              >
+              {entry.label}
+              <span className="text-xs tabular-nums text-muted-foreground">
                 {data ? <CountUp value={count} /> : "0"}
               </span>
             </button>
           );
         })}
       </div>
-      <p className="text-xs text-muted-foreground">{TABS.find((t) => t.key === tab)?.hint}</p>
 
       {feedback ? (
         <p role="status" aria-live="polite" className="text-sm font-medium">
@@ -272,7 +272,11 @@ export function MarketplaceServiceCatalog() {
         />
       ) : data ? (
         <>
-          <motion.section layout={!reduced} aria-label="Daftar jasa" className="space-y-3">
+          <motion.section
+            layout={!reduced}
+            aria-label="Daftar jasa"
+            className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3"
+          >
             <AnimatePresence initial={false} mode="popLayout">
               {filtered.map((listing, index) => (
                 <ServiceCard
@@ -352,42 +356,46 @@ function ServiceCard({
       animate={{ opacity: 1, y: 0 }}
       exit={reduced ? undefined : { opacity: 0, y: -8 }}
       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : index * 0.04 }}
-      className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+      className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
     >
-      {/* Header: media, nama, status */}
-      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          {listing.media[0] ? (
-            <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-selected">
-              {listing.media[0].kind === "image" ? (
-                <img
-                  src={serviceMediaUrl(listing.media[0].path)}
-                  alt={listing.media[0].alt}
-                  className="size-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <Video className="size-5 text-muted-foreground" aria-hidden="true" />
-              )}
-            </span>
-          ) : null}
-          <div className="min-w-0 space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusPill
-                value={listing.status}
-                kind="raw"
-                label={marketplaceServiceStatusLabels[listing.status]}
-              />
-            </div>
-            <h2 className="break-words text-sm font-semibold leading-snug">{listing.name}</h2>
-            <p className="text-sm tabular-nums text-muted-foreground">
-              {formatRupiah(listing.price)} · {listing.agreement.durationDays} hari ·{" "}
-              {listing.agreement.revisionLimit} revisi
-              {listing.media.length > 0 ? ` · ${listing.media.length} media` : ""}
-            </p>
-          </div>
+      {/* Kartu grid: media di atas, info, lalu aksi di bawah. */}
+      <span className="relative grid aspect-[16/9] place-items-center overflow-hidden bg-surface-selected">
+        {listing.media[0]?.kind === "image" ? (
+          <img
+            src={serviceMediaUrl(listing.media[0].path)}
+            alt={listing.media[0].alt}
+            className="size-full object-cover"
+            loading="lazy"
+          />
+        ) : listing.media[0] ? (
+          <Video className="size-7 text-muted-foreground" aria-hidden="true" />
+        ) : (
+          <FileText className="size-7 text-accent" aria-hidden="true" />
+        )}
+        <span className="absolute left-2 top-2">
+          <StatusPill
+            value={listing.status}
+            kind="raw"
+            label={marketplaceServiceStatusLabels[listing.status]}
+            className="bg-card px-2 py-0.5 text-[11px]"
+          />
+        </span>
+      </span>
+
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="min-w-0 space-y-1">
+          <h2 className="line-clamp-2 break-words text-sm font-semibold leading-snug">
+            {listing.name}
+          </h2>
+          <p className="text-base font-bold tabular-nums text-price">
+            {formatRupiah(listing.price)}
+          </p>
+          <p className="text-xs tabular-nums text-muted-foreground">
+            {listing.agreement.durationDays} hari · {listing.agreement.revisionLimit} revisi
+            {listing.media.length > 0 ? ` · ${listing.media.length} media` : ""}
+          </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-auto flex flex-wrap gap-2">
           {["draft", "rejected", "approved"].includes(listing.status) ? (
             <Button
               variant="outline"
@@ -422,11 +430,10 @@ function ServiceCard({
             </Button>
           ) : null}
         </div>
-      </div>
 
       {/* Catatan moderator */}
       {listing.moderation_note ? (
-        <div className="mt-3 rounded-lg border-l-2 border-warning bg-warning/5 px-3 py-2">
+        <div className="rounded-lg border-l-2 border-warning bg-warning/5 px-3 py-2">
           <p className="text-xs font-semibold text-warning-foreground">Catatan moderator</p>
           <p className="mt-0.5 break-words text-sm">{listing.moderation_note}</p>
         </div>
@@ -435,7 +442,9 @@ function ServiceCard({
       {/* Collapsible agreement */}
       <button
         onClick={() => setOpen(!open)}
-        className="mt-3 flex min-h-10 w-full items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+        type="button"
+        aria-expanded={open}
+        className="flex min-h-11 w-full items-center gap-2 border-t border-border text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
       >
         <ChevronDown
           className={cn("size-4 shrink-0 transition-transform duration-200", open && "rotate-180")}
@@ -456,6 +465,7 @@ function ServiceCard({
           </motion.div>
         ) : null}
       </AnimatePresence>
+      </div>
     </motion.article>
   );
 }

@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowDownLeft, ArrowUpRight, Info, ReceiptText, TrendingUp, Wallet } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Clock, Info, TrendingUp, Wallet } from "lucide-react";
 
 import { CountUp } from "@/components/admin/report-widgets";
-import { BankListRow, InlineEmpty, StatTile } from "@/components/ebry/cards";
+import { BankListRow, InlineEmpty } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
 import { WithdrawalPanel } from "@/components/ebry/withdrawal-panel";
 import { Button } from "@/components/ui/button";
@@ -116,70 +116,66 @@ function SellerFinance() {
         </Button>
       </header>
 
-      {/* KPI tiles */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatTile
-          icon={TrendingUp}
-          label="Total pendapatan"
-          value={formatRupiah(totalIncome)}
-          tone="success"
-        />
-        <StatTile icon={ReceiptText} label="Transaksi" value={txCount} tone="accent" />
-        <StatTile
-          icon={Wallet}
-          label="Saldo tersedia"
-          value={formatRupiah(balance)}
-          tone="accent"
-        />
-      </div>
-
-      {/* Balance card */}
+      {/* Ringkasan dana: saldo utama + posisi dana lain, satu baris di desktop. */}
       <motion.section
         initial={reduced ? false : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="rounded-2xl border border-border bg-card p-5"
+        className="grid overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-px"
         aria-label="Saldo toko"
       >
-        <div className="flex items-center gap-2">
-          <Wallet className="size-4 shrink-0 text-accent" aria-hidden="true" />
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="bg-card p-5">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Wallet className="size-4 shrink-0 text-accent" aria-hidden="true" />
             Saldo tersedia
           </p>
+          <p className="mt-1.5 text-3xl font-bold tabular-nums text-foreground">
+            <CountUp value={balance} format={formatRupiah} />
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Bisa ditarik ke rekening.</p>
         </div>
-        <p className="mt-1.5 text-3xl font-bold tabular-nums text-foreground">
-          <CountUp value={balance} format={formatRupiah} />
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Pendapatan dilepas setelah pembeli menerima produk.
-        </p>
-        <dl className="mt-4 space-y-2 text-sm">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <dt className="flex items-center gap-1 text-muted-foreground">
-              Ditahan, menunggu penerimaan
-              <span title="Dana dari pesanan yang sudah dibayar tapi pembeli belum konfirmasi penerimaan.">
-                <Info className="size-3 text-muted-foreground/60" aria-hidden="true" />
-              </span>
-            </dt>
-            <dd className="font-semibold tabular-nums">{formatRupiah(data?.held ?? 0)}</dd>
+        {[
+          {
+            icon: Clock,
+            label: "Ditahan",
+            value: data?.held ?? 0,
+            hint: "Menunggu pembeli konfirmasi penerimaan.",
+          },
+          {
+            icon: Info,
+            label: "Cadangan refund",
+            value: data?.reserved ?? 0,
+            hint: "Dibekukan selama refund diproses.",
+          },
+          {
+            icon: TrendingUp,
+            label: "Total pendapatan",
+            value: totalIncome,
+            hint: `${txCount} mutasi tercatat.`,
+          },
+        ].map((k) => (
+          <div key={k.label} className="bg-card p-5">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <k.icon className="size-3.5 shrink-0" aria-hidden="true" />
+              {k.label}
+            </p>
+            <p className="mt-1.5 text-xl font-bold tabular-nums text-foreground">
+              {formatRupiah(k.value)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{k.hint}</p>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <dt className="flex items-center gap-1 text-muted-foreground">
-              Cadangan refund aktif
-              <span title="Dana yang dibekukan karena ada refund yang sedang diproses.">
-                <Info className="size-3 text-muted-foreground/60" aria-hidden="true" />
-              </span>
-            </dt>
-            <dd className="font-semibold tabular-nums">{formatRupiah(data?.reserved ?? 0)}</dd>
-          </div>
-        </dl>
+        ))}
       </motion.section>
 
-      <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
+      {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
+      <div className="lg:sticky lg:top-24 lg:order-2">
+        <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
+      </div>
 
       {/* Mutation list */}
       <section
-        className="rounded-2xl border border-border bg-card"
+        className="rounded-2xl border border-border bg-card lg:order-1"
         aria-labelledby="mutasi-heading"
       >
         <h2
@@ -220,6 +216,7 @@ function SellerFinance() {
           </motion.ul>
         )}
       </section>
+      </div>
     </div>
   );
 }

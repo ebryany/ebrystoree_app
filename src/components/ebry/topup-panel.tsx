@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/format";
 import { checkCreditTopup, createCreditTopup } from "@/lib/credit-topup.functions";
+import {
+  createManualTopup,
+  getPendingManualTopup,
+  listTopupMethods,
+} from "@/lib/topup-manual.functions";
+import { ManualTopupInstructions, type ManualTopup } from "@/components/ebry/topup-manual";
+import type { CustomPaymentMethod } from "@/lib/payment-methods";
 
 /**
  * Panel isi saldo Ebrystore via QRIS.
@@ -64,6 +71,29 @@ export function TopupPanel({ onPaid }: { onPaid: () => void | Promise<void> }) {
   const [qrImage, setQrImage] = useState<string | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
 
+  // Multi metode: "qris" atau id metode custom dari Pengaturan Website.
+  const fetchMethods = useServerFn(listTopupMethods);
+  const fetchPending = useServerFn(getPendingManualTopup);
+  const createManual = useServerFn(createManualTopup);
+  const [qrisAvailable, setQrisAvailable] = useState(true);
+  const [customMethods, setCustomMethods] = useState<CustomPaymentMethod[]>([]);
+  const [methodId, setMethodId] = useState<string>("qris");
+  const [manual, setManual] = useState<ManualTopup | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void Promise.all([fetchMethods(), fetchPending()]).then(([m, p]: any[]) => {
+      if (!active) return;
+      setQrisAvailable(Boolean(m?.qris));
+      setCustomMethods(m?.methods ?? []);
+      if (!m?.qris && m?.methods?.[0]) setMethodId(m.methods[0].id);
+      if (p?.topup) setManual(p.topup);
+    });
+    return () => {
+      active = false;
+    };
+  }, [fetchMethods, fetchPending]);
+
   const secondsLeft = useCountdown(qris?.expiredAt ?? null);
 
   useEffect(() => {
@@ -116,6 +146,13 @@ export function TopupPanel({ onPaid }: { onPaid: () => void | Promise<void> }) {
   async function start(amount: number) {
     setCreating(true);
     setFailed(null);
+    if (methodId !== "qris") {
+      const res: any = await createManual({ data: { amount, methodId } });
+      setCreating(false);
+      if (!res.ok) setFailed(res.error);
+      else setManual(res.topup);
+      return;
+    }
     const result: any = await create({ data: { amount } });
     setCreating(false);
     if (!result.ok) {
@@ -134,10 +171,60 @@ export function TopupPanel({ onPaid }: { onPaid: () => void | Promise<void> }) {
   const customValue = Number(custom.replace(/[^\d]/g, ""));
   const customValid = customValue >= MIN_AMOUNT && customValue <= MAX_AMOUNT;
 
+  if (manual) {
+    return (
+      <ManualTopupInstructions
+        topup={manual}
+        onSubmitted={() =>
+          setManual({ ...manual, proofSubmitted: true, proofSubmittedAt: new Date().toISOString() })
+        }
+        onNew={() => setManual(null)}
+        onPaid={onPaid}
+      />
+    );
+  }
+
+  const noMethod = !qrisAvailable && customMethods.length === 0;
+
   // Belum ada permintaan aktif: tampilkan pilihan nominal.
   if (!qris) {
     return (
       <div className="space-y-4">
+        <fieldset>
+          <legend className="text-sm font-semibold text-foreground">Metode pembayaran</legend>
+          {noMethod ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Belum ada metode pembayaran yang tersedia.
+            </p>
+          ) : (
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {[
+                ...(qrisAvailable ? [{ id: "qris", name: "QRIS", sub: "Otomatis, semua e-wallet & m-banking" }] : []),
+                ...customMethods.map((m) => ({
+                  id: m.id,
+                  name: m.name,
+                  sub: m.type === "bank" ? "Transfer bank · verifikasi manual" : "Transfer · verifikasi manual",
+                })),
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  aria-pressed={methodId === opt.id}
+                  onClick={() => setMethodId(opt.id)}
+                  className={`min-h-11 rounded-lg border px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    methodId === opt.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-card hover:border-accent/50"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold">{opt.name}</span>
+                  <span className="block text-xs text-muted-foreground">{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </fieldset>
+
         <div>
           <p className="text-sm font-semibold text-foreground">Pilih nominal</p>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -188,12 +275,12 @@ export function TopupPanel({ onPaid }: { onPaid: () => void | Promise<void> }) {
 
         <Button
           className="min-h-11 w-full sm:w-auto"
-          disabled={creating || (custom ? !customValid : false)}
+          disabled={noMethod || creating || (custom ? !customValid : false)}
           onClick={() => void start(custom ? customValue : selected)}
         >
           <Wallet className="mr-1.5 h-4 w-4" aria-hidden="true" />
           {creating
-            ? "Menyiapkan QRIS…"
+            ? "Menyiapkan…"
             : `Isi saldo ${formatRupiah(custom ? customValue || 0 : selected)}`}
         </Button>
       </div>

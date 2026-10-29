@@ -4,6 +4,8 @@
  * dan aturan validasi. Dipakai bersama oleh server function dan UI admin.
  */
 
+import { validatePaymentMethods } from "./payment-methods";
+
 export type FieldType =
   | "text"
   | "textarea"
@@ -16,7 +18,8 @@ export type FieldType =
   | "phone"
   | "list"
   | "banners"
-  | "nav";
+  | "nav"
+  | "payment_methods";
 
 export type SettingField = {
   key: string;
@@ -875,6 +878,28 @@ export const SETTING_SECTIONS: SettingSection[] = [
         isPublic: true,
         help: 'Dipertahankan untuk kompatibilitas. Saklar yang dipakai sistem adalah "QRIS (SumoPod) aktif" di atas.',
       },
+      {
+        key: "custom_payment_methods",
+        label: "Metode pembayaran custom",
+        type: "payment_methods",
+        default: [],
+        isPublic: false,
+        sensitive: true,
+        group: "Metode pembayaran custom",
+        help: "Rekening bank / e-wallet tujuan transfer. Metode bertanda Top up muncul di menu isi saldo; pembayaran diverifikasi manual oleh admin.",
+        confirm:
+          "Mengubah metode pembayaran memengaruhi rekening tujuan transfer pengguna. Pastikan nomor dan nama pemilik benar. Lanjutkan?",
+      },
+      {
+        key: "topup_manual_deadline_hours",
+        label: "Batas transfer top up manual (jam)",
+        type: "number",
+        default: 24,
+        isPublic: false,
+        min: 1,
+        max: 72,
+        group: "Metode pembayaran custom",
+      },
     ],
   },
   {
@@ -1658,6 +1683,8 @@ export function validateField(field: SettingField, raw: unknown): ValidationResu
       return validateBannerSlides(raw);
     case "nav":
       return validateNavItems(raw);
+    case "payment_methods":
+      return validatePaymentMethods(raw);
     default: {
       let v = String(raw ?? "").trim();
       v = v.replace(/<[^>]*>/g, "");

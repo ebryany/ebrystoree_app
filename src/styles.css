@@ -604,3 +604,17 @@
 @utility animate-marquee-vertical-reverse {
   animation: marquee-vertical-reverse var(--marquee-duration) linear infinite;
 }
+
+/* Pita penjual populer (dashboard): dua <ul> identik bergeser -100% bersamaan. */
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@utility animate-infinite-scroll {
+  animation: infinite-scroll 40s linear infinite;
+}

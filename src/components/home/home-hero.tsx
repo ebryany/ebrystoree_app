@@ -3,7 +3,6 @@ import { ArrowRight, BarChart3, MessagesSquare, ShieldCheck, Store, Wallet } fro
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 /**
  * Jalur masuk seller.
@@ -63,17 +62,17 @@ export function SellerJoinSection({
   return (
     <motion.section
       aria-labelledby="seller-join-heading"
-      className="relative mt-10 overflow-hidden rounded-2xl border border-border sm:mt-12"
+      className="relative mt-10 overflow-hidden rounded-2xl border border-border bg-card sm:mt-12"
       initial={reduced ? false : "hidden"}
       whileInView={reduced ? undefined : "show"}
       viewport={{ once: true, margin: "-60px" }}
     >
       <motion.div
-        className="grid gap-0 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]"
+        className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]"
         variants={stagger}
       >
         {/* Kiri: ajakan + tombol. Transparan agar grid tetap terlihat. */}
-        <div className="min-w-0 p-5 sm:p-7">
+        <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 lg:p-8">
           <motion.span
             variants={reveal}
             className="grid size-10 place-items-center rounded-xl border border-border bg-card text-accent"
@@ -114,17 +113,17 @@ export function SellerJoinSection({
           </motion.p>
         </div>
 
-        {/* Kanan: rail manfaat bernomor. Nomor mono menyambung motif dengan
-            section "Cara memesan"; pemisah border tipis, bukan kartu terpisah. */}
-        <motion.div className="border-t border-border lg:border-l lg:border-t-0" variants={stagger}>
+        {/* Kanan: manfaat bernomor. HP 1 kolom; sm+ grid 2x2 agar teks tidak
+            memanjang di layar lebar. Garis pemisah = gap-px di atas latar border. */}
+        <motion.div
+          className="grid gap-px border-t border-border bg-border sm:grid-cols-2 lg:border-l lg:border-t-0"
+          variants={stagger}
+        >
           {PERKS.map((perk, i) => (
             <motion.div
               key={perk.title}
               variants={reveal}
-              className={cn(
-                "group flex items-start gap-3 p-4 transition-colors duration-200 hover:bg-accent/[0.05] motion-reduce:transition-none sm:p-5",
-                i > 0 && "border-t border-border",
-              )}
+              className="group flex items-start gap-3 bg-card p-4 transition-colors duration-200 hover:bg-surface motion-reduce:transition-none sm:p-6"
             >
               <span
                 aria-hidden="true"

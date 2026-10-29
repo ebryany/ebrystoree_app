@@ -106,7 +106,7 @@ export async function loadManualAccount() {
  * kanonik belum ada. Ini mencegah keadaan "kanonik false tapi alias true" yang
  * membuat saklar tampak tidak berfungsi.
  */
-export type PaymentMethods = { qris: boolean; manual: boolean };
+export type PaymentMethods = { qris: boolean; manual: boolean; shopeepay: boolean };
 
 function resolveEnabled(map: Map<string, unknown>, canonical: string, aliases: string[]): boolean {
   const canonicalValue = map.get(canonical);
@@ -129,10 +129,12 @@ export async function loadPaymentMethods(): Promise<PaymentMethods> {
       "feature_qris",
       "manual_payment_active",
       "feature_manual_payment",
+      "shopeepay_enabled",
     ]);
 
   const map = new Map<string, unknown>((data ?? []).map((r: any) => [r.key, r.value]));
   const { sumopodConfig } = await import("./sumopod.server");
+  const { shopeepayConfig } = await import("./shopeepay.server");
 
   return {
     // QRIS juga butuh kredensial provider; tanpa itu saklar tidak ada artinya.
@@ -140,6 +142,9 @@ export async function loadPaymentMethods(): Promise<PaymentMethods> {
       Boolean(sumopodConfig()) &&
       resolveEnabled(map, "qris_enabled", ["qris_payment_active", "feature_qris"]),
     manual: resolveEnabled(map, "manual_payment_active", ["feature_manual_payment"]),
+    // ShopeePay resmi: wajib SHOPEEPAY_ENABLED=true + kredensial lengkap di server,
+    // dan dapat dimatikan admin lewat setting shopeepay_enabled=false.
+    shopeepay: Boolean(shopeepayConfig()) && map.get("shopeepay_enabled") !== false,
   };
 }
 

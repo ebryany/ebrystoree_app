@@ -12,7 +12,7 @@ import {
   RevisionList,
 } from "@/components/fulfillment/fulfillment-panel";
 import { LiveOrderTimeline } from "@/components/ebry/live-timeline";
-import { QrisPayment } from "@/components/ebry/qris-payment";
+import { QrisPayment, type QrisProvider } from "@/components/ebry/qris-payment";
 import { ManualPayment } from "@/components/ebry/manual-payment";
 import { DigitalReceiptPanel } from "@/components/ebry/digital-receipt";
 import { MarketplaceServiceOrderDetail } from "@/components/ebry/marketplace-service-order";
@@ -81,6 +81,7 @@ function DetailPesanan() {
   const { data: credit } = useQuery({ queryKey: ["my-credit"], queryFn: () => fetchCredit({}) });
   const [applyingCredit, setApplyingCredit] = useState(false);
   const [useQris, setUseQris] = useState(false);
+  const [qrisChoice, setQrisChoice] = useState<QrisProvider | null>(null);
 
   // Query yang sama dengan MarketplaceServiceOrderDetail; React Query berbagi
   // cache sehingga timeline dan panel tidak melakukan fetch ganda.
@@ -129,7 +130,18 @@ function DetailPesanan() {
 
   // Metode pembayaran mengikuti saklar admin (satu sumber kebenaran di server).
   const manualEnabled = data.manualAvailable !== false && data.manualAccount.active;
-  const qrisEnabled = data.qrisAvailable === true;
+  const sumopodEnabled = data.qrisAvailable === true;
+  const shopeepayEnabled = data.shopeepayAvailable === true;
+  const qrisEnabled = sumopodEnabled || shopeepayEnabled;
+  // Provider QRIS: pilihan pembeli, lalu provider yang sedang dipakai tagihan ini.
+  const qrisProvider: QrisProvider =
+    qrisChoice && (qrisChoice === "shopeepay" ? shopeepayEnabled : sumopodEnabled)
+      ? qrisChoice
+      : payment?.provider === "shopeepay" && shopeepayEnabled
+        ? "shopeepay"
+        : sumopodEnabled
+          ? "sumopod"
+          : "shopeepay";
 
   const manualReady =
     manualEnabled &&
@@ -352,9 +364,35 @@ function DetailPesanan() {
                   Kembali ke transfer manual
                 </Button>
               ) : null}
+              {showQris && sumopodEnabled && shopeepayEnabled ? (
+                <div className="mt-4 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Penyedia QRIS">
+                  {(
+                    [
+                      ["sumopod", "QRIS"],
+                      ["shopeepay", "ShopeePay QRIS"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      role="radio"
+                      aria-checked={qrisProvider === value}
+                      variant={qrisProvider === value ? "default" : "outline"}
+                      className="min-h-11"
+                      onClick={() => setQrisChoice(value)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
               {showQris ? (
                 <div className="mt-4">
-                  <QrisPayment paymentId={payment.id} onPaid={refresh} />
+                  <QrisPayment
+                    key={qrisProvider}
+                    paymentId={payment.id}
+                    provider={qrisProvider}
+                    onPaid={refresh}
+                  />
                 </div>
               ) : null}
               {noMethodAvailable ? (

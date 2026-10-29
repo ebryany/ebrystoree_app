@@ -27,6 +27,8 @@ import {
 } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
 import { SellerEntryCard } from "@/components/ebry/seller-entry-card";
+import { PopularSellers } from "@/components/ebry/popular-sellers";
+import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import { StatusPill } from "@/components/ebry/status";
 import { TopupPanel } from "@/components/ebry/topup-panel";
 import { Button } from "@/components/ui/button";
@@ -105,7 +107,7 @@ function DashboardRingkasan() {
       .join("") || "E";
 
   const shortcuts = [
-    { to: "/produk", icon: Package, label: "Produk Digital" },
+    { to: "/dashboard/produk", icon: Package, label: "Produk Digital" },
     { to: "/layanan", icon: Wrench, label: "Pesan Jasa" },
     { to: "/dashboard/pesanan", icon: ReceiptText, label: "Pesanan" },
     { to: "/dashboard/produk-saya", icon: Download, label: "Produk Saya" },
@@ -243,6 +245,10 @@ function DashboardRingkasan() {
         </h2>
         <RoundMenuGrid items={shortcuts} />
       </section>
+
+      <RecentlyViewedShelf />
+
+      <PopularSellers />
 
       {/* E. Pintu masuk seller (status mengikuti kondisi toko) */}
       <SellerEntryCard />

@@ -26,6 +26,7 @@ import { addToCart } from "@/lib/cart-store";
 import { getProductDetail } from "@/lib/orders.functions";
 import { effectivePrice, formatRupiah } from "@/lib/format";
 import { isRenderableImageUrl } from "@/lib/utils";
+import { recordProductView } from "@/lib/recently-viewed";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 
 const detailQuery = (slug: string) =>
@@ -108,6 +109,21 @@ function DetailProduk() {
       trackEvent("product_view", `/produk/${slug}`),
     );
   }, [slug]);
+
+  // Riwayat "Terakhir dilihat" (lokal di perangkat), ditampilkan di dashboard user.
+  useEffect(() => {
+    if (!p) return;
+    const s = (p as any).stores as { name?: string } | null;
+    recordProductView({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      thumbnail_url: p.thumbnail_url ?? null,
+      price: Number(p.price),
+      discount_price: p.discount_price == null ? null : Number(p.discount_price),
+      store_name: s?.name ?? null,
+    });
+  }, [p]);
 
   if (!p) return null;
   const thumbnail = isRenderableImageUrl(p.thumbnail_url) ? p.thumbnail_url : null;

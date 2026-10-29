@@ -1,5 +1,26 @@
 import { Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  BookOpen,
+  ClipboardList,
+  Code2,
+  FileSearch,
+  FileText,
+  FlaskConical,
+  GraduationCap,
+  KeyRound,
+  LayoutTemplate,
+  LineChart,
+  ListOrdered,
+  type LucideIcon,
+  MonitorPlay,
+  Package,
+  PenLine,
+  Quote,
+  RotateCcw,
+  Tag,
+  Wrench,
+} from "lucide-react";
 
 import { listCatalogCategories } from "@/lib/catalog.functions";
 
@@ -8,58 +29,109 @@ const categoriesQuery = queryOptions({
   queryFn: () => listCatalogCategories({ data: { kind: "service" } }),
 });
 
+const productCategoriesQuery = queryOptions({
+  queryKey: ["categories", "product"],
+  queryFn: () => listCatalogCategories({ data: { kind: "product" } }),
+  staleTime: 5 * 60_000,
+});
+
 type CategoryItem = { id: string; name: string; slug: string };
 type CategoryPayload = { items?: CategoryItem[]; error?: string | null };
 
+/** Ikon dari kata kunci nama kategori; kategori baru otomatis dapat ikon umum. */
+const ICON_RULES: Array<[RegExp, LucideIcon]> = [
+  [/tugas|harian/i, ClipboardList],
+  [/makalah|laporan|artikel/i, FileText],
+  [/presentasi|slide|ppt/i, MonitorPlay],
+  [/proposal|revisi/i, PenLine],
+  [/praktikum|lab/i, FlaskConical],
+  [/analisis|data|statistik/i, LineChart],
+  [/pemrograman|coding|web|aplikasi/i, Code2],
+  [/review|cek|periksa/i, FileSearch],
+  [/format/i, ListOrdered],
+  [/sitasi|referensi/i, Quote],
+  [/sidang|wisuda/i, GraduationCap],
+  [/skripsi|tesis|jurnal/i, BookOpen],
+  [/template|desain|capcut/i, LayoutTemplate],
+  [/akun|premium|langganan/i, KeyRound],
+  [/ulang|perbaik/i, RotateCcw],
+];
+
+function iconFor(name: string): LucideIcon {
+  return ICON_RULES.find(([re]) => re.test(name))?.[1] ?? Tag;
+}
+
+type Tile = {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  to: "/layanan" | "/produk";
+  kategori?: string;
+};
+
 /**
- * Rail kategori jasa untuk homepage.
- *
- * Mengapa ada: katalog jasa punya kategori nyata (tabel `categories`, kind
- * `service`) dan halaman /layanan sudah menerima filter ?kategori= — tetapi
- * homepage tidak pernah menampilkannya, padahal ini pintu eksplorasi paling
- * murah bagi pembeli. Setiap chip adalah tautan sungguhan ke hasil terfilter,
- * bukan dekorasi.
- *
- * Keputusan desain:
- * - Hanya kategori service yang ada di data (kategori produk kosong), jadi
- *   rail ini milik penawaran jasa dan diberi label jujur.
- * - Scroll horizontal native + snap (pola NativeTrack ShowcaseGallery): satu
- *   baris di semua ukuran layar, tanpa scroll-jack, tetap bisa dijelajahi
- *   keyboard lewat fokus.
- * - Data kosong atau gagal → section tidak dirender sama sekali; navigasi
- *   kategori tetap tersedia lewat halaman /layanan, jadi tidak ada kontrol
- *   mati maupun error block yang mengganggu hero.
+ * Grid kategori ala marketplace: ikon + label, dua baris yang bisa digeser
+ * di mobile dan melebar di desktop. Kategori produk dan jasa digabung supaya
+ * pengunjung tidak perlu tahu bedanya sebelum menjelajah.
+ * Data kosong/gagal → tidak dirender; navigasi tetap lewat /produk dan /layanan.
  */
 export function CategoryRail() {
   const { data } = useSuspenseQuery(categoriesQuery);
-  // Normalisasi bentuk data: runtime mengembalikan { items, error }; mock test
-  // historis untuk queryKey "categories" mengembalikan { product, service }.
-  const payload = data as Partial<CategoryPayload> & {
-    service?: Partial<CategoryPayload>;
-  };
-  const items = (payload.service ?? payload).items ?? [];
-  if (!items.length) return null;
+  const products = useQuery(productCategoriesQuery);
+  // Normalisasi bentuk data: runtime { items, error }; mock test lama { service }.
+  const payload = data as Partial<CategoryPayload> & { service?: Partial<CategoryPayload> };
+  const services = (payload.service ?? payload).items ?? [];
+  const productItems = (products.data as CategoryPayload | undefined)?.items ?? [];
+  if (!services.length && !productItems.length) return null;
+
+  const tiles: Tile[] = [
+    { key: "all-products", label: "Semua produk", icon: Package, to: "/produk" },
+    ...productItems.map((c) => ({
+      key: `p-${c.id}`,
+      label: c.name,
+      icon: iconFor(c.name),
+      to: "/produk" as const,
+      kategori: c.slug,
+    })),
+    { key: "all-services", label: "Semua jasa", icon: Wrench, to: "/layanan" },
+    ...services.map((c) => ({
+      key: `s-${c.id}`,
+      label: c.name,
+      icon: iconFor(c.name),
+      to: "/layanan" as const,
+      kategori: c.slug,
+    })),
+  ];
 
   return (
-    <section aria-label="Kategori jasa" className="pb-1">
-      <h2 className="text-sm font-semibold text-foreground">
-        Jelajahi jasa berdasarkan kategori
+    <section aria-labelledby="kategori-heading" className="rounded-2xl border border-border bg-card py-4">
+      <h2 id="kategori-heading" className="px-4 text-base font-bold text-foreground sm:px-5">
+        Kategori
       </h2>
       <div
         role="region"
-        aria-label="Daftar kategori jasa"
+        aria-label="Daftar kategori"
         tabIndex={0}
-        className="-mx-4 mt-2.5 overflow-x-auto px-4 pb-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:-mx-6 sm:px-6 [scrollbar-width:thin]"
+        className="mt-3 overflow-x-auto px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <ul className="flex w-max gap-2">
-          {items.map((item) => (
-            <li key={item.id} className="shrink-0">
+        {/* Selalu dua baris penuh mengalir ke samping, jadi tidak ada baris
+            yang setengah kosong. HP: kolom terpotong = tanda bisa digeser.
+            Desktop: kolom melebar rata mengisi lebar kartu (min 104px);
+            kategori sangat banyak tetap bisa digeser. */}
+        <ul className="grid w-max snap-x grid-flow-col grid-rows-2 auto-cols-[76px] gap-x-1 gap-y-2 sm:auto-cols-[92px] lg:w-full lg:min-w-max lg:auto-cols-[minmax(104px,1fr)] lg:gap-y-3">
+          {tiles.map((t) => (
+            <li key={t.key} className="snap-start">
               <Link
-                to="/layanan"
-                search={{ kategori: item.slug }}
-                className="inline-flex min-h-11 items-center rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:border-accent/50 hover:bg-accent/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                to={t.to}
+                search={t.kategori ? ({ kategori: t.kategori } as never) : undefined}
+                className="group flex min-h-11 flex-col items-center gap-1.5 rounded-xl p-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {item.name}
+                <span className="grid size-12 place-items-center rounded-xl border border-border bg-surface text-accent transition-colors group-hover:border-accent/50 group-hover:bg-accent/[0.06] sm:size-14">
+                  <t.icon className="size-5 sm:size-6" aria-hidden="true" />
+                </span>
+                <span className="line-clamp-2 text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                  {t.label}
+                </span>
               </Link>
             </li>
           ))}

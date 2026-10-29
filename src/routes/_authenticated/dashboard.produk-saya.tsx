@@ -10,6 +10,7 @@ import { InlineEmpty } from "@/components/ebry/cards";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Button } from "@/components/ui/button";
 import { StockCodeAccess } from "@/components/ebry/stock-code-access";
+import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import { downloadEntitlement, listMyEntitlements } from "@/lib/orders.functions";
 import { cn } from "@/lib/utils";
 import { CalendarClock, Download, FileArchive, Loader2, Package, ShieldOff, TimerOff } from "lucide-react";
@@ -71,6 +72,8 @@ function ProdukSaya() {
         description="Akses berkas atau kode/link pembelian Anda. Periksa produk sebelum mengonfirmasi penerimaan."
       />
 
+      <RecentlyViewedShelf />
+
       {isPending ? (
         <AdminLoading label="Memuat pustaka…" />
       ) : error ? (
@@ -83,7 +86,7 @@ function ProdukSaya() {
             icon={FileArchive}
             text="Belum ada produk digital yang bisa diunduh."
             actionLabel="Ke katalog"
-            to="/produk"
+            to="/dashboard/produk"
           />
         </div>
       ) : (

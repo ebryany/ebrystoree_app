@@ -198,7 +198,9 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </MaintenanceGate>
-      <Toaster position="top-center" richColors />
+      {/* richColors sengaja dilepas: permukaan frosted netral + ikon semantik
+          diatur terpusat di components/ui/sonner.tsx untuk semua toast. */}
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }

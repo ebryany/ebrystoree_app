@@ -111,6 +111,122 @@ export const listProducts = createServerFn({ method: "GET" })
     };
   });
 
+export type ShelfProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  thumbnail_url: string | null;
+  price: number;
+  discount_price: number | null;
+  sold_count: number;
+  store_name: string | null;
+  store_slug: string | null;
+  store_logo_url: string | null;
+  is_official: boolean;
+  /** Rata-rata bintang toko dari ulasan yang tampil; null bila belum ada ulasan. */
+  store_rating: number | null;
+};
+
+/**
+ * Rak produk untuk dashboard user: "Terlaris" + satu rak per kategori aktif.
+ * Satu query produk lalu dikelompokkan di server agar klien cukup 1 request.
+ */
+export const listProductShelves = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicClient } = await import("./supabase-public.server");
+  const supabase = createPublicClient();
+
+  const [productsRes, categoriesRes] = await Promise.all([
+    supabase
+      .from("digital_products")
+      .select(
+        "id, name, slug, thumbnail_url, price, discount_price, sold_count, category_id, store_id, stores(name, slug, logo_url, is_platform)",
+      )
+      .eq("status", "published")
+      .eq("moderation_status", "approved")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(300),
+    supabase
+      .from("categories")
+      .select("id, name, slug")
+      .eq("kind", "product")
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+  ]);
+
+  if (productsRes.error) {
+    console.error("[catalog] listProductShelves gagal:", productsRes.error.message);
+    return {
+      bestSellers: [] as ShelfProduct[],
+      latest: [] as ShelfProduct[],
+      shelves: [] as { slug: string; name: string; items: ShelfProduct[] }[],
+      error: "Produk sedang tidak dapat dimuat." as const,
+    };
+  }
+
+  // Rating per toko: satu query ulasan, dirata-rata di server.
+  const storeIds = [
+    ...new Set((productsRes.data ?? []).map((r: any) => r.store_id as string).filter(Boolean)),
+  ];
+  const ratingByStore = new Map<string, number>();
+  if (storeIds.length) {
+    const { data: reviews } = await supabase
+      .from("product_reviews")
+      .select("store_id, rating")
+      .eq("is_visible", true)
+      .in("store_id", storeIds)
+      .limit(3000);
+    const agg = new Map<string, { sum: number; n: number }>();
+    for (const r of reviews ?? []) {
+      const a = agg.get(r.store_id as string) ?? { sum: 0, n: 0 };
+      a.sum += Number(r.rating);
+      a.n += 1;
+      agg.set(r.store_id as string, a);
+    }
+    for (const [id, a] of agg) ratingByStore.set(id, a.sum / a.n);
+  }
+
+  const rows = (productsRes.data ?? []).map((r: any) => ({
+    category_id: r.category_id as string | null,
+    item: {
+      id: r.id,
+      name: r.name,
+      slug: r.slug,
+      thumbnail_url: r.thumbnail_url,
+      price: Number(r.price),
+      discount_price: r.discount_price == null ? null : Number(r.discount_price),
+      sold_count: Number(r.sold_count ?? 0),
+      // Produk tanpa toko = milik platform; tampil sebagai Ebrystore resmi.
+      store_name: r.stores?.name ?? (r.store_id ? null : "Ebrystore"),
+      store_slug: r.stores?.slug ?? null,
+      store_logo_url: r.stores?.logo_url ?? null,
+      is_official: !r.store_id || Boolean(r.stores?.is_platform),
+      store_rating: ratingByStore.get(r.store_id) ?? null,
+    } satisfies ShelfProduct,
+  }));
+
+  const bestSellers = rows
+    .map((r) => r.item)
+    .filter((p) => p.sold_count > 0)
+    .sort((a, b) => b.sold_count - a.sold_count)
+    .slice(0, 12);
+
+  const shelves = (categoriesRes.data ?? [])
+    .map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      items: rows.filter((r) => r.category_id === c.id).map((r) => r.item).slice(0, 12),
+    }))
+    .filter((s) => s.items.length > 0);
+
+  // Query sudah diurutkan created_at desc, jadi 12 pertama = produk terbaru.
+  const latest = rows.map((r) => r.item).slice(0, 12);
+
+  return { bestSellers, latest, shelves, error: null };
+});
+
 export const listPublicMarketplaceServices = createServerFn({ method: "GET" })
   .validator((data: unknown) => listInput.parse(data))
   .handler(async ({ data }) => {

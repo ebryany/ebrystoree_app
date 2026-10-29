@@ -160,6 +160,13 @@ export const adminNav: AdminNavGroup[] = [
         available: true,
       },
       {
+        to: "/admin/topups",
+        label: "Top Up Saldo",
+        icon: CreditCard,
+        permission: "payments.view",
+        available: true,
+      },
+      {
         to: "/admin/refunds",
         label: "Refund",
         icon: Undo2,

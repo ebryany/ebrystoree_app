@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import {
   BarChart3,
+  BriefcaseBusiness,
+  ClipboardList,
   LayoutDashboard,
   MessageSquare,
   Package,
@@ -29,8 +31,8 @@ export function SellerSidebar() {
       items: [
         { to: "/seller/pesanan", label: "Pesanan", icon: ReceiptText },
         { to: "/seller/produk", label: "Produk", icon: Package },
-        { to: "/seller/jasa", label: "Jasa Saya", icon: ReceiptText },
-        { to: "/seller/jasa-pesanan", label: "Pesanan Jasa", icon: ReceiptText },
+        { to: "/seller/jasa", label: "Jasa Saya", icon: BriefcaseBusiness },
+        { to: "/seller/jasa-pesanan", label: "Pesanan Jasa", icon: ClipboardList },
         { to: "/seller/chat", label: "Chat", icon: MessageSquare },
       ],
     },

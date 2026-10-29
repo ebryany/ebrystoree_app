@@ -3,29 +3,36 @@ import { useEffect, useState } from "react";
 /**
  * Apakah halaman sudah digulir melewati ambang tertentu.
  *
- * Dipakai header untuk mengecil saat pengguna mulai menggulir: header ramping
- * memberi ruang lebih banyak ke konten, sementara saat di puncak halaman header
- * tampil lega.
- *
- * Kenapa `passive: true`: listener gulir tidak memanggil `preventDefault`, dan
- * penanda itu memberi tahu browser bahwa gulir tidak akan diblokir sehingga
- * halaman tetap mulus di perangkat sentuh.
- *
- * Nilai diperbarui hanya saat melewati ambang, bukan setiap piksel: state React
- * yang berubah puluhan kali per detik membuat seluruh header dirender ulang dan
- * gulir terasa berat.
+ * - `passive: true`: listener tidak memblokir gulir di perangkat sentuh.
+ * - Dibaca maksimal sekali per frame (rAF), bukan setiap event scroll.
+ * - Histeresis: aktif setelah `threshold`, baru nonaktif di bawah `threshold / 3`.
+ *   Tanpa ini, posisi gulir yang berhenti tepat di sekitar ambang (atau momentum
+ *   iOS) membuat state bolak-balik dan header berkedip.
  */
 export function useScrolled(threshold = 24): boolean {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    let frame = 0;
+    let current = false;
     const read = () => {
-      const next = window.scrollY > threshold;
-      setScrolled((current) => (current === next ? current : next));
+      frame = 0;
+      const y = window.scrollY;
+      const next = current ? y > threshold / 3 : y > threshold;
+      if (next !== current) {
+        current = next;
+        setScrolled(next);
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(read);
     };
     read();
-    window.addEventListener("scroll", read, { passive: true });
-    return () => window.removeEventListener("scroll", read);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, [threshold]);
 
   return scrolled;

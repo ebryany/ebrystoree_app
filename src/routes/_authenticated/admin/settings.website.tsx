@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useBlocker, useRouter } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { AlertTriangle, Check, RotateCcw, Save, Search } from "lucide-react";
+import { AlertTriangle, Eye, RotateCcw, Save, Search } from "lucide-react";
 
 import {
   AdminError,
@@ -13,12 +13,14 @@ import {
   ForbiddenState,
   useCan,
 } from "@/components/admin/admin-ui";
-import { DetailCard, formatDateTime } from "@/components/admin/tx-ui";
+import { formatDateTime } from "@/components/admin/tx-ui";
 import { ActionResultDialog, type ActionResult } from "@/components/admin/action-result-dialog";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { BannerSlidesEditor } from "@/components/admin/banner-slides-editor";
 import { EmailHealthPanel } from "@/components/admin/email-health-panel";
 import { NavEditor } from "@/components/admin/nav-editor";
+import { PaymentMethodsEditor } from "@/components/admin/payment-methods-editor";
+import type { CustomPaymentMethod } from "@/lib/payment-methods";
 import { SettingsPreview } from "@/components/admin/settings-preview";
 import {
   Dialog,
@@ -28,6 +30,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +45,9 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -86,6 +97,38 @@ const SECTION_GROUPS: { label: string; sections: { id: string; risky?: boolean }
   },
 ];
 
+/** Bagian berisiko: keputusan uang, fitur, atau marketplace. */
+const RISKY_SECTIONS = new Set(["transaksi", "fitur", "maintenance", "marketplace"]);
+
+/** Ringkasan nilai untuk dialog dampak; daftar/objek tidak dicetak mentah. */
+function impactValue(value: unknown): string {
+  if (value === undefined || value === null || value === "") return "kosong";
+  if (Array.isArray(value)) {
+    if (!value.length) return "kosong";
+    const names = value
+      .map((v) => (v && typeof v === "object" ? ((v as any).name ?? (v as any).label) : v))
+      .filter(Boolean);
+    return names.length ? `${value.length} item: ${names.join(", ")}` : `${value.length} item`;
+  }
+  if (typeof value === "boolean") return value ? "Aktif" : "Nonaktif";
+  if (typeof value === "object") return "data terstruktur";
+  return String(value);
+}
+
+/** Satuan field angka diturunkan dari label registry; tidak mengubah key atau nilai. */
+function numberUnit(field: SettingField): string | null {
+  const label = field.label.toLowerCase();
+  if (label.includes("(rp)")) return "Rp";
+  if (label.includes("basis poin")) return "bps";
+  if (label.includes("(%)")) return "%";
+  if (label.includes("(mb)")) return "MB";
+  if (label.includes("(jam") || label.includes("sla")) return "jam";
+  if (label.includes("(menit)")) return "menit";
+  if (label.includes("(hari)")) return "hari";
+  if (label.includes("(karakter)")) return "karakter";
+  return null;
+}
+
 export const Route = createFileRoute("/_authenticated/admin/settings/website")({
   head: () => ({
     meta: [
@@ -126,6 +169,7 @@ function WebsiteSettingsPage() {
   const [resultOpen, setResultOpen] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   const [confirmFieldOpen, setConfirmFieldOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const reduced = useReducedMotion();
 
   const { data, isPending, error } = useQuery({
@@ -135,9 +179,21 @@ function WebsiteSettingsPage() {
 
   const serverValues: Record<string, any> = (data as any)?.values ?? {};
 
+  // Setelah simpan/refetch: key yang tidak sedang diedit mengikuti server; draf yang
+  // belum disimpan di bagian lain dipertahankan.
+  const previousServer = useRef<Record<string, any> | null>(null);
   useEffect(() => {
     if (!data || (data as any).forbidden || (data as any).error) return;
-    setDraft({ ...serverValues });
+    const prevServer = previousServer.current;
+    previousServer.current = serverValues;
+    setDraft((prev) => {
+      if (!prevServer) return { ...serverValues };
+      const next = { ...serverValues };
+      for (const key of Object.keys(prev)) {
+        if (JSON.stringify(prev[key]) !== JSON.stringify(prevServer[key])) next[key] = prev[key];
+      }
+      return next;
+    });
   }, [data]);
 
   const section = useMemo(() => SETTING_SECTIONS.find((s) => s.id === activeId)!, [activeId]);
@@ -178,10 +234,25 @@ function WebsiteSettingsPage() {
     return results.slice(0, 40);
   }, [search]);
 
+  // Draf disimpan per key untuk semua bagian, jadi pindah bagian tidak membuang perubahan.
+  const dirtySectionIds = useMemo(
+    () =>
+      new Set(
+        SETTING_SECTIONS.filter((s) =>
+          s.fields.some(
+            (f) =>
+              !f.readOnly && JSON.stringify(draft[f.key]) !== JSON.stringify(serverValues[f.key]),
+          ),
+        ).map((s) => s.id),
+      ),
+    [draft, serverValues],
+  );
+
   const dirtyKeys = section.fields
     .filter((f) => !f.readOnly)
     .filter((f) => JSON.stringify(draft[f.key]) !== JSON.stringify(serverValues[f.key]))
     .map((f) => f.key);
+  const otherDirtySections = [...dirtySectionIds].filter((id) => id !== section.id).length;
 
   const fieldErrors = Object.fromEntries(
     section.fields
@@ -283,16 +354,14 @@ function WebsiteSettingsPage() {
     },
   });
 
-  // Pengaman: perubahan belum disimpan tidak boleh hilang tanpa peringatan.
-  useEffect(() => {
-    if (dirtyKeys.length === 0) return;
-    const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", onBeforeUnload);
-    return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [dirtyKeys.length]);
+  // Pengaman: perubahan belum disimpan (di bagian mana pun) tidak boleh hilang
+  // tanpa peringatan, baik saat menutup tab maupun pindah route di dalam aplikasi.
+  const hasUnsaved = dirtySectionIds.size > 0;
+  const blocker = useBlocker({
+    shouldBlockFn: () => hasUnsaved,
+    enableBeforeUnload: () => hasUnsaved,
+    withResolver: true,
+  });
 
   // Pintasan simpan yang lazim di layar pengaturan.
   useEffect(() => {
@@ -316,8 +385,19 @@ function WebsiteSettingsPage() {
     setDraft((prev) => ({ ...prev, [key]: value }));
   }
 
-  /** Bagian berisiko: keputusan uang, fitur, atau marketplace. */
-  const RISKY_SECTIONS = new Set(["transaksi", "fitur", "maintenance", "marketplace"]);
+  function selectSection(id: string) {
+    setActiveId(id);
+    setSearch("");
+  }
+
+  /** Batalkan hanya perubahan pada bagian aktif; draf bagian lain tetap. */
+  function discardSection() {
+    setDraft((prev) => {
+      const next = { ...prev };
+      for (const key of dirtyKeys) next[key] = serverValues[key];
+      return next;
+    });
+  }
 
   function commitSave() {
     saveMutation.mutate({
@@ -348,106 +428,122 @@ function WebsiteSettingsPage() {
   }
 
   const lastChange = (data as any)?.lastChange;
+  const saveDisabled =
+    !canEdit || !dirtyKeys.length || saveMutation.isPending || bannerBusyKeys.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <AdminPageHeader
         title="Pengaturan Website"
         crumb="Pengaturan website"
-        description="Semua nilai tersimpan di database, divalidasi di server, dan tercatat pada audit log."
+        description="Nilai disimpan di database, divalidasi server, dan tercatat di audit log."
+        actions={
+          <Button variant="outline" className="min-h-11" onClick={() => setPreviewOpen(true)}>
+            <Eye className="size-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Pratinjau Website</span>
+            <span className="sm:hidden">Pratinjau</span>
+          </Button>
+        }
       />
 
-      {lastChange ? (
-        <p className="text-xs text-muted-foreground">
-          Perubahan terakhir {formatDateTime(lastChange.created_at)}
-          {(data as any)?.actorName ? ` oleh ${(data as any).actorName}` : ""} ·{" "}
-          {lastChange.reason ?? lastChange.action}
-        </p>
-      ) : null}
-
-      {/* Pencarian field lintas bagian: hasil turun sebagai dropdown, tidak menggeser konten. */}
-      <div className="relative max-w-md">
-        <Search
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden="true"
-        />
-        <Input
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Cari pengaturan, mis. escrow, banner, refund"
-          aria-label="Cari pengaturan"
-          aria-expanded={Boolean(search.trim())}
-          className="min-h-11 pl-9"
-          maxLength={80}
-        />
-        <AnimatePresence>
-          {search.trim() ? (
-            <motion.div
-              initial={reduced ? false : { opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduced ? undefined : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-0 right-0 top-full z-40 mt-1 max-h-80 overflow-y-auto rounded-xl border border-border bg-popover shadow-lg"
-            >
-              {searchResults.length === 0 ? (
-                <p className="px-3 py-3 text-sm text-muted-foreground">
-                  Tidak ada pengaturan yang cocok.
-                </p>
-              ) : (
-                <ul className="divide-y divide-border">
-                  {searchResults.map(({ section: owner, field }) => (
-                    <li key={field.key}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveId(owner.id);
-                          setSearch("");
-                        }}
-                        className="flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-medium">{field.label}</span>
-                          <span className="block truncate text-xs text-muted-foreground">
-                            {owner.label}
-                            {field.group ? ` · ${field.group}` : ""}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Pencarian field lintas bagian: hasil turun sebagai dropdown, tidak menggeser konten. */}
+        <div className="relative w-full sm:max-w-sm">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Cari pengaturan, mis. escrow, banner, refund"
+            aria-label="Cari pengaturan"
+            aria-expanded={Boolean(search.trim())}
+            className="min-h-11 pl-9"
+            maxLength={80}
+          />
+          <AnimatePresence>
+            {search.trim() ? (
+              <motion.div
+                initial={reduced ? false : { opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? undefined : { opacity: 0, y: -6 }}
+                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute left-0 right-0 top-full z-40 mt-1 max-h-80 overflow-y-auto rounded-xl border border-border bg-popover shadow-lg"
+              >
+                {searchResults.length === 0 ? (
+                  <p className="px-3 py-3 text-sm text-muted-foreground">
+                    Tidak ada pengaturan yang cocok.
+                  </p>
+                ) : (
+                  <ul className="divide-y divide-border">
+                    {searchResults.map(({ section: owner, field }) => (
+                      <li key={field.key}>
+                        <button
+                          type="button"
+                          onClick={() => selectSection(owner.id)}
+                          className="flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-medium">
+                              {field.label}
+                            </span>
+                            <span className="block truncate text-xs text-muted-foreground">
+                              {owner.label}
+                              {field.group ? ` · ${field.group}` : ""}
+                            </span>
                           </span>
-                        </span>
-                        <span className="shrink-0 text-[11px] text-muted-foreground">
-                          {field.isPublic ? "Tampil di situs" : "Internal"}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+                          <span className="shrink-0 text-[11px] text-muted-foreground">
+                            {field.isPublic ? "Tampil di situs" : "Internal"}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
+
+        {lastChange ? (
+          <p
+            className="min-w-0 truncate text-xs text-muted-foreground"
+            title={lastChange.reason ?? lastChange.action}
+          >
+            Terakhir diubah {formatDateTime(lastChange.created_at)}
+            {(data as any)?.actorName ? ` · ${(data as any).actorName}` : ""}
+          </p>
+        ) : null}
       </div>
 
-      <div className="grid min-w-0 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)_320px]">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[200px_minmax(0,1fr)] xl:gap-6">
         <nav aria-label="Bagian pengaturan" className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-          {/* Mobile: select agar sebelas bagian tidak menjadi baris geser panjang. */}
+          {/* Layar kecil: select berkelompok agar dua belas bagian tidak jadi baris geser panjang. */}
           <div className="lg:hidden">
             <Label htmlFor="pengaturan-bagian" className="sr-only">
               Pilih bagian pengaturan
             </Label>
-            <Select
-              value={activeId}
-              onValueChange={(value) => {
-                setActiveId(value);
-                setSearch("");
-              }}
-            >
+            <Select value={activeId} onValueChange={selectSection}>
               <SelectTrigger id="pengaturan-bagian" className="min-h-11">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {SETTING_SECTIONS.map((entry) => (
-                  <SelectItem key={entry.id} value={entry.id}>
-                    {entry.label}
-                  </SelectItem>
+                {SECTION_GROUPS.map((group) => (
+                  <SelectGroup key={group.label}>
+                    <SelectLabel className="text-xs text-muted-foreground">{group.label}</SelectLabel>
+                    {group.sections.map((entry) => {
+                      const target = SETTING_SECTIONS.find((s) => s.id === entry.id);
+                      if (!target) return null;
+                      return (
+                        <SelectItem key={target.id} value={target.id}>
+                          {target.label}
+                          {dirtySectionIds.has(target.id) ? " •" : ""}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
@@ -456,46 +552,38 @@ function WebsiteSettingsPage() {
           <div className="hidden lg:flex lg:flex-col lg:gap-4">
             {SECTION_GROUPS.map((group) => (
               <div key={group.label}>
-                <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {group.label}
                 </p>
                 <div className="flex flex-col gap-0.5">
                   {group.sections.map((entry) => {
                     const target = SETTING_SECTIONS.find((s) => s.id === entry.id);
                     if (!target) return null;
-                    const sectionDirty = target.fields.some(
-                      (f) =>
-                        !f.readOnly &&
-                        JSON.stringify(draft[f.key]) !== JSON.stringify(serverValues[f.key]),
-                    );
+                    const sectionDirty = dirtySectionIds.has(target.id);
                     const active = target.id === activeId;
                     return (
                       <button
                         key={target.id}
                         type="button"
-                        onClick={() => {
-                          setActiveId(target.id);
-                          setSearch("");
-                        }}
+                        onClick={() => selectSection(target.id)}
                         aria-current={active ? "page" : undefined}
-                        className={`flex min-h-10 w-full items-center gap-1.5 rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring ${
+                        className={`flex min-h-10 w-full items-center gap-2 rounded-md border-l-2 px-3 py-2 text-left text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring ${
                           active
-                            ? "bg-primary/10 font-semibold text-primary"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            ? "border-primary bg-primary/10 font-semibold text-primary"
+                            : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                         }`}
                       >
-                        <span className="min-w-0 flex-1 truncate">{target.label}</span>
+                        <span className="min-w-0 flex-1 break-words">{target.label}</span>
                         {entry.risky ? (
-                          <span
-                            className="shrink-0 text-[10px] font-semibold text-warning-foreground"
-                            title="Menyentuh uang atau perilaku sistem"
-                          >
-                            !
-                          </span>
+                          <AlertTriangle
+                            className="size-3.5 shrink-0 text-warning-foreground"
+                            aria-label="Menyentuh uang atau perilaku sistem"
+                          />
                         ) : null}
                         {sectionDirty ? (
                           <span
-                            className="size-1.5 shrink-0 rounded-full bg-warning"
+                            className="size-2 shrink-0 rounded-full bg-warning"
+                            role="img"
                             aria-label="Ada perubahan belum disimpan"
                           />
                         ) : null}
@@ -508,31 +596,28 @@ function WebsiteSettingsPage() {
           </div>
         </nav>
 
-        <div className="min-w-0 space-y-6">
-          <DetailCard
-            title={section.label}
-            description={section.description}
-            actions={
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
-                  {section.fields.length} pengaturan
-                </span>
-                {dirtyKeys.length > 0 ? (
-                  <span className="rounded-full border border-warning/50 bg-warning/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-warning-foreground">
-                    {dirtyKeys.length} diubah
-                  </span>
-                ) : null}
-                {RISKY_SECTIONS.has(section.id) ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-destructive/40 bg-destructive/5 px-2 py-0.5 text-[11px] font-semibold text-destructive">
-                    <AlertTriangle className="size-3" aria-hidden="true" />
-                    Menyentuh uang/perilaku
-                  </span>
-                ) : null}
-              </div>
-            }
-          >
+        <section
+          aria-labelledby="bagian-aktif"
+          className="min-w-0 rounded-xl border border-border bg-card"
+        >
+          <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4 sm:px-6">
+            <div className="min-w-0">
+              <h2 id="bagian-aktif" className="text-lg font-semibold">
+                {section.label}
+              </h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">{section.description}</p>
+            </div>
+            {RISKY_SECTIONS.has(section.id) ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-destructive/40 bg-destructive/5 px-2 py-1 text-xs font-medium text-destructive">
+                <AlertTriangle className="size-3.5" aria-hidden="true" />
+                Menyentuh uang/perilaku
+              </span>
+            ) : null}
+          </header>
+
+          <div className="px-4 py-5 sm:px-6">
             {!canEdit ? (
-              <p className="mb-4 rounded-lg border border-dashed border-border p-3 text-sm text-muted-foreground">
+              <p className="mb-5 rounded-lg border border-dashed border-border p-3 text-sm text-muted-foreground">
                 Anda hanya dapat melihat bagian ini. Perubahan memerlukan izin {section.permission}.
               </p>
             ) : null}
@@ -546,15 +631,13 @@ function WebsiteSettingsPage() {
             ) : null}
 
             {/* Field dikelompokkan supaya bagian besar tidak jadi satu daftar panjang. */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {groupedFields.map((group) => (
-                <section key={group.name} aria-label={group.name}>
+                <section key={group.name || "_"} aria-label={group.name || section.label}>
                   {group.name ? (
-                    <h3 className="mb-3 border-b border-border pb-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                      {group.name}
-                    </h3>
+                    <h3 className="mb-4 text-sm font-semibold text-foreground">{group.name}</h3>
                   ) : null}
-                  <div className="space-y-5">
+                  <div className="divide-y divide-border">
                     {group.fields.map((field) => (
                       <FieldRow
                         key={field.key}
@@ -563,6 +646,7 @@ function WebsiteSettingsPage() {
                         error={fieldErrors[field.key]}
                         disabled={!canEdit || field.readOnly || saveMutation.isPending}
                         changedFromDefault={changedKeys.has(field.key)}
+                        dirty={dirtyKeys.includes(field.key)}
                         onChange={(v) => setValue(field.key, v)}
                         uploadBannerFile={uploadBannerFile}
                         onBannerBusy={(busy) =>
@@ -581,92 +665,109 @@ function WebsiteSettingsPage() {
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-4">
-              <Button
-                onClick={onSave}
-                disabled={
-                  !canEdit ||
-                  !dirtyKeys.length ||
-                  saveMutation.isPending ||
-                  bannerBusyKeys.length > 0
-                }
-              >
-                <Save className="mr-1 size-4" />
-                {saveMutation.isPending ? "Menyimpan…" : "Simpan perubahan"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setDraft({ ...serverValues })}
-                disabled={!dirtyKeys.length || saveMutation.isPending}
-              >
-                Batalkan perubahan
-              </Button>
-              {canReset ? (
-                <Button variant="ghost" onClick={onReset} disabled={resetMutation.isPending}>
-                  <RotateCcw className="mr-1 size-4" /> Reset ke default
-                </Button>
-              ) : null}
-              <span className="text-xs text-muted-foreground">
-                {dirtyKeys.length
-                  ? `${dirtyKeys.length} perubahan belum disimpan`
-                  : "Tidak ada perubahan"}
-              </span>
-            </div>
-          </DetailCard>
-        </div>
-
-        {/* Preview berdampingan pada layar lebar; menempel agar dampak terlihat saat mengubah. */}
-        <aside className="hidden min-w-0 xl:block">
-          <div className="sticky top-20">
-            <SettingsPreview values={draft} />
-          </div>
-        </aside>
-      </div>
-
-      {/* Preview tetap tersedia di bawah pada layar lebih kecil. */}
-      <div className="xl:hidden">
-        <SettingsPreview values={draft} />
-      </div>
-
-      {/* Bilah simpan mengambang: simpan selalu terjangkau di bagian panjang. */}
-      <AnimatePresence>
-        {canEdit && dirtyKeys.length > 0 ? (
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: 16 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="sticky bottom-0 z-30 -mx-4 mt-2 border-t border-border bg-card/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-medium" role="status" aria-live="polite">
-                {dirtyKeys.length} perubahan belum disimpan
-                <span className="ml-1 text-xs font-normal text-muted-foreground">
-                  · {section.label}
-                </span>
-              </p>
-              <div className="flex flex-wrap gap-2">
+            {canReset ? (
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Kembalikan seluruh bagian {section.label} ke nilai default registry.
+                </p>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   className="min-h-11"
-                  disabled={saveMutation.isPending}
-                  onClick={() => setDraft({ ...serverValues })}
+                  onClick={onReset}
+                  disabled={resetMutation.isPending || saveMutation.isPending}
                 >
-                  Batalkan
-                </Button>
-                <Button
-                  className="min-h-11"
-                  disabled={saveMutation.isPending || bannerBusyKeys.length > 0}
-                  onClick={onSave}
-                >
-                  <Save className="mr-1 size-4" aria-hidden="true" />
-                  {saveMutation.isPending ? "Menyimpan…" : "Simpan perubahan"}
+                  <RotateCcw className="size-4" aria-hidden="true" /> Reset ke default
                 </Button>
               </div>
+            ) : null}
+          </div>
+        </section>
+      </div>
+
+      {/* Satu-satunya aksi simpan. Selalu tampil untuk editor agar posisinya stabil;
+          scroll-padding di bawah mencegah bilah menutupi field terakhir. */}
+      {canEdit ? (
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className="sticky bottom-0 z-30 -mx-4 border-t border-border bg-card px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <p className="min-w-0 text-sm" role="status" aria-live="polite">
+              {dirtyKeys.length ? (
+                <span className="font-medium">
+                  {dirtyKeys.length} perubahan belum disimpan
+                  <span className="font-normal text-muted-foreground"> · {section.label}</span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">Tidak ada perubahan</span>
+              )}
+              {otherDirtySections > 0 ? (
+                <span className="block text-xs text-warning-foreground">
+                  {otherDirtySections} bagian lain juga punya perubahan belum disimpan
+                </span>
+              ) : null}
+            </p>
+            <div className="flex w-full gap-2 sm:w-auto">
+              <Button
+                variant="outline"
+                className="min-h-11 flex-1 sm:flex-none"
+                disabled={!dirtyKeys.length || saveMutation.isPending}
+                onClick={discardSection}
+              >
+                Batalkan
+              </Button>
+              <Button className="min-h-11 flex-1 sm:flex-none" disabled={saveDisabled} onClick={onSave}>
+                <Save className="size-4" aria-hidden="true" />
+                {saveMutation.isPending ? "Menyimpan…" : "Simpan perubahan"}
+              </Button>
             </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+          </div>
+        </motion.div>
+      ) : null}
+
+      <Sheet open={previewOpen} onOpenChange={setPreviewOpen}>
+        <SheetContent
+          side="right"
+          className="flex w-full flex-col gap-4 overflow-y-auto p-4 sm:max-w-3xl sm:p-6 xl:max-w-5xl"
+        >
+          <SheetHeader className="pr-10 text-left">
+            <SheetTitle>Pratinjau Website</SheetTitle>
+            <SheetDescription>
+              Tampilan header, banner, dan footer berdasarkan draf pengaturan.
+            </SheetDescription>
+          </SheetHeader>
+          {/* Dimount hanya saat dibuka supaya mengetik di form tidak merender ulang pratinjau. */}
+          {previewOpen ? <SettingsPreview values={draft} /> : null}
+        </SheetContent>
+      </Sheet>
+
+      {/* Navigasi keluar halaman saat ada draf: konfirmasi eksplisit. */}
+      <Dialog
+        open={blocker.status === "blocked"}
+        onOpenChange={(open) => {
+          if (!open && blocker.status === "blocked") blocker.reset();
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tinggalkan halaman?</DialogTitle>
+            <DialogDescription>
+              Ada perubahan pengaturan yang belum disimpan. Perubahan itu akan hilang bila Anda
+              meninggalkan halaman ini.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="min-h-11" onClick={() => blocker.reset?.()}>
+              Tetap di sini
+            </Button>
+            <Button variant="destructive" className="min-h-11" onClick={() => blocker.proceed?.()}>
+              Tinggalkan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Konfirmasi field berisiko: dialog, bukan konfirmasi bawaan browser. */}
       <Dialog open={confirmFieldOpen} onOpenChange={setConfirmFieldOpen}>
@@ -766,10 +867,10 @@ function WebsiteSettingsPage() {
                   <p className="text-sm font-medium">{field?.label ?? key}</p>
                   <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                     <span className="line-through">
-                      {String(serverValues[key] ?? field?.default ?? "kosong")}
+                      {impactValue(serverValues[key] ?? field?.default)}
                     </span>
                     <span aria-hidden="true">→</span>
-                    <span className="font-semibold text-foreground">{String(draft[key])}</span>
+                    <span className="font-semibold text-foreground">{impactValue(draft[key])}</span>
                   </p>
                 </li>
               );
@@ -807,6 +908,7 @@ function FieldRow({
   error,
   disabled,
   changedFromDefault,
+  dirty,
   onChange,
   uploadBannerFile,
   onBannerBusy,
@@ -816,6 +918,7 @@ function FieldRow({
   error?: string;
   disabled: boolean;
   changedFromDefault?: boolean;
+  dirty?: boolean;
   onChange: (value: unknown) => void;
   uploadBannerFile: (input: {
     data: { name: string; data: string };
@@ -841,31 +944,26 @@ function FieldRow({
 
   const label = (
     <div className="min-w-0">
-      <div className="flex flex-wrap items-center gap-1.5">
-        <Label htmlFor={id}>{field.label}</Label>
-        {/* Sifat publik menentukan apakah nilai terlihat pengunjung; admin perlu tahu. */}
-        <span
-          className={
-            field.isPublic
-              ? "rounded-full border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent"
-              : "rounded-full border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
-          }
-        >
-          {field.isPublic ? "Tampil di situs" : "Internal"}
-        </span>
-        {field.enforcedInDatabase ? (
-          <span className="rounded-full border border-warning/50 bg-warning/10 px-1.5 py-0.5 text-[10px] font-semibold text-warning-foreground">
-            Ditegakkan database
-          </span>
-        ) : null}
-        {changedFromDefault ? (
-          <span className="rounded-full border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-            Diubah dari default
-          </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <Label htmlFor={id} className="text-sm font-medium">
+          {field.label}
+        </Label>
+        {dirty ? (
+          <span className="size-1.5 rounded-full bg-warning" role="img" aria-label="Belum disimpan" />
         ) : null}
       </div>
+      {/* Metadata ringkas sebagai teks sekunder; hanya "Ditegakkan database" yang ditonjolkan. */}
+      <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-[11px] text-muted-foreground">
+        <span className={field.isPublic ? "text-accent" : undefined}>
+          {field.isPublic ? "Tampil di situs" : "Internal"}
+        </span>
+        {changedFromDefault ? <span>· Diubah dari default</span> : null}
+        {field.enforcedInDatabase ? (
+          <span className="font-semibold text-warning-foreground">· Ditegakkan database</span>
+        ) : null}
+      </p>
       {field.help ? (
-        <p id={`${id}-help`} className="text-xs text-muted-foreground">
+        <p id={`${id}-help`} className="mt-1 text-xs text-muted-foreground">
           {field.help}
         </p>
       ) : null}
@@ -874,7 +972,7 @@ function FieldRow({
 
   if (field.type === "boolean") {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+      <div className="flex items-center justify-between gap-4 py-4">
         {label}
         <Switch
           id={id}
@@ -889,7 +987,7 @@ function FieldRow({
 
   if (field.type === "banners") {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 py-4">
         {label}
         <BannerSlidesEditor
           slides={Array.isArray(value) ? (value as HomeBannerSlide[]) : []}
@@ -907,9 +1005,27 @@ function FieldRow({
     );
   }
 
+  if (field.type === "payment_methods") {
+    return (
+      <div className="space-y-3 py-4">
+        {label}
+        <PaymentMethodsEditor
+          value={Array.isArray(value) ? (value as CustomPaymentMethod[]) : []}
+          disabled={disabled}
+          onChange={onChange}
+        />
+        {error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
   if (field.type === "nav") {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 py-4">
         {label}
         <NavEditor
           items={(value ?? []) as NavItem[]}
@@ -921,10 +1037,30 @@ function FieldRow({
     );
   }
 
+  const unit = field.type === "number" ? numberUnit(field) : null;
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 py-4">
       {label}
-      {field.type === "textarea" ? (
+      {field.type === "number" ? (
+        <div className="relative w-full max-w-xs">
+          <Input
+            id={id}
+            inputMode="numeric"
+            className={unit ? "pr-20" : undefined}
+            value={String(value ?? "")}
+            disabled={disabled}
+            aria-invalid={Boolean(error)}
+            aria-describedby={describedBy}
+            onChange={(e) => onChange(e.target.value)}
+          />
+          {unit ? (
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+              {unit}
+            </span>
+          ) : null}
+        </div>
+      ) : field.type === "textarea" ? (
         <Textarea
           id={id}
           rows={3}

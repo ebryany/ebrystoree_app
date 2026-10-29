@@ -46,6 +46,8 @@ const PROGRESS = [
 const DANGER = ["cancelled", "rejected", "failed", "expired", "disputed", "blocked", "refunded", "archived"];
 
 export function statusTone(value: string): StatusTone {
+  // Pemanggil boleh mengirim nama tone langsung (mis. "success" untuk toko aktif).
+  if (Object.hasOwn(TONE, value)) return value as StatusTone;
   if (SUCCESS.includes(value)) return "success";
   if (DANGER.includes(value)) return "danger";
   if (PROGRESS.includes(value)) return "progress";

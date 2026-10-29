@@ -3,9 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ReceiptText } from "lucide-react";
 
 import { AdminLoading, AdminError } from "@/components/admin/admin-ui";
 import { CountUp } from "@/components/admin/report-widgets";
+import { EmptyState } from "@/components/ebry/states";
+import { cn } from "@/lib/utils";
 import { SellerOrderCard } from "@/components/seller/seller-order-card";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
@@ -106,42 +109,51 @@ function SellerOrders() {
         </Button>
       </header>
 
+      {/* Tab status sebagai kotak angka: jumlah tiap status terlihat sekaligus. */}
       <div
         role="tablist"
         aria-label="Filter status pesanan"
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0"
+        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4"
       >
         {TABS.map((entry) => {
           const active = tab === entry.key;
-          // Tab "Semua" tidak punya countKey; tanpa penjagaan ini, indeks null
-          // akan dipakai ke objek counts dan menghasilkan undefined yang membingungkan.
-          const count = entry.countKey ? data?.counts?.[entry.countKey] : undefined;
+          // Tab "Semua" tidak punya countKey; jumlahnya diambil dari total saat tab aktif.
+          const count = entry.countKey
+            ? data?.counts?.[entry.countKey]
+            : active
+              ? data?.total
+              : undefined;
+          const urgent = entry.key !== "all" && entry.key !== "awaiting_receipt" && (count ?? 0) > 0;
           return (
             <button
               key={entry.key}
+              type="button"
               role="tab"
               aria-selected={active}
               onClick={() => switchTab(entry.key)}
-              className="relative flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent/50 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring aria-selected:border-transparent"
+              className={cn(
+                "relative flex min-h-[84px] flex-col items-start justify-between gap-2 bg-card p-4 text-left transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                active && "bg-surface-selected hover:bg-surface-selected",
+              )}
             >
               {active ? (
-                <motion.span
-                  layoutId="seller-pesanan-tab"
-                  className="absolute inset-0 rounded-full bg-primary"
-                  transition={{ duration: reduced ? 0 : 0.18, ease: [0.16, 1, 0.3, 1] }}
-                />
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-accent" aria-hidden="true" />
               ) : null}
-              <span className={active ? "relative text-primary-foreground" : "relative"}>
-                {entry.label}
+              <span
+                className={cn(
+                  "text-2xl font-bold leading-none tabular-nums",
+                  urgent ? "text-destructive" : "text-foreground",
+                )}
+              >
+                {typeof count === "number" ? <CountUp value={count} /> : "–"}
               </span>
               <span
-                className={
-                  active
-                    ? "relative text-primary-foreground tabular-nums"
-                    : "relative tabular-nums text-muted-foreground"
-                }
+                className={cn(
+                  "text-xs",
+                  active ? "font-semibold text-foreground" : "text-muted-foreground",
+                )}
               >
-                {typeof count === "number" ? <CountUp value={count} /> : "0"}
+                {entry.label}
               </span>
             </button>
           );
@@ -166,12 +178,18 @@ function SellerOrders() {
       ) : query.isError ? (
         <AdminError message={query.error.message} />
       ) : data && items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border px-4 py-10 text-center">
-          <p className="text-sm font-medium">{EMPTY_HINT[tab]}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Gunakan tab Semua untuk melihat riwayat pesanan.
-          </p>
-        </div>
+        <EmptyState
+          icon={ReceiptText}
+          title={EMPTY_HINT[tab]}
+          description={tab === "all" ? undefined : "Buka tab Semua untuk melihat riwayat pesanan."}
+          action={
+            tab === "all" ? undefined : (
+              <Button variant="outline" className="min-h-11" onClick={() => switchTab("all")}>
+                Lihat semua pesanan
+              </Button>
+            )
+          }
+        />
       ) : data ? (
         <>
           <motion.section layout={!reduced} aria-label="Daftar pesanan" className="space-y-3">

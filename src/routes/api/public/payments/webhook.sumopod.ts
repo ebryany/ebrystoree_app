@@ -84,27 +84,26 @@ export const Route = createFileRoute("/api/public/payments/webhook/sumopod")({
 
         // Jalur kedua: top-up saldo (tidak memakai tabel payments/orders).
         if (!payment) {
-          const topupHandled = await handleTopupEvent(parsed);
+          const topupHandled = await handleTopupEvent(parsed, raw);
           if (topupHandled) return new Response("ok");
         }
 
         const eventId = `${parsed.data.payment_id}:${parsed.event_type}`;
+        const payloadHash = await hashPayload(raw);
 
-        async function logEvent(status: string, error?: string) {
-          await supabaseAdmin.from("payment_events").insert({
-            provider: "sumopod",
+        async function logEvent(status: EventStatus, error?: string) {
+          await insertEvent({
             external_event_id: eventId,
             payment_id: payment?.id ?? null,
             event_type: parsed.event_type,
-            signature_valid: true,
+            payload_hash: payloadHash,
             processing_status: status,
-            processed_at: new Date().toISOString(),
             error: error ?? null,
           });
         }
 
         if (parsed.event_type !== "payment.completed") {
-          await logEvent("skipped", `event ${parsed.event_type}`);
+          await logEvent("rejected", `ignored event ${parsed.event_type}`);
           return new Response("ok");
         }
         if (!payment) {
@@ -112,7 +111,7 @@ export const Route = createFileRoute("/api/public/payments/webhook/sumopod")({
           return new Response("ok");
         }
         if (payment.status === "paid") {
-          await logEvent("skipped", "already settled");
+          await logEvent("duplicate", "already settled");
           return new Response("ok");
         }
         if (Number(parsed.data.amount) !== Number(payment.expected_amount)) {
@@ -176,6 +175,39 @@ export const Route = createFileRoute("/api/public/payments/webhook/sumopod")({
 
 type ParsedWebhook = z.infer<typeof bodySchema>;
 
+/** Nilai yang diizinkan CHECK payment_events.processing_status. */
+type EventStatus = "received" | "processed" | "duplicate" | "rejected" | "failed";
+
+async function hashPayload(raw: string): Promise<string> {
+  const { createHash } = await import("node:crypto");
+  return createHash("sha256").update(raw, "utf8").digest("hex");
+}
+
+/**
+ * Catat payment_events. Duplikat (UNIQUE provider + external_event_id) berarti
+ * webhook dikirim ulang dan bukan error. Error lain dicatat ke log server agar
+ * tidak hilang diam-diam; webhook tetap dibalas karena pelunasan sudah idempoten.
+ */
+async function insertEvent(row: {
+  external_event_id: string;
+  payment_id: string | null;
+  event_type: string;
+  payload_hash: string;
+  processing_status: EventStatus;
+  error: string | null;
+}) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin.from("payment_events").insert({
+    provider: "sumopod",
+    signature_valid: true,
+    processed_at: new Date().toISOString(),
+    ...row,
+  });
+  if (error && error.code !== "23505") {
+    console.error("[sumopod] catat payment_events gagal:", error.code ?? "", error.message);
+  }
+}
+
 /**
  * Jalur webhook untuk top-up saldo. Dipanggil hanya ketika event bukan milik
  * tabel `payments`. Idempoten: settle_credit_topup mengembalikan
@@ -184,7 +216,7 @@ type ParsedWebhook = z.infer<typeof bodySchema>;
  *
  * Mengembalikan true bila event memang milik top-up (sudah ditangani).
  */
-async function handleTopupEvent(parsed: ParsedWebhook): Promise<boolean> {
+async function handleTopupEvent(parsed: ParsedWebhook, raw: string): Promise<boolean> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const { data: byProviderId } = await supabaseAdmin
@@ -207,25 +239,24 @@ async function handleTopupEvent(parsed: ParsedWebhook): Promise<boolean> {
   if (!topup) return false;
 
   const eventId = `${parsed.data.payment_id}:${parsed.event_type}`;
-  async function logEvent(status: string, error?: string) {
-    await supabaseAdmin.from("payment_events").insert({
-      provider: "sumopod",
+  const payloadHash = await hashPayload(raw);
+  async function logEvent(status: EventStatus, error?: string) {
+    await insertEvent({
       external_event_id: eventId,
       payment_id: null,
       event_type: parsed.event_type,
-      signature_valid: true,
+      payload_hash: payloadHash,
       processing_status: status,
-      processed_at: new Date().toISOString(),
       error: error ?? null,
     });
   }
 
   if (parsed.event_type !== "payment.completed") {
-    await logEvent("skipped", `topup event ${parsed.event_type}`);
+    await logEvent("rejected", `ignored topup event ${parsed.event_type}`);
     return true;
   }
   if (topup.status === "paid") {
-    await logEvent("skipped", "topup already settled");
+    await logEvent("duplicate", "topup already settled");
     return true;
   }
   if (topup.status !== "waiting_payment") {

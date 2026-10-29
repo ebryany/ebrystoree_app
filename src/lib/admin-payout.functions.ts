@@ -111,12 +111,32 @@ export const getPayoutDetail = createServerFn({ method: "GET" })
       const sb = (context as Ctx).supabase;
       const { data: w, error } = await sb
         .from("withdrawals")
-        .select(
-          "*, stores(name, slug, owner_id, profiles:owner_id(full_name)), requested_by_profile:requested_by(full_name)",
-        )
+        .select("*, stores(name, slug, owner_id)")
         .eq("id", data.id)
         .maybeSingle();
-      if (error || !w) return { detail: null, error: "Detail payout tidak dapat dimuat." };
+      if (error)
+        return {
+          detail: null,
+          error: "Detail payout tidak dapat dimuat. Silakan coba lagi.",
+        };
+      if (!w) return { detail: null, error: "Payout tidak ditemukan." };
+
+      // stores.owner_id dan withdrawals.requested_by menunjuk auth.users, bukan
+      // profiles.id, sehingga PostgREST tidak dapat melakukan nested join.
+      const profileIds = Array.from(
+        new Set([w.stores?.owner_id, w.requested_by].filter(Boolean)),
+      );
+      const { data: profiles, error: profilesError } = profileIds.length
+        ? await sb.from("profiles").select("id, full_name").in("id", profileIds)
+        : { data: [], error: null };
+      if (profilesError)
+        return {
+          detail: null,
+          error: "Identitas seller tidak dapat dimuat. Silakan coba lagi.",
+        };
+      const profileMap = new Map(
+        (profiles ?? []).map((profile: any) => [profile.id, profile]),
+      );
 
       const { data: events } = await sb
         .from("withdrawal_events")
@@ -132,6 +152,7 @@ export const getPayoutDetail = createServerFn({ method: "GET" })
           net_amount: Number(w.net_amount),
           bank_account_masked: maskAccount(w.bank_account_number),
           store_owner_id: w.stores?.owner_id ?? null,
+          requested_by_profile: profileMap.get(w.requested_by) ?? null,
           events: events ?? [],
         },
         error: null,

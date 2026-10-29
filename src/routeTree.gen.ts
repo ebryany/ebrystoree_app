@@ -48,9 +48,11 @@ import { Route as AuthenticatedAdminNotifikasiRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPenggunaRouteImport } from './routes/_authenticated/admin/pengguna'
 import { Route as AuthenticatedAdminProdukRouteImport } from './routes/_authenticated/admin/produk'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
+import { Route as AuthenticatedAdminTopupsRouteImport } from './routes/_authenticated/admin/topups'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardNotifikasiRouteImport } from './routes/_authenticated/dashboard.notifikasi'
 import { Route as AuthenticatedDashboardPengaturanRouteImport } from './routes/_authenticated/dashboard.pengaturan'
+import { Route as AuthenticatedDashboardProdukRouteImport } from './routes/_authenticated/dashboard.produk'
 import { Route as AuthenticatedDashboardProdukSayaRouteImport } from './routes/_authenticated/dashboard.produk-saya'
 import { Route as AuthenticatedDashboardSaldoRouteImport } from './routes/_authenticated/dashboard.saldo'
 import { Route as AuthenticatedOperatorIndexRouteImport } from './routes/_authenticated/operator.index'
@@ -110,10 +112,12 @@ import { Route as AuthenticatedSellerProdukBaruRouteImport } from './routes/_aut
 import { Route as ApiPublicAnalyticsTrackRouteImport } from './routes/api/public/analytics/track'
 import { Route as ApiPublicCatalogImageSplatRouteImport } from './routes/api/public/catalog-image.$'
 import { Route as ApiPublicJobsEmailDispatchRouteImport } from './routes/api/public/jobs/email-dispatch'
+import { Route as ApiPublicJobsShopeepayReconcileRouteImport } from './routes/api/public/jobs/shopeepay-reconcile'
 import { Route as ApiPublicJobsTelegramDispatchRouteImport } from './routes/api/public/jobs/telegram-dispatch'
 import { Route as ApiPublicServiceMediaSplatRouteImport } from './routes/api/public/service-media.$'
 import { Route as ApiPublicIntegrationsJiofarmDemandRouteImport } from './routes/api/public/integrations/jiofarm/demand'
 import { Route as ApiPublicIntegrationsJiofarmLinksRouteImport } from './routes/api/public/integrations/jiofarm/links'
+import { Route as ApiPublicPaymentsWebhookShopeepayRouteImport } from './routes/api/public/payments/webhook.shopeepay'
 import { Route as ApiPublicPaymentsWebhookSumopodRouteImport } from './routes/api/public/payments/webhook.sumopod'
 
 const IndexRoute = IndexRouteImport.update({
@@ -319,6 +323,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/reports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminTopupsRoute =
+  AuthenticatedAdminTopupsRouteImport.update({
+    id: '/topups',
+    path: '/topups',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
@@ -335,6 +345,12 @@ const AuthenticatedDashboardPengaturanRoute =
   AuthenticatedDashboardPengaturanRouteImport.update({
     id: '/pengaturan',
     path: '/pengaturan',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardProdukRoute =
+  AuthenticatedDashboardProdukRouteImport.update({
+    id: '/produk',
+    path: '/produk',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardProdukSayaRoute =
@@ -682,6 +698,12 @@ const ApiPublicJobsEmailDispatchRoute =
     path: '/api/public/jobs/email-dispatch',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicJobsShopeepayReconcileRoute =
+  ApiPublicJobsShopeepayReconcileRouteImport.update({
+    id: '/api/public/jobs/shopeepay-reconcile',
+    path: '/api/public/jobs/shopeepay-reconcile',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicJobsTelegramDispatchRoute =
   ApiPublicJobsTelegramDispatchRouteImport.update({
     id: '/api/public/jobs/telegram-dispatch',
@@ -704,6 +726,12 @@ const ApiPublicIntegrationsJiofarmLinksRoute =
   ApiPublicIntegrationsJiofarmLinksRouteImport.update({
     id: '/api/public/integrations/jiofarm/links',
     path: '/api/public/integrations/jiofarm/links',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicPaymentsWebhookShopeepayRoute =
+  ApiPublicPaymentsWebhookShopeepayRouteImport.update({
+    id: '/api/public/payments/webhook/shopeepay',
+    path: '/api/public/payments/webhook/shopeepay',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicPaymentsWebhookSumopodRoute =
@@ -751,8 +779,10 @@ export interface FileRoutesByFullPath {
   '/admin/pengguna': typeof AuthenticatedAdminPenggunaRoute
   '/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/topups': typeof AuthenticatedAdminTopupsRoute
   '/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
+  '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
   '/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/operator/$id': typeof AuthenticatedOperatorIdRoute
@@ -800,6 +830,7 @@ export interface FileRoutesByFullPath {
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
@@ -818,6 +849,7 @@ export interface FileRoutesByFullPath {
   '/seller/produk/': typeof AuthenticatedSellerProdukIndexRoute
   '/api/public/integrations/jiofarm/demand': typeof ApiPublicIntegrationsJiofarmDemandRoute
   '/api/public/integrations/jiofarm/links': typeof ApiPublicIntegrationsJiofarmLinksRoute
+  '/api/public/payments/webhook/shopeepay': typeof ApiPublicPaymentsWebhookShopeepayRoute
   '/api/public/payments/webhook/sumopod': typeof ApiPublicPaymentsWebhookSumopodRoute
 }
 export interface FileRoutesByTo {
@@ -853,8 +885,10 @@ export interface FileRoutesByTo {
   '/admin/pengguna': typeof AuthenticatedAdminPenggunaRoute
   '/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/topups': typeof AuthenticatedAdminTopupsRoute
   '/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
+  '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
   '/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/operator/$id': typeof AuthenticatedOperatorIdRoute
@@ -901,6 +935,7 @@ export interface FileRoutesByTo {
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/admin/chat': typeof AuthenticatedAdminChatIndexRoute
@@ -919,6 +954,7 @@ export interface FileRoutesByTo {
   '/seller/produk': typeof AuthenticatedSellerProdukIndexRoute
   '/api/public/integrations/jiofarm/demand': typeof ApiPublicIntegrationsJiofarmDemandRoute
   '/api/public/integrations/jiofarm/links': typeof ApiPublicIntegrationsJiofarmLinksRoute
+  '/api/public/payments/webhook/shopeepay': typeof ApiPublicPaymentsWebhookShopeepayRoute
   '/api/public/payments/webhook/sumopod': typeof ApiPublicPaymentsWebhookSumopodRoute
 }
 export interface FileRoutesById {
@@ -961,8 +997,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/pengguna': typeof AuthenticatedAdminPenggunaRoute
   '/_authenticated/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/topups': typeof AuthenticatedAdminTopupsRoute
   '/_authenticated/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/_authenticated/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
+  '/_authenticated/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/_authenticated/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
   '/_authenticated/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/_authenticated/operator/$id': typeof AuthenticatedOperatorIdRoute
@@ -1010,6 +1048,7 @@ export interface FileRoutesById {
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/_authenticated/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
@@ -1028,6 +1067,7 @@ export interface FileRoutesById {
   '/_authenticated/seller/produk/': typeof AuthenticatedSellerProdukIndexRoute
   '/api/public/integrations/jiofarm/demand': typeof ApiPublicIntegrationsJiofarmDemandRoute
   '/api/public/integrations/jiofarm/links': typeof ApiPublicIntegrationsJiofarmLinksRoute
+  '/api/public/payments/webhook/shopeepay': typeof ApiPublicPaymentsWebhookShopeepayRoute
   '/api/public/payments/webhook/sumopod': typeof ApiPublicPaymentsWebhookSumopodRoute
 }
 export interface FileRouteTypes {
@@ -1070,8 +1110,10 @@ export interface FileRouteTypes {
     | '/admin/pengguna'
     | '/admin/produk'
     | '/admin/reports'
+    | '/admin/topups'
     | '/dashboard/notifikasi'
     | '/dashboard/pengaturan'
+    | '/dashboard/produk'
     | '/dashboard/produk-saya'
     | '/dashboard/saldo'
     | '/operator/$id'
@@ -1119,6 +1161,7 @@ export interface FileRouteTypes {
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/service-media/$'
     | '/admin/chat/'
@@ -1137,6 +1180,7 @@ export interface FileRouteTypes {
     | '/seller/produk/'
     | '/api/public/integrations/jiofarm/demand'
     | '/api/public/integrations/jiofarm/links'
+    | '/api/public/payments/webhook/shopeepay'
     | '/api/public/payments/webhook/sumopod'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1172,8 +1216,10 @@ export interface FileRouteTypes {
     | '/admin/pengguna'
     | '/admin/produk'
     | '/admin/reports'
+    | '/admin/topups'
     | '/dashboard/notifikasi'
     | '/dashboard/pengaturan'
+    | '/dashboard/produk'
     | '/dashboard/produk-saya'
     | '/dashboard/saldo'
     | '/operator/$id'
@@ -1220,6 +1266,7 @@ export interface FileRouteTypes {
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/service-media/$'
     | '/admin/chat'
@@ -1238,6 +1285,7 @@ export interface FileRouteTypes {
     | '/seller/produk'
     | '/api/public/integrations/jiofarm/demand'
     | '/api/public/integrations/jiofarm/links'
+    | '/api/public/payments/webhook/shopeepay'
     | '/api/public/payments/webhook/sumopod'
   id:
     | '__root__'
@@ -1279,8 +1327,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pengguna'
     | '/_authenticated/admin/produk'
     | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/topups'
     | '/_authenticated/dashboard/notifikasi'
     | '/_authenticated/dashboard/pengaturan'
+    | '/_authenticated/dashboard/produk'
     | '/_authenticated/dashboard/produk-saya'
     | '/_authenticated/dashboard/saldo'
     | '/_authenticated/operator/$id'
@@ -1328,6 +1378,7 @@ export interface FileRouteTypes {
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/service-media/$'
     | '/_authenticated/admin/chat/'
@@ -1346,6 +1397,7 @@ export interface FileRouteTypes {
     | '/_authenticated/seller/produk/'
     | '/api/public/integrations/jiofarm/demand'
     | '/api/public/integrations/jiofarm/links'
+    | '/api/public/payments/webhook/shopeepay'
     | '/api/public/payments/webhook/sumopod'
   fileRoutesById: FileRoutesById
 }
@@ -1376,10 +1428,12 @@ export interface RootRouteChildren {
   ApiPublicAnalyticsTrackRoute: typeof ApiPublicAnalyticsTrackRoute
   ApiPublicCatalogImageSplatRoute: typeof ApiPublicCatalogImageSplatRoute
   ApiPublicJobsEmailDispatchRoute: typeof ApiPublicJobsEmailDispatchRoute
+  ApiPublicJobsShopeepayReconcileRoute: typeof ApiPublicJobsShopeepayReconcileRoute
   ApiPublicJobsTelegramDispatchRoute: typeof ApiPublicJobsTelegramDispatchRoute
   ApiPublicServiceMediaSplatRoute: typeof ApiPublicServiceMediaSplatRoute
   ApiPublicIntegrationsJiofarmDemandRoute: typeof ApiPublicIntegrationsJiofarmDemandRoute
   ApiPublicIntegrationsJiofarmLinksRoute: typeof ApiPublicIntegrationsJiofarmLinksRoute
+  ApiPublicPaymentsWebhookShopeepayRoute: typeof ApiPublicPaymentsWebhookShopeepayRoute
   ApiPublicPaymentsWebhookSumopodRoute: typeof ApiPublicPaymentsWebhookSumopodRoute
 }
 
@@ -1658,6 +1712,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/topups': {
+      id: '/_authenticated/admin/topups'
+      path: '/topups'
+      fullPath: '/admin/topups'
+      preLoaderRoute: typeof AuthenticatedAdminTopupsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/'
@@ -1677,6 +1738,13 @@ declare module '@tanstack/react-router' {
       path: '/pengaturan'
       fullPath: '/dashboard/pengaturan'
       preLoaderRoute: typeof AuthenticatedDashboardPengaturanRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/produk': {
+      id: '/_authenticated/dashboard/produk'
+      path: '/produk'
+      fullPath: '/dashboard/produk'
+      preLoaderRoute: typeof AuthenticatedDashboardProdukRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/produk-saya': {
@@ -2092,6 +2160,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsEmailDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/shopeepay-reconcile': {
+      id: '/api/public/jobs/shopeepay-reconcile'
+      path: '/api/public/jobs/shopeepay-reconcile'
+      fullPath: '/api/public/jobs/shopeepay-reconcile'
+      preLoaderRoute: typeof ApiPublicJobsShopeepayReconcileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/telegram-dispatch': {
       id: '/api/public/jobs/telegram-dispatch'
       path: '/api/public/jobs/telegram-dispatch'
@@ -2120,6 +2195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicIntegrationsJiofarmLinksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook/shopeepay': {
+      id: '/api/public/payments/webhook/shopeepay'
+      path: '/api/public/payments/webhook/shopeepay'
+      fullPath: '/api/public/payments/webhook/shopeepay'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookShopeepayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook/sumopod': {
       id: '/api/public/payments/webhook/sumopod'
       path: '/api/public/payments/webhook/sumopod'
@@ -2140,6 +2222,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminPenggunaRoute: typeof AuthenticatedAdminPenggunaRoute
   AuthenticatedAdminProdukRoute: typeof AuthenticatedAdminProdukRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminTopupsRoute: typeof AuthenticatedAdminTopupsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminChatIdRoute: typeof AuthenticatedAdminChatIdRoute
   AuthenticatedAdminOrdersIdRoute: typeof AuthenticatedAdminOrdersIdRoute
@@ -2178,6 +2261,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminPenggunaRoute: AuthenticatedAdminPenggunaRoute,
     AuthenticatedAdminProdukRoute: AuthenticatedAdminProdukRoute,
     AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+    AuthenticatedAdminTopupsRoute: AuthenticatedAdminTopupsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminChatIdRoute: AuthenticatedAdminChatIdRoute,
     AuthenticatedAdminOrdersIdRoute: AuthenticatedAdminOrdersIdRoute,
@@ -2217,6 +2301,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardNotifikasiRoute: typeof AuthenticatedDashboardNotifikasiRoute
   AuthenticatedDashboardPengaturanRoute: typeof AuthenticatedDashboardPengaturanRoute
+  AuthenticatedDashboardProdukRoute: typeof AuthenticatedDashboardProdukRoute
   AuthenticatedDashboardProdukSayaRoute: typeof AuthenticatedDashboardProdukSayaRoute
   AuthenticatedDashboardSaldoRoute: typeof AuthenticatedDashboardSaldoRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -2235,6 +2320,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardNotifikasiRoute,
     AuthenticatedDashboardPengaturanRoute:
       AuthenticatedDashboardPengaturanRoute,
+    AuthenticatedDashboardProdukRoute: AuthenticatedDashboardProdukRoute,
     AuthenticatedDashboardProdukSayaRoute:
       AuthenticatedDashboardProdukSayaRoute,
     AuthenticatedDashboardSaldoRoute: AuthenticatedDashboardSaldoRoute,
@@ -2398,12 +2484,15 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAnalyticsTrackRoute: ApiPublicAnalyticsTrackRoute,
   ApiPublicCatalogImageSplatRoute: ApiPublicCatalogImageSplatRoute,
   ApiPublicJobsEmailDispatchRoute: ApiPublicJobsEmailDispatchRoute,
+  ApiPublicJobsShopeepayReconcileRoute: ApiPublicJobsShopeepayReconcileRoute,
   ApiPublicJobsTelegramDispatchRoute: ApiPublicJobsTelegramDispatchRoute,
   ApiPublicServiceMediaSplatRoute: ApiPublicServiceMediaSplatRoute,
   ApiPublicIntegrationsJiofarmDemandRoute:
     ApiPublicIntegrationsJiofarmDemandRoute,
   ApiPublicIntegrationsJiofarmLinksRoute:
     ApiPublicIntegrationsJiofarmLinksRoute,
+  ApiPublicPaymentsWebhookShopeepayRoute:
+    ApiPublicPaymentsWebhookShopeepayRoute,
   ApiPublicPaymentsWebhookSumopodRoute: ApiPublicPaymentsWebhookSumopodRoute,
 }
 export const routeTree = rootRouteImport

@@ -6,7 +6,9 @@ import {
   MessageSquare,
   PackageCheck,
   RotateCcw,
+  Store,
   TriangleAlert,
+  Wallet,
   Wrench,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -53,10 +55,90 @@ const MAP: Array<{ match: RegExp; tone: NotificationTone }> = [
   },
 ];
 
+/** Tipe dengan prefiks pasti dicocokkan lebih dulu; MAP regex jadi cadangan. */
+const PREFIX_TONE: Array<[RegExp, NotificationTone]> = [
+  [/^(credit|payout)/, { icon: Wallet, label: "Saldo", wrap: "bg-success/12 text-success" }],
+  [/^product_inquiry/, { icon: MessageSquare, label: "Chat", wrap: "bg-primary/10 text-primary" }],
+  [/^seller\./, { icon: Store, label: "Toko", wrap: "bg-accent/15 text-accent" }],
+  [/^service\./, { icon: PackageCheck, label: "Pesanan jasa", wrap: "bg-accent/15 text-accent" }],
+];
+
 export function notificationTone(type?: string | null): NotificationTone {
   const value = type ?? "";
+  for (const [re, tone] of PREFIX_TONE) if (re.test(value)) return tone;
   for (const entry of MAP) if (entry.match.test(value)) return entry.tone;
   return { icon: Bell, label: "Notifikasi", wrap: "bg-muted text-muted-foreground" };
+}
+
+export type NotificationCategory = "pesanan" | "pembayaran" | "saldo" | "chat" | "toko" | "lainnya";
+
+export const NOTIFICATION_CATEGORIES: Array<{ key: NotificationCategory; label: string; icon: LucideIcon }> = [
+  { key: "pesanan", label: "Pesanan", icon: PackageCheck },
+  { key: "pembayaran", label: "Pembayaran", icon: CreditCard },
+  { key: "saldo", label: "Saldo & penarikan", icon: Wallet },
+  { key: "chat", label: "Chat", icon: MessageSquare },
+  { key: "toko", label: "Toko", icon: Store },
+  { key: "lainnya", label: "Lainnya", icon: Megaphone },
+];
+
+export function notificationCategory(type?: string | null): NotificationCategory {
+  const t = type ?? "";
+  if (/^(order|service)\./.test(t)) return "pesanan";
+  if (/^payment/.test(t)) return "pembayaran";
+  if (/^(payout|credit|refund)/.test(t)) return "saldo";
+  if (/^product_inquiry/.test(t)) return "chat";
+  if (/^seller\./.test(t)) return "toko";
+  return "lainnya";
+}
+
+type NotificationLike = {
+  type?: string | null;
+  title?: string | null;
+  related_type?: string | null;
+  related_id?: string | null;
+};
+
+export type NotificationHref = { to: string; params?: Record<string, string> };
+
+/** Tipe pesanan jasa yang penerimanya seller (bukan pembeli). */
+const SELLER_SERVICE_TYPES = new Set([
+  "service.accepted",
+  "service.revision_requested",
+  "service.complaint_opened",
+  "service.complaint_resumed",
+]);
+
+/**
+ * Tujuan klik notifikasi. Tabel notifications tidak menyimpan peran penerima,
+ * jadi peran disimpulkan dari tipe (dan judul untuk tipe yang dipakai bersama).
+ * Hanya navigasi: halaman tujuan tetap menegakkan permission & RLS.
+ */
+export function notificationHref(n: NotificationLike, staff: boolean): NotificationHref | null {
+  const id = n.related_id ?? "";
+  const type = n.type ?? "";
+  const title = n.title ?? "";
+  switch (n.related_type) {
+    case "payout":
+      return staff && id ? { to: "/admin/payouts/$id", params: { id } } : { to: "/seller/keuangan" };
+    case "payment":
+      return staff && id ? { to: "/admin/payments/$id", params: { id } } : null;
+    case "credit_ledger":
+      return { to: "/dashboard/saldo" };
+    case "store":
+      return { to: "/seller" };
+    case "product_inquiry":
+      if (!id) return null;
+      // "Balasan dari penjual" dikirim ke pembeli; sisanya ke seller.
+      return /penjual/i.test(title)
+        ? { to: "/dashboard/chat/$id", params: { id } }
+        : { to: "/seller/chat/$id", params: { id } };
+    case "order":
+      if (SELLER_SERVICE_TYPES.has(type) || (type === "order.paid" && /jasa diterima/i.test(title)))
+        return { to: "/seller/jasa-pesanan" };
+      return id ? { to: "/dashboard/pesanan/$id", params: { id } } : null;
+    default:
+      return null;
+  }
 }
 
 export function relativeTime(iso: string): string {

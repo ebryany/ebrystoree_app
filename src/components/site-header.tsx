@@ -39,8 +39,7 @@ const NAV_META: Record<string, { description: string; icon: typeof Package }> = 
   "/artikel": { description: "Panduan dari tim Ebrystore", icon: BookOpen },
 };
 
-export function SiteHeader({ variant = "default" }: { variant?: "default" | "dark" }) {
-  void variant;
+export function SiteHeader() {
   const { user, loading } = useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -51,6 +50,7 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
   const [term, setTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchTriggerRef = useRef<HTMLButtonElement>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
   // Header mengecil setelah digulir: di puncak halaman tampil lega, saat
   // menggulir jadi ramping supaya konten dapat lebih banyak ruang.
   const scrolled = useScrolled(24);
@@ -72,6 +72,7 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
     "Akun saya";
 
   async function handleSignOut() {
+    setOpen(false);
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
@@ -98,10 +99,13 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
       {/* Lapisan jarak. Di puncak halaman jaraknya nol sehingga navbar menempel
           ke tepi layar; setelah digulir jaraknya muncul dan navbar terlihat
           mengambang dari tepi viewport. */}
+      {/* Tinggi header sengaja konstan: efek "mengambang" memakai transform
+          (translate) saja. Perubahan padding/min-height yang dianimasikan
+          menggeser konten di bawah header setiap frame dan membuat gulir patah. */}
       <div
         className={cn(
-          "transition-[padding] duration-300 ease-out motion-reduce:transition-none",
-          scrolled ? "px-3 pt-2 sm:px-5 sm:pt-3" : "px-0 pt-0",
+          "px-0 transition-[padding,transform] duration-300 ease-out will-change-transform motion-reduce:transition-none",
+          scrolled ? "translate-y-2 px-3 sm:translate-y-3 sm:px-5" : "translate-y-0",
         )}
       >
         {/* Permukaan navbar: lebar penuh dengan radius kecil supaya terasa tegas
@@ -116,15 +120,13 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
         >
           <div
             className={cn(
-              "flex w-full flex-wrap items-center gap-x-4 px-4 transition-[padding,min-height] duration-300 ease-out motion-reduce:transition-none sm:px-6 lg:px-8",
-              scrolled ? "min-h-12 gap-y-1 py-0.5" : "min-h-14 gap-y-1.5 py-1.5",
+              "flex min-h-14 w-full flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-1.5 sm:px-6 lg:px-8",
             )}
           >
             <Link
               to="/"
               className={cn(
-                "flex min-h-11 min-w-11 shrink items-center justify-center gap-2.5 rounded-md font-bold tracking-tight transition-[font-size] duration-300 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-[440px]:justify-start",
-                scrolled ? "text-base" : "text-lg",
+                "flex min-h-11 min-w-11 shrink items-center justify-center gap-2.5 rounded-md text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-[440px]:justify-start",
               )}
             >
               {logoUrl ? (
@@ -151,8 +153,7 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
                     target={item.open_in_new_tab ? "_blank" : undefined}
                     rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
                     className={cn(
-                      "flex items-center rounded-md px-2.5 text-sm font-medium text-muted-foreground transition-[min-height,color,background-color] duration-300 hover:bg-surface hover:text-foreground motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      scrolled ? "min-h-9" : "min-h-11",
+                      "flex min-h-11 items-center rounded-md px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface hover:text-foreground motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     )}
                     activeProps={{ className: "bg-surface-selected font-semibold text-primary" }}
                   >
@@ -275,6 +276,7 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
                 </>
               ) : null}
               <Button
+                ref={menuTriggerRef}
                 variant="ghost"
                 size="icon"
                 className="min-h-11 min-w-11"
@@ -292,6 +294,11 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
         <SheetContent
           side="right"
           className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 [&>button]:hidden sm:max-w-md lg:hidden"
+          aria-describedby={undefined}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            menuTriggerRef.current?.focus();
+          }}
         >
           <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
             <SheetTitle className="min-w-0 truncate text-lg">{brandName}</SheetTitle>
@@ -305,7 +312,12 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
               <X className="size-5" aria-hidden="true" />
             </Button>
           </div>
-          {user ? (
+          {loading ? (
+            <div
+              className="m-4 h-14 animate-pulse rounded-lg bg-muted motion-reduce:animate-none"
+              aria-label="Memuat akun"
+            />
+          ) : user ? (
             <Link
               to="/dashboard"
               onClick={() => setOpen(false)}
@@ -381,7 +393,12 @@ export function SiteHeader({ variant = "default" }: { variant?: "default" | "dar
             })}
           </nav>
           <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
-            {user ? (
+            {loading ? (
+              <div
+                className="h-11 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
+                aria-label="Memuat akun"
+              />
+            ) : user ? (
               <>
                 {isAdmin ? (
                   <Button asChild variant="outline" className="min-h-11 justify-start">

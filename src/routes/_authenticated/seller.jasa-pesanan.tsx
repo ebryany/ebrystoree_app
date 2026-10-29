@@ -10,6 +10,7 @@ import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { ServiceOrderCard } from "@/components/seller/service-order-card";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { listMyServiceOrders } from "@/lib/marketplace-service.functions";
 import {
   SERVICE_ORDER_TABS,
@@ -83,30 +84,6 @@ function SellerServiceOrders() {
         </div>
       </header>
 
-      {/* Ringkasan kerja: angka yang membantu memutuskan, bukan statistik hiasan. */}
-      {data ? (
-        <dl className="grid grid-cols-3 gap-2" aria-label="Ringkasan pesanan jasa">
-          <div className="rounded-xl border border-border bg-card px-3 py-2.5">
-            <dt className="text-[11px] font-medium text-muted-foreground">Perlu tindakan</dt>
-            <dd className="mt-0.5 text-lg font-bold tabular-nums">
-              <CountUp value={counts.needs_action} />
-            </dd>
-          </div>
-          <div className="rounded-xl border border-border bg-card px-3 py-2.5">
-            <dt className="text-[11px] font-medium text-muted-foreground">Menunggu pembeli</dt>
-            <dd className="mt-0.5 text-lg font-bold tabular-nums">
-              <CountUp value={counts.awaiting_buyer} />
-            </dd>
-          </div>
-          <div className="rounded-xl border border-border bg-card px-3 py-2.5">
-            <dt className="text-[11px] font-medium text-muted-foreground">Revisi diminta</dt>
-            <dd className="mt-0.5 text-lg font-bold tabular-nums">
-              <CountUp value={counts.revision} />
-            </dd>
-          </div>
-        </dl>
-      ) : null}
-
       {complaints > 0 ? (
         <div className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/5 px-3.5 py-3">
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
@@ -120,37 +97,42 @@ function SellerServiceOrders() {
       <div
         role="tablist"
         aria-label="Filter status pesanan jasa"
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0"
+        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5"
       >
         {SERVICE_ORDER_TABS.map((entry) => {
           const active = tab === entry.key;
           const count = counts[entry.key];
+          const urgent = (entry.key === "needs_action" || entry.key === "revision") && count > 0;
           return (
             <button
               key={entry.key}
+              type="button"
               role="tab"
               aria-selected={active}
               onClick={() => setTab(entry.key)}
-              className="relative flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent/50 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring aria-selected:border-transparent"
+              className={cn(
+                "relative flex min-h-[84px] flex-col items-start justify-between gap-2 bg-card p-4 text-left transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                active && "bg-surface-selected hover:bg-surface-selected",
+              )}
             >
               {active ? (
-                <motion.span
-                  layoutId="seller-jasa-pesanan-tab"
-                  className="absolute inset-0 rounded-full bg-primary"
-                  transition={{ duration: reduced ? 0 : 0.18, ease: [0.16, 1, 0.3, 1] }}
-                />
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-accent" aria-hidden="true" />
               ) : null}
-              <span className={active ? "relative text-primary-foreground" : "relative"}>
-                {entry.label}
+              <span
+                className={cn(
+                  "text-2xl font-bold leading-none tabular-nums",
+                  urgent ? "text-destructive" : "text-foreground",
+                )}
+              >
+                {data ? <CountUp value={count} /> : "–"}
               </span>
               <span
-                className={
-                  active
-                    ? "relative text-primary-foreground tabular-nums"
-                    : "relative tabular-nums text-muted-foreground"
-                }
+                className={cn(
+                  "text-xs",
+                  active ? "font-semibold text-foreground" : "text-muted-foreground",
+                )}
               >
-                {data ? <CountUp value={count} /> : "0"}
+                {entry.label}
               </span>
             </button>
           );

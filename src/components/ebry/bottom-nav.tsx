@@ -16,7 +16,7 @@ export function BottomNavigation({ items, ariaLabel }: { items: BottomNavItem[];
   return (
     <nav
       aria-label={ariaLabel}
-      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/80 shadow-[0_-8px_24px_-18px_hsl(0_0%_0%/0.5)] backdrop-blur-xl md:hidden"
+      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 shadow-[0_-8px_24px_-18px_hsl(0_0%_0%/0.5)] md:hidden"
     >
       <ul className="mx-auto flex max-w-lg px-1">
         {items.map((item) => (

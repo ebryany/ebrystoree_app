@@ -1,16 +1,18 @@
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Package, PackagePlus } from "lucide-react";
+import { AlertTriangle, Package, PackagePlus, Search } from "lucide-react";
 
-import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
-import { InlineEmpty } from "@/components/ebry/cards";
+import { AdminError } from "@/components/admin/admin-ui";
+import { CardSkeleton, EmptyState } from "@/components/ebry/states";
 import { StatusPill } from "@/components/ebry/status";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/format";
 import { listMyStoreProducts, getMyInventorySummary } from "@/lib/seller.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/seller/produk/")({
   head: () => ({
@@ -26,41 +28,58 @@ export const Route = createFileRoute("/_authenticated/seller/produk/")({
   component: SellerProducts,
 });
 
-const MOD_LABEL: Record<string, { label: string; tone: string }> = {
-  pending: { label: "Menunggu moderasi", tone: "waiting" },
-  approved: { label: "Disetujui", tone: "success" },
-  rejected: { label: "Ditolak", tone: "danger" },
+// StatusPill menurunkan warna dari nilai status mentah (pending/approved/rejected).
+const MOD_LABEL: Record<string, string> = {
+  pending: "Menunggu moderasi",
+  approved: "Disetujui",
+  rejected: "Ditolak",
 };
 
-function StockBadge({ mode, stock }: { mode: string; stock: number }) {
-  if (mode === "shared") return null;
-  if (stock === 0) {
-    return (
-      <Badge variant="destructive" className="gap-1 text-[10px]">
-        <AlertTriangle className="size-3" aria-hidden="true" />
-        Stok habis
-      </Badge>
-    );
-  }
-  if (stock <= 5) {
-    return (
-      <Badge variant="outline" className="gap-1 border-amber-500/40 text-[10px] text-amber-600">
-        <Package className="size-3" aria-hidden="true" />
-        Stok {stock}
-      </Badge>
-    );
-  }
-  return (
-    <Badge variant="secondary" className="gap-1 text-[10px]">
-      <Package className="size-3" aria-hidden="true" />
-      Stok {stock}
-    </Badge>
-  );
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  discount_price: number | null;
+  status: string;
+  moderation_status: string;
+  moderation_note: string | null;
+  thumbnail_url: string | null;
+  delivery_mode: string | null;
+  available_stock: number | null;
+};
+
+const TABS = [
+  { key: "all", label: "Semua", match: () => true },
+  { key: "published", label: "Tayang", match: (p: Product) => p.status === "published" },
+  { key: "review", label: "Moderasi", match: (p: Product) => p.moderation_status === "pending" },
+  {
+    key: "fix",
+    label: "Perlu perbaikan",
+    match: (p: Product) => p.moderation_status === "rejected",
+  },
+  {
+    key: "stock",
+    label: "Stok habis",
+    match: (p: Product) => p.delivery_mode !== "shared" && Number(p.available_stock ?? 0) === 0,
+  },
+  { key: "draft", label: "Draf & arsip", match: (p: Product) => p.status !== "published" },
+] as const;
+
+type TabKey = (typeof TABS)[number]["key"];
+
+function stockLabel(p: Product) {
+  if ((p.delivery_mode ?? "shared") === "shared") return null;
+  const stock = Number(p.available_stock ?? 0);
+  if (stock === 0) return { text: "Stok habis", tone: "text-destructive" };
+  if (stock <= 5) return { text: `Stok ${stock}`, tone: "text-warning-foreground" };
+  return { text: `Stok ${stock}`, tone: "text-muted-foreground" };
 }
 
 function SellerProducts() {
   const fetchProducts = useServerFn(listMyStoreProducts);
   const fetchInventory = useServerFn(getMyInventorySummary);
+  const [tab, setTab] = useState<TabKey>("all");
+  const [q, setQ] = useState("");
 
   const { data, isPending, error } = useQuery({
     queryKey: ["my-store-products"],
@@ -77,102 +96,194 @@ function SellerProducts() {
     keys: [["my-store-products"], ["my-inventory-summary"]],
   });
 
-  if (isPending) return <AdminLoading label="Memuat produk…" />;
-  if (error || data?.error) return <AdminError message={data?.error ?? undefined} />;
+  const items = (data?.items ?? []) as Product[];
+  const counts = useMemo(
+    () => Object.fromEntries(TABS.map((t) => [t.key, items.filter(t.match).length])),
+    [items],
+  ) as Record<TabKey, number>;
+  const visible = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    const match = TABS.find((t) => t.key === tab)!.match;
+    return items.filter((p) => match(p) && (!term || p.name.toLowerCase().includes(term)));
+  }, [items, tab, q]);
 
-  const items: any[] = data?.items ?? [];
-  const inv = (inventoryQ.data as any)?.summary;
+  const inv = (inventoryQ.data as { summary?: { low_stock: number; threshold: number } } | undefined)
+    ?.summary;
 
   return (
     <div className="space-y-4">
-      {inv && (inv.out_of_stock > 0 || inv.low_stock > 0) && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 text-xs text-muted-foreground">
-          <AlertTriangle
-            className="mb-0.5 inline-block size-3.5 text-amber-500"
-            aria-hidden="true"
-          />{" "}
-          {inv.out_of_stock > 0 && (
-            <strong className="text-foreground">{inv.out_of_stock} produk stok habis.</strong>
-          )}
-          {inv.out_of_stock > 0 && inv.low_stock > 0 && " "}
-          {inv.low_stock > 0 && (
-            <span>
-              {inv.low_stock} produk stok rendah (≤{inv.threshold}).
-            </span>
-          )}{" "}
-          Tambah file atau kode agar produk bisa dibeli.
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-bold sm:text-xl">Produk</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {items.length} produk · {counts.published} tayang
+          </p>
         </div>
-      )}
+        <Button asChild className="min-h-11">
+          <Link to="/seller/produk/baru">
+            <PackagePlus className="size-4" aria-hidden="true" />
+            Produk baru
+          </Link>
+        </Button>
+      </header>
 
-      <section
-        aria-labelledby="produk-heading"
-        className="rounded-2xl border border-border bg-card"
-      >
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-          <h2 id="produk-heading" className="text-sm font-bold text-foreground">
-            Produk toko ({items.length})
-          </h2>
-          <Button asChild size="sm" className="min-h-11">
-            <Link to="/seller/produk/baru">
-              <PackagePlus className="size-4" aria-hidden="true" />
-              Produk baru
-            </Link>
-          </Button>
+      {counts.stock > 0 || (inv?.low_stock ?? 0) > 0 ? (
+        <div className="flex items-start gap-2.5 rounded-2xl border border-warning/40 bg-warning/10 p-3.5 text-sm">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning-foreground" aria-hidden="true" />
+          <p className="text-muted-foreground">
+            {counts.stock > 0 ? (
+              <strong className="text-foreground">{counts.stock} produk stok habis. </strong>
+            ) : null}
+            {(inv?.low_stock ?? 0) > 0
+              ? `${inv!.low_stock} produk stok rendah (≤${inv!.threshold}). `
+              : null}
+            Tambah file atau kode agar produk tetap bisa dibeli.
+          </p>
+        </div>
+      ) : null}
+
+      <div className="rounded-2xl border border-border bg-card">
+        <div className="flex flex-col gap-2 border-b border-border p-3 lg:flex-row lg:items-center lg:justify-between">
+          <div
+            role="tablist"
+            aria-label="Filter produk"
+            className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.key}
+                onClick={() => setTab(t.key)}
+                className={cn(
+                  "flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  tab === t.key
+                    ? "bg-surface-selected font-semibold text-foreground"
+                    : "text-muted-foreground hover:bg-surface hover:text-foreground",
+                )}
+              >
+                {t.label}
+                <span className="text-xs tabular-nums text-muted-foreground">{counts[t.key]}</span>
+              </button>
+            ))}
+          </div>
+          <label className="relative block lg:w-64">
+            <span className="sr-only">Cari produk</span>
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Cari nama produk"
+              className="min-h-11 pl-9"
+            />
+          </label>
         </div>
 
-        {items.length === 0 ? (
-          <InlineEmpty
-            icon={PackagePlus}
-            text="Belum ada produk. Tambahkan produk pertama Anda."
-            actionLabel="Tambah"
-            to="/seller/produk/baru"
-          />
-        ) : (
-          <ul className="divide-y divide-border">
-            {items.map((p: any) => {
-              const mod = MOD_LABEL[p.moderation_status] ?? {
-                label: p.moderation_status,
-                tone: "neutral",
-              };
-              const price = Number(p.discount_price ?? p.price);
-              return (
-                <li key={p.id} className="flex items-center gap-3 px-4 py-3">
-                  <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-selected">
-                    {p.thumbnail_url ? (
-                      <img src={p.thumbnail_url} alt="" className="size-full object-cover" />
-                    ) : (
-                      <PackagePlus className="size-5 text-muted-foreground" aria-hidden="true" />
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {p.status === "published"
-                        ? "Tayang"
-                        : p.status === "archived"
-                          ? "Diarsipkan"
-                          : "Draf"}{" "}
-                      · {formatRupiah(price)}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      <StatusPill value={mod.tone as any} kind="raw" label={mod.label} />
-                      <StockBadge
-                        mode={p.delivery_mode ?? "shared"}
-                        stock={Number(p.available_stock ?? 0)}
-                      />
-                    </div>
-                  </div>
-                  <Button asChild variant="outline" size="sm" className="min-h-10 shrink-0">
-                    <Link to="/seller/produk/$id" params={{ id: p.id }}>
-                      Kelola
-                    </Link>
+        <div className="p-3">
+          {isPending ? (
+            <CardSkeleton rows={2} />
+          ) : error || data?.error ? (
+            <AdminError message={data?.error ?? undefined} />
+          ) : visible.length === 0 ? (
+            <EmptyState
+              icon={PackagePlus}
+              className="border-0"
+              title={items.length === 0 ? "Belum ada produk" : "Tidak ada produk di filter ini"}
+              description={
+                items.length === 0
+                  ? "Tambahkan produk pertama Anda. Produk tayang setelah lolos moderasi."
+                  : "Coba tab lain atau ubah kata kunci."
+              }
+              action={
+                items.length === 0 ? (
+                  <Button asChild className="min-h-11">
+                    <Link to="/seller/produk/baru">Tambah produk</Link>
                   </Button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+                ) : undefined
+              }
+            />
+          ) : (
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+              {visible.map((p) => (
+                <ProductCard key={p.id} p={p} />
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
+  );
+}
+
+function ProductCard({ p }: { p: Product }) {
+  const modLabel = MOD_LABEL[p.moderation_status] ?? p.moderation_status;
+  const price = Number(p.discount_price ?? p.price);
+  const hasDiscount = p.discount_price != null && Number(p.discount_price) < Number(p.price);
+  const stock = stockLabel(p);
+  const statusText =
+    p.status === "published" ? "Tayang" : p.status === "archived" ? "Diarsipkan" : "Draf";
+
+  return (
+    <li className="flex">
+      <Link
+        to="/seller/produk/$id"
+        params={{ id: p.id }}
+        className="group flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span className="relative block aspect-[4/3] overflow-hidden bg-surface-selected">
+          {p.thumbnail_url ? (
+            <img
+              src={p.thumbnail_url}
+              alt=""
+              loading="lazy"
+              className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
+            />
+          ) : (
+            <span className="grid size-full place-items-center text-accent">
+              <Package className="size-8" aria-hidden="true" />
+            </span>
+          )}
+          <span
+            className={cn(
+              "absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+              p.status === "published"
+                ? "bg-success text-white"
+                : "bg-foreground/75 text-background",
+            )}
+          >
+            {statusText}
+          </span>
+        </span>
+        <span className="flex flex-1 flex-col gap-1.5 p-3">
+          <span className="line-clamp-2 min-h-10 text-sm font-medium leading-snug text-foreground">
+            {p.name}
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <span className="text-sm font-bold tabular-nums text-price">{formatRupiah(price)}</span>
+            {hasDiscount ? (
+              <span className="text-[11px] tabular-nums text-muted-foreground line-through">
+                {formatRupiah(Number(p.price))}
+              </span>
+            ) : null}
+          </span>
+          {stock ? <span className={cn("text-xs", stock.tone)}>{stock.text}</span> : null}
+          <span className="mt-auto pt-1">
+            <StatusPill
+              value={p.moderation_status}
+              kind="raw"
+              label={modLabel}
+              className="px-2 py-0.5 text-[11px]"
+            />
+          </span>
+          {p.moderation_status === "rejected" && p.moderation_note ? (
+            <span className="line-clamp-2 text-[11px] text-destructive">{p.moderation_note}</span>
+          ) : null}
+        </span>
+      </Link>
+    </li>
   );
 }

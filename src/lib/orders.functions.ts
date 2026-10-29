@@ -257,6 +257,7 @@ export const getMyOrder = createServerFn({ method: "GET" })
         manualAccount: { method: "", number: "", holder: "", active: false, reuploadLimit: 3 },
         instruction: "",
         qrisAvailable: false,
+        shopeepayAvailable: false,
         error: "Pesanan tidak ditemukan." as const,
       };
     }
@@ -310,6 +311,7 @@ export const getMyOrder = createServerFn({ method: "GET" })
       manualAccount: account,
       instruction: instruction.instruction,
       qrisAvailable: methods.qris,
+      shopeepayAvailable: methods.shopeepay,
       manualAvailable: methods.manual,
       error: null,
     };

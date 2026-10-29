@@ -18,6 +18,7 @@ const DEFAULT_POLICIES = {
   "payment.proof": { limit: 10, windowSeconds: 300 },
   "refund.request": { limit: 5, windowSeconds: 3600 },
   "qris.create": { limit: 10, windowSeconds: 300 },
+  "qris.check": { limit: 20, windowSeconds: 60 },
   "topup.create": { limit: 5, windowSeconds: 600 },
   "seller.apply": { limit: 3, windowSeconds: 3600 },
   "seller.product": { limit: 30, windowSeconds: 300 },
