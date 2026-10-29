@@ -68,26 +68,82 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
   const items = reviews.data?.items ?? [];
   const average = reviews.data?.average ?? 0;
   const canReview = state.data?.canReview ?? false;
+  const [starFilter, setStarFilter] = useState<number | null>(null);
+  const counts = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: items.filter((r) => Math.round(Number(r.rating)) === star).length,
+  }));
+  const shown =
+    starFilter === null ? items : items.filter((r) => Math.round(Number(r.rating)) === starFilter);
 
   return (
-    <section className="mt-4 border border-border bg-card" aria-labelledby="ulasan-produk">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-surface px-5 py-4">
-        <h2 id="ulasan-produk" className="text-base font-semibold">
-          Ulasan pembeli
-        </h2>
-        {items.length ? (
-          <span className="flex items-center gap-2 text-sm">
-            <StarRating value={average} />
-            <span className="font-semibold">{average.toFixed(1)}</span>
-            <span className="text-muted-foreground">({items.length})</span>
-          </span>
-        ) : null}
-      </div>
+    <section
+      className="scroll-mt-24 rounded-xl border border-border bg-card"
+      aria-labelledby="ulasan-produk-judul"
+      id="ulasan-produk"
+    >
+      <h2 id="ulasan-produk-judul" className="px-4 pt-4 text-base font-semibold sm:px-5 sm:pt-5">
+        Ulasan pembeli
+      </h2>
+
+      {items.length ? (
+        <div className="mx-4 mt-3 flex flex-col gap-4 rounded-lg bg-surface p-4 sm:mx-5 sm:flex-row sm:items-center">
+          <div className="shrink-0 sm:w-36">
+            <p className="text-3xl font-bold tabular-nums text-price">
+              {average.toFixed(1)}
+              <span className="text-base font-medium text-muted-foreground"> / 5</span>
+            </p>
+            <StarRating value={average} className="mt-1" />
+            <p className="mt-1 text-xs text-muted-foreground">{items.length} ulasan</p>
+          </div>
+          <ul className="min-w-0 flex-1 space-y-1.5" aria-label="Sebaran bintang">
+            {counts.map(({ star, count }) => (
+              <li key={star} className="flex items-center gap-2 text-xs">
+                <span className="w-8 shrink-0 tabular-nums">{star} ★</span>
+                <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-border">
+                  <span
+                    className="block h-full rounded-full bg-aurora"
+                    style={{ width: `${(count / items.length) * 100}%` }}
+                  />
+                </span>
+                <span className="w-6 shrink-0 text-right tabular-nums text-muted-foreground">
+                  {count}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {items.length ? (
+        <div className="mx-4 mt-3 flex flex-wrap gap-2 sm:mx-5" role="group" aria-label="Filter ulasan">
+          {[null, 5, 4, 3, 2, 1].map((star) => {
+            const active = starFilter === star;
+            const count = star === null ? items.length : counts.find((c) => c.star === star)!.count;
+            return (
+              <button
+                key={star ?? "all"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setStarFilter(star)}
+                className={
+                  "min-h-11 rounded-lg border px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground " +
+                  (active
+                    ? "border-primary bg-primary/5 font-medium text-primary"
+                    : "border-border bg-card hover:border-primary/50")
+                }
+              >
+                {star === null ? "Semua" : `${star} Bintang`} ({count})
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {/* Form hanya tampil bagi yang berhak, dan default tertutup supaya
           pembeli yang tidak memenuhi syarat tidak disodori form besar.
           Pengguna yang sudah punya ulasan langsung melihat formnya terbuka. */}
-      <div className="border-b border-border p-5">
+      <div className="mt-4 border-y border-border px-4 py-4 sm:px-5">
         {!user ? (
           <p className="text-sm text-muted-foreground">
             <Link to="/auth" className="font-semibold text-primary hover:underline">
@@ -166,9 +222,9 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
         )}
       </div>
 
-      {items.length ? (
-        <ul className="divide-y divide-border px-5">
-          {items.map((review) => (
+      {shown.length ? (
+        <ul className="divide-y divide-border px-4 sm:px-5">
+          {shown.map((review) => (
             <li key={review.id} className="py-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-sm font-semibold">{review.reviewer_name ?? "Pembeli Ebrystore"}</span>
@@ -185,7 +241,9 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
           ))}
         </ul>
       ) : (
-        <p className="px-5 py-8 text-sm text-muted-foreground">Belum ada ulasan untuk produk ini.</p>
+        <p className="px-4 py-8 text-sm text-muted-foreground sm:px-5">
+          {items.length ? "Tidak ada ulasan dengan bintang ini." : "Belum ada ulasan untuk produk ini."}
+        </p>
       )}
     </section>
   );

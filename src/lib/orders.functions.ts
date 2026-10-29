@@ -29,7 +29,7 @@ export const getProductDetail = createServerFn({ method: "GET" })
     const { data: row, error } = await supabase
       .from("digital_products")
       .select(
-        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, available_stock, store_id, stores(name, slug, is_platform), product_variants(id, name, price, discount_price, sort_order)",
+        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, available_stock, store_id, stores(name, slug, is_platform), categories(name, slug), product_variants(id, name, price, discount_price, sort_order)",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -51,7 +51,75 @@ export const getProductDetail = createServerFn({ method: "GET" })
       (rest.delivery_mode ?? "shared") === "shared"
         ? [...(rawVariants ?? [])].sort((a, b) => a.sort_order - b.sort_order)
         : [];
-    return { product: { ...rest, variants }, error: null };
+
+    // Produk tanpa store_id adalah produk platform: tampilkan sebagai toko resmi.
+    type SellerRow = {
+      id: string;
+      name: string;
+      slug: string;
+      is_platform: boolean;
+      logo_url: string | null;
+      created_at: string;
+    };
+    let seller: SellerRow | null = null;
+    if (rest.store_id) {
+      const { data: s } = await supabase
+        .from("stores")
+        .select("id, name, slug, is_platform, logo_url, created_at")
+        .eq("id", rest.store_id)
+        .maybeSingle();
+      seller = (s as SellerRow | null) ?? null;
+    } else {
+      const { data: s } = await supabase
+        .from("stores")
+        .select("id, name, slug, is_platform, logo_url, created_at")
+        .eq("is_platform", true)
+        .eq("status", "active")
+        .limit(1)
+        .maybeSingle();
+      seller = (s as SellerRow | null) ?? null;
+    }
+
+    // Statistik toko dari data nyata; kegagalan hanya mengosongkan angka.
+    let sellerStats: {
+      products: number;
+      sold: number;
+      rating: number | null;
+      reviews: number;
+    } | null = null;
+    if (seller) {
+      const ownerFilter = seller.is_platform
+        ? `store_id.is.null,store_id.eq.${seller.id}`
+        : `store_id.eq.${seller.id}`;
+      const { data: storeProducts } = await supabase
+        .from("digital_products")
+        .select("id, sold_count")
+        .or(ownerFilter)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .limit(1000);
+      const ids = (storeProducts ?? []).map((r) => r.id as string);
+      let rating: number | null = null;
+      let reviewCount = 0;
+      if (ids.length) {
+        const { data: rv } = await supabase
+          .from("product_reviews")
+          .select("rating")
+          .eq("is_visible", true)
+          .in("product_id", ids)
+          .limit(3000);
+        reviewCount = rv?.length ?? 0;
+        if (reviewCount) rating = rv!.reduce((s, r) => s + Number(r.rating), 0) / reviewCount;
+      }
+      sellerStats = {
+        products: ids.length,
+        sold: (storeProducts ?? []).reduce((s, r) => s + Number(r.sold_count ?? 0), 0),
+        rating,
+        reviews: reviewCount,
+      };
+    }
+
+    return { product: { ...rest, variants, seller, sellerStats }, error: null };
   });
 
 /** Penegakan feature flag di server: checkout ditutup saat flag dimatikan. */
