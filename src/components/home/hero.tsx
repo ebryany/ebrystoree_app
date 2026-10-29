@@ -49,7 +49,7 @@ export function HomeHero() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_85%_40%,var(--surface-selected),transparent_70%)]"
       />
-      <div className="grid w-full items-center gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:py-14">
+      <div className="grid w-full items-center gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:py-14">
         <div className="min-w-0">
           <h1
             id="hero-heading"
@@ -136,7 +136,7 @@ export function HomeHero() {
             width={1254}
             height={1254}
             decoding="async"
-            className="h-auto w-full max-w-sm object-contain xl:max-w-md"
+            className="-my-6 h-auto w-full max-w-lg object-contain xl:-my-10 xl:max-w-2xl"
           />
         </div>
       </div>
