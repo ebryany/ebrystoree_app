@@ -49,7 +49,6 @@ export function SiteHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchTriggerRef = useRef<HTMLButtonElement>(null);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   // Header mengecil setelah digulir: di puncak halaman tampil lega, saat
   // menggulir jadi ramping supaya konten dapat lebih banyak ruang.
@@ -70,6 +69,7 @@ export function SiteHeader() {
     (user?.user_metadata?.full_name as string | undefined) ??
     user?.email?.split("@")[0] ??
     "Akun saya";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
 
   async function handleSignOut() {
     setOpen(false);
@@ -104,8 +104,10 @@ export function SiteHeader() {
           menggeser konten di bawah header setiap frame dan membuat gulir patah. */}
       <div
         className={cn(
-          "px-0 transition-[padding,transform] duration-300 ease-out will-change-transform motion-reduce:transition-none",
-          scrolled ? "translate-y-2 px-3 sm:translate-y-3 sm:px-5" : "translate-y-0",
+          // Mobile/tablet: navbar diam di tempat, tanpa animasi gulir. Efek
+          // mengambang hanya di desktop (lg+).
+          "px-0 lg:transition-[padding,transform] lg:duration-300 lg:ease-out lg:motion-reduce:transition-none",
+          scrolled && "lg:translate-y-3 lg:px-5",
         )}
       >
         {/* Permukaan navbar: lebar penuh dengan radius kecil supaya terasa tegas
@@ -114,19 +116,22 @@ export function SiteHeader() {
             perubahan bentuk di sini tidak pernah menggeser konten di bawahnya. */}
         <div
           className={cn(
-            "relative w-full border bg-card text-foreground transition-[border-radius,border-color,box-shadow] duration-300 ease-out motion-reduce:transition-none",
-            scrolled ? "rounded-xl border-border shadow-card" : "rounded-none border-transparent",
+            "relative w-full border-b border-border bg-card text-foreground lg:border lg:transition-[border-radius,border-color,box-shadow] lg:duration-300 lg:ease-out lg:motion-reduce:transition-none",
+            scrolled
+              ? "lg:rounded-xl lg:border-border lg:shadow-card"
+              : "lg:rounded-none lg:border-transparent",
           )}
         >
           <div
             className={cn(
-              "flex min-h-14 w-full flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-1.5 sm:px-6 lg:px-8",
+              // Mobile: satu baris (nowrap) supaya ikon tidak turun ke baris kedua.
+              "flex min-h-14 w-full flex-nowrap items-center gap-x-2 gap-y-1.5 px-3 py-1.5 sm:gap-x-4 sm:px-6 lg:flex-wrap lg:px-8",
             )}
           >
             <Link
               to="/"
               className={cn(
-                "flex min-h-11 min-w-11 shrink items-center justify-center gap-2.5 rounded-md text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-[440px]:justify-start",
+                "flex min-h-11 min-w-0 shrink items-center justify-start gap-2 rounded-md text-base font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:text-lg",
               )}
             >
               {logoUrl ? (
@@ -136,8 +141,7 @@ export function SiteHeader() {
                   <ShoppingBag className="size-5" aria-hidden="true" />
                 </span>
               )}
-              {/* Nama brand disembunyikan di layar sempit supaya kolom pencarian tetap lega. */}
-              <span className="hidden truncate min-[440px]:inline">{brandName}</span>
+              <span className="truncate">{brandName}</span>
             </Link>
             {/* Navigasi utama sebaris dengan pencarian, bukan baris terpisah:
                 satu baris membuat navbar terbaca sebagai satu permukaan. */}
@@ -167,17 +171,6 @@ export function SiteHeader() {
                 {/* Mobile: satu tombol search. Desktop: form inline penuh.
                     Pemisahan ini menghapus dua ikon search yang sebelumnya
                     tampil berdampingan di satu form. */}
-                <Button
-                  ref={searchTriggerRef}
-                  variant="outline"
-                  className="min-h-11 min-w-11 flex-1 justify-start gap-2 px-3 text-muted-foreground lg:hidden"
-                  aria-label="Cari produk"
-                  onClick={() => setSearchOpen(true)}
-                >
-                  <Search className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="truncate text-sm">Cari produk</span>
-                </Button>
-
                 <form
                   onSubmit={searchProducts}
                   role="search"
@@ -257,29 +250,38 @@ export function SiteHeader() {
                 </>
               )}
             </div>
-            <div className="ml-auto flex items-center gap-1 lg:hidden">
+            {/* Mobile: cukup keranjang, notifikasi, avatar, menu. Pencarian dan
+                chat pindah ke dalam menu supaya baris ini tidak pernah patah. */}
+            <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:hidden">
               <CartButton />
               {user ? (
                 <>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="icon"
-                    className="min-h-11 min-w-11"
-                    aria-label="Chat produk"
-                  >
-                    <Link to="/dashboard/chat">
-                      <MessagesSquare className="size-5" aria-hidden="true" />
-                    </Link>
-                  </Button>
                   <NotificationBell />
+                  <Link
+                    to="/dashboard"
+                    aria-label="Akun saya"
+                    className="grid min-h-11 min-w-11 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt=""
+                        className="size-8 rounded-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="grid size-8 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                        {displayName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
                 </>
               ) : null}
               <Button
                 ref={menuTriggerRef}
                 variant="ghost"
                 size="icon"
-                className="min-h-11 min-w-11"
+                className="min-h-11 min-w-11 rounded-lg bg-surface"
                 aria-label="Buka menu"
                 aria-expanded={open}
                 onClick={() => setOpen(!open)}
@@ -311,6 +313,35 @@ export function SiteHeader() {
             >
               <X className="size-5" aria-hidden="true" />
             </Button>
+          </div>
+          {/* Pencarian & chat mobile (dipindah dari navbar supaya baris atas ringkas). */}
+          <div className="flex gap-2 px-4 pt-4">
+            {publicPage ? (
+              <Button
+                variant="outline"
+                className="min-h-11 flex-1 justify-start gap-2 text-muted-foreground"
+                onClick={() => {
+                  setOpen(false);
+                  setSearchOpen(true);
+                }}
+              >
+                <Search className="size-4 shrink-0" aria-hidden="true" />
+                Cari produk
+              </Button>
+            ) : null}
+            {user ? (
+              <Button
+                asChild
+                variant="outline"
+                size="icon"
+                className="min-h-11 min-w-11"
+                aria-label="Chat produk"
+              >
+                <Link to="/dashboard/chat" onClick={() => setOpen(false)}>
+                  <MessagesSquare className="size-5" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : null}
           </div>
           {loading ? (
             <div
@@ -453,7 +484,7 @@ export function SiteHeader() {
           aria-describedby={undefined}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            searchTriggerRef.current?.focus();
+            menuTriggerRef.current?.focus();
           }}
         >
           <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
