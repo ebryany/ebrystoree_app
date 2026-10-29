@@ -54,8 +54,8 @@ describe("HomeHero preservation", () => {
 
   it("uses content-sized responsive composition and visible keyboard focus", () => {
     const html = renderHero();
-    expect(html).toContain("max-w-7xl");
-    expect(html).toContain("lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]");
+    expect(html).not.toContain("max-w-7xl");
+    expect(html).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]");
     expect(html).not.toContain("bg-white/10");
     expect(html).toContain("sm:flex-row");
     expect(html.match(/min-h-12/g)).toHaveLength(2);
@@ -65,7 +65,7 @@ describe("HomeHero preservation", () => {
 
   it("balances the content with the original mascot without decorative image framing", () => {
     const html = renderHero();
-    expect(html).toContain("mx-auto grid w-full max-w-7xl");
+    expect(html).toContain("grid w-full py-2");
     expect(html).toContain('src="/images/ebrystore-hero-mascot.webp?v=bf406217"');
     expect(html).toContain('alt="Maskot Ebrystore membawa laptop"');
     expect(html).toContain('width="1254" height="1254"');

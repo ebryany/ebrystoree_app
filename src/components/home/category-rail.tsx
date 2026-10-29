@@ -1,28 +1,31 @@
 import { Link } from "@tanstack/react-router";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
-  BookOpen,
-  ClipboardList,
+  BarChart3,
+  BookMarked,
+  Bot,
+  ClipboardCheck,
   Code2,
+  Crown,
+  FilePen,
   FileSearch,
-  FileText,
+  FileSpreadsheet,
   FlaskConical,
   GraduationCap,
-  KeyRound,
-  LayoutTemplate,
-  LineChart,
+  Handshake,
+  LayoutGrid,
   ListOrdered,
   type LucideIcon,
-  MonitorPlay,
-  Package,
-  PenLine,
+  Palette,
+  Presentation,
   Quote,
   RotateCcw,
+  ScrollText,
   Tag,
-  Wrench,
 } from "lucide-react";
 
 import { listCatalogCategories } from "@/lib/catalog.functions";
+import { cn } from "@/lib/utils";
 
 const categoriesQuery = queryOptions({
   queryKey: ["categories", "service", "home"],
@@ -38,33 +41,48 @@ const productCategoriesQuery = queryOptions({
 type CategoryItem = { id: string; name: string; slug: string };
 type CategoryPayload = { items?: CategoryItem[]; error?: string | null };
 
-/** Ikon dari kata kunci nama kategori; kategori baru otomatis dapat ikon umum. */
-const ICON_RULES: Array<[RegExp, LucideIcon]> = [
-  [/tugas|harian/i, ClipboardList],
-  [/makalah|laporan|artikel/i, FileText],
-  [/presentasi|slide|ppt/i, MonitorPlay],
-  [/proposal|revisi/i, PenLine],
-  [/praktikum|lab/i, FlaskConical],
-  [/analisis|data|statistik/i, LineChart],
-  [/pemrograman|coding|web|aplikasi/i, Code2],
-  [/review|cek|periksa/i, FileSearch],
-  [/format/i, ListOrdered],
-  [/sitasi|referensi/i, Quote],
-  [/sidang|wisuda/i, GraduationCap],
-  [/skripsi|tesis|jurnal/i, BookOpen],
-  [/template|desain|capcut/i, LayoutTemplate],
-  [/akun|premium|langganan/i, KeyRound],
-  [/ulang|perbaik/i, RotateCcw],
+/** Warna latar + ikon per kelompok, semuanya dari token tema. */
+const TONES = {
+  teal: "bg-accent/12 text-accent",
+  green: "bg-success/15 text-success",
+  blue: "bg-info/15 text-info",
+  amber: "bg-warning/20 text-warning-foreground",
+  red: "bg-chart-5/12 text-chart-5",
+  brand: "bg-primary text-primary-foreground",
+} as const;
+type Tone = keyof typeof TONES;
+
+/** Ikon + warna dari kata kunci nama kategori; urutan = prioritas. */
+const ICON_RULES: Array<[RegExp, LucideIcon, Tone]> = [
+  [/chat\s?gpt|gpt|ai\b|\bai |gemini|claude|copilot/i, Bot, "green"],
+  [/akun|premium|langganan|netflix|spotify|canva pro/i, Crown, "amber"],
+  [/template|desain|capcut|canva/i, Palette, "red"],
+  [/presentasi|slide|ppt/i, Presentation, "amber"],
+  [/praktikum|lab/i, FlaskConical, "blue"],
+  [/laporan/i, FileSpreadsheet, "blue"],
+  [/makalah|artikel|esai/i, ScrollText, "teal"],
+  [/tugas|harian/i, ClipboardCheck, "teal"],
+  [/proposal/i, FilePen, "red"],
+  [/revisi|ulang|perbaik/i, RotateCcw, "red"],
+  [/analisis|data|statistik/i, BarChart3, "blue"],
+  [/pemrograman|coding|web|aplikasi|program/i, Code2, "green"],
+  [/review|cek|periksa/i, FileSearch, "teal"],
+  [/format/i, ListOrdered, "amber"],
+  [/sitasi|referensi/i, Quote, "blue"],
+  [/sidang|wisuda/i, GraduationCap, "brand"],
+  [/skripsi|tesis|jurnal|pendampingan/i, BookMarked, "green"],
 ];
 
-function iconFor(name: string): LucideIcon {
-  return ICON_RULES.find(([re]) => re.test(name))?.[1] ?? Tag;
+function styleFor(name: string): { icon: LucideIcon; tone: Tone } {
+  const hit = ICON_RULES.find(([re]) => re.test(name));
+  return hit ? { icon: hit[1], tone: hit[2] } : { icon: Tag, tone: "teal" };
 }
 
 type Tile = {
   key: string;
   label: string;
   icon: LucideIcon;
+  tone: Tone;
   to: "/layanan" | "/produk";
   kategori?: string;
 };
@@ -85,19 +103,19 @@ export function CategoryRail() {
   if (!services.length && !productItems.length) return null;
 
   const tiles: Tile[] = [
-    { key: "all-products", label: "Semua produk", icon: Package, to: "/produk" },
+    { key: "all-products", label: "Semua produk", icon: LayoutGrid, tone: "brand", to: "/produk" },
     ...productItems.map((c) => ({
       key: `p-${c.id}`,
       label: c.name,
-      icon: iconFor(c.name),
+      ...styleFor(c.name),
       to: "/produk" as const,
       kategori: c.slug,
     })),
-    { key: "all-services", label: "Semua jasa", icon: Wrench, to: "/layanan" },
+    { key: "all-services", label: "Semua jasa", icon: Handshake, tone: "brand", to: "/layanan" },
     ...services.map((c) => ({
       key: `s-${c.id}`,
       label: c.name,
-      icon: iconFor(c.name),
+      ...styleFor(c.name),
       to: "/layanan" as const,
       kategori: c.slug,
     })),
@@ -133,10 +151,15 @@ export function CategoryRail() {
                 search={t.kategori ? ({ kategori: t.kategori } as never) : undefined}
                 className="group flex min-h-11 flex-col items-center gap-1.5 rounded-xl p-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span className="grid size-12 place-items-center rounded-xl border border-border bg-surface text-accent transition-colors group-hover:border-accent/50 group-hover:bg-accent/[0.06] sm:size-14">
-                  <t.icon className="size-5 sm:size-6" aria-hidden="true" />
+                <span
+                  className={cn(
+                    "grid size-12 place-items-center rounded-2xl transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 sm:size-14",
+                    TONES[t.tone],
+                  )}
+                >
+                  <t.icon className="size-6 sm:size-7" strokeWidth={1.75} aria-hidden="true" />
                 </span>
-                <span className="line-clamp-2 text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                <span className="line-clamp-2 text-[11px] font-medium capitalize leading-tight text-foreground group-hover:text-accent sm:text-xs">
                   {t.label}
                 </span>
               </Link>
