@@ -55,12 +55,12 @@ import {
   deleteProduct,
   listAdminProducts,
   listCategories,
-  saveCategory,
   saveProduct,
   setProductStatus,
 } from "@/lib/admin.functions";
 import { Switch } from "@/components/ui/switch";
 import { ProductFilesDialog } from "@/components/admin/product-files-dialog";
+import { CategoryManagerDialog } from "@/components/admin/category-manager-dialog";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { formatRupiah } from "@/lib/format";
 
@@ -124,18 +124,9 @@ function AdminProduk() {
   const [filesTarget, setFilesTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const [categoryDraft, setCategoryDraft] = useState<{
-    id?: string;
-    name: string;
-    isActive: boolean;
-  }>({
-    name: "",
-    isActive: true,
-  });
 
   const fetchItems = useServerFn(listAdminProducts);
   const fetchCategories = useServerFn(listCategories);
-  const persistCategory = useServerFn(saveCategory);
   const save = useServerFn(saveProduct);
   const publish = useServerFn(setProductStatus);
   const remove = useServerFn(deleteProduct);
@@ -187,21 +178,6 @@ function AdminProduk() {
       setDeleteTarget(null);
       invalidate();
     },
-  });
-
-  const categoryMutation = useMutation({
-    mutationFn: (payload: { id?: string; name: string; isActive: boolean }) =>
-      persistCategory({ data: { ...payload, kind: "product" as const } }),
-    onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
-      if (!res.ok) return toast.error(res.message);
-      toast.success(res.message);
-      setCategoryDraft({ name: "", isActive: true });
-      void qc.invalidateQueries({ queryKey: ["admin-categories"] });
-      void qc.invalidateQueries({ queryKey: ["categories", "product"] });
-      void qc.invalidateQueries({ queryKey: ["admin-audit"] });
-    },
-    onError: (e: any) => toast.error(e?.message ?? "Gagal menyimpan kategori."),
   });
 
   const submit = () => {
@@ -406,98 +382,7 @@ function AdminProduk() {
         </>
       )}
 
-      <Dialog open={categoryOpen} onOpenChange={setCategoryOpen}>
-        <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Kategori produk digital</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
-              <Field label={categoryDraft.id ? "Ubah nama kategori" : "Kategori baru"}>
-                <Input
-                  value={categoryDraft.name}
-                  maxLength={80}
-                  placeholder="Contoh: Template Dokumen"
-                  onChange={(e) => setCategoryDraft({ ...categoryDraft, name: e.target.value })}
-                />
-              </Field>
-              <div className="flex items-center justify-between gap-3">
-                <Label
-                  htmlFor="kategori-aktif"
-                  className="text-sm font-normal text-muted-foreground"
-                >
-                  Tampilkan di katalog publik
-                </Label>
-                <Switch
-                  id="kategori-aktif"
-                  checked={categoryDraft.isActive}
-                  onCheckedChange={(v) => setCategoryDraft({ ...categoryDraft, isActive: v })}
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  disabled={categoryMutation.isPending || categoryDraft.name.trim().length < 2}
-                  onClick={() =>
-                    categoryMutation.mutate({
-                      id: categoryDraft.id,
-                      name: categoryDraft.name.trim(),
-                      isActive: categoryDraft.isActive,
-                    })
-                  }
-                >
-                  {categoryDraft.id ? "Simpan perubahan" : "Tambah kategori"}
-                </Button>
-                {categoryDraft.id ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setCategoryDraft({ name: "", isActive: true })}
-                  >
-                    Batal ubah
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-
-            <ul className="divide-y divide-border rounded-xl border border-border">
-              {productCategories.length === 0 ? (
-                <li className="p-4 text-sm text-muted-foreground">
-                  Belum ada kategori produk digital.
-                </li>
-              ) : (
-                productCategories.map((c: any) => (
-                  <li key={c.id} className="flex items-center justify-between gap-3 p-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{c.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">{c.slug}</p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <Badge variant={c.is_active ? "default" : "secondary"}>
-                        {c.is_active ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Ubah kategori ${c.name}`}
-                        onClick={() =>
-                          setCategoryDraft({
-                            id: c.id,
-                            name: c.name,
-                            isActive: c.is_active !== false,
-                          })
-                        }
-                      >
-                        <Pencil className="size-4" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CategoryManagerDialog kind="product" open={categoryOpen} onOpenChange={setCategoryOpen} />
 
       <Dialog open={form !== null} onOpenChange={(o) => !o && setForm(null)}>
         <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-2xl">

@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  CATEGORY_ICON_KEYS,
+  CATEGORY_TONE_KEYS,
+  type CategoryIconKey,
+  type CategoryTone,
+} from "@/lib/category-icons";
 
 const authz = () => import("./authz.server");
 
@@ -177,7 +183,7 @@ export const listCategories = createServerFn({ method: "GET" })
     guard(context as Ctx, "products.view", async () => {
       const { data } = await context.supabase
         .from("categories")
-        .select("id, name, slug, kind, is_active")
+        .select("id, name, slug, kind, is_active, icon, tone")
         .is("deleted_at", null)
         .order("sort_order");
       return { forbidden: false as const, items: data ?? [] };
@@ -189,6 +195,14 @@ const categoryInput = z.object({
   name: z.string().trim().min(2).max(80),
   kind: z.enum(["product", "service"]),
   isActive: z.boolean().default(true),
+  icon: z
+    .enum(CATEGORY_ICON_KEYS as [CategoryIconKey, ...CategoryIconKey[]])
+    .nullable()
+    .optional(),
+  tone: z
+    .enum(CATEGORY_TONE_KEYS as [CategoryTone, ...CategoryTone[]])
+    .nullable()
+    .optional(),
 });
 
 export const saveCategory = createServerFn({ method: "POST" })
@@ -201,6 +215,8 @@ export const saveCategory = createServerFn({ method: "POST" })
         slug: helpers.slugify(data.name),
         kind: data.kind,
         is_active: data.isActive,
+        ...(data.icon !== undefined ? { icon: data.icon } : {}),
+        ...(data.tone !== undefined ? { tone: data.tone } : {}),
       };
 
       if (data.id) {

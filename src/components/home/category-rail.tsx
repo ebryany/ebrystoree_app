@@ -1,30 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  BarChart3,
-  BookMarked,
-  Bot,
-  ClipboardCheck,
-  Code2,
-  Crown,
-  FilePen,
-  FileSearch,
-  FileSpreadsheet,
-  FlaskConical,
-  GraduationCap,
-  Handshake,
-  LayoutGrid,
-  ListOrdered,
-  type LucideIcon,
-  Palette,
-  Presentation,
-  Quote,
-  RotateCcw,
-  ScrollText,
-  Tag,
-} from "lucide-react";
+import { Handshake, LayoutGrid, type LucideIcon } from "lucide-react";
 
 import { listCatalogCategories } from "@/lib/catalog.functions";
+import {
+  CATEGORY_TONES,
+  resolveCategoryStyle,
+  type CategoryTone as Tone,
+} from "@/lib/category-icons";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/home/section-header";
 
@@ -39,44 +22,22 @@ const productCategoriesQuery = queryOptions({
   staleTime: 5 * 60_000,
 });
 
-type CategoryItem = { id: string; name: string; slug: string };
+type CategoryItem = {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string | null;
+  tone?: string | null;
+};
 type CategoryPayload = { items?: CategoryItem[]; error?: string | null };
 
-/** Warna latar + ikon per kelompok, semuanya dari token tema. */
-const TONES = {
-  teal: "bg-accent/12 text-accent",
-  green: "bg-success/15 text-success",
-  blue: "bg-info/15 text-info",
-  amber: "bg-warning/20 text-warning-foreground",
-  red: "bg-chart-5/12 text-chart-5",
-  brand: "bg-primary text-primary-foreground",
-} as const;
-type Tone = keyof typeof TONES;
+const TONES = Object.fromEntries(
+  Object.entries(CATEGORY_TONES).map(([k, v]) => [k, v.className]),
+) as Record<Tone, string>;
 
-/** Ikon + warna dari kata kunci nama kategori; urutan = prioritas. */
-const ICON_RULES: Array<[RegExp, LucideIcon, Tone]> = [
-  [/chat\s?gpt|gpt|ai\b|\bai |gemini|claude|copilot/i, Bot, "green"],
-  [/akun|premium|langganan|netflix|spotify|canva pro/i, Crown, "amber"],
-  [/template|desain|capcut|canva/i, Palette, "red"],
-  [/presentasi|slide|ppt/i, Presentation, "amber"],
-  [/praktikum|lab/i, FlaskConical, "blue"],
-  [/laporan/i, FileSpreadsheet, "blue"],
-  [/makalah|artikel|esai/i, ScrollText, "teal"],
-  [/tugas|harian/i, ClipboardCheck, "teal"],
-  [/proposal/i, FilePen, "red"],
-  [/revisi|ulang|perbaik/i, RotateCcw, "red"],
-  [/analisis|data|statistik/i, BarChart3, "blue"],
-  [/pemrograman|coding|web|aplikasi|program/i, Code2, "green"],
-  [/review|cek|periksa/i, FileSearch, "teal"],
-  [/format/i, ListOrdered, "amber"],
-  [/sitasi|referensi/i, Quote, "blue"],
-  [/sidang|wisuda/i, GraduationCap, "brand"],
-  [/skripsi|tesis|jurnal|pendampingan/i, BookMarked, "green"],
-];
-
-function styleFor(name: string): { icon: LucideIcon; tone: Tone } {
-  const hit = ICON_RULES.find(([re]) => re.test(name));
-  return hit ? { icon: hit[1], tone: hit[2] } : { icon: Tag, tone: "teal" };
+function styleFor(c: CategoryItem): { icon: LucideIcon; tone: Tone } {
+  const { icon, tone } = resolveCategoryStyle(c);
+  return { icon, tone };
 }
 
 type Tile = {
@@ -108,7 +69,7 @@ export function CategoryRail() {
     ...productItems.map((c) => ({
       key: `p-${c.id}`,
       label: c.name,
-      ...styleFor(c.name),
+      ...styleFor(c),
       to: "/produk" as const,
       kategori: c.slug,
     })),
@@ -116,7 +77,7 @@ export function CategoryRail() {
     ...services.map((c) => ({
       key: `s-${c.id}`,
       label: c.name,
-      ...styleFor(c.name),
+      ...styleFor(c),
       to: "/layanan" as const,
       kategori: c.slug,
     })),

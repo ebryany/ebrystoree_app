@@ -2,7 +2,7 @@ import { cloneElement, isValidElement, useId, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { FolderTree, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -20,9 +20,28 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,15 +52,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { deleteService, listAdminServices, listCategories, saveService, setServiceStatus } from "@/lib/admin.functions";
+import {
+  deleteService,
+  listAdminServices,
+  listCategories,
+  saveService,
+  setServiceStatus,
+} from "@/lib/admin.functions";
 import { ServiceOptionsDialog } from "@/components/admin/service-options-dialog";
+import { CategoryManagerDialog } from "@/components/admin/category-manager-dialog";
 import { formatRupiah } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin/layanan")({
   head: () => ({
     meta: [
       { title: "Kelola Layanan Akademik — Admin Ebrystore" },
-      { name: "description", content: "CRUD layanan akademik Ebrystore: buat, ubah, terbitkan, dan arsipkan layanan." },
+      {
+        name: "description",
+        content: "CRUD layanan akademik Ebrystore: buat, ubah, terbitkan, dan arsipkan layanan.",
+      },
       { property: "og:title", content: "Kelola Layanan Akademik — Admin Ebrystore" },
       { property: "og:description", content: "Manajemen katalog layanan akademik Ebrystore." },
       { property: "og:type", content: "website" },
@@ -88,6 +117,7 @@ function AdminLayanan() {
   const [form, setForm] = useState<FormState | null>(null);
   const [optionsTarget, setOptionsTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const fetchItems = useServerFn(listAdminServices);
   const fetchCategories = useServerFn(listCategories);
@@ -99,7 +129,10 @@ function AdminLayanan() {
     queryKey: ["admin-services", search, status, page],
     queryFn: () => fetchItems({ data: { search, status, page, pageSize: PAGE_SIZE } }),
   });
-  const { data: categories } = useQuery({ queryKey: ["admin-categories"], queryFn: () => fetchCategories({}) });
+  const { data: categories } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: () => fetchCategories({}),
+  });
 
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["admin-services"] });
@@ -120,7 +153,8 @@ function AdminLayanan() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: (payload: { id: string; status: "draft" | "published" | "archived" }) => publish({ data: payload }),
+    mutationFn: (payload: { id: string; status: "draft" | "published" | "archived" }) =>
+      publish({ data: payload }),
     onSuccess: (res: any) => {
       if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
       if (!res.ok) return toast.error(res.message);
@@ -156,9 +190,11 @@ function AdminLayanan() {
     });
   };
 
-  const serviceCategories = (categories && !("forbidden" in categories && categories.forbidden) ? (categories as any).items : []).filter(
-    (c: any) => c.kind === "service",
-  );
+  const serviceCategories = (
+    categories && !("forbidden" in categories && categories.forbidden)
+      ? (categories as any).items
+      : []
+  ).filter((c: any) => c.kind === "service");
 
   return (
     <div className="space-y-6">
@@ -167,14 +203,21 @@ function AdminLayanan() {
         title="Layanan akademik"
         description="Kelola layanan akademik beserta paket harga dan add-on."
         actions={
-          canCreate ? (
-            <Button size="sm" onClick={() => setForm(emptyForm)}>
-              <Plus className="mr-1 size-4" aria-hidden="true" />
-              Layanan baru
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={() => setCategoryOpen(true)}>
+              <FolderTree className="mr-1 size-4" aria-hidden="true" />
+              Kategori jasa
             </Button>
-          ) : null
+            {canCreate ? (
+              <Button size="sm" onClick={() => setForm(emptyForm)}>
+                <Plus className="mr-1 size-4" aria-hidden="true" />
+                Layanan baru
+              </Button>
+            ) : null}
+          </div>
         }
       />
+      <CategoryManagerDialog kind="service" open={categoryOpen} onOpenChange={setCategoryOpen} />
 
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
         <Input
@@ -240,15 +283,23 @@ function AdminLayanan() {
                         <p className="truncate text-xs text-muted-foreground">{s.slug}</p>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={s.status === "published" ? "default" : "secondary"}>{s.status}</Badge>
+                        <Badge variant={s.status === "published" ? "default" : "secondary"}>
+                          {s.status}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {packages.length} paket
-                        {cheapest !== null ? <span className="block text-xs">mulai {formatRupiah(cheapest)}</span> : null}
+                        {cheapest !== null ? (
+                          <span className="block text-xs">mulai {formatRupiah(cheapest)}</span>
+                        ) : null}
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-1">
-                          <Button variant="outline" size="sm" onClick={() => setOptionsTarget({ id: s.id, name: s.name })}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setOptionsTarget({ id: s.id, name: s.name })}
+                          >
                             Paket
                           </Button>
                           {canUpdate ? (
@@ -278,7 +329,8 @@ function AdminLayanan() {
                                     description: s.description ?? "",
                                     thumbnailUrl: s.thumbnail_url ?? "",
                                     requirementsNote: s.requirements_note ?? "",
-                                    orderCapacity: s.order_capacity != null ? String(s.order_capacity) : "",
+                                    orderCapacity:
+                                      s.order_capacity != null ? String(s.order_capacity) : "",
                                     status: s.status,
                                   })
                                 }
@@ -317,10 +369,17 @@ function AdminLayanan() {
           {form ? (
             <div className="space-y-4">
               <Field label="Nama layanan">
-                <Input value={form.name} maxLength={120} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <Input
+                  value={form.name}
+                  maxLength={120}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
               </Field>
               <Field label="Kategori">
-                <Select value={form.categoryId} onValueChange={(v) => setForm({ ...form, categoryId: v })}>
+                <Select
+                  value={form.categoryId}
+                  onValueChange={(v) => setForm({ ...form, categoryId: v })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -368,12 +427,17 @@ function AdminLayanan() {
                   <Input
                     inputMode="numeric"
                     value={form.orderCapacity}
-                    onChange={(e) => setForm({ ...form, orderCapacity: e.target.value.replace(/\D/g, "") })}
+                    onChange={(e) =>
+                      setForm({ ...form, orderCapacity: e.target.value.replace(/\D/g, "") })
+                    }
                   />
                 </Field>
               </div>
               <Field label="Status">
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as FormState["status"] })}>
+                <Select
+                  value={form.status}
+                  onValueChange={(v) => setForm({ ...form, status: v as FormState["status"] })}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -408,12 +472,15 @@ function AdminLayanan() {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus layanan?</AlertDialogTitle>
             <AlertDialogDescription>
-              Layanan “{deleteTarget?.name}” akan diarsipkan (soft delete). Tindakan ini tercatat di audit log.
+              Layanan “{deleteTarget?.name}” akan diarsipkan (soft delete). Tindakan ini tercatat di
+              audit log.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}>
+            <AlertDialogAction
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+            >
               Hapus
             </AlertDialogAction>
           </AlertDialogFooter>

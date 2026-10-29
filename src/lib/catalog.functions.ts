@@ -27,7 +27,7 @@ export const listCatalogCategories = createServerFn({ method: "GET" })
     const supabase = createPublicClient();
     const { data: rows, error } = await supabase
       .from("categories")
-      .select("id, name, slug")
+      .select("id, name, slug, icon, tone")
       .eq("kind", data.kind)
       .eq("is_active", true)
       .is("deleted_at", null)
@@ -37,7 +37,13 @@ export const listCatalogCategories = createServerFn({ method: "GET" })
     if (error) {
       console.error("[catalog] listCatalogCategories gagal:", error.message);
       return {
-        items: [] as { id: string; name: string; slug: string }[],
+        items: [] as {
+          id: string;
+          name: string;
+          slug: string;
+          icon: string | null;
+          tone: string | null;
+        }[],
         error: "Kategori sedang tidak dapat dimuat.",
       };
     }
@@ -217,7 +223,10 @@ export const listProductShelves = createServerFn({ method: "GET" }).handler(asyn
     .map((c) => ({
       slug: c.slug,
       name: c.name,
-      items: rows.filter((r) => r.category_id === c.id).map((r) => r.item).slice(0, 12),
+      items: rows
+        .filter((r) => r.category_id === c.id)
+        .map((r) => r.item)
+        .slice(0, 12),
     }))
     .filter((s) => s.items.length > 0);
 

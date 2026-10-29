@@ -414,36 +414,42 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           description: string | null
+          icon: string | null
           id: string
           is_active: boolean
           kind: string
           name: string
           slug: string
           sort_order: number
+          tone: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          icon?: string | null
           id?: string
           is_active?: boolean
           kind: string
           name: string
           slug: string
           sort_order?: number
+          tone?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          icon?: string | null
           id?: string
           is_active?: boolean
           kind?: string
           name?: string
           slug?: string
           sort_order?: number
+          tone?: string | null
           updated_at?: string
         }
         Relationships: []
