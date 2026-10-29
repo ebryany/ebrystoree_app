@@ -104,8 +104,15 @@ export function CategoryRail() {
   ];
 
   return (
-    <section aria-labelledby="kategori-heading" className="rounded-2xl border border-border bg-card py-4">
-      <h2 id="kategori-heading" className="px-4 text-base font-bold text-foreground sm:px-5">
+    <section
+      aria-labelledby="kategori-heading"
+      className="rounded-2xl border border-border bg-card py-4"
+    >
+      <h2
+        id="kategori-heading"
+        className="flex items-center gap-2 px-4 text-base font-bold text-foreground sm:px-5 sm:text-lg"
+      >
+        <span className="h-4 w-1 rounded-full bg-accent" aria-hidden="true" />
         Kategori
       </h2>
       <div

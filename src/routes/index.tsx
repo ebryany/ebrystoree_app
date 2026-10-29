@@ -11,7 +11,8 @@ import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { SellerServiceCard } from "@/components/home/seller-service-card";
 import { MarketplaceServiceCard } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
-import { SeeAllLink, Shelf } from "@/components/ebry/product-shelf";
+import { PRODUCT_GRID, SeeAllLink, Shelf } from "@/components/ebry/product-shelf";
+import { cn } from "@/lib/utils";
 import { PopularSellers } from "@/components/ebry/popular-sellers";
 import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import {
@@ -152,7 +153,9 @@ function Beranda() {
           {/* Kategori jasa: pintu eksplorasi pertama setelah hero. Gagal/ kosong
               → tidak dirender (fallback minimal), navigasi tetap via /layanan. */}
           <SectionSuspense
-            fallback={<div className="h-14 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />}
+            fallback={
+              <div className="h-14 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
+            }
             queryKey={homeCategoriesQuery.queryKey}
           >
             <CategoryRail />
@@ -167,9 +170,16 @@ function Beranda() {
               <ProductShelves />
             </SectionSuspense>
             <PopularSellers />
-            <section aria-labelledby="jasa-heading" className="@container rounded-2xl bg-card py-3.5 sm:py-4">
+            <section
+              aria-labelledby="jasa-heading"
+              className="@container rounded-2xl bg-card py-3.5 sm:py-4"
+            >
               <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
-                <h2 id="jasa-heading" className="text-sm font-bold text-foreground sm:text-base">
+                <h2
+                  id="jasa-heading"
+                  className="flex items-center gap-2 text-base font-bold text-foreground sm:text-lg"
+                >
+                  <span className="h-4 w-1 rounded-full bg-accent" aria-hidden="true" />
                   Jasa seller
                 </h2>
                 <SeeAllLink to="/layanan" />
@@ -219,6 +229,9 @@ function ProductShelves() {
       />
     );
   }
+  // Rak kategori dengan 1–3 produk terlihat kosong di desktop dan produknya
+  // sudah muncul di grid terbaru, jadi hanya kategori yang cukup isi ditampilkan.
+  const categoryShelves = data.shelves.filter((s) => s.items.length >= MIN_CATEGORY_SHELF);
   return (
     <>
       <Shelf
@@ -227,8 +240,7 @@ function ProductShelves() {
         ranked
         action={<SeeAllLink to="/produk" />}
       />
-      <Shelf title="Produk terbaru" items={data.latest} action={<SeeAllLink to="/produk" />} />
-      {data.shelves.map((s) => (
+      {categoryShelves.map((s) => (
         <Shelf
           key={s.slug}
           title={s.name}
@@ -236,9 +248,17 @@ function ProductShelves() {
           action={<SeeAllLink to="/produk" kategori={s.slug} />}
         />
       ))}
+      <Shelf
+        title="Produk terbaru"
+        items={data.latest}
+        layout="grid"
+        action={<SeeAllLink to="/produk" />}
+      />
     </>
   );
 }
+
+const MIN_CATEGORY_SHELF = 4;
 
 function SellerServicesSection() {
   const query = useSuspenseQuery(sellerServicesQuery);
@@ -252,14 +272,11 @@ function SellerServicesSection() {
       />
     );
   return (
-    // Kartu jasa lebih padat isinya: 1 kartu + intip di HP, 2–5 kolom mengikuti lebar rak.
-    <ul className="flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto scroll-px-4 px-4 pb-1 sm:scroll-px-5 sm:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    // Grid sama dengan kartu produk supaya ukuran kartu seragam di seluruh beranda.
+    <ul className={cn("mt-1 px-4 sm:px-5", PRODUCT_GRID)}>
       {query.data.items.map((item) => (
-        <li
-          key={item.id}
-          className="w-[78%] shrink-0 snap-start @xl:w-[calc((100%-0.75rem)/2)] @3xl:w-[calc((100%-1.5rem)/3)] @5xl:w-[calc((100%-2.25rem)/4)] @7xl:w-[calc((100%-3rem)/5)]"
-        >
-          <SellerServiceCard item={item} variant="home" />
+        <li key={item.id} className="min-w-0">
+          <SellerServiceCard item={item} />
         </li>
       ))}
     </ul>

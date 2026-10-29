@@ -20,11 +20,23 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-function SellerItems({ items, hidden }: { items: PopularSeller[]; hidden?: boolean }) {
+function SellerItems({
+  items,
+  hidden,
+  animated = true,
+}: {
+  items: PopularSeller[];
+  hidden?: boolean;
+  animated?: boolean;
+}) {
   return (
     <ul
       aria-hidden={hidden || undefined}
-      className="flex shrink-0 items-center gap-3 pr-3 animate-infinite-scroll group-hover:[animation-play-state:paused] motion-reduce:animate-none"
+      className={
+        animated
+          ? "flex shrink-0 items-center gap-3 pr-3 animate-infinite-scroll group-hover:[animation-play-state:paused] motion-reduce:animate-none"
+          : "flex flex-wrap items-center gap-3 px-4"
+      }
     >
       {items.map((s) => (
         <li key={s.id} className="shrink-0">
@@ -62,6 +74,8 @@ function SellerItems({ items, hidden }: { items: PopularSeller[]; hidden?: boole
   );
 }
 
+const MARQUEE_MIN = 4;
+
 /** Pita penjual populer berjalan tanpa henti; berhenti saat hover / reduced-motion. */
 export function PopularSellers() {
   const fetchSellers = useServerFn(listPopularSellers);
@@ -75,13 +89,23 @@ export function PopularSellers() {
 
   return (
     <section aria-labelledby="popular-sellers-heading" className="rounded-2xl bg-card py-3.5">
-      <h2 id="popular-sellers-heading" className="mb-3 px-4 text-sm font-bold text-foreground">
+      <h2
+        id="popular-sellers-heading"
+        className="mb-3 flex items-center gap-2 px-4 text-base font-bold text-foreground sm:px-5 sm:text-lg"
+      >
+        <span className="h-4 w-1 rounded-full bg-accent" aria-hidden="true" />
         Penjual populer
       </h2>
-      <div className="group flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0,black_48px,black_calc(100%-48px),transparent_100%)] sm:[mask-image:linear-gradient(to_right,transparent_0,black_128px,black_calc(100%-200px),transparent_100%)]">
-        <SellerItems items={items} />
-        <SellerItems items={items} hidden />
-      </div>
+      {/* Pita berjalan hanya masuk akal bila penjual cukup banyak; sedikit
+          penjual dianimasikan justru tampak terpotong dan berulang. */}
+      {items.length < MARQUEE_MIN ? (
+        <SellerItems items={items} animated={false} />
+      ) : (
+        <div className="group flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0,black_48px,black_calc(100%-48px),transparent_100%)] sm:[mask-image:linear-gradient(to_right,transparent_0,black_128px,black_calc(100%-200px),transparent_100%)]">
+          <SellerItems items={items} />
+          <SellerItems items={items} hidden />
+        </div>
+      )}
     </section>
   );
 }
