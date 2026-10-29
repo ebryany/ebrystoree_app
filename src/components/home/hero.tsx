@@ -1,25 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronsRight } from "lucide-react";
 
-import { HeroShaderBackground } from "@/components/home/hero-shader-background";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { WordAnimator } from "@/components/ui/word-animator";
-
-/**
- * Hero beranda.
- *
- * Pita lebar penuh, bukan kotak berbingkai. Latar gradien bergerak mengisi
- * seluruh lebar, dengan lapisan gelap agar teks putih tetap terbaca.
- *
- * Aturan copy: tidak ada istilah internal di sini. "Seller", "vendor",
- * "multi-vendor", "ledger", "pencairan dana" adalah kosakata operasional yang
- * tidak dikenal pembeli. Hero hanya menyebut apa yang bisa dibeli dan apa
- * manfaatnya bagi pembeli.
- *
- * Animasi kata dipertahankan karena memberi gerak tanpa menggeser tata letak.
- * Kedua kata yang berputar sama-sama melengkapi kalimat, jadi headline tetap
- * terbaca utuh kapan pun animasi berhenti.
- */
 
 const WORDS = ["produk digital", "jasa"];
 
@@ -27,66 +10,70 @@ export function HomeHero() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative isolate overflow-hidden bg-foreground"
+      className="relative isolate bg-background px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
     >
-      <HeroShaderBackground />
+      <div className="mx-auto grid w-full max-w-7xl py-2 text-left sm:py-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-10 lg:py-10">
+        <div className="min-w-0">
+          <h1
+            id="hero-heading"
+            className="min-w-0 font-display text-2xl font-bold leading-tight tracking-tight text-foreground min-[375px]:text-3xl sm:text-4xl lg:text-5xl"
+          >
+            Belanja di Ebrystore
+            <span className="mt-2 block">
+              <WordAnimator
+                words={WORDS}
+                duration={3}
+                className="max-w-full text-primary [&>span]:whitespace-normal"
+              />
+            </span>
+          </h1>
 
-      {/* Lapisan gelap: menjaga kontras teks putih di atas gradien yang terang. */}
+          <div className="mt-5 min-w-0 max-w-3xl">
+            <p className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base lg:text-lg">
+              Belanja produk digital dan jasa dari toko terpilih. Harga jelas di depan, pembayaran
+              terverifikasi, dan setiap pesanan bisa dipantau sampai tuntas.
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:mt-6">
+              <ShimmerButton
+                asChild
+                borderRadius="8px"
+                background="var(--primary)"
+                shimmerColor="var(--primary-foreground)"
+                className="rounded-control min-h-12 w-full justify-center text-sm font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card motion-reduce:transition-none sm:w-auto lg:min-h-14 lg:px-7 lg:text-base"
+              >
+                <Link to="/produk">Jelajahi produk</Link>
+              </ShimmerButton>
+
+              <Link
+                to="/layanan"
+                className="rounded-control inline-flex min-h-12 w-full items-center justify-center gap-1.5 border border-primary/60 bg-card px-5 text-sm font-medium text-primary transition-colors hover:border-primary hover:bg-surface-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card motion-reduce:transition-none sm:w-auto lg:min-h-14 lg:px-6 lg:text-base"
+              >
+                Lihat layanan
+                <ChevronsRight className="size-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+          <p className="mt-6 max-w-3xl border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Pembayaran diverifikasi sebelum pesanan diproses. Setiap toko ditinjau sebelum tayang.
+          </p>
+        </div>
+        <div className="hidden min-w-0 lg:flex lg:justify-end">
+          <img
+            src="/images/ebrystore-hero-mascot.webp?v=bf406217"
+            alt="Maskot Ebrystore membawa laptop"
+            width={1254}
+            height={1254}
+            loading="lazy"
+            decoding="async"
+            className="h-auto w-full max-w-md object-contain xl:max-w-[33rem]"
+          />
+        </div>
+      </div>
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/65"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_90%_70%_at_100%_0%,var(--surface-selected),transparent_70%)] lg:bg-[radial-gradient(ellipse_50%_90%_at_80%_50%,var(--surface-selected),transparent_70%)]"
       />
-
-      <div className="relative px-4 py-14 text-center sm:px-6 sm:py-24 lg:py-28">
-        {/* Baris pertama statis, baris kedua berisi kata beranimasi. Di mobile
-            kedua barisnya memang terpisah, jadi kotak animasi tidak pernah
-            memotong kalimat di tengah. */}
-        <h1
-          id="hero-heading"
-          className="mx-auto max-w-4xl text-balance font-display text-3xl font-bold leading-[1.2] tracking-tight text-white sm:text-4xl lg:text-6xl"
-        >
-          Belanja di Ebrystore
-          <span className="mt-3 block sm:mt-4">
-            <WordAnimator
-              words={WORDS}
-              duration={3}
-              className="rounded-lg border border-white/25 bg-white/10 px-3 text-white sm:px-4"
-            />
-          </span>
-        </h1>
-
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-lg">
-          Belanja produk digital dan jasa dari toko terpilih. Harga jelas di depan, pembayaran
-          terverifikasi, dan setiap pesanan bisa dipantau sampai tuntas.
-        </p>
-
-        {/* Di mobile tombol ditumpuk penuh supaya mudah dijangkau jempol;
-            sejajar berdampingan baru di layar >= 640px. */}
-        <div className="mx-auto mt-6 flex w-full max-w-xs flex-col gap-2.5 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3">
-          <ShimmerButton
-            borderRadius="8px"
-            background="#ffffff"
-            shimmerColor="var(--accent)"
-            className="rounded-control w-full justify-center sm:w-auto"
-          >
-            <Link to="/produk" className="text-sm font-semibold text-foreground lg:text-base">
-              Jelajahi produk
-            </Link>
-          </ShimmerButton>
-
-          <Link
-            to="/layanan"
-            className="rounded-control inline-flex min-h-11 w-full items-center justify-center gap-1.5 border border-white/40 bg-white/5 px-5 text-sm font-medium text-white transition-colors hover:border-white/70 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:w-auto"
-          >
-            Lihat layanan
-            <ChevronsRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-
-        <p className="mx-auto mt-5 max-w-md text-xs leading-relaxed text-white/70">
-          Pembayaran diverifikasi sebelum pesanan diproses. Setiap toko ditinjau sebelum tayang.
-        </p>
-      </div>
     </section>
   );
 }

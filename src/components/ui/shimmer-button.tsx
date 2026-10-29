@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
  */
 export function ShimmerButton({
   children,
+  asChild = false,
   className,
   background = "#334cec",
   shimmerColor = "#ffffff",
@@ -22,6 +24,7 @@ export function ShimmerButton({
   shimmerDuration = "3s",
 }: {
   children: ReactNode;
+  asChild?: boolean;
   className?: string;
   background?: string;
   shimmerColor?: string;
@@ -29,9 +32,10 @@ export function ShimmerButton({
   borderRadius?: string;
   shimmerDuration?: string;
 }) {
+  const Comp = asChild ? Slot : "button";
   return (
-    <button
-      type="button"
+    <Comp
+      type={asChild ? undefined : "button"}
       style={
         {
           "--spread": "90deg",
@@ -78,7 +82,13 @@ export function ShimmerButton({
         aria-hidden="true"
         className="absolute inset-0 -z-20 [border-radius:var(--radius)] [box-shadow:0_0_0_1px_var(--shimmer-color)_inset]"
       />
-      {children}
-    </button>
+      {asChild ? (
+        <span
+          aria-hidden="true"
+          className="absolute inset-[var(--cut)] -z-10 [border-radius:var(--radius)] [background:var(--bg)]"
+        />
+      ) : null}
+      <Slottable>{children}</Slottable>
+    </Comp>
   );
 }

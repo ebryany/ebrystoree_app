@@ -2,7 +2,7 @@ import { Component, Suspense, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronRight, GraduationCap, HelpCircle } from "lucide-react";
+import { ChevronRight, GraduationCap } from "lucide-react";
 
 import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
@@ -16,12 +16,13 @@ import {
 import { HomeHero } from "@/components/home/hero";
 import { SellerJoinSection } from "@/components/home/home-hero";
 import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
-import { SmoothScrollStory } from "@/components/home/smooth-scroll-story";
 import { SellerServiceCard } from "@/components/home/seller-service-card";
+import { CompactProductCard } from "@/components/home/compact-product-card";
 import { MarketplaceProductCard, MarketplaceServiceCard } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
 import { Button } from "@/components/ui/button";
-import { listProducts, listServices, listPublicMarketplaceServices } from "@/lib/catalog.functions";
+import { listProducts, listServices, listPublicMarketplaceServices, listCatalogCategories } from "@/lib/catalog.functions";
+import { CategoryRail } from "@/components/home/category-rail";
 
 const productsQuery = queryOptions({
   queryKey: ["storefront-products", 12],
@@ -36,6 +37,11 @@ const servicesQuery = queryOptions({
 const sellerServicesQuery = queryOptions({
   queryKey: ["storefront-seller-services", 6],
   queryFn: () => listPublicMarketplaceServices({ data: { pageSize: 6 } }),
+});
+
+const homeCategoriesQuery = queryOptions({
+  queryKey: ["categories", "service", "home"],
+  queryFn: () => listCatalogCategories({ data: { kind: "service" } }),
 });
 
 export const Route = createFileRoute("/")({
@@ -101,6 +107,7 @@ export const Route = createFileRoute("/")({
       context.queryClient.ensureQueryData(productsQuery),
       context.queryClient.ensureQueryData(servicesQuery),
       context.queryClient.ensureQueryData(sellerServicesQuery),
+      context.queryClient.ensureQueryData(homeCategoriesQuery),
     ]);
   },
   pendingMs: 200,
@@ -143,6 +150,14 @@ function Beranda() {
         {/* Lebar penuh dengan padding, sama seperti navbar: tepi kiri konten
             sejajar dengan logo di navbar, bukan lagi terkurung 1152px. */}
         <div className="w-full px-4 pb-10 pt-5 sm:px-6 sm:pt-6 lg:px-8">
+          {/* Kategori jasa: pintu eksplorasi pertama setelah hero. Gagal/ kosong
+              → tidak dirender (fallback minimal), navigasi tetap via /layanan. */}
+          <SectionSuspense
+            fallback={<div className="h-14 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />}
+            queryKey={homeCategoriesQuery.queryKey}
+          >
+            <CategoryRail />
+          </SectionSuspense>
           <ReviewMarqueeSection />
           <section aria-labelledby="produk-heading" className="pt-8 sm:pt-10">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
@@ -199,30 +214,11 @@ function Beranda() {
           <PlatformServicesSection />
         </div>
 
-        {/* Kawasan grid kontinu: Seller CTA, strip bantuan, dan Cara memesan
-            berada di atas satu lembar graph paper yang sama. Grid didefinisikan
-            SEKALI di wrapper ini — background-position origin tunggal membuat
-            garis menyambung antar section tanpa reset atau garis ganda. Wrapper
-            berada di luar container berpadding agar grid memenuhi lebar penuh. */}
-        <div className="relative">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--color-border)_70%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--color-border)_70%,transparent)_1px,transparent_1px)] bg-[size:54px_54px]"
-          />
-          <div className="relative">
-            <SellerJoinSection stores={proofStores} />
-            <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-border px-4 pt-5 sm:px-6 lg:px-8">
-              <p className="text-sm text-muted-foreground">
-                Belum tahu cara memesan atau menerima produk?
-              </p>
-              <Button asChild variant="ghost" className="min-h-11">
-                <Link to="/bantuan">
-                  <HelpCircle className="size-4" aria-hidden="true" /> Buka pusat bantuan
-                </Link>
-              </Button>
-            </div>
-            <SmoothScrollStory />
-          </div>
+        {/* Penutup homepage: ajakan seller dalam kartu ber-gutter, sama dengan
+            container katalog di atasnya. Section "Cara memesan" dihapus karena
+            mengganggu; pusat bantuan tetap terjangkau lewat menu navigasi. */}
+        <div className="w-full px-4 pb-14 sm:px-6 lg:px-8">
+          <SellerJoinSection stores={proofStores} />
         </div>
       </div>
     </PageShell>
@@ -262,41 +258,57 @@ function ProductsSection() {
   const items = query.data.items;
   const useGrid = items.length <= 4;
 
-  if (useGrid) {
-    // Mobile-first: satu kartu per baris di bawah 640px, lalu lebar tetap 272px
-    // mulai sm. Sebelumnya `w-[calc(50%-...)]` berlaku tanpa breakpoint sehingga
-    // dua kartu dipaksa muat di 320px (kartu jadi 131px, tombol 124px meluber).
-    return (
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-        {items.map((item) => (
-          <div key={item.id} className="w-full sm:w-[272px]">
-            <MarketplaceProductCard item={item} variant="home" spotlight />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <div className="relative">
-      <Carousel opts={{ align: "start", slidesToScroll: 1 }} className="w-full">
-        <CarouselContent className="-ml-3 sm:-ml-4">
+    <>
+      {/* Mobile (<640px): rail scroll native tanpa JS carousel — kartu compact
+          dengan snap, kartu berikutnya terlihat sebagian sebagai affordance
+          swipe. Full-bleed -mx-4 supaya kartu pertama sejajar konten sambil
+          menyisakan peek kartu berikutnya. */}
+      <div
+        role="region"
+        aria-label="Daftar produk digital"
+        tabIndex={0}
+        className="relative -mx-4 snap-x snap-proximity overflow-x-auto overscroll-x-contain scroll-px-4 px-4 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden"
+      >
+        <ul className="flex w-max gap-2.5">
           {items.map((item) => (
-            <CarouselItem
-              key={item.id}
-              /* 288px = 272px kartu + 16px padding kiri, supaya lebar kartu sama
-                 dengan kartu jasa di desktop. */
-              className="basis-[calc(50%-0.375rem)] pl-3 sm:basis-[288px] sm:pl-4"
-            >
-              <MarketplaceProductCard item={item} variant="home" spotlight />
-            </CarouselItem>
+            <li key={item.id} className="w-[clamp(205px,68vw,252px)] shrink-0 snap-start">
+              <CompactProductCard item={item} />
+            </li>
           ))}
-        </CarouselContent>
-        {/* Panah melayang di tepi kiri/kanan, setengah keluar dari deret kartu. */}
-        <CarouselPrevious className="-left-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-left-5" />
-        <CarouselNext className="-right-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-right-5" />
-      </Carousel>
-    </div>
+        </ul>
+      </div>
+
+      {/* Tablet/desktop (>=640px): perilaku existing dipertahankan — grid
+          untuk <=4 produk, carousel dengan panah untuk lebih dari itu. */}
+      {useGrid ? (
+        <div className="hidden sm:flex flex-wrap justify-center gap-4">
+          {items.map((item) => (
+            <div key={item.id} className="w-[272px]">
+              <MarketplaceProductCard item={item} variant="home" spotlight />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="relative hidden sm:block">
+          <Carousel opts={{ align: "start", slidesToScroll: 1 }} className="w-full">
+            <CarouselContent className="-ml-4">
+              {items.map((item) => (
+                <CarouselItem
+                  key={item.id}
+                  className="basis-full pl-4 sm:basis-[288px]"
+                >
+                  <MarketplaceProductCard item={item} variant="home" spotlight />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {/* Panah melayang di tepi kiri/kanan, setengah keluar dari deret kartu. */}
+            <CarouselPrevious className="-left-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-left-5" />
+            <CarouselNext className="-right-3 size-10 rounded-full border-border bg-card shadow-card hover:bg-surface-selected sm:-right-5" />
+          </Carousel>
+        </div>
+      )}
+    </>
   );
 }
 
