@@ -1,10 +1,9 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { ForbiddenState } from "@/components/admin/admin-ui";
 import { useCan } from "@/components/admin/admin-ui";
+import { ChatSplit } from "@/components/chat/chat-split";
 import { InquiryThread } from "@/components/inquiry/inquiry-thread";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin/chat/$id")({
   head: () => ({
@@ -27,13 +26,8 @@ function AdminChatDetail() {
   if (!canView) return <ForbiddenState />;
 
   return (
-    <div className="space-y-4">
-      <Button asChild variant="ghost" size="sm" className="-ml-2">
-        <Link to="/admin/chat">
-          <ArrowLeft className="size-4" aria-hidden="true" /> Semua chat produk
-        </Link>
-      </Button>
-      <InquiryThread id={id} mode="staff" />
-    </div>
+    <ChatSplit mode="staff" activeId={id}>
+      <InquiryThread id={id} mode="staff" embedded />
+    </ChatSplit>
   );
 }

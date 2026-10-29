@@ -84,7 +84,7 @@ function applySecurityHeaders(response: Response): Response {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), payment=(self), usb=(), interest-cohort=()",
+    "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), interest-cohort=()",
   );
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // HSTS diabaikan browser pada koneksi non-TLS, jadi aman dikirim juga di dev lokal.

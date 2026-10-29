@@ -239,7 +239,7 @@ export const getInquiry = createServerFn({ method: "GET" })
     const [rawMessages, productResult, { data: profile }, storeResult] = await Promise.all([
       supabase
         .from("product_inquiry_messages")
-        .select("id, sender_id, sender_role, body, is_system, created_at")
+        .select("id, sender_id, sender_role, body, is_system, created_at, attachment")
         .eq("inquiry_id", data.id)
         .order("created_at", { ascending: false })
         .limit(MESSAGE_PAGE_SIZE + 1),
@@ -293,7 +293,7 @@ export const getInquiryMessagesPage = createServerFn({ method: "GET" })
     const { supabase } = context as Ctx;
     const { data: raw } = await supabase
       .from("product_inquiry_messages")
-      .select("id, sender_id, sender_role, body, is_system, created_at")
+      .select("id, sender_id, sender_role, body, is_system, created_at, attachment")
       .eq("inquiry_id", data.id)
       .lt("created_at", data.before)
       .order("created_at", { ascending: false })
@@ -304,11 +304,126 @@ export const getInquiryMessagesPage = createServerFn({ method: "GET" })
     return { messages, hasMore, oldest: messages[0]?.created_at ?? null };
   });
 
+// ---------------------------------------------------------------------------
+// Lampiran chat (migration 20261029140000). Bucket privat `chat-attachments`;
+// path selalu diawali id thread supaya file bisa dicek kepemilikannya.
+// ---------------------------------------------------------------------------
+
+const CHAT_BUCKET = "chat-attachments";
+const CHAT_MAX_BYTES = 10 * 1024 * 1024;
+const CHAT_MIME_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "application/pdf": "pdf",
+  "application/zip": "zip",
+  "text/plain": "txt",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "application/vnd.ms-excel": "xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+};
+
+const attachmentSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.enum(["image", "file"]),
+    path: z.string().min(10).max(300),
+    name: z.string().trim().min(1).max(160),
+    mime: z.string().max(120),
+    size: z.number().int().min(1).max(CHAT_MAX_BYTES),
+  }),
+  z.object({
+    kind: z.literal("location"),
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
+  }),
+]);
+
+export type ChatAttachment = z.infer<typeof attachmentSchema>;
+
+/** Peserta thread? RLS SELECT sudah membatasi ke pembeli/seller toko/staff. */
+async function canAccessThread(supabase: any, inquiryId: string) {
+  const { data } = await supabase
+    .from("product_inquiries")
+    .select("id, status")
+    .eq("id", inquiryId)
+    .maybeSingle();
+  return data as { id: string; status: string } | null;
+}
+
+export const prepareChatUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        inquiryId: z.string().uuid(),
+        mimeType: z.string().max(120),
+        sizeBytes: z.number().int().min(1).max(CHAT_MAX_BYTES),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as Ctx;
+    const ext = CHAT_MIME_EXT[data.mimeType];
+    if (!ext) return { ok: false as const, error: "Jenis file ini tidak didukung." };
+    const limited = await enforceRateLimit(userId, "inquiry.message");
+    if (limited) return { ok: false as const, error: limited.error };
+    const thread = await canAccessThread(supabase, data.inquiryId);
+    if (!thread) return { ok: false as const, error: "Percakapan tidak ditemukan." };
+    if (thread.status === "closed") return { ok: false as const, error: "Percakapan sudah ditutup." };
+
+    const path = `${data.inquiryId}/${crypto.randomUUID()}.${ext}`;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error } = await (supabaseAdmin as any).storage
+      .from(CHAT_BUCKET)
+      .createSignedUploadUrl(path);
+    if (error || !signed) return { ok: false as const, error: "Gagal menyiapkan unggahan." };
+    return { ok: true as const, bucket: CHAT_BUCKET, path, token: signed.token as string };
+  });
+
+/** Signed URL baca (1 jam) untuk lampiran di satu thread yang boleh diakses pemanggil. */
+export const getChatAttachmentUrls = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({ inquiryId: z.string().uuid(), paths: z.array(z.string().max(300)).max(100) })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as Ctx;
+    const thread = await canAccessThread(supabase, data.inquiryId);
+    const paths = data.paths.filter((p) => p.startsWith(`${data.inquiryId}/`));
+    if (!thread || !paths.length) return { urls: {} as Record<string, string> };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed } = await (supabaseAdmin as any).storage
+      .from(CHAT_BUCKET)
+      .createSignedUrls(paths, 3600);
+    const urls: Record<string, string> = {};
+    for (const s of (signed ?? []) as { path: string; signedUrl: string }[]) {
+      if (s.path && s.signedUrl) urls[s.path] = s.signedUrl;
+    }
+    return { urls };
+  });
+
 export const sendInquiryMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z
-      .object({ inquiryId: z.string().uuid(), body: z.string().trim().min(1).max(2000) })
+      .object({
+        inquiryId: z.string().uuid(),
+        body: z.string().trim().max(2000),
+        attachment: attachmentSchema.optional(),
+      })
+      .refine((d) => d.body.length > 0 || d.attachment, "Pesan kosong.")
+      .refine(
+        (d) =>
+          !d.attachment ||
+          d.attachment.kind === "location" ||
+          d.attachment.path.startsWith(`${d.inquiryId}/`),
+        "Lampiran tidak valid.",
+      )
       .parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -344,6 +459,7 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
       sender_id: userId,
       sender_role: senderRole,
       body: data.body,
+      attachment: data.attachment ?? null,
     });
     if (error) return { ok: false as const, error: "Pesan gagal dikirim. Coba lagi." };
 

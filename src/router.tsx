@@ -22,6 +22,8 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Muat kode + data rute saat link di-hover/disentuh, jadi klik terasa instan.
+    defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
     defaultErrorComponent: () => <RouteError />,
   });

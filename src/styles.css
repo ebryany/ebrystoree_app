@@ -509,6 +509,15 @@
   }
 }
 
+/*
+ * Section di bawah lipatan: browser melewati layout & paint sampai section
+ * mendekati viewport. Ukuran cadangan mencegah scrollbar melompat.
+ */
+@utility defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
 /* Animasi line-fill satu kali untuk diagram alur hero. */
 @keyframes ebry-line-fill {
   from {

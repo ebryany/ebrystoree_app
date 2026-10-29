@@ -188,7 +188,7 @@ function CheckoutProduk() {
       >
         <div className="min-w-0 space-y-6">
           {/* Item */}
-          <section className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur sm:p-6">
+          <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Item pesanan
             </h2>
@@ -291,7 +291,7 @@ function CheckoutProduk() {
           </section>
 
           {/* Catatan */}
-          <section className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur sm:p-6">
+          <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
             <Label
               htmlFor="note"
               className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
@@ -323,7 +323,7 @@ function CheckoutProduk() {
 
         {/* Ringkasan */}
         <aside className="min-w-0">
-          <div className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur sm:p-6 lg:sticky lg:top-24">
+          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 lg:sticky lg:top-24">
             <h2 className="font-display font-semibold">Ringkasan pesanan</h2>
             <dl className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-4">
@@ -447,7 +447,7 @@ function Assurance({
   desc: string;
 }) {
   return (
-    <li className="flex items-start gap-3 rounded-xl border border-border bg-card/60 p-3.5 backdrop-blur">
+    <li className="flex items-start gap-3 rounded-xl border border-border bg-card p-3.5">
       <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
         <Icon className="size-4" />
       </span>

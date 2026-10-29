@@ -1,8 +1,7 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 
+import { ChatSplit } from "@/components/chat/chat-split";
 import { InquiryThread } from "@/components/inquiry/inquiry-thread";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/chat/$id")({
   head: () => ({
@@ -22,13 +21,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/chat/$id")({
 function ChatDetailPage() {
   const { id } = Route.useParams();
   return (
-    <div className="space-y-4">
-      <Button asChild variant="ghost" size="sm" className="-ml-2">
-        <Link to="/dashboard/chat">
-          <ArrowLeft className="size-4" aria-hidden="true" /> Semua chat
-        </Link>
-      </Button>
-      <InquiryThread id={id} mode="customer" />
-    </div>
+    <ChatSplit mode="customer" activeId={id}>
+      <InquiryThread id={id} mode="customer" embedded />
+    </ChatSplit>
   );
 }

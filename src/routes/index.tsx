@@ -182,16 +182,18 @@ function Beranda() {
               </SectionSuspense>
             </section>
           </div>
-          <ReviewMarqueeSection />
-          {/* Layanan platform disembunyikan saat belum ada paket aktif: menampilkan
-              section berisi "belum ada layanan" lebih merugikan daripada tidak tampil. */}
-          <PlatformServicesSection />
+          <div className="defer-render">
+            <ReviewMarqueeSection />
+            {/* Layanan platform disembunyikan saat belum ada paket aktif: menampilkan
+                section berisi "belum ada layanan" lebih merugikan daripada tidak tampil. */}
+            <PlatformServicesSection />
+          </div>
         </div>
 
         {/* Penutup homepage: ajakan seller dalam kartu ber-gutter, sama dengan
             container katalog di atasnya. Section "Cara memesan" dihapus karena
             mengganggu; pusat bantuan tetap terjangkau lewat menu navigasi. */}
-        <div className="w-full px-4 pb-14 sm:px-6 lg:px-8">
+        <div className="defer-render w-full px-4 pb-14 sm:px-6 lg:px-8">
           <SellerJoinSection stores={proofStores} />
         </div>
       </div>

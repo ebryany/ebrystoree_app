@@ -146,7 +146,7 @@ export function StickyActionBar({
   return (
     <div
       className={cn(
-        "pb-safe sticky bottom-0 z-30 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur",
+        "pb-safe sticky bottom-0 z-30 -mx-4 mt-6 border-t border-border bg-background px-4 py-3",
         className,
       )}
     >
