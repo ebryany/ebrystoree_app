@@ -196,7 +196,7 @@ function DetailPesanan() {
     const result = await cancelOrder({ data: { orderId: order.id, reason: reason.trim() } });
     setBusy(false);
     if (!result.ok) return toast.error(result.error);
-    toast.success("Pesanan dibatalkan.");
+    // Tanpa toast sukses: kartu notifikasi "Pesanan dibatalkan" dari server sudah muncul.
     setReason("");
     await refresh();
   }

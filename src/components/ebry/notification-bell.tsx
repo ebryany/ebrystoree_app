@@ -74,10 +74,6 @@ export function NotificationBell({ className }: { className?: string }) {
         // Lonceng dipasang lebih dari sekali (header desktop + mobile); hanya
         // instance pertama yang menerima id ini boleh berbunyi dan menampilkan kartu.
         if (!claimNotification(payload.new.id)) return;
-        // Pengguna sedang membuka halaman objek notifikasi ini (mis. detail pesanan
-        // yang baru ia batalkan): toast aksi di halaman itu sudah cukup.
-        const related = payload.new.related_id as string | null | undefined;
-        if (related && window.location.pathname.includes(related)) return;
         playRef.current();
         pushNotificationToast({
           id: payload.new.id,
