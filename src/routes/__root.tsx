@@ -96,7 +96,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // dirender sama sekali (lebih aman daripada menunjuk domain lama). Path
     // diambil dari match agar tiap halaman punya canonical sendiri.
     const canonicalBase = String(s.seo_canonical_base || SITE_ORIGIN).replace(/\/+$/, "");
-    const canonicalPath = String((match as { pathname?: string })?.pathname ?? "");
+    // Path halaman yang sedang dibuka ada di match terdalam, bukan di match root ("/").
+    const leaf = (matches[matches.length - 1] ?? match) as { pathname?: string };
+    const canonicalPath = String(leaf?.pathname ?? "").replace(/\/+$/, "");
     const canonicalHref = canonicalBase
       ? `${canonicalBase}${canonicalPath === "/" ? "" : canonicalPath}`
       : undefined;
