@@ -419,13 +419,17 @@ export const getPublicStore = createServerFn({ method: "GET" })
 
     // Produk, jasa, rating, dan jumlah terjual diambil paralel; masing-masing
     // gagal secara terpisah supaya satu error tidak mengosongkan seluruh halaman.
+    // Toko resmi juga menaungi produk platform (store_id NULL).
+    const ownerFilter = store.is_platform
+      ? `store_id.eq.${store.id},store_id.is.null`
+      : `store_id.eq.${store.id}`;
     const [productsResult, ratingResult, soldResult] = await Promise.all([
       supabase
         .from("digital_products")
         .select(
           "id, name, slug, short_description, thumbnail_url, price, discount_price, sold_count",
         )
-        .eq("store_id", store.id)
+        .or(ownerFilter)
         .eq("status", "published")
         .eq("moderation_status", "approved")
         .is("deleted_at", null)
@@ -436,7 +440,7 @@ export const getPublicStore = createServerFn({ method: "GET" })
       supabase
         .from("digital_products")
         .select("sold_count")
-        .eq("store_id", store.id)
+        .or(ownerFilter)
         .eq("status", "published")
         .eq("moderation_status", "approved")
         .is("deleted_at", null),

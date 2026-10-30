@@ -118,6 +118,8 @@ export const createProductInquiry = createServerFn({ method: "POST" })
       .object({
         productId: z.string().uuid().optional(),
         serviceId: z.string().uuid().optional(),
+        /** Chat langsung ke toko (dari halaman profil toko), tanpa produk/jasa. */
+        storeId: z.string().uuid().optional(),
         subject: z.string().trim().min(3).max(160),
         body: z.string().trim().min(3).max(2000),
       })
@@ -127,9 +129,28 @@ export const createProductInquiry = createServerFn({ method: "POST" })
     const { supabase, userId } = context as Ctx;
     const limited = await enforceRateLimit(userId, "inquiry.create");
     if (limited) return { ok: false as const, error: limited.error };
-    const storeId = data.serviceId
-      ? await resolveServiceStoreId(supabase, data.serviceId)
-      : await resolveStoreId(supabase, data.productId ?? null);
+    let storeId: string | null;
+    if (data.storeId && !data.productId && !data.serviceId) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: target } = await supabaseAdmin
+        .from("stores")
+        .select("id, owner_id, is_platform, status")
+        .eq("id", data.storeId)
+        .maybeSingle();
+      if (!target || target.status !== "active") {
+        return { ok: false as const, error: "Toko tidak ditemukan." };
+      }
+      if (target.owner_id === userId) {
+        return { ok: false as const, error: "Ini tokomu sendiri." };
+      }
+      // Toko resmi = produk platform: dilayani admin/support (store_id NULL),
+      // sama seperti chat produk resmi.
+      storeId = target.is_platform ? null : (target.id as string);
+    } else {
+      storeId = data.serviceId
+        ? await resolveServiceStoreId(supabase, data.serviceId)
+        : await resolveStoreId(supabase, data.productId ?? null);
+    }
     const { data: row, error } = await supabase
       .from("product_inquiries")
       .insert({

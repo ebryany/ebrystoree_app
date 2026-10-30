@@ -1,23 +1,33 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import {
   BadgeCheck,
+  CalendarDays,
   Clock,
+  Heart,
   MessageCircle,
   Package,
   Pencil,
   Search,
   ShoppingBag,
+  Star,
   Store,
+  Users,
+  type LucideIcon,
 } from "lucide-react";
 
 import { MarketplaceProductCard } from "@/components/home/catalog-cards";
 import { SellerServiceCard } from "@/components/home/seller-service-card";
 import { EmptyState } from "@/components/ebry/states";
-import { StarRating } from "@/components/ebry/rating";
 import { PageShell } from "@/components/page-shell";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { StoreProfileEditor, type StoreEditorDraft } from "@/components/store/store-profile-editor";
+import {
+  FollowStoreButton,
+  StoreChatButton,
+  formatCount,
+  useStoreSocial,
+} from "@/components/store/social-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPublicStore } from "@/lib/seller.functions";
@@ -89,6 +99,25 @@ export const Route = createFileRoute("/toko/$slug")({
 });
 
 type SortKey = "newest" | "price_asc" | "price_desc" | "popular";
+type StoreTab = "home" | "produk" | "jasa";
+
+function StoreStat({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: LucideIcon;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <dt className="shrink-0 text-muted-foreground">{label}:</dt>
+      <dd className="min-w-0 truncate font-semibold tabular-nums text-accent">{children}</dd>
+    </div>
+  );
+}
 
 const SORT_LABEL: Record<SortKey, string> = {
   newest: "Terbaru",
@@ -110,7 +139,6 @@ function Storefront() {
     Route.useLoaderData() as any;
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
-  const [showAllProducts, setShowAllProducts] = useState(false);
   // Editor kontekstual: draft terpisah dari data published (loader). Preview
   // hanya mengubah tampilan sesi ini; buyer lain dan SSR tetap melihat data
   // publik. Setelah simpan, editor memicu refetch loader via router invalidate.
@@ -171,6 +199,23 @@ function Storefront() {
   const noResult = isFiltered && visibleProducts.length === 0 && visibleServices.length === 0;
   const isPreviewing = draft !== null;
 
+  const social = useStoreSocial(store.id).data?.social ?? null;
+  // Ringkasan sosial juga menghitung produk platform untuk toko resmi.
+  const ratingTotal = social ? social.rating_total : Number(rating.total) || 0;
+  const ratingAverage = social ? social.rating_average : Number(rating.average) || 0;
+
+  const [tab, setTab] = useState<StoreTab>("home");
+  const tabs: Array<{ key: StoreTab; label: string; count?: number }> = [
+    { key: "home", label: "Halaman Utama" },
+    { key: "produk", label: "Produk", count: products.length },
+    ...(services.length > 0
+      ? [{ key: "jasa" as const, label: "Jasa", count: services.length }]
+      : []),
+  ];
+  const showServices = tab !== "produk";
+  const showProducts = tab !== "jasa";
+  const productLimit = tab === "produk" ? Infinity : 8;
+
   return (
     <PageShell>
       <div className="min-h-[60vh] bg-surface">
@@ -178,62 +223,57 @@ function Storefront() {
           {/* Header toko: identitas dan bukti yang bisa diverifikasi.
               Saat editor terbuka, header menampilkan DRAFT (pratinjau lokal);
               data publik di server belum berubah. */}
-          <header className="overflow-hidden rounded-2xl border border-border bg-card">
-            {view.bannerUrl ? (
-              <div className="h-28 overflow-hidden bg-surface-selected sm:h-36" aria-hidden="true">
+          <header className="grid gap-3 rounded-2xl border border-border bg-card p-3 sm:p-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-6">
+            {/* Kartu identitas: banner gelap + logo + aksi utama. Overlay hitam
+                tetap dipakai di atas banner apa pun agar teks putih terbaca. */}
+            <div className="relative isolate overflow-hidden rounded-xl bg-primary">
+              {view.bannerUrl ? (
                 <img
                   src={view.bannerUrl}
                   alt=""
-                  className="size-full object-cover"
+                  aria-hidden="true"
+                  className="absolute inset-0 -z-10 size-full object-cover"
                   style={{ objectPosition: `50% ${view.bannerPosition}%` }}
                 />
-              </div>
-            ) : (
-              <div className="h-20 bg-surface-selected sm:h-24" aria-hidden="true" />
-            )}
-            <div className="px-4 pb-4 sm:px-6 sm:pb-5">
-              <div className="-mt-10 flex flex-wrap items-end justify-between gap-3 sm:-mt-12">
-                <div className="flex min-w-0 items-end gap-3">
-                  <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-card bg-surface-selected text-2xl font-bold text-accent sm:size-24">
+              ) : null}
+              <div className="absolute inset-0 -z-10 bg-black/55" aria-hidden="true" />
+              <div className="p-4 text-white">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white/80 bg-surface-selected text-2xl font-bold text-accent sm:size-[72px]">
                     {view.logoUrl ? (
                       <img src={view.logoUrl} alt="" className="size-full object-cover" />
                     ) : (
                       <span aria-hidden="true">{initial}</span>
                     )}
                   </span>
-                  <div className="min-w-0 pb-1">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <h1 className="min-w-0 break-words text-xl font-bold text-foreground sm:text-2xl">
-                        {view.name}
-                      </h1>
+                  <div className="min-w-0">
+                    <h1 className="break-words text-lg font-bold leading-tight sm:text-xl">
+                      {view.name}
+                    </h1>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      {store.is_platform ? (
+                        <span className="inline-flex items-center gap-1 rounded bg-accent px-1.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
+                          <BadgeCheck className="size-3" aria-hidden="true" />
+                          Official
+                        </span>
+                      ) : null}
                       {isPreviewing ? (
-                        <span className="rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                        <span className="rounded bg-white/20 px-1.5 py-0.5 text-[11px] font-semibold">
                           Pratinjau
                         </span>
                       ) : null}
-                      {store.is_platform ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
-                          <BadgeCheck className="size-3" aria-hidden="true" />
-                          Toko resmi
-                        </span>
-                      ) : null}
+                      <span className="truncate text-xs text-white/80">/toko/{store.slug}</span>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      /toko/{store.slug}
-                      {joined ? ` · bergabung ${joined}` : ""}
-                    </p>
                   </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  {/* Tombol ini hanya muncul untuk pemilik toko yang statusnya aktif
-                      (isOwner dihitung server). Klik membuka editor kontekstual di
-                      halaman yang sama — perubahan profil sederhana tidak perlu
-                      ke dashboard. Otorisasi tetap diverifikasi ulang server saat
-                      simpan (update terikat pemilik toko). */}
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
                   {isOwner ? (
+                    // Hanya untuk pemilik toko aktif (isOwner dihitung server).
+                    // Otorisasi diverifikasi ulang server saat simpan.
                     <Button
                       variant="outline"
-                      className="min-h-11"
+                      className="col-span-2 min-h-11 border-white/70 bg-transparent text-white hover:bg-white/15 hover:text-white"
                       onClick={() => {
                         setDraft({
                           name: store.name ?? "",
@@ -245,64 +285,105 @@ function Storefront() {
                         setEditorOpen(true);
                       }}
                     >
-                      <Pencil className="mr-1.5 size-4" aria-hidden="true" />
+                      <Pencil className="size-4" aria-hidden="true" />
                       Edit toko
                     </Button>
-                  ) : null}
-                  {whatsappHref ? (
-                    <Button asChild variant="outline" className="min-h-11">
-                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                        <MessageCircle className="mr-1.5 size-4" aria-hidden="true" />
-                        Hubungi penjual
-                      </a>
-                    </Button>
-                  ) : null}
+                  ) : (
+                    <>
+                      <FollowStoreButton
+                        storeId={store.id}
+                        className="w-full border border-white/70 bg-transparent text-white hover:bg-white/15 hover:text-white aria-pressed:bg-white/15"
+                      />
+                      <StoreChatButton
+                        storeId={store.id}
+                        storeName={store.name}
+                        isPlatform={Boolean(store.is_platform)}
+                        className="w-full border-white/70 bg-transparent text-white hover:bg-white/15 hover:text-white"
+                      />
+                    </>
+                  )}
                 </div>
               </div>
+            </div>
 
+            {/* Statistik nyata saja; angka sosial dimuat terpisah (klien). */}
+            <div className="flex min-w-0 flex-col justify-center gap-3">
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm min-[360px]:grid-cols-2 xl:grid-cols-3">
+                <StoreStat icon={Package} label="Produk">
+                  {products.length}
+                  {services.length > 0 ? ` · ${services.length} jasa` : ""}
+                </StoreStat>
+                <StoreStat icon={Users} label="Pengikut">
+                  {social ? formatCount(social.followers) : "–"}
+                </StoreStat>
+                <StoreStat icon={Heart} label="Disukai">
+                  {social ? formatCount(social.likes) : "–"}
+                </StoreStat>
+                <StoreStat icon={Star} label="Penilaian">
+                  {ratingTotal > 0 ? (
+                    <>
+                      {ratingAverage.toFixed(1)}{" "}
+                      <span className="font-normal text-muted-foreground">
+                        ({formatCount(ratingTotal)} penilaian)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="font-normal text-muted-foreground">Belum ada</span>
+                  )}
+                </StoreStat>
+                <StoreStat icon={ShoppingBag} label="Terjual">
+                  {soldCount > 0 ? formatCount(soldCount) : "0"}
+                </StoreStat>
+                {joined ? (
+                  <StoreStat icon={CalendarDays} label="Bergabung">
+                    {joined}
+                  </StoreStat>
+                ) : null}
+              </dl>
               {view.description ? (
-                <p className="mt-3 max-w-3xl whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground">
+                <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground">
                   {view.description}
                 </p>
               ) : null}
-
-              {/* Bukti nyata: rating, transaksi selesai, jumlah listing. */}
-              <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <dt className="sr-only">Rating toko</dt>
-                  <dd className="flex items-center gap-2">
-                    {rating.total > 0 ? (
-                      <>
-                        <StarRating value={Number(rating.average)} />
-                        <span className="font-semibold tabular-nums text-foreground">
-                          {Number(rating.average).toFixed(1)}
-                        </span>
-                        <span className="text-muted-foreground tabular-nums">
-                          ({rating.total} ulasan)
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground">Belum ada ulasan</span>
-                    )}
-                  </dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <ShoppingBag className="size-4 text-muted-foreground" aria-hidden="true" />
-                  <dt className="sr-only">Transaksi selesai</dt>
-                  <dd className="tabular-nums text-muted-foreground">
-                    {soldCount > 0 ? `${soldCount} terjual` : "Belum ada penjualan"}
-                  </dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Package className="size-4 text-muted-foreground" aria-hidden="true" />
-                  <dt className="sr-only">Jumlah listing</dt>
-                  <dd className="tabular-nums text-muted-foreground">
-                    {products.length} produk · {services.length} jasa
-                  </dd>
-                </div>
-              </dl>
+              {whatsappHref ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 w-fit items-center gap-1.5 text-xs font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  <MessageCircle className="size-4" aria-hidden="true" />
+                  WhatsApp penjual
+                </a>
+              ) : null}
             </div>
           </header>
+
+          {/* Tab toko. */}
+          <nav
+            aria-label="Bagian toko"
+            className="mt-4 flex overflow-x-auto border-b border-border bg-card px-1 [scrollbar-width:none] sm:rounded-t-xl [&::-webkit-scrollbar]:hidden"
+          >
+            {tabs.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                aria-pressed={tab === t.key}
+                onClick={() => setTab(t.key)}
+                className={cn(
+                  "min-h-11 shrink-0 border-b-2 px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
+                  tab === t.key
+                    ? "border-accent text-accent"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t.label}
+                {t.count !== undefined ? (
+                  <span className="ml-1 tabular-nums text-xs">({t.count})</span>
+                ) : null}
+              </button>
+            ))}
+          </nav>
 
           {/* Pencarian dan urutan dalam toko. */}
           {hasAnyListing ? (
@@ -358,7 +439,7 @@ function Storefront() {
           ) : null}
 
           {/* Jasa toko: ditampilkan sebelum produk karena jasa butuh keputusan lebih dulu. */}
-          {!noResult && visibleServices.length > 0 ? (
+          {!noResult && showServices && visibleServices.length > 0 ? (
             <section aria-labelledby="jasa-toko" className="mt-8">
               <div className="flex items-end justify-between gap-3">
                 <div>
@@ -385,7 +466,7 @@ function Storefront() {
           ) : null}
 
           {/* Produk toko. */}
-          {!noResult ? (
+          {!noResult && showProducts ? (
             <section aria-labelledby="produk-toko" className="mt-8">
               <div className="flex items-end justify-between gap-3">
                 <div>
@@ -420,18 +501,16 @@ function Storefront() {
                       hanya jika ruang cukup. `grid-cols-4` tetap membuat kartu
                       ~360px pada container 1152px — terlalu lebar untuk CTA. */}
                   <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-3 sm:gap-4">
-                    {(showAllProducts ? visibleProducts : visibleProducts.slice(0, 8)).map(
-                      (item: any) => (
-                        <MarketplaceProductCard key={item.id} item={item} />
-                      ),
-                    )}
+                    {visibleProducts.slice(0, productLimit).map((item: any) => (
+                      <MarketplaceProductCard key={item.id} item={item} />
+                    ))}
                   </div>
-                  {!showAllProducts && visibleProducts.length > 8 ? (
+                  {visibleProducts.length > productLimit ? (
                     <div className="mt-4 flex justify-center">
                       <Button
                         variant="outline"
                         className="min-h-11"
-                        onClick={() => setShowAllProducts(true)}
+                        onClick={() => setTab("produk")}
                       >
                         Tampilkan semua {visibleProducts.length} produk
                       </Button>

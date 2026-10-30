@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Bell,
+  Heart,
   LayoutDashboard,
   MessagesSquare,
   Package,
@@ -74,6 +75,7 @@ export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
       items: [
         { to: "/dashboard/pesanan", label: "Pesanan", icon: ReceiptText },
         { to: "/dashboard/produk-saya", label: "Produk Saya", icon: Package },
+        { to: "/dashboard/disukai", label: "Disukai & Diikuti", icon: Heart },
         { to: "/dashboard/po", label: "PO Custom", icon: MessageSquarePlus },
         { to: "/dashboard/chat", label: "Chat Produk", icon: MessagesSquare },
         { to: "/dashboard/notifikasi", label: "Notifikasi", icon: Bell, badge: unread },

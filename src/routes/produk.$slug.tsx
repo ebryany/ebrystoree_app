@@ -25,6 +25,7 @@ import { StickyActionBar } from "@/components/ebry/cards";
 import { ProductReviewPanel } from "@/components/product/review-panel";
 import { ProductInquiryButton } from "@/components/product/inquiry-dialog";
 import { ProductDescription } from "@/components/product/product-description";
+import { LikeProductButton } from "@/components/store/social-buttons";
 import { addToCart } from "@/lib/cart-store";
 import { getProductDetail, type ProductVariant } from "@/lib/orders.functions";
 import { listProducts } from "@/lib/catalog.functions";
@@ -332,6 +333,7 @@ function DetailProduk() {
                 <span className="font-semibold">{p.sold_count ?? 0}</span>{" "}
                 <span className="text-muted-foreground">terjual</span>
               </span>
+              <LikeProductButton productId={p.id} className="-my-2 ml-auto" />
             </div>
 
             {/* Harga: aktif dominan, harga lama + persentase sekunder. */}

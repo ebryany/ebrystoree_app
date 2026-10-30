@@ -12,6 +12,7 @@
 const DEFAULT_POLICIES = {
   "inquiry.create": { limit: 10, windowSeconds: 60 },
   "inquiry.message": { limit: 20, windowSeconds: 60 },
+  "social.toggle": { limit: 30, windowSeconds: 60 },
   "po.create": { limit: 5, windowSeconds: 300 },
   "po.message": { limit: 20, windowSeconds: 60 },
   "order.create": { limit: 20, windowSeconds: 60 },

@@ -19,6 +19,7 @@ const tabs = [
   { to: "/dashboard", label: "Ringkasan", exact: true },
   { to: "/dashboard/pesanan", label: "Pesanan" },
   { to: "/dashboard/produk-saya", label: "Produk saya" },
+  { to: "/dashboard/disukai", label: "Disukai" },
   { to: "/dashboard/po", label: "PO Custom" },
   { to: "/dashboard/chat", label: "Chat Produk" },
   { to: "/dashboard/notifikasi", label: "Notifikasi" },

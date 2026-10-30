@@ -60,6 +60,7 @@ const PREFIX_TONE: Array<[RegExp, NotificationTone]> = [
   [/^(credit|payout)/, { icon: Wallet, label: "Saldo", wrap: "bg-success/12 text-success" }],
   [/^product_inquiry/, { icon: MessageSquare, label: "Chat", wrap: "bg-primary/10 text-primary" }],
   [/^seller\./, { icon: Store, label: "Toko", wrap: "bg-accent/15 text-accent" }],
+  [/^store\.new_product/, { icon: Store, label: "Toko diikuti", wrap: "bg-primary/10 text-primary" }],
   [/^service\./, { icon: PackageCheck, label: "Pesanan jasa", wrap: "bg-accent/15 text-accent" }],
 ];
 
@@ -87,7 +88,7 @@ export function notificationCategory(type?: string | null): NotificationCategory
   if (/^payment/.test(t)) return "pembayaran";
   if (/^(payout|credit|refund)/.test(t)) return "saldo";
   if (/^product_inquiry/.test(t)) return "chat";
-  if (/^seller\./.test(t)) return "toko";
+  if (/^(seller|store)\./.test(t)) return "toko";
   return "lainnya";
 }
 
@@ -126,6 +127,8 @@ export function notificationHref(n: NotificationLike, staff: boolean): Notificat
       return { to: "/dashboard/saldo" };
     case "store":
       return { to: "/seller" };
+    case "product":
+      return id ? { to: "/p/$id", params: { id } } : null;
     case "product_inquiry":
       if (!id) return null;
       // "Balasan dari penjual" dikirim ke pembeli; sisanya ke seller.

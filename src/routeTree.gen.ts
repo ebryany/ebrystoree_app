@@ -31,6 +31,7 @@ import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LayananIndexRouteImport } from './routes/layanan.index'
 import { Route as LayananSlugRouteImport } from './routes/layanan.$slug'
+import { Route as PIdRouteImport } from './routes/p.$id'
 import { Route as ProdukIndexRouteImport } from './routes/produk.index'
 import { Route as ProdukSlugRouteImport } from './routes/produk.$slug'
 import { Route as SeeDashboardRouteRouteImport } from './routes/see/_dashboard/route'
@@ -50,6 +51,7 @@ import { Route as AuthenticatedAdminProdukRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
 import { Route as AuthenticatedAdminTopupsRouteImport } from './routes/_authenticated/admin/topups'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardDisukaiRouteImport } from './routes/_authenticated/dashboard.disukai'
 import { Route as AuthenticatedDashboardNotifikasiRouteImport } from './routes/_authenticated/dashboard.notifikasi'
 import { Route as AuthenticatedDashboardPengaturanRouteImport } from './routes/_authenticated/dashboard.pengaturan'
 import { Route as AuthenticatedDashboardProdukRouteImport } from './routes/_authenticated/dashboard.produk'
@@ -231,6 +233,11 @@ const LayananSlugRoute = LayananSlugRouteImport.update({
   path: '/layanan/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PIdRoute = PIdRouteImport.update({
+  id: '/p/$id',
+  path: '/p/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdukIndexRoute = ProdukIndexRouteImport.update({
   id: '/produk/',
   path: '/produk/',
@@ -333,6 +340,12 @@ const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardDisukaiRoute =
+  AuthenticatedDashboardDisukaiRouteImport.update({
+    id: '/disukai',
+    path: '/disukai',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardNotifikasiRoute =
@@ -762,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
+  '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
   '/toko/$slug': typeof TokoSlugRoute
@@ -780,6 +794,7 @@ export interface FileRoutesByFullPath {
   '/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/topups': typeof AuthenticatedAdminTopupsRoute
+  '/dashboard/disukai': typeof AuthenticatedDashboardDisukaiRoute
   '/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
@@ -868,6 +883,7 @@ export interface FileRoutesByTo {
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
+  '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
   '/toko/$slug': typeof TokoSlugRoute
@@ -886,6 +902,7 @@ export interface FileRoutesByTo {
   '/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/topups': typeof AuthenticatedAdminTopupsRoute
+  '/dashboard/disukai': typeof AuthenticatedDashboardDisukaiRoute
   '/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
@@ -980,6 +997,7 @@ export interface FileRoutesById {
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/layanan/$slug': typeof LayananSlugRoute
+  '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
   '/toko/$slug': typeof TokoSlugRoute
@@ -998,6 +1016,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/produk': typeof AuthenticatedAdminProdukRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/topups': typeof AuthenticatedAdminTopupsRoute
+  '/_authenticated/dashboard/disukai': typeof AuthenticatedDashboardDisukaiRoute
   '/_authenticated/dashboard/notifikasi': typeof AuthenticatedDashboardNotifikasiRoute
   '/_authenticated/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/_authenticated/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
@@ -1093,6 +1112,7 @@ export interface FileRouteTypes {
     | '/artikel/$slug'
     | '/auth/callback'
     | '/layanan/$slug'
+    | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
     | '/toko/$slug'
@@ -1111,6 +1131,7 @@ export interface FileRouteTypes {
     | '/admin/produk'
     | '/admin/reports'
     | '/admin/topups'
+    | '/dashboard/disukai'
     | '/dashboard/notifikasi'
     | '/dashboard/pengaturan'
     | '/dashboard/produk'
@@ -1199,6 +1220,7 @@ export interface FileRouteTypes {
     | '/artikel/$slug'
     | '/auth/callback'
     | '/layanan/$slug'
+    | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
     | '/toko/$slug'
@@ -1217,6 +1239,7 @@ export interface FileRouteTypes {
     | '/admin/produk'
     | '/admin/reports'
     | '/admin/topups'
+    | '/dashboard/disukai'
     | '/dashboard/notifikasi'
     | '/dashboard/pengaturan'
     | '/dashboard/produk'
@@ -1310,6 +1333,7 @@ export interface FileRouteTypes {
     | '/artikel/$slug'
     | '/auth/callback'
     | '/layanan/$slug'
+    | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
     | '/toko/$slug'
@@ -1328,6 +1352,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/produk'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/topups'
+    | '/_authenticated/dashboard/disukai'
     | '/_authenticated/dashboard/notifikasi'
     | '/_authenticated/dashboard/pengaturan'
     | '/_authenticated/dashboard/produk'
@@ -1417,6 +1442,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ArtikelSlugRoute: typeof ArtikelSlugRoute
   LayananSlugRoute: typeof LayananSlugRoute
+  PIdRoute: typeof PIdRoute
   ProdukSlugRoute: typeof ProdukSlugRoute
   SeeMasukRoute: typeof SeeMasukRoute
   TokoSlugRoute: typeof TokoSlugRoute
@@ -1593,6 +1619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayananSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/p/$id': {
+      id: '/p/$id'
+      path: '/p/$id'
+      fullPath: '/p/$id'
+      preLoaderRoute: typeof PIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produk/': {
       id: '/produk/'
       path: '/produk'
@@ -1724,6 +1757,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/disukai': {
+      id: '/_authenticated/dashboard/disukai'
+      path: '/disukai'
+      fullPath: '/dashboard/disukai'
+      preLoaderRoute: typeof AuthenticatedDashboardDisukaiRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/notifikasi': {
@@ -2299,6 +2339,7 @@ const AuthenticatedAdminRouteRouteWithChildren =
   )
 
 interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardDisukaiRoute: typeof AuthenticatedDashboardDisukaiRoute
   AuthenticatedDashboardNotifikasiRoute: typeof AuthenticatedDashboardNotifikasiRoute
   AuthenticatedDashboardPengaturanRoute: typeof AuthenticatedDashboardPengaturanRoute
   AuthenticatedDashboardProdukRoute: typeof AuthenticatedDashboardProdukRoute
@@ -2316,6 +2357,7 @@ interface AuthenticatedDashboardRouteChildren {
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
+    AuthenticatedDashboardDisukaiRoute: AuthenticatedDashboardDisukaiRoute,
     AuthenticatedDashboardNotifikasiRoute:
       AuthenticatedDashboardNotifikasiRoute,
     AuthenticatedDashboardPengaturanRoute:
@@ -2473,6 +2515,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ArtikelSlugRoute: ArtikelSlugRoute,
   LayananSlugRoute: LayananSlugRoute,
+  PIdRoute: PIdRoute,
   ProdukSlugRoute: ProdukSlugRoute,
   SeeMasukRoute: SeeMasukRoute,
   TokoSlugRoute: TokoSlugRoute,

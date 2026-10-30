@@ -2324,6 +2324,34 @@ export type Database = {
           },
         ]
       }
+      product_likes: {
+        Row: { created_at: string; product_id: string; user_id: string }
+        Insert: { created_at?: string; product_id: string; user_id: string }
+        Update: { created_at?: string; product_id?: string; user_id?: string }
+        Relationships: [
+          {
+            foreignKeyName: "product_likes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_follows: {
+        Row: { created_at: string; store_id: string; user_id: string }
+        Insert: { created_at?: string; store_id: string; user_id: string }
+        Update: { created_at?: string; store_id?: string; user_id?: string }
+        Relationships: [
+          {
+            foreignKeyName: "store_follows_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_variants: {
         Row: {
           created_at: string
@@ -4109,6 +4137,10 @@ export type Database = {
       }
       stock_code_demand: { Args: never; Returns: Json }
       store_rating_summary: { Args: { _store_id: string }; Returns: Json }
+      store_social_summary: { Args: { _store_id: string }; Returns: Json }
+      toggle_store_follow: { Args: { _store_id: string }; Returns: Json }
+      toggle_product_like: { Args: { _product_id: string }; Returns: Json }
+      product_like_summary: { Args: { _product_id: string }; Returns: Json }
       submit_job_result: {
         Args: {
           _delivery_note?: string
