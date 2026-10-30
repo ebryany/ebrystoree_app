@@ -128,7 +128,13 @@ export type PublicMarketplaceService = {
   price: number;
   agreement: MarketplaceServiceAgreement;
   media: MarketplaceServiceMedia[];
-  store: { name: string; slug: string };
+  store: {
+    name: string;
+    slug: string;
+    id?: string;
+    logo_url?: string | null;
+    presence?: import("./store-presence").StorePresence;
+  };
   category: { name: string; slug: string };
 };
 

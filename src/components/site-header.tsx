@@ -26,7 +26,6 @@ import { NotificationBell } from "@/components/ebry/notification-bell";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useSession } from "@/hooks/use-session";
-import { useScrolled } from "@/hooks/use-scrolled";
 import { useSiteNav, useWebsiteSettings } from "@/hooks/use-website-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRoles } from "@/lib/admin.functions";
@@ -52,7 +51,6 @@ export function SiteHeader() {
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   // Header mengecil setelah digulir: di puncak halaman tampil lega, saat
   // menggulir jadi ramping supaya konten dapat lebih banyak ruang.
-  const scrolled = useScrolled(24);
   const settings = useWebsiteSettings();
   const navItems = useSiteNav("header", Boolean(user));
   const brandName = String(settings.store_name ?? "Ebrystore");
@@ -96,32 +94,9 @@ export function SiteHeader() {
 
   return (
     <header className="pt-safe sticky top-0 z-40">
-      {/* Lapisan jarak. Di puncak halaman jaraknya nol sehingga navbar menempel
-          ke tepi layar; setelah digulir jaraknya muncul dan navbar terlihat
-          mengambang dari tepi viewport. */}
-      {/* Tinggi header sengaja konstan: efek "mengambang" memakai transform
-          (translate) saja. Perubahan padding/min-height yang dianimasikan
-          menggeser konten di bawah header setiap frame dan membuat gulir patah. */}
-      <div
-        className={cn(
-          // Mobile/tablet: navbar diam di tempat, tanpa animasi gulir. Efek
-          // mengambang hanya di desktop (lg+).
-          "px-0 lg:transition-[padding,transform] lg:duration-300 lg:ease-out lg:motion-reduce:transition-none",
-          scrolled && "lg:translate-y-3 lg:px-5",
-        )}
-      >
-        {/* Permukaan navbar: lebar penuh dengan radius kecil supaya terasa tegas
-            seperti aplikasi SaaS, bukan kartu mengambang yang besar. Header di
-            luar tetap `sticky` dan menempati ruangnya di alur dokumen, jadi
-            perubahan bentuk di sini tidak pernah menggeser konten di bawahnya. */}
-        <div
-          className={cn(
-            "relative w-full border-b border-border bg-card text-foreground lg:border lg:transition-[border-radius,border-color,box-shadow] lg:duration-300 lg:ease-out lg:motion-reduce:transition-none",
-            scrolled
-              ? "lg:rounded-xl lg:border-border lg:shadow-card"
-              : "lg:rounded-none lg:border-transparent",
-          )}
-        >
+      {/* Navbar diam saat digulir: lebar penuh, tanpa efek mengambang. */}
+      <div>
+        <div className="relative w-full border-b border-border bg-card text-foreground">
           <div
             className={cn(
               // Mobile: satu baris (nowrap) supaya ikon tidak turun ke baris kedua.

@@ -44,12 +44,26 @@ export function ServiceChatButton({
   serviceName,
   storeName,
   className,
+  iconOnly = false,
 }: {
   serviceId: string;
   serviceName: string;
   storeName?: string;
   className?: string;
+  /** Hanya ikon (kartu ringkas); label tetap terbaca pembaca layar. */
+  iconOnly?: boolean;
 }) {
+  const label = iconOnly ? (
+    <>
+      <MessagesSquare className="size-4" aria-hidden="true" />
+      <span className="sr-only">Chat penjual</span>
+    </>
+  ) : (
+    <>
+      <MessagesSquare className="size-4" aria-hidden="true" />
+      Chat
+    </>
+  );
   const navigate = useNavigate();
   const { user, loading } = useSession();
   const create = useServerFn(createProductInquiry);
@@ -85,8 +99,7 @@ export function ServiceChatButton({
         className={className}
         onClick={() => navigate({ to: "/auth", search: { next: "/layanan" } })}
       >
-        <MessagesSquare className="size-4" aria-hidden="true" />
-        Chat
+        {label}
       </Button>
     );
   }
@@ -95,8 +108,7 @@ export function ServiceChatButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" variant="outline" className={className}>
-          <MessagesSquare className="size-4" aria-hidden="true" />
-          Chat
+          {label}
         </Button>
       </DialogTrigger>
       <DialogContent surface="glass">

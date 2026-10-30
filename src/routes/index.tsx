@@ -8,10 +8,10 @@ import { RouteError } from "@/components/route-fallback";
 import { HomeHero } from "@/components/home/hero";
 import { SellerJoinSection } from "@/components/home/home-hero";
 import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
-import { SellerServiceCard } from "@/components/home/seller-service-card";
+import { ServiceTile } from "@/components/home/service-tile";
 import { MarketplaceServiceCard } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
-import { SeeAllLink } from "@/components/ebry/product-shelf";
+import { PRODUCT_GRID, SeeAllLink } from "@/components/ebry/product-shelf";
 import { FeaturedSellers } from "@/components/home/featured-sellers";
 import { ProductTabs, type ProductTab } from "@/components/home/product-tabs";
 import { SectionHeader } from "@/components/home/section-header";
@@ -147,41 +147,43 @@ function Beranda() {
       {/* Hero pita lebar penuh: diletakkan di luar wadah berlebar tetap supaya
           latar gradiennya menyentuh tepi layar, bukan terkurung kotak. */}
       <HomeHero />
-      {/* Satu kolom lebar penuh, tepi kiri sejajar navbar. Antar-section diberi
-          jarak lega; tidak ada kartu pembungkus per rak. */}
-      <div className="w-full space-y-12 px-4 pb-16 pt-10 sm:space-y-16 sm:px-6 sm:pt-12 lg:px-8">
-        <SectionSuspense
-          fallback={
-            <div className="h-32 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
-          }
-          queryKey={homeCategoriesQuery.queryKey}
-        >
-          <CategoryRail />
-        </SectionSuspense>
-        <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
-          <ProductShelves />
-        </SectionSuspense>
-        <section aria-labelledby="jasa-heading">
-          <SectionHeader
-            id="jasa-heading"
-            title="Jasa seller"
-            desc="Dikerjakan seller sesuai kesepakatan. Dana ditahan sampai hasil Anda terima."
-            action={<SeeAllLink to="/layanan" />}
-          />
+      {/* Lebar konten sama dengan blok hero (max-w-7xl, 88rem di 2xl) dan ikut
+          di tengah, jadi tepi kiri-kanan semua section sejajar dengan hero. */}
+      <div className="w-full px-4 pb-16 pt-10 sm:px-6 sm:pt-12 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl space-y-12 sm:space-y-16 2xl:max-w-[88rem]">
           <SectionSuspense
-            fallback={<CardsSkeleton count={3} />}
-            queryKey={sellerServicesQuery.queryKey}
+            fallback={
+              <div className="h-32 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
+            }
+            queryKey={homeCategoriesQuery.queryKey}
           >
-            <SellerServicesSection />
+            <CategoryRail />
           </SectionSuspense>
-        </section>
-        <FeaturedSellers />
-        <RecentlyViewedShelf />
-        <div className="defer-render space-y-12 sm:space-y-16">
-          <ReviewMarqueeSection />
-          {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
-          <PlatformServicesSection />
-          <SellerJoinSection stores={proofStores} />
+          <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
+            <ProductShelves />
+          </SectionSuspense>
+          <section aria-labelledby="jasa-heading">
+            <SectionHeader
+              id="jasa-heading"
+              title="Jasa seller"
+              desc="Dikerjakan seller sesuai kesepakatan. Dana ditahan sampai hasil Anda terima."
+              action={<SeeAllLink to="/layanan" />}
+            />
+            <SectionSuspense
+              fallback={<CardsSkeleton count={3} />}
+              queryKey={sellerServicesQuery.queryKey}
+            >
+              <SellerServicesSection />
+            </SectionSuspense>
+          </section>
+          <FeaturedSellers />
+          <RecentlyViewedShelf />
+          <div className="defer-render space-y-12 sm:space-y-16">
+            <ReviewMarqueeSection />
+            {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
+            <PlatformServicesSection />
+            <SellerJoinSection stores={proofStores} />
+          </div>
         </div>
       </div>
     </PageShell>
@@ -234,10 +236,10 @@ function SellerServicesSection() {
       />
     );
   return (
-    <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <ul className={PRODUCT_GRID}>
       {query.data.items.map((item) => (
         <li key={item.id} className="min-w-0">
-          <SellerServiceCard item={item} variant="home" />
+          <ServiceTile item={item} />
         </li>
       ))}
     </ul>

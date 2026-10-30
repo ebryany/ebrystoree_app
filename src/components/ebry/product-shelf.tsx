@@ -52,7 +52,7 @@ export const GLASS_SECTION =
 const TOP_SELLER_MIN_SOLD = 10;
 
 /** Format ringkas ala marketplace: 280000 -> "280rb", 1500000 -> "1,5jt". */
-function shortRupiah(n: number) {
+export function shortRupiah(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`;
   if (n >= 1_000) return `${Math.round(n / 1_000)}rb`;
   return String(n);

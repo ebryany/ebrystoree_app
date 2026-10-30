@@ -13,7 +13,12 @@ const publicServiceSchema = z.object({
   price: z.coerce.number().int().min(1).max(1_000_000_000),
   agreement: marketplaceServiceAgreementSchema,
   media: marketplaceServiceMediaListSchema.default([]),
-  store: z.object({ name: z.string(), slug: z.string() }),
+  store: z.object({
+    name: z.string(),
+    slug: z.string(),
+    id: z.string().uuid().optional(),
+    logo_url: z.string().nullable().optional(),
+  }),
   category: z.object({ name: z.string(), slug: z.string() }),
 });
 
@@ -28,7 +33,7 @@ export async function readPublicMarketplaceServices(
     let query = client
       .from("marketplace_services")
       .select(
-        "id, name, price, agreement, media, store:stores!inner(name, slug), category:categories!inner(name, slug)",
+        "id, name, price, agreement, media, store:stores!inner(id, name, slug, logo_url), category:categories!inner(name, slug)",
         { count: "exact" },
       )
       .eq("status", "approved")
@@ -42,11 +47,13 @@ export async function readPublicMarketplaceServices(
     const term = filters.q?.replace(/[\\%_]/g, " ").trim();
     if (term) query = query.ilike("name", `%${term}%`);
     if (filters.category) query = query.eq("category.slug", filters.category);
-    const { data, error, count } = await query;
+    const { readPresenceMap } = await import("./store-presence");
+    const [{ data, error, count }, presence] = await Promise.all([query, readPresenceMap(client)]);
     if (error) throw error;
-    const items: PublicMarketplaceService[] = (data ?? []).map((row) =>
-      publicServiceSchema.parse(row),
-    );
+    const items: PublicMarketplaceService[] = (data ?? []).map((row) => {
+      const item = publicServiceSchema.parse(row);
+      return { ...item, store: { ...item.store, presence: presence.get(item.store.id) } };
+    });
     const total = count ?? items.length;
     return {
       items,
