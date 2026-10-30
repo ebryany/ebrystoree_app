@@ -64,25 +64,27 @@ function ArtikelIndex() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1">
-        <header className="border-b border-border bg-surface">
-          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
-            <div className="min-w-0">
-              <div className="mb-5 flex items-center gap-3 text-xs font-bold uppercase text-accent">
-                <span className="h-px w-9 bg-accent" aria-hidden="true" />
-                Jurnal Ebrystore
-              </div>
-              <h1 className="max-w-3xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-                Wawasan digital yang bisa langsung dipakai.
-              </h1>
-            </div>
-            <p className="border-l-2 border-accent pl-5 text-sm leading-7 text-muted-foreground sm:text-base">
-              Panduan ringkas tentang AI, produk digital, dan cara bekerja lebih efektif—ditulis dari pengalaman nyata.
+      <main className="flex-1 bg-surface">
+        <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+          >
+            <Link
+              to="/"
+              className="flex min-h-11 items-center rounded-md hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Beranda
+            </Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Artikel</span>
+          </nav>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Artikel & panduan</h1>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              Panduan ringkas tentang AI, produk digital, dan cara memakai Ebrystore.
             </p>
           </div>
-        </header>
-
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:py-14">
           {data.error ? (
             <ErrorState message={data.error} />
           ) : !featured ? (
@@ -96,9 +98,9 @@ function ArtikelIndex() {
                 key={featured.id}
                 to="/artikel/$slug"
                 params={{ slug: featured.slug }}
-                className="group grid overflow-hidden rounded-lg border border-border bg-card shadow-card transition-shadow hover:shadow-lifted lg:grid-cols-[1.4fr_1fr]"
+                className="group grid overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:grid-cols-[1.4fr_1fr]"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-muted lg:aspect-auto lg:min-h-[25rem]">
+                <div className="relative aspect-[16/10] overflow-hidden bg-muted lg:aspect-auto lg:min-h-[20rem]">
                   {featured.cover_url ? (
                     <img
                       src={featured.cover_url}
@@ -117,7 +119,7 @@ function ArtikelIndex() {
                     Pilihan editor
                   </Badge>
                 </div>
-                <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                <div className="flex flex-col justify-center p-5 sm:p-6 lg:p-8">
                   <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
                     <span>{formatDate(featured.published_at)}</span>
                     <span aria-hidden="true">•</span>
@@ -139,36 +141,36 @@ function ArtikelIndex() {
               </Link>
 
               {moreArticles.length ? (
-                <section className="mt-14 border-t border-border pt-8">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold uppercase text-accent">Terbaru</p>
-                      <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Bacaan lainnya</h2>
-                    </div>
-                    <BookOpen className="size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <section className="mt-8">
+                  <div className="mb-4 flex items-center justify-between gap-2">
+                    <h2 className="flex items-center gap-2 font-semibold">
+                      <BookOpen className="size-4 text-muted-foreground" aria-hidden="true" />
+                      Bacaan lainnya
+                    </h2>
+                    <p className="text-sm text-muted-foreground">{moreArticles.length} artikel</p>
                   </div>
-                  <div className="mt-7 grid gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                    {moreArticles.map((article, index) => (
+                  <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+                    {moreArticles.map((article) => (
                       <Link
                         key={article.id}
                         to="/artikel/$slug"
                         params={{ slug: article.slug }}
-                        className="group border-t border-border pt-4"
+                        className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
-                          <span className="font-mono">{String(index + 2).padStart(2, "0")}</span>
-                          <span>{article.reading_minutes} menit baca</span>
-                        </div>
-                        <div className="aspect-video overflow-hidden rounded-lg bg-muted">
+                        <div className="aspect-video overflow-hidden bg-muted">
                           {article.cover_url ? (
                             <img src={article.cover_url} alt={article.title} loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
                           ) : (
                             <div className="grid size-full place-items-center text-muted-foreground"><ImageIcon className="size-8" aria-hidden="true" /></div>
                           )}
                         </div>
-                        <p className="mt-4 text-xs font-medium uppercase text-muted-foreground">{formatDate(article.published_at)}</p>
-                        <h3 className="mt-2 text-lg font-bold leading-snug transition-colors group-hover:text-accent">{article.title}</h3>
-                        {article.excerpt ? <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{article.excerpt}</p> : null}
+                        <div className="flex flex-1 flex-col p-4">
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(article.published_at)} · {article.reading_minutes} menit baca
+                          </p>
+                          <h3 className="mt-1.5 line-clamp-2 text-base font-bold leading-snug transition-colors group-hover:text-accent">{article.title}</h3>
+                          {article.excerpt ? <p className="mt-1.5 line-clamp-2 text-sm leading-6 text-muted-foreground">{article.excerpt}</p> : null}
+                        </div>
                       </Link>
                     ))}
                   </div>

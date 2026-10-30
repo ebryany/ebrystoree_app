@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { PageShell } from "@/components/page-shell";
-import { OwnerReview } from "@/components/legal-page";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,8 +66,8 @@ const TOPICS: Topic[] = [
           Buka <Link to="/produk" className="font-medium text-primary hover:underline">Produk digital</Link>{" "}
           lalu pilih produk yang kamu butuhkan.
         </li>
-        <li>Klik checkout. Pesanan dibuat satu jenis per checkout, tanpa keranjang gabungan.</li>
-        <li>Lakukan pembayaran dan unggah bukti transfer.</li>
+        <li>Klik beli, atau tambahkan ke keranjang bila ingin membeli beberapa produk.</li>
+        <li>Lakukan pembayaran sesuai instruksi di halaman pembayaran.</li>
         <li>Setelah pembayaran diverifikasi, akses unduhan terbit otomatis di akunmu.</li>
       </ol>
     ),
@@ -100,10 +99,10 @@ const TOPICS: Topic[] = [
     body: (
       <ul className="list-disc space-y-2 pl-5">
         <li>Pembayaran manual dilakukan ke kanal yang ditampilkan pada halaman pembayaran pesanan.</li>
-        <li>Nominal transfer harus sama persis dengan total pesanan (BR-60).</li>
-        <li>Batas waktu pembayaran manual 24 jam sejak pesanan dibuat (BR-61).</li>
-        <li>Bukti transfer berupa JPG, PNG, WEBP, atau PDF, maksimal 5 MB (BR-62).</li>
-        <li>Unggah ulang bukti maksimal 3 kali per pembayaran (BR-64).</li>
+        <li>Nominal transfer harus sama persis dengan total pesanan.</li>
+        <li>Batas waktu pembayaran manual 24 jam sejak pesanan dibuat.</li>
+        <li>Bukti transfer berupa JPG, PNG, WEBP, atau PDF, maksimal 5 MB.</li>
+        <li>Unggah ulang bukti maksimal 3 kali per pembayaran.</li>
       </ul>
     ),
   },
@@ -131,8 +130,8 @@ const TOPICS: Topic[] = [
     body: (
       <ul className="list-disc space-y-2 pl-5">
         <li>Akses unduhan muncul di halaman pesanan setelah pembayaran diverifikasi.</li>
-        <li>Kuota default 5 kali unduh dan masa aktif 365 hari sejak akses terbit (BR-21).</li>
-        <li>Setiap unduhan dicatat sistem (BR-22).</li>
+        <li>Kuota default 5 kali unduh dan masa aktif 365 hari sejak akses terbit.</li>
+        <li>Setiap unduhan dicatat sistem.</li>
       </ul>
     ),
   },
@@ -146,7 +145,7 @@ const TOPICS: Topic[] = [
       <p>
         Ajukan revisi dari halaman pesanan saat hasil pengerjaan dikirim. Jumlah revisi gratis
         mengikuti paket yang dipilih; kelebihan revisi ditolak atau menjadi add-on berbayar sesuai
-        ketentuan paket (BR-32).
+        ketentuan paket.
       </p>
     ),
   },
@@ -159,8 +158,8 @@ const TOPICS: Topic[] = [
     body: (
       <p>
         Ajukan refund dari halaman pesanan dengan menuliskan alasan. Refund parsial dimungkinkan dan
-        memerlukan persetujuan admin (BR-40). Total refund atas satu pesanan tidak melebihi total
-        yang sudah dibayar (BR-41). Refund produk digital mencabut akses unduhan terkait (BR-42).
+        memerlukan persetujuan admin. Total refund atas satu pesanan tidak melebihi total yang sudah
+        dibayar. Refund produk digital mencabut akses unduhan terkait.
       </p>
     ),
   },
@@ -168,24 +167,43 @@ const TOPICS: Topic[] = [
     id: "dukungan",
     icon: LifeBuoy,
     title: "Cara menghubungi dukungan",
-    summary: "Dukungan berjalan melalui pesanan terkait.",
-    keywords: "kontak dukungan bantuan support komplain",
+    summary: "Lewat Chat ke toko resmi atau dari pesanan terkait.",
+    keywords: "kontak dukungan bantuan support komplain chat admin",
     body: (
-      <div className="space-y-3">
-        <p>
-          Dukungan dijalankan melalui pesanan terkait agar riwayat percakapan menempel pada kasusnya.
-        </p>
-        <OwnerReview>
-          Kanal dukungan resmi (email atau WhatsApp) belum ditetapkan Owner, jadi belum dicantumkan di
-          sini.
-        </OwnerReview>
-      </div>
+      <ul className="list-disc space-y-2 pl-5">
+        <li>
+          Untuk masalah pesanan, buka pesanan terkait di{" "}
+          <Link to="/dashboard" className="font-medium text-primary hover:underline">
+            Pesanan saya
+          </Link>{" "}
+          agar riwayat kasusnya terlihat oleh tim kami.
+        </li>
+        <li>
+          Untuk pertanyaan umum, tekan tombol Chat di halaman{" "}
+          <Link
+            to="/toko/$slug"
+            params={{ slug: "ebrystore-official" }}
+            className="font-medium text-primary hover:underline"
+          >
+            Ebrystore Official
+          </Link>
+          . Balasan muncul di menu Chat pada dashboard.
+        </li>
+      </ul>
     ),
   },
 ];
 
 function Bantuan() {
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState<string[]>([]);
+
+  function openTopic(id: string) {
+    setOpen((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    requestAnimationFrame(() =>
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  }
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -228,17 +246,24 @@ function Bantuan() {
 
       <section className="mx-auto w-full max-w-4xl px-4 py-10 sm:py-14">
         {query.trim() === "" ? (
-          <div className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {TOPICS.slice(0, 4).map((topic) => (
-              <a
+          <div className="mb-10 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
+            {TOPICS.map((topic) => (
+              <button
                 key={topic.id}
-                href={`#${topic.id}`}
-                className="group rounded-xl border border-border bg-card p-4 shadow-card transition-colors hover:border-primary/40"
+                type="button"
+                onClick={() => openTopic(topic.id)}
+                className="min-w-0 rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-4"
               >
-                <topic.icon className="size-5 text-primary" aria-hidden="true" />
-                <p className="mt-3 text-sm font-semibold">{topic.title}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{topic.summary}</p>
-              </a>
+                <span className="grid size-9 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <topic.icon className="size-4" aria-hidden="true" />
+                </span>
+                <span className="mt-2.5 block text-sm font-semibold leading-snug">
+                  {topic.title.replace(/^Cara /, "")}
+                </span>
+                <span className="mt-1 hidden text-xs text-muted-foreground sm:block">
+                  {topic.summary}
+                </span>
+              </button>
             ))}
           </div>
         ) : null}
@@ -249,12 +274,12 @@ function Bantuan() {
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Coba kata kunci lain seperti “bayar”, “revisi”, atau “unduh”.
             </p>
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => setQuery("")}>
+            <Button variant="outline" className="mt-4 min-h-11" onClick={() => setQuery("")}>
               Tampilkan semua topik
             </Button>
           </div>
         ) : (
-          <Accordion type="multiple" className="space-y-3">
+          <Accordion type="multiple" value={open} onValueChange={setOpen} className="space-y-3">
             {results.map((topic) => (
               <AccordionItem
                 key={topic.id}
@@ -289,7 +314,7 @@ function Bantuan() {
             <p className="mt-2 text-sm text-muted-foreground">
               Buka pesanan terkait di dashboard supaya tim kami bisa melihat riwayat kasusnya.
             </p>
-            <Button asChild size="sm" className="mt-4">
+            <Button asChild className="mt-4 min-h-11">
               <Link to="/dashboard">
                 Buka pesanan saya
                 <ArrowRight className="size-4" aria-hidden="true" />
@@ -302,10 +327,10 @@ function Bantuan() {
               Detail aturan layanan, privasi, dan refund tersedia di halaman kebijakan.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" className="min-h-11">
                 <Link to="/syarat-ketentuan">Syarat & ketentuan</Link>
               </Button>
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" className="min-h-11">
                 <Link to="/kebijakan-refund">Kebijakan refund</Link>
               </Button>
             </div>

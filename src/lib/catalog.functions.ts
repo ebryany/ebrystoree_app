@@ -108,8 +108,29 @@ export const listProducts = createServerFn({ method: "GET" })
       is_official: boolean;
       rank: number;
     }>;
+    // FTS tidak membawa jumlah terjual dan logo toko; ambil untuk id halaman ini saja.
+    const extra = new Map<string, { sold_count: number; store_logo_url: string | null }>();
+    if (items.length > 0) {
+      const { data: meta } = await supabase
+        .from("digital_products")
+        .select("id, sold_count, stores(logo_url)")
+        .in(
+          "id",
+          items.map((i) => i.id),
+        );
+      for (const m of (meta ?? []) as any[]) {
+        extra.set(m.id, {
+          sold_count: Number(m.sold_count ?? 0),
+          store_logo_url: m.stores?.logo_url ?? null,
+        });
+      }
+    }
     return {
-      items,
+      items: items.map((i) => ({
+        ...i,
+        sold_count: extra.get(i.id)?.sold_count ?? 0,
+        store_logo_url: extra.get(i.id)?.store_logo_url ?? null,
+      })),
       error: null,
       total: items.length,
       page,

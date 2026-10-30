@@ -116,8 +116,7 @@ function HalamanLayanan() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Jasa dari seller</h1>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Jasa yang sudah disetujui dari toko aktif. Periksa harga, durasi, revisi, dan
-                lingkup pekerjaan sebelum memesan. Pembayaran dilakukan setelah pesanan dibuat.
+                Cek harga, durasi, revisi, dan lingkup pekerjaan sebelum memesan.
               </p>
             </div>
             <Button asChild variant="outline" className="min-h-11">

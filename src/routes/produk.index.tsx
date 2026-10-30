@@ -9,7 +9,7 @@ import {
 import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
 import { Button } from "@/components/ui/button";
-import { MarketplaceProductCard } from "@/components/home/catalog-cards";
+import { PRODUCT_GRID, ProductTile } from "@/components/ebry/product-shelf";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
 import { CatalogFilters } from "@/components/catalog-filters";
 import { listCatalogCategories, listProducts } from "@/lib/catalog.functions";
@@ -208,16 +208,11 @@ function HalamanProduk() {
                     {items.length} produk ditampilkan
                   </p>
                 </div>
-                {/* Grid berbasis lebar minimum, bukan jumlah kolom tetap.
-                    Sebelumnya `xl:grid-cols-6` memaksa kartu ~170px pada
-                    container 1152px, sehingga CTA hanya dapat ~70px dan
-                    terpotong. `auto-fill` + `minmax(260px,1fr)` menjaga kartu
-                    di rentang 260-320px dan menambah kolom hanya jika ruang
-                    benar-benar cukup; baris terakhir tidak ikut melebar. */}
-                <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-3 sm:gap-4">
+                {/* Kartu dan grid sama dengan beranda (ProductTile). */}
+                <ul className={PRODUCT_GRID}>
                   {items.map((item) => (
-                    <li key={item.id} className="flex min-w-0 flex-col">
-                      <MarketplaceProductCard item={item} linkStore />
+                    <li key={item.id} className="min-w-0">
+                      <ProductTile item={item} />
                     </li>
                   ))}
                 </ul>
