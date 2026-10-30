@@ -43,13 +43,15 @@ export function HomeHero() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative isolate overflow-hidden border-b border-border bg-background px-4 sm:px-6 lg:px-8"
+      className="relative isolate overflow-hidden border-b border-border bg-background px-3 sm:px-6 lg:px-8"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_85%_40%,var(--surface-selected),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_60%_40%,var(--surface-selected),transparent_70%)]"
       />
-      <div className="grid w-full items-center gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:py-14">
+      {/* Kolom teks mulai tepat di tepi logo navbar; gambar langsung di sebelahnya
+          (lebar kolom tetap), bukan didorong ke tepi kanan layar lebar. */}
+      <div className="grid w-full items-center gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,40rem)_minmax(0,34rem)] lg:gap-10 lg:py-14 xl:grid-cols-[minmax(0,42rem)_minmax(0,38rem)] xl:gap-14">
         <div className="min-w-0">
           <h1
             id="hero-heading"
@@ -129,14 +131,14 @@ export function HomeHero() {
           </ul>
         </div>
 
-        <div className="hidden min-w-0 justify-center lg:flex">
+        <div className="hidden min-w-0 justify-start lg:flex">
           <img
             src="/images/ebrystore-hero-mascot.webp?v=bf406217"
             alt="Maskot Ebrystore membawa laptop"
             width={1254}
             height={1254}
             decoding="async"
-            className="-my-6 h-auto w-full max-w-lg object-contain xl:-my-10 xl:max-w-2xl"
+            className="-my-6 h-auto w-full object-contain xl:-my-10"
           />
         </div>
       </div>
