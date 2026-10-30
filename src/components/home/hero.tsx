@@ -47,15 +47,15 @@ export function HomeHero() {
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_60%_40%,var(--surface-selected),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_70%_40%,var(--surface-selected),transparent_70%)]"
       />
-      {/* Kolom teks mulai tepat di tepi logo navbar; gambar langsung di sebelahnya
-          (lebar kolom tetap), bukan didorong ke tepi kanan layar lebar. */}
-      <div className="grid w-full items-center gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,40rem)_minmax(0,34rem)] lg:gap-10 lg:py-14 xl:grid-cols-[minmax(0,42rem)_minmax(0,38rem)] xl:gap-14">
+      {/* Teks dan gambar satu blok rapat di tengah; di layar lg tepinya tetap
+          sejajar navbar, di layar lebih lebar sisa ruang dibagi rata kiri-kanan. */}
+      <div className="mx-auto grid w-full max-w-7xl items-center 2xl:max-w-[88rem] gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10 lg:py-14 xl:gap-14">
         <div className="min-w-0">
           <h1
             id="hero-heading"
-            className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl"
+            className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl"
           >
             Belanja di Ebrystore
             <span className="mt-1 block">
@@ -66,7 +66,7 @@ export function HomeHero() {
               />
             </span>
           </h1>
-          <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+          <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base xl:mt-5 xl:max-w-2xl xl:text-lg">
             Produk digital dan jasa dari toko terpilih. Harga jelas di depan, dan setiap pesanan
             bisa dipantau sampai tuntas.
           </p>
@@ -131,14 +131,14 @@ export function HomeHero() {
           </ul>
         </div>
 
-        <div className="hidden min-w-0 justify-start lg:flex">
+        <div className="hidden min-w-0 justify-center lg:flex">
           <img
             src="/images/ebrystore-hero-mascot.webp?v=bf406217"
             alt="Maskot Ebrystore membawa laptop"
             width={1254}
             height={1254}
             decoding="async"
-            className="-my-6 h-auto w-full object-contain xl:-my-10"
+            className="-my-6 h-auto w-full max-w-xl object-contain xl:-my-10 xl:max-w-2xl 2xl:max-w-3xl"
           />
         </div>
       </div>
