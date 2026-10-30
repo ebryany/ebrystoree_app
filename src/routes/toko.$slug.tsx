@@ -22,6 +22,7 @@ import { EmptyState } from "@/components/ebry/states";
 import { PageShell } from "@/components/page-shell";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl } from "@/lib/seo-url";
+import { OnlineDot, OnlineLabel } from "@/components/ebry/online-status";
 import { StoreProfileEditor, type StoreEditorDraft } from "@/components/store/store-profile-editor";
 import {
   FollowStoreButton,
@@ -240,18 +241,22 @@ function Storefront() {
               ) : null}
               <div className="p-4 text-foreground">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-surface-selected text-2xl font-bold text-accent sm:size-[72px]">
-                    {view.logoUrl ? (
-                      <img src={view.logoUrl} alt="" className="size-full object-cover" />
-                    ) : (
-                      <span aria-hidden="true">{initial}</span>
-                    )}
+                  <span className="relative shrink-0">
+                    <span className="grid size-16 place-items-center overflow-hidden rounded-full border border-border bg-surface-selected text-2xl font-bold text-accent sm:size-[72px]">
+                      {view.logoUrl ? (
+                        <img src={view.logoUrl} alt="" className="size-full object-cover" />
+                      ) : (
+                        <span aria-hidden="true">{initial}</span>
+                      )}
+                    </span>
+                    {store.online ? <OnlineDot /> : null}
                   </span>
                   <div className="min-w-0">
                     <h1 className="break-words text-lg font-bold leading-tight sm:text-xl">
                       {view.name}
                     </h1>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      {store.online ? <OnlineLabel /> : null}
                       {store.is_platform ? (
                         <span className="inline-flex items-center gap-1 rounded border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[11px] font-semibold text-accent">
                           <BadgeCheck className="size-3" aria-hidden="true" />

@@ -447,7 +447,11 @@ export const getPublicStore = createServerFn({ method: "GET" })
     ]);
 
     const { readPublicStoreServices } = await import("./marketplace-service-catalog.server");
-    const servicesResult = await readPublicStoreServices(store.id);
+    const { readStoreOnline } = await import("./store-presence");
+    const [servicesResult, online] = await Promise.all([
+      readPublicStoreServices(store.id),
+      readStoreOnline(supabase, store.id),
+    ]);
 
     if (productsResult.error) {
       return { ...empty, store, error: "Produk toko tidak dapat dimuat." as const };
@@ -465,7 +469,7 @@ export const getPublicStore = createServerFn({ method: "GET" })
     );
 
     return {
-      store,
+      store: { ...store, online },
       products: products.slice(0, 48),
       hasMoreProducts,
       services: servicesResult.items,

@@ -119,7 +119,13 @@ export const getProductDetail = createServerFn({ method: "GET" })
       };
     }
 
-    return { product: { ...rest, variants, seller, sellerStats }, error: null };
+    const { readStoreOnline } = await import("./store-presence");
+    const sellerOnline = seller ? await readStoreOnline(supabase, seller.id) : false;
+
+    return {
+      product: { ...rest, variants, seller: seller ? { ...seller, online: sellerOnline } : null, sellerStats },
+      error: null,
+    };
   });
 
 /** Penegakan feature flag di server: checkout ditutup saat flag dimatikan. */

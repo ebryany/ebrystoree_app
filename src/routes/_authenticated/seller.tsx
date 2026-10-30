@@ -17,6 +17,7 @@ import {
 
 import { AdminLoading } from "@/components/admin/admin-ui";
 import { StatusPill } from "@/components/ebry/status";
+import { OnlineDot, OnlineLabel } from "@/components/ebry/online-status";
 import { BottomNavigation, type BottomNavItem } from "@/components/ebry/bottom-nav";
 import { DashboardSidebar } from "@/components/ebry/dashboard-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -122,6 +123,8 @@ function SellerLayout() {
 
   const store = data.store as any;
   const meta = STORE_STATUS[store.status] ?? { label: store.status, tone: "neutral" };
+  // Heartbeat berjalan selama dashboard terbuka, jadi toko aktif sedang online.
+  const isActive = store.status === "active";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -130,12 +133,17 @@ function SellerLayout() {
       <div className="border-b border-border bg-background md:hidden">
         <div className="mx-auto flex h-auto w-full max-w-6xl flex-col gap-2 px-4 py-3">
           <header className="flex items-center gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-selected text-accent">
+            <span className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-surface-selected text-accent">
               <Store className="size-4" aria-hidden="true" />
+              {isActive ? <OnlineDot className="-bottom-0.5 -right-0.5 size-3 ring-background sm:size-3" /> : null}
             </span>
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-sm font-bold">{store.name}</h1>
-              <p className="truncate text-[11px] text-muted-foreground">/toko/{store.slug}</p>
+              {isActive ? (
+                <OnlineLabel className="text-[11px]" />
+              ) : (
+                <p className="truncate text-[11px] text-muted-foreground">/toko/{store.slug}</p>
+              )}
             </div>
             <StatusPill value={meta.tone as any} kind="raw" label={meta.label} />
           </header>
@@ -152,12 +160,16 @@ function SellerLayout() {
           <div className="mx-auto w-full max-w-6xl lg:mx-0">
             {/* Store header — desktop only, mobile sudah di atas */}
             <header className="mb-4 hidden items-start gap-3 md:flex">
-              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-surface-selected text-accent">
+              <span className="relative grid size-11 shrink-0 place-items-center rounded-2xl bg-surface-selected text-accent">
                 <Store className="size-5" aria-hidden="true" />
+                {isActive ? <OnlineDot className="-bottom-0.5 -right-0.5 ring-background" /> : null}
               </span>
               <div className="min-w-0 flex-1">
                 <h1 className="truncate text-lg font-bold text-foreground">{store.name}</h1>
-                <p className="mt-0.5 truncate text-xs text-muted-foreground">/toko/{store.slug}</p>
+                <p className="mt-0.5 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+                  {isActive ? <OnlineLabel className="shrink-0" /> : null}
+                  <span className="truncate">/toko/{store.slug}</span>
+                </p>
               </div>
               <div className="shrink-0">
                 <StatusPill value={meta.tone as any} kind="raw" label={meta.label} />

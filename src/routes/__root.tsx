@@ -19,6 +19,7 @@ import { getPublicWebsiteSettings } from "@/lib/website-settings.functions";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl, SITE_ORIGIN } from "@/lib/seo-url";
+import { useStorePresenceHeartbeat } from "@/hooks/use-store-presence-heartbeat";
 
 /** Origin Supabase dari environment — hindari hardcode saat pindah project. */
 const supabaseOrigin = (() => {
@@ -185,6 +186,7 @@ function RootComponent() {
   const settings = Route.useLoaderData();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const inlineToasts = useInlineToastActive();
+  useStorePresenceHeartbeat();
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
