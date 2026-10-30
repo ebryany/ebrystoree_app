@@ -517,9 +517,10 @@ function DetailProduk() {
                       productId={p.id}
                       productName={p.name}
                       isSellerProduct={isSellerProduct}
-                      className="min-h-11 w-full border-primary text-primary"
+                      label="Chat"
+                      className="min-h-11 w-full min-w-0 border-primary bg-primary/5 px-3 text-primary hover:bg-primary/10 hover:text-primary"
                     />
-                    <Button asChild variant="outline" className="min-h-11 w-full">
+                    <Button asChild variant="outline" className="min-h-11 w-full min-w-0 px-3">
                       <Link to="/toko/$slug" params={{ slug: store.slug }}>
                         <Store className="size-4" aria-hidden="true" /> Kunjungi
                       </Link>

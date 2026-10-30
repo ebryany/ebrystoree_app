@@ -31,12 +31,14 @@ export function ProductInquiryButton({
   isSellerProduct = false,
   className,
   variant = "outline",
+  label = "Tanya ketersediaan",
 }: {
   productId: string;
   productName: string;
   isSellerProduct?: boolean;
   className?: string;
   variant?: "outline" | "secondary" | "ghost";
+  label?: string;
 }) {
   const navigate = useNavigate();
   const { user, loading } = useSession();
@@ -72,8 +74,8 @@ export function ProductInquiryButton({
         className={className}
         onClick={() => navigate({ to: "/auth", search: { next: "/produk" } })}
       >
-        <MessageCircleQuestion className="size-4" aria-hidden="true" />
-        Tanya ketersediaan
+        <MessageCircleQuestion className="size-4 shrink-0" aria-hidden="true" />
+        {label}
       </Button>
     );
   }
@@ -82,8 +84,8 @@ export function ProductInquiryButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={variant} className={className}>
-          <MessageCircleQuestion className="size-4" aria-hidden="true" />
-          Tanya ketersediaan
+          <MessageCircleQuestion className="size-4 shrink-0" aria-hidden="true" />
+          {label}
         </Button>
       </DialogTrigger>
       <DialogContent surface="glass">
