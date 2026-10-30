@@ -22,7 +22,8 @@ import { EmptyState } from "@/components/ebry/states";
 import { PageShell } from "@/components/page-shell";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl } from "@/lib/seo-url";
-import { OnlineDot, OnlineLabel } from "@/components/ebry/online-status";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import { useStorePresence } from "@/hooks/use-store-presence";
 import { StoreProfileEditor, type StoreEditorDraft } from "@/components/store/store-profile-editor";
 import {
   FollowStoreButton,
@@ -139,6 +140,7 @@ function Storefront() {
   const router = useRouter();
   const { store, products, services, rating, soldCount, hasMoreProducts, isOwner } =
     Route.useLoaderData() as any;
+  const presence = useStorePresence(store?.id, store?.presence);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
   // Editor kontekstual: draft terpisah dari data published (loader). Preview
@@ -249,14 +251,14 @@ function Storefront() {
                         <span aria-hidden="true">{initial}</span>
                       )}
                     </span>
-                    {store.online ? <OnlineDot /> : null}
+                    <OnlineDot presence={presence} />
                   </span>
                   <div className="min-w-0">
                     <h1 className="break-words text-lg font-bold leading-tight sm:text-xl">
                       {view.name}
                     </h1>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      {store.online ? <OnlineLabel /> : null}
+                      <PresenceLabel presence={presence} />
                       {store.is_platform ? (
                         <span className="inline-flex items-center gap-1 rounded border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[11px] font-semibold text-accent">
                           <BadgeCheck className="size-3" aria-hidden="true" />

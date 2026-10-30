@@ -6,6 +6,7 @@ import { ArrowUpRight, Star } from "lucide-react";
 import { SectionHeader } from "@/components/home/section-header";
 import { listPopularSellers } from "@/lib/reviews.functions";
 import { isRenderableImageUrl } from "@/lib/utils";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 
 /** Penjual unggulan dalam grid statis; tersembunyi bila belum ada toko berulasan. */
 export function FeaturedSellers() {
@@ -35,22 +36,26 @@ export function FeaturedSellers() {
                 params={{ slug: s.slug }}
                 className="group flex min-h-11 items-center gap-3 rounded-xl border border-border bg-card p-3.5 transition-[border-color,box-shadow] duration-200 hover:border-accent/40 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
               >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt=""
-                    loading="lazy"
-                    className="size-12 shrink-0 rounded-xl border border-border object-cover"
-                  />
-                ) : (
-                  <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-surface-selected font-display text-lg font-bold text-accent">
-                    {s.name.trim().slice(0, 1).toUpperCase()}
-                  </span>
-                )}
+                <span className="relative shrink-0">
+                  {logo ? (
+                    <img
+                      src={logo}
+                      alt=""
+                      loading="lazy"
+                      className="size-12 rounded-xl border border-border object-cover"
+                    />
+                  ) : (
+                    <span className="grid size-12 place-items-center rounded-xl bg-surface-selected font-display text-lg font-bold text-accent">
+                      {s.name.trim().slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <OnlineDot presence={s.presence} className="-bottom-0.5 -right-0.5 size-3 sm:size-3" />
+                </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold group-hover:text-accent">
                     {s.name}
                   </span>
+                  <PresenceLabel presence={s.presence} className="flex text-[11px]" />
                   <span className="mt-0.5 flex items-center gap-1 text-xs tabular-nums text-muted-foreground">
                     <Star className="size-3.5 fill-warning text-warning" aria-hidden="true" />
                     <span>

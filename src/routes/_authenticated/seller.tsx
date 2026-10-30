@@ -17,7 +17,8 @@ import {
 
 import { AdminLoading } from "@/components/admin/admin-ui";
 import { StatusPill } from "@/components/ebry/status";
-import { OnlineDot, OnlineLabel } from "@/components/ebry/online-status";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import { useStorePresence } from "@/hooks/use-store-presence";
 import { BottomNavigation, type BottomNavItem } from "@/components/ebry/bottom-nav";
 import { DashboardSidebar } from "@/components/ebry/dashboard-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -31,6 +32,28 @@ import { useSession } from "@/hooks/use-session";
 import { listMyNotifications } from "@/lib/orders.functions";
 import { applyAsSeller, getMyStore } from "@/lib/seller.functions";
 import { formatRupiah } from "@/lib/format";
+
+/**
+ * Status toko sendiri seperti yang dilihat pembeli (dibaca dari server, disegarkan
+ * tiap menit). Sebelum data pertama tiba, dashboard yang terbuka dianggap online.
+ */
+function OwnPresence({
+  storeId,
+  kind,
+  className,
+}: {
+  storeId: string;
+  kind: "dot" | "label";
+  className?: string;
+}) {
+  const [openedAt] = useState(() => new Date().toISOString());
+  const presence = useStorePresence(storeId, { online: true, lastSeenAt: openedAt });
+  return kind === "dot" ? (
+    <OnlineDot presence={presence} className={className} />
+  ) : (
+    <PresenceLabel presence={presence} className={className} />
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/seller")({
   head: () => ({
@@ -123,7 +146,6 @@ function SellerLayout() {
 
   const store = data.store as any;
   const meta = STORE_STATUS[store.status] ?? { label: store.status, tone: "neutral" };
-  // Heartbeat berjalan selama dashboard terbuka, jadi toko aktif sedang online.
   const isActive = store.status === "active";
 
   return (
@@ -135,12 +157,14 @@ function SellerLayout() {
           <header className="flex items-center gap-3">
             <span className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-surface-selected text-accent">
               <Store className="size-4" aria-hidden="true" />
-              {isActive ? <OnlineDot className="-bottom-0.5 -right-0.5 size-3 ring-background sm:size-3" /> : null}
+              {isActive ? (
+                <OwnPresence storeId={store.id} kind="dot" className="-bottom-0.5 -right-0.5 size-3 ring-background sm:size-3" />
+              ) : null}
             </span>
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-sm font-bold">{store.name}</h1>
               {isActive ? (
-                <OnlineLabel className="text-[11px]" />
+                <OwnPresence storeId={store.id} kind="label" className="flex text-[11px]" />
               ) : (
                 <p className="truncate text-[11px] text-muted-foreground">/toko/{store.slug}</p>
               )}
@@ -162,12 +186,14 @@ function SellerLayout() {
             <header className="mb-4 hidden items-start gap-3 md:flex">
               <span className="relative grid size-11 shrink-0 place-items-center rounded-2xl bg-surface-selected text-accent">
                 <Store className="size-5" aria-hidden="true" />
-                {isActive ? <OnlineDot className="-bottom-0.5 -right-0.5 ring-background" /> : null}
+                {isActive ? (
+                  <OwnPresence storeId={store.id} kind="dot" className="-bottom-0.5 -right-0.5 ring-background" />
+                ) : null}
               </span>
               <div className="min-w-0 flex-1">
                 <h1 className="truncate text-lg font-bold text-foreground">{store.name}</h1>
                 <p className="mt-0.5 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-                  {isActive ? <OnlineLabel className="shrink-0" /> : null}
+                  {isActive ? <OwnPresence storeId={store.id} kind="label" className="shrink-0" /> : null}
                   <span className="truncate">/toko/{store.slug}</span>
                 </p>
               </div>

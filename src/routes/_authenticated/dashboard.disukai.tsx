@@ -7,6 +7,7 @@ import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
 import { InlineEmpty, PageHeader } from "@/components/ebry/cards";
 import { MarketplaceProductCard } from "@/components/home/catalog-cards";
 import { FollowStoreButton } from "@/components/store/social-buttons";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import { listMyFollowsAndLikes } from "@/lib/social.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/disukai")({
@@ -59,12 +60,15 @@ function DisukaiPage() {
                       params={{ slug: s.slug }}
                       className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
                     >
-                      <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-selected font-bold text-accent">
-                        {s.logo_url ? (
-                          <img src={s.logo_url} alt="" className="size-full object-cover" />
-                        ) : (
-                          <span aria-hidden="true">{s.name.charAt(0).toUpperCase()}</span>
-                        )}
+                      <span className="relative shrink-0">
+                        <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-surface-selected font-bold text-accent">
+                          {s.logo_url ? (
+                            <img src={s.logo_url} alt="" className="size-full object-cover" />
+                          ) : (
+                            <span aria-hidden="true">{s.name.charAt(0).toUpperCase()}</span>
+                          )}
+                        </span>
+                        <OnlineDot presence={s.presence} className="bottom-0 right-0 size-3 sm:size-3" />
                       </span>
                       <span className="min-w-0">
                         <span className="flex items-center gap-1 truncate text-sm font-semibold">
@@ -73,7 +77,7 @@ function DisukaiPage() {
                             <BadgeCheck className="size-4 shrink-0 text-accent" aria-label="Toko resmi" />
                           ) : null}
                         </span>
-                        <span className="block truncate text-xs text-muted-foreground">/toko/{s.slug}</span>
+                        <PresenceLabel presence={s.presence} className="flex" />
                       </span>
                     </Link>
                     <FollowStoreButton storeId={s.id} className="shrink-0 px-3" />

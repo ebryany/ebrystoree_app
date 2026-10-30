@@ -12,6 +12,8 @@ import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Package, Star } from
 
 import { formatRupiah } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import type { StorePresence } from "@/lib/store-presence";
 
 export type ProductTileItem = {
   id: string;
@@ -21,6 +23,7 @@ export type ProductTileItem = {
   store_name?: string | null;
   store_logo_url?: string | null;
   store_rating?: number | null;
+  store_presence?: StorePresence | null;
   is_official?: boolean;
   price: number | string;
   discount_price: number | string | null;
@@ -164,23 +167,31 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
           <div className="mt-auto grid grid-rows-[1fr] transition-[grid-template-rows] duration-200 motion-reduce:transition-none [@media(hover:hover)]:grid-rows-[0fr] [@media(hover:hover)]:group-hover:grid-rows-[1fr] [@media(hover:hover)]:group-focus-visible:grid-rows-[1fr]">
             <div className="min-h-0 overflow-hidden">
               <div className="mt-2 flex items-center gap-2 border-t border-border pt-2">
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt=""
-                    loading="lazy"
-                    className="size-7 shrink-0 rounded-full border border-border object-cover"
-                  />
-                ) : (
-                  <span
-                    className={cn(
-                      "grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-bold",
-                      official ? "bg-primary text-primary-foreground" : "bg-muted",
-                    )}
-                  >
-                    {(sellerName?.trim()[0] ?? "?").toUpperCase()}
-                  </span>
-                )}
+                <span className="relative shrink-0">
+                  {logo ? (
+                    <img
+                      src={logo}
+                      alt=""
+                      loading="lazy"
+                      className="size-7 rounded-full border border-border object-cover"
+                    />
+                  ) : (
+                    <span
+                      className={cn(
+                        "grid size-7 place-items-center rounded-full text-[11px] font-bold",
+                        official ? "bg-primary text-primary-foreground" : "bg-muted",
+                      )}
+                    >
+                      {(sellerName?.trim()[0] ?? "?").toUpperCase()}
+                    </span>
+                  )}
+                  {item.store_presence ? (
+                    <OnlineDot
+                      presence={item.store_presence}
+                      className="-bottom-0.5 -right-0.5 size-2.5 sm:size-2.5"
+                    />
+                  ) : null}
+                </span>
                 <span className="min-w-0">
                   <span className="flex items-center gap-1">
                     <span className="truncate text-xs font-medium">{sellerName}</span>
@@ -209,6 +220,10 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
                       Belum ada ulasan
                     </span>
                   ) : null}
+                  <PresenceLabel
+                    presence={item.store_presence}
+                    className="mt-0.5 flex max-w-full text-[10px]"
+                  />
                 </span>
               </div>
             </div>

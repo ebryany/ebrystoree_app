@@ -447,10 +447,10 @@ export const getPublicStore = createServerFn({ method: "GET" })
     ]);
 
     const { readPublicStoreServices } = await import("./marketplace-service-catalog.server");
-    const { readStoreOnline } = await import("./store-presence");
-    const [servicesResult, online] = await Promise.all([
+    const { readStorePresence } = await import("./store-presence");
+    const [servicesResult, presence] = await Promise.all([
       readPublicStoreServices(store.id),
-      readStoreOnline(supabase, store.id),
+      readStorePresence(supabase, store.id),
     ]);
 
     if (productsResult.error) {
@@ -469,7 +469,7 @@ export const getPublicStore = createServerFn({ method: "GET" })
     );
 
     return {
-      store: { ...store, online },
+      store: { ...store, presence },
       products: products.slice(0, 48),
       hasMoreProducts,
       services: servicesResult.items,

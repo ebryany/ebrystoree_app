@@ -38,7 +38,9 @@ import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { recordProductView } from "@/lib/recently-viewed";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl } from "@/lib/seo-url";
-import { OnlineDot, OnlineLabel } from "@/components/ebry/online-status";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import { useStorePresence } from "@/hooks/use-store-presence";
+import type { StorePresence } from "@/lib/store-presence";
 
 const detailQuery = (slug: string) =>
   queryOptions({
@@ -70,7 +72,8 @@ type DetailStore = {
   is_platform: boolean;
   logo_url: string | null;
   created_at: string;
-  online?: boolean;
+  id?: string;
+  presence?: StorePresence | null;
 } | null;
 
 export const Route = createFileRoute("/produk/$slug")({
@@ -197,6 +200,7 @@ function DetailProduk() {
   const soldOut = uniqueStock && stock < 1;
   const validityDays = p.validity_days ?? 365;
   const store = p.seller as DetailStore;
+  const presence = useStorePresence(store?.id, store?.presence);
   const stats = p.sellerStats;
   const category = (p as { categories?: { name: string; slug: string } | null }).categories ?? null;
   const isSellerProduct = Boolean(store && !store.is_platform);
@@ -533,7 +537,7 @@ function DetailProduk() {
                       {(store.name.trim()[0] ?? "?").toUpperCase()}
                     </span>
                   )}
-                  {store.online ? <OnlineDot /> : null}
+                  <OnlineDot presence={presence} />
                   {store.is_platform ? (
                     <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                       Official
@@ -548,7 +552,7 @@ function DetailProduk() {
                       <BadgeCheck className="size-4 shrink-0 text-primary" aria-label="Toko resmi" />
                     ) : null}
                   </p>
-                  {store.online ? <OnlineLabel className="mt-0.5" /> : null}
+                  <PresenceLabel presence={presence} className="mt-0.5" />
                   {/* Di HP ikon di atas label supaya tiga tombol muat sampai 320px. */}
                   <div className="mt-2.5 grid grid-cols-3 gap-2">
                     <ProductInquiryButton

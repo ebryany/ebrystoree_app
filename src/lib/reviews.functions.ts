@@ -62,6 +62,7 @@ export type PopularSeller = {
   logo_url: string | null;
   rating: number;
   reviews: number;
+  presence: import("./store-presence").StorePresence;
 };
 
 /**
@@ -93,16 +94,20 @@ export const listPopularSellers = createServerFn({ method: "GET" }).handler(asyn
   }
   if (!agg.size) return { items: [] as PopularSeller[] };
 
-  const { data: stores } = await supabase
-    .from("stores")
-    .select("id, name, slug, logo_url")
-    .in("id", [...agg.keys()])
-    .eq("status", "active");
+  const { readPresenceMap } = await import("./store-presence");
+  const [{ data: stores }, presence] = await Promise.all([
+    supabase
+      .from("stores")
+      .select("id, name, slug, logo_url")
+      .in("id", [...agg.keys()])
+      .eq("status", "active"),
+    readPresenceMap(supabase),
+  ]);
 
   const items: PopularSeller[] = (stores ?? [])
     .map((s) => {
       const a = agg.get(s.id)!;
-      return { ...s, rating: a.sum / a.n, reviews: a.n };
+      return { ...s, rating: a.sum / a.n, reviews: a.n, presence: presence.get(s.id) };
     })
     .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
     .slice(0, 12);

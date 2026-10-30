@@ -121,7 +121,8 @@ export const listMyFollowsAndLikes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context as Ctx;
-    const [follows, likes] = await Promise.all([
+    const { readPresenceMap } = await import("./store-presence");
+    const [follows, likes, presence] = await Promise.all([
       supabase
         .from("store_follows")
         .select("created_at, stores(id, name, slug, logo_url, is_platform)")
@@ -136,18 +137,23 @@ export const listMyFollowsAndLikes = createServerFn({ method: "GET" })
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(100),
+      readPresenceMap(supabase),
     ]);
     if (follows.error || likes.error) {
       return { stores: [], products: [], error: "Daftar belum dapat dimuat." as const };
     }
     return {
       // Baris yang target-nya tidak lagi publik (RLS) muncul sebagai null: dibuang.
-      stores: (follows.data ?? []).map((r: any) => r.stores).filter(Boolean) as Array<{
+      stores: (follows.data ?? [])
+        .map((r: any) => r.stores)
+        .filter(Boolean)
+        .map((s: any) => ({ ...s, presence: presence.get(s.id) })) as Array<{
         id: string;
         name: string;
         slug: string;
         logo_url: string | null;
         is_platform: boolean;
+        presence: import("./store-presence").StorePresence;
       }>,
       products: (likes.data ?? []).map((r: any) => r.digital_products).filter(Boolean) as Array<{
         id: string;

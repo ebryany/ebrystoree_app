@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import type { StorePresence } from "./store-presence";
+
 const listInput = z
   .object({
     q: z.string().trim().max(80).optional(),
@@ -109,28 +111,42 @@ export const listProducts = createServerFn({ method: "GET" })
       rank: number;
     }>;
     // FTS tidak membawa jumlah terjual dan logo toko; ambil untuk id halaman ini saja.
-    const extra = new Map<string, { sold_count: number; store_logo_url: string | null }>();
-    if (items.length > 0) {
-      const { data: meta } = await supabase
-        .from("digital_products")
-        .select("id, sold_count, stores(logo_url)")
-        .in(
-          "id",
-          items.map((i) => i.id),
-        );
-      for (const m of (meta ?? []) as any[]) {
-        extra.set(m.id, {
-          sold_count: Number(m.sold_count ?? 0),
-          store_logo_url: m.stores?.logo_url ?? null,
-        });
-      }
-    }
+    const extra = new Map<
+      string,
+      { sold_count: number; store_logo_url: string | null; store_id: string | null }
+    >();
+    const { readPresenceMap } = await import("./store-presence");
+    const [, presence] = await Promise.all([
+      items.length > 0
+        ? supabase
+            .from("digital_products")
+            .select("id, sold_count, store_id, stores(logo_url)")
+            .in(
+              "id",
+              items.map((i) => i.id),
+            )
+            .then(({ data: meta }) => {
+              for (const m of (meta ?? []) as any[]) {
+                extra.set(m.id, {
+                  sold_count: Number(m.sold_count ?? 0),
+                  store_logo_url: m.stores?.logo_url ?? null,
+                  store_id: m.store_id ?? null,
+                });
+              }
+            })
+        : Promise.resolve(),
+      readPresenceMap(supabase),
+    ]);
     return {
-      items: items.map((i) => ({
-        ...i,
-        sold_count: extra.get(i.id)?.sold_count ?? 0,
-        store_logo_url: extra.get(i.id)?.store_logo_url ?? null,
-      })),
+      items: items.map((i) => {
+        const storeId = extra.get(i.id)?.store_id ?? null;
+        return {
+          ...i,
+          sold_count: extra.get(i.id)?.sold_count ?? 0,
+          store_logo_url: extra.get(i.id)?.store_logo_url ?? null,
+          store_presence: presence.get(storeId),
+        };
+      }),
       error: null,
       total: items.length,
       page,
@@ -152,6 +168,7 @@ export type ShelfProduct = {
   is_official: boolean;
   /** Rata-rata bintang toko dari ulasan yang tampil; null bila belum ada ulasan. */
   store_rating: number | null;
+  store_presence: StorePresence;
 };
 
 /**
@@ -198,6 +215,8 @@ export const listProductShelves = createServerFn({ method: "GET" }).handler(asyn
     ...new Set((productsRes.data ?? []).map((r: any) => r.store_id as string).filter(Boolean)),
   ];
   const ratingByStore = new Map<string, number>();
+  const { readPresenceMap } = await import("./store-presence");
+  const presence = await readPresenceMap(supabase);
   if (storeIds.length) {
     const { data: reviews } = await supabase
       .from("product_reviews")
@@ -231,6 +250,7 @@ export const listProductShelves = createServerFn({ method: "GET" }).handler(asyn
       store_logo_url: r.stores?.logo_url ?? null,
       is_official: !r.store_id || Boolean(r.stores?.is_platform),
       store_rating: ratingByStore.get(r.store_id) ?? null,
+      store_presence: presence.get(r.store_id),
     } satisfies ShelfProduct,
   }));
 

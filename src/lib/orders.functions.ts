@@ -119,11 +119,11 @@ export const getProductDetail = createServerFn({ method: "GET" })
       };
     }
 
-    const { readStoreOnline } = await import("./store-presence");
-    const sellerOnline = seller ? await readStoreOnline(supabase, seller.id) : false;
+    const { readStorePresence } = await import("./store-presence");
+    const presence = seller ? await readStorePresence(supabase, seller.id) : null;
 
     return {
-      product: { ...rest, variants, seller: seller ? { ...seller, online: sellerOnline } : null, sellerStats },
+      product: { ...rest, variants, seller: seller ? { ...seller, presence } : null, sellerStats },
       error: null,
     };
   });

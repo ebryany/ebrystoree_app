@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Star } from "lucide-react";
 
 import { listPopularSellers, type PopularSeller } from "@/lib/reviews.functions";
+import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 
 function Stars({ value }: { value: number }) {
   const full = Math.round(value);
@@ -46,20 +47,27 @@ function SellerItems({
             tabIndex={hidden ? -1 : undefined}
             className="flex min-h-11 w-56 items-center gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {s.logo_url ? (
-              <img
-                src={s.logo_url}
-                alt=""
-                loading="lazy"
-                className="size-10 shrink-0 rounded-lg border border-border object-cover"
+            <span className="relative shrink-0">
+              {s.logo_url ? (
+                <img
+                  src={s.logo_url}
+                  alt=""
+                  loading="lazy"
+                  className="size-10 rounded-lg border border-border object-cover"
+                />
+              ) : (
+                <span className="grid size-10 place-items-center rounded-lg bg-muted text-sm font-bold">
+                  {s.name.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <OnlineDot
+                presence={s.presence}
+                className="-bottom-0.5 -right-0.5 size-3 ring-background sm:size-3"
               />
-            ) : (
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-sm font-bold">
-                {s.name.slice(0, 1).toUpperCase()}
-              </span>
-            )}
+            </span>
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold">{s.name}</span>
+              <PresenceLabel presence={s.presence} className="flex text-[11px]" />
               <span className="mt-0.5 flex items-center gap-1.5">
                 <Stars value={s.rating} />
                 <span className="text-xs tabular-nums text-muted-foreground">
