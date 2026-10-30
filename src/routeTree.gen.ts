@@ -116,6 +116,7 @@ import { Route as ApiPublicCatalogImageSplatRouteImport } from './routes/api/pub
 import { Route as ApiPublicJobsEmailDispatchRouteImport } from './routes/api/public/jobs/email-dispatch'
 import { Route as ApiPublicJobsShopeepayReconcileRouteImport } from './routes/api/public/jobs/shopeepay-reconcile'
 import { Route as ApiPublicJobsTelegramDispatchRouteImport } from './routes/api/public/jobs/telegram-dispatch'
+import { Route as ApiPublicOgImageSplatRouteImport } from './routes/api/public/og-image.$'
 import { Route as ApiPublicServiceMediaSplatRouteImport } from './routes/api/public/service-media.$'
 import { Route as ApiPublicIntegrationsJiofarmDemandRouteImport } from './routes/api/public/integrations/jiofarm/demand'
 import { Route as ApiPublicIntegrationsJiofarmLinksRouteImport } from './routes/api/public/integrations/jiofarm/links'
@@ -723,6 +724,11 @@ const ApiPublicJobsTelegramDispatchRoute =
     path: '/api/public/jobs/telegram-dispatch',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicOgImageSplatRoute = ApiPublicOgImageSplatRouteImport.update({
+  id: '/api/public/og-image/$',
+  path: '/api/public/og-image/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicServiceMediaSplatRoute =
   ApiPublicServiceMediaSplatRouteImport.update({
     id: '/api/public/service-media/$',
@@ -847,6 +853,7 @@ export interface FileRoutesByFullPath {
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
+  '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
@@ -954,6 +961,7 @@ export interface FileRoutesByTo {
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
+  '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/admin/chat': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
@@ -1069,6 +1077,7 @@ export interface FileRoutesById {
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
+  '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/_authenticated/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
@@ -1184,6 +1193,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/email-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
+    | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/admin/chat/'
     | '/admin/orders/'
@@ -1291,6 +1301,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/email-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
+    | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/admin/chat'
     | '/admin/orders'
@@ -1405,6 +1416,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/email-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
+    | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/_authenticated/admin/chat/'
     | '/_authenticated/admin/orders/'
@@ -1456,6 +1468,7 @@ export interface RootRouteChildren {
   ApiPublicJobsEmailDispatchRoute: typeof ApiPublicJobsEmailDispatchRoute
   ApiPublicJobsShopeepayReconcileRoute: typeof ApiPublicJobsShopeepayReconcileRoute
   ApiPublicJobsTelegramDispatchRoute: typeof ApiPublicJobsTelegramDispatchRoute
+  ApiPublicOgImageSplatRoute: typeof ApiPublicOgImageSplatRoute
   ApiPublicServiceMediaSplatRoute: typeof ApiPublicServiceMediaSplatRoute
   ApiPublicIntegrationsJiofarmDemandRoute: typeof ApiPublicIntegrationsJiofarmDemandRoute
   ApiPublicIntegrationsJiofarmLinksRoute: typeof ApiPublicIntegrationsJiofarmLinksRoute
@@ -2214,6 +2227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsTelegramDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/og-image/$': {
+      id: '/api/public/og-image/$'
+      path: '/api/public/og-image/$'
+      fullPath: '/api/public/og-image/$'
+      preLoaderRoute: typeof ApiPublicOgImageSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/service-media/$': {
       id: '/api/public/service-media/$'
       path: '/api/public/service-media/$'
@@ -2529,6 +2549,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJobsEmailDispatchRoute: ApiPublicJobsEmailDispatchRoute,
   ApiPublicJobsShopeepayReconcileRoute: ApiPublicJobsShopeepayReconcileRoute,
   ApiPublicJobsTelegramDispatchRoute: ApiPublicJobsTelegramDispatchRoute,
+  ApiPublicOgImageSplatRoute: ApiPublicOgImageSplatRoute,
   ApiPublicServiceMediaSplatRoute: ApiPublicServiceMediaSplatRoute,
   ApiPublicIntegrationsJiofarmDemandRoute:
     ApiPublicIntegrationsJiofarmDemandRoute,

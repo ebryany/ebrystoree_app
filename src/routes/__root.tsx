@@ -18,6 +18,7 @@ import { useInlineToastActive } from "@/components/ebry/inline-toasts";
 import { getPublicWebsiteSettings } from "@/lib/website-settings.functions";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { ogImageUrl, SITE_ORIGIN } from "@/lib/seo-url";
 
 /** Origin Supabase dari environment — hindari hardcode saat pindah project. */
 const supabaseOrigin = (() => {
@@ -77,9 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     );
     const ogTitle = String(s.seo_og_title || title);
     const ogDescription = String(s.seo_og_description || description);
-    const ogImage =
-      String(s.seo_og_image || s.site_og_image_url || "") ||
-      "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3952373c-94fb-42e0-9ad7-461706af72d1/id-preview-2e01c3d1--40849f03-5e34-493c-9c5b-a371d5864664.lovable.app-1785242674817.png";
+    // Gambar pratinjau link harus URL absolut yang bisa diunduh crawler WhatsApp.
+    const ogImage = ogImageUrl(
+      String(s.seo_og_image || s.site_og_image_url || s.site_square_logo_url || s.site_logo_url || ""),
+    );
     const verification = [
       { name: "google-site-verification", content: "5V5oY0ERtp1nkZTxzinF-GwbMZwJAj3fSTiYPUwaCIg" },
       s.seo_google_verification
@@ -93,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Canonical: sumber kebenaran adalah setting admin. Bila kosong, tag tidak
     // dirender sama sekali (lebih aman daripada menunjuk domain lama). Path
     // diambil dari match agar tiap halaman punya canonical sendiri.
-    const canonicalBase = String(s.seo_canonical_base || "").replace(/\/+$/, "");
+    const canonicalBase = String(s.seo_canonical_base || SITE_ORIGIN).replace(/\/+$/, "");
     const canonicalPath = String((match as { pathname?: string })?.pathname ?? "");
     const canonicalHref = canonicalBase
       ? `${canonicalBase}${canonicalPath === "/" ? "" : canonicalPath}`
@@ -114,11 +116,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: ogDescription },
         { property: "og:type", content: "website" },
+        { property: "og:site_name", content: String(s.site_business_name || "Ebrystore") },
+        { property: "og:locale", content: "id_ID" },
+        ...(canonicalHref ? [{ property: "og:url", content: canonicalHref }] : []),
         { name: "twitter:card", content: String(s.seo_twitter_card ?? "summary_large_image") },
         { name: "twitter:title", content: ogTitle },
         { name: "twitter:description", content: ogDescription },
-        { property: "og:image", content: ogImage },
-        { name: "twitter:image", content: ogImage },
+        ...(ogImage
+          ? [
+              { property: "og:image", content: ogImage },
+              { name: "twitter:image", content: ogImage },
+            ]
+          : []),
         ...(failureHead?.meta ?? []),
       ],
       links: [

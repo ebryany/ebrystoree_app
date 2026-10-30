@@ -23,6 +23,7 @@ import {
   listCatalogCategories,
 } from "@/lib/catalog.functions";
 import { CategoryRail } from "@/components/home/category-rail";
+import { SITE_ORIGIN } from "@/lib/seo-url";
 
 const shelvesQuery = queryOptions({
   queryKey: ["storefront-shelves"],
@@ -65,7 +66,6 @@ export const Route = createFileRoute("/")({
           "Pilih produk digital berdasarkan kategori, harga, dan toko. Pesanan tercatat di akunmu.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://ebrystore.my.id/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Ebrystore | Marketplace Produk Digital" },
       {
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/")({
         content: "Cari produk digital dan layanan pendampingan akademik di Ebrystore.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://ebrystore.my.id/" }],
+    // og:url dan canonical diisi root dari seo_canonical_base.
     scripts: [
       {
         type: "application/ld+json",
@@ -81,12 +81,12 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Ebrystore",
-          url: "https://ebrystore.my.id/",
+          url: `${SITE_ORIGIN}/`,
           inLanguage: "id-ID",
           description: "Marketplace produk digital dan layanan pendampingan akademik.",
           potentialAction: {
             "@type": "SearchAction",
-            target: "https://ebrystore.my.id/produk?q={search_term_string}",
+            target: `${SITE_ORIGIN}/produk?q={search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         }),
@@ -97,7 +97,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Ebrystore",
-          url: "https://ebrystore.my.id/",
+          url: `${SITE_ORIGIN}/`,
           description: "Platform produk digital dan layanan pendampingan akademik.",
         }),
       },

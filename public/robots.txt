@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://ebrystore.my.id/sitemap.xml
+Sitemap: https://app.ebrystore.my.id/sitemap.xml

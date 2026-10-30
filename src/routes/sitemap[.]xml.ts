@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
 import { createPublicClient } from "@/lib/supabase-public.server";
+import { SITE_ORIGIN } from "@/lib/seo-url";
 
-const BASE_URL = "https://ebrystore.my.id";
+const BASE_URL = SITE_ORIGIN;
 
 interface SitemapEntry {
   path: string;

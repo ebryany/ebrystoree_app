@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { getServiceDetail } from "@/lib/catalog.functions";
 import { cn } from "@/lib/utils";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { ogImageUrl } from "@/lib/seo-url";
 
 const detailQuery = (slug: string) =>
   queryOptions({
@@ -46,10 +47,10 @@ export const Route = createFileRoute("/layanan/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
-        ...(s.thumbnail_url?.startsWith("https://")
+        ...(ogImageUrl(s.thumbnail_url)
           ? [
-              { property: "og:image", content: s.thumbnail_url },
-              { name: "twitter:image", content: s.thumbnail_url },
+              { property: "og:image", content: ogImageUrl(s.thumbnail_url)! },
+              { name: "twitter:image", content: ogImageUrl(s.thumbnail_url)! },
             ]
           : []),
       ],

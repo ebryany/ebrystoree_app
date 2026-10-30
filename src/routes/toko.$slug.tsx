@@ -21,6 +21,7 @@ import { SellerServiceCard } from "@/components/home/seller-service-card";
 import { EmptyState } from "@/components/ebry/states";
 import { PageShell } from "@/components/page-shell";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { ogImageUrl } from "@/lib/seo-url";
 import { StoreProfileEditor, type StoreEditorDraft } from "@/components/store/store-profile-editor";
 import {
   FollowStoreButton,
@@ -51,7 +52,7 @@ export const Route = createFileRoute("/toko/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
-        ...(store?.logo_url ? [{ property: "og:image", content: store.logo_url }] : []),
+        ...(ogImageUrl(store?.logo_url) ? [{ property: "og:image", content: ogImageUrl(store?.logo_url)! }] : []),
         { name: "twitter:card", content: store?.logo_url ? "summary_large_image" : "summary" },
       ],
     };

@@ -37,6 +37,7 @@ import { effectivePrice, formatRupiah } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { recordProductView } from "@/lib/recently-viewed";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { ogImageUrl } from "@/lib/seo-url";
 
 const detailQuery = (slug: string) =>
   queryOptions({
@@ -83,6 +84,7 @@ export const Route = createFileRoute("/produk/$slug")({
     if (!loaderData?.product) return {};
     const p = loaderData.product;
     const desc = (p.short_description ?? "Produk digital Ebrystore siap unduh.").slice(0, 155);
+    const image = ogImageUrl(p.thumbnail_url);
     return {
       meta: [
         { title: `${p.name} — Produk Digital Ebrystore`.slice(0, 60) },
@@ -91,10 +93,11 @@ export const Route = createFileRoute("/produk/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
-        ...(p.thumbnail_url?.startsWith("https://")
+        ...(image
           ? [
-              { property: "og:image", content: p.thumbnail_url },
-              { name: "twitter:image", content: p.thumbnail_url },
+              { property: "og:image", content: image },
+              { property: "og:image:alt", content: p.name },
+              { name: "twitter:image", content: image },
             ]
           : []),
       ],
