@@ -181,6 +181,42 @@ export const createProductInquiry = createServerFn({ method: "POST" })
     return { ok: true as const, id: row.id as string };
   });
 
+/**
+ * Thread terbuka milik pembeli dengan toko yang sama, supaya tombol Chat
+ * melanjutkan percakapan lama. Thread produk yang sama diutamakan.
+ */
+export const findMyStoreThread = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({ storeId: z.string().uuid().optional(), productId: z.string().uuid().optional() })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as Ctx;
+    let storeId = data.storeId ?? null;
+    if (!storeId && data.productId) storeId = await resolveStoreId(supabase, data.productId);
+    const official = await isPlatformStore(storeId);
+
+    let query = supabase
+      .from("product_inquiries")
+      .select("id, product_id")
+      .eq("user_id", userId)
+      .neq("status", "closed")
+      .order("last_message_at", { ascending: false })
+      .limit(20);
+    // Toko resmi: thread bisa ber-store_id NULL atau id toko platform.
+    query = official
+      ? storeId
+        ? query.or(`store_id.is.null,store_id.eq.${storeId}`)
+        : query.is("store_id", null)
+      : query.eq("store_id", storeId);
+    const { data: rows } = await query;
+    const list = (rows ?? []) as { id: string; product_id: string | null }[];
+    const hit = (data.productId && list.find((r) => r.product_id === data.productId)) || list[0];
+    return { id: hit?.id ?? null };
+  });
+
 export const listMyInquiries = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

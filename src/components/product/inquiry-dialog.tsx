@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2, MessageCircleQuestion } from "lucide-react";
 
@@ -17,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
-import { createProductInquiry } from "@/lib/inquiries.functions";
+import { createProductInquiry, findMyStoreThread } from "@/lib/inquiries.functions";
 
 const QUICK = [
   "Apakah produk ini masih tersedia?",
@@ -46,6 +47,13 @@ export function ProductInquiryButton({
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState(QUICK[0]);
   const [busy, setBusy] = useState(false);
+  const findThread = useServerFn(findMyStoreThread);
+  const existing = useQuery({
+    queryKey: ["my-store-thread", user?.id ?? "anon", "", productId],
+    queryFn: () => findThread({ data: { productId } }),
+    enabled: Boolean(user),
+    staleTime: 30_000,
+  });
 
   async function submit() {
     const text = body.trim();
@@ -65,6 +73,20 @@ export function ProductInquiryButton({
     setOpen(false);
     toast.success(isSellerProduct ? "Pertanyaan terkirim. Penjual akan membalas di chat." : "Pertanyaan terkirim. Tim kami akan membalas di chat.");
     navigate({ to: "/dashboard/chat/$id", params: { id: result.id } });
+  }
+
+  if (user && existing.data?.id) {
+    const threadId = existing.data.id;
+    return (
+      <Button
+        variant={variant}
+        className={className}
+        onClick={() => navigate({ to: "/dashboard/chat/$id", params: { id: threadId } })}
+      >
+        <MessageCircleQuestion className="size-4 shrink-0" aria-hidden="true" />
+        {label}
+      </Button>
+    );
   }
 
   if (!loading && !user) {

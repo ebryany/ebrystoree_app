@@ -18,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
-import { createProductInquiry } from "@/lib/inquiries.functions";
+import { createProductInquiry, findMyStoreThread } from "@/lib/inquiries.functions";
 import {
   getMySocialState,
   getProductLikes,
@@ -225,8 +225,30 @@ export function StoreChatButton({
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState(STORE_QUICK[0]);
   const [busy, setBusy] = useState(false);
+  const findThread = useServerFn(findMyStoreThread);
+  const existing = useQuery({
+    queryKey: ["my-store-thread", user?.id ?? "anon", storeId, ""],
+    queryFn: () => findThread({ data: { storeId } }),
+    enabled: Boolean(user) && !isOwner,
+    staleTime: 30_000,
+  });
 
   if (isOwner) return null;
+
+  if (user && existing.data?.id) {
+    const threadId = existing.data.id;
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        className={cn("min-h-11", className)}
+        onClick={() => navigate({ to: "/dashboard/chat/$id", params: { id: threadId } })}
+      >
+        <MessageCircle className="size-4" aria-hidden="true" />
+        Chat
+      </Button>
+    );
+  }
 
   async function submit() {
     const text = body.trim();
