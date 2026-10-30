@@ -37,11 +37,13 @@ export function ProductGlass({ children }: { children: ReactNode }) {
   return <GlassContext.Provider value>{children}</GlassContext.Provider>;
 }
 
+// Resep sama dengan kartu saldo (LiquidGlassCard): kaca tipis, blur kuat, kilau tepi dalam.
 const GLASS_TILE =
-  "border-white/60 bg-white/55 shadow-[0_8px_24px_-12px_oklch(0.33_0.062_200/0.35)] ring-1 ring-inset ring-white/40 backdrop-blur-md hover:border-white/90 dark:border-white/10 dark:bg-white/5 dark:ring-white/5 dark:hover:border-white/25";
+  "border-white/40 bg-card/35 backdrop-blur-lg backdrop-saturate-150 shadow-[inset_3px_3px_3px_0_oklch(1_0_0/55%),inset_-3px_-3px_3px_0_oklch(1_0_0/35%),0_18px_40px_-16px_oklch(0.42_0.06_205/38%),0_4px_12px_-4px_oklch(0.22_0.03_205/18%)] hover:border-white/80 dark:border-white/10 dark:bg-white/5 dark:shadow-[inset_1px_1px_1px_0_oklch(1_0_0/12%),0_12px_32px_-14px_oklch(0_0_0/60%)] dark:hover:border-white/25";
 
+// Latar sama dengan kartu saldo: gradasi teal pucat + dua bulatan buram sebagai bidang yang di-blur kaca.
 export const GLASS_SECTION =
-  "bg-[linear-gradient(135deg,oklch(0.94_0.04_195/0.9),oklch(0.97_0.02_95/0.85))] dark:bg-[linear-gradient(135deg,oklch(0.3_0.05_200/0.7),oklch(0.24_0.035_203/0.7))]";
+  "bg-[radial-gradient(circle_at_8%_0%,oklch(0.86_0.07_190/70%),transparent_40%),radial-gradient(circle_at_95%_100%,oklch(0.88_0.06_205/65%),transparent_45%),linear-gradient(150deg,oklch(0.97_0.02_195),oklch(0.94_0.03_190)_50%,oklch(0.96_0.02_205))] dark:bg-[radial-gradient(circle_at_8%_0%,oklch(0.4_0.07_190/50%),transparent_40%),radial-gradient(circle_at_95%_100%,oklch(0.38_0.06_205/45%),transparent_45%),linear-gradient(150deg,oklch(0.26_0.04_200),oklch(0.22_0.03_203))]";
 
 /** Ambang "Top Seller": produk di 3 besar rak terlaris atau sudah laku ≥ 10. */
 const TOP_SELLER_MIN_SOLD = 10;
