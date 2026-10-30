@@ -8,21 +8,24 @@ import {
   ChevronRight,
   Download,
   FileText,
+  KeyRound,
   PackageCheck,
-  QrCode,
+  Send,
   ServerCog,
   ShieldCheck,
   ShoppingCart,
   Star,
   Store,
+  Ticket,
   UserCheck,
+  Wallet,
 } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { StickyActionBar } from "@/components/ebry/cards";
-import { ProductReviewPanel } from "@/components/product/review-panel";
+import { OPEN_REVIEW_EVENT, ProductReviewPanel } from "@/components/product/review-panel";
 import { ProductInquiryButton } from "@/components/product/inquiry-dialog";
 import { ProductDescription } from "@/components/product/product-description";
 import { LikeProductButton } from "@/components/store/social-buttons";
@@ -40,6 +43,17 @@ const detailQuery = (slug: string) =>
     queryKey: ["product-detail", slug],
     queryFn: () => getProductDetail({ data: { slug } }),
   });
+
+type Delivery = "file" | "code" | "account";
+
+/** Tombol aksi kartu penjual: ikon di atas label di HP, sebaris mulai sm. */
+const SELLER_ACTION =
+  "h-auto min-h-11 w-full min-w-0 flex-col gap-0.5 px-1.5 py-1.5 text-xs sm:flex-row sm:gap-2 sm:px-3 sm:text-sm";
+
+function openReviewForm() {
+  window.dispatchEvent(new Event(OPEN_REVIEW_EVENT));
+  document.getElementById("ulasan-produk")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 const monthYearFmt = new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" });
 const fullDateFmt = new Intl.DateTimeFormat("id-ID", {
@@ -167,7 +181,13 @@ function DetailProduk() {
   const discountPct = discounted ? Math.round((1 - price / basePrice) * 100) : 0;
   const checkoutSearch = selectedVariant ? { variant: selectedVariant.id } : {};
   const downloadLimit = p.download_limit ?? 5;
-  const uniqueStock = p.delivery_mode === "unique";
+  const delivery: Delivery =
+    p.delivery_mode === "code"
+      ? (p as { code_kind?: string }).code_kind === "account"
+        ? "account"
+        : "code"
+      : "file";
+  const uniqueStock = p.delivery_mode === "unique" || delivery !== "file";
   const stock = Number(p.available_stock ?? 0);
   const soldOut = uniqueStock && stock < 1;
   const validityDays = p.validity_days ?? 365;
@@ -231,13 +251,20 @@ function DetailProduk() {
     },
     {
       label: "Jenis produk",
-      value: uniqueStock ? "Stok unik per pembeli" : "Berkas digital (kuota sama per pembeli)",
+      value:
+        delivery === "account"
+          ? "Akun (satu akun per pembeli)"
+          : delivery === "code"
+            ? "Kode/link (satu per pembeli)"
+            : uniqueStock
+              ? "Stok unik per pembeli"
+              : "Berkas digital (kuota sama per pembeli)",
     },
-    { label: "Kuota unduhan", value: `${downloadLimit}x per pembelian` },
+    ...(delivery === "file" ? [{ label: "Kuota unduhan", value: `${downloadLimit}x per pembelian` }] : []),
     { label: "Masa akses", value: `${validityDays} hari sejak pembayaran terverifikasi` },
     ...(p.version ? [{ label: "Versi", value: p.version }] : []),
     ...(variants.length ? [{ label: "Pilihan variasi", value: `${variants.length} variasi` }] : []),
-    { label: "Pengiriman", value: "Otomatis ke menu Produk saya" },
+    { label: "Pengiriman", value: "Langsung terkirim ke menu Produk saya setelah transaksi selesai" },
     ...(uniqueStock ? [{ label: "Stok", value: soldOut ? "Habis" : `${stock} tersedia` }] : []),
   ];
 
@@ -291,8 +318,8 @@ function DetailProduk() {
               )}
               <ul className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] leading-tight text-muted-foreground">
                 <li className="rounded-lg border border-border bg-card px-1.5 py-2">
-                  <QrCode className="mx-auto mb-1 size-4 text-accent" aria-hidden="true" />
-                  Bayar QRIS
+                  <Wallet className="mx-auto mb-1 size-4 text-accent" aria-hidden="true" />
+                  Banyak metode bayar
                 </li>
                 <li className="rounded-lg border border-border bg-card px-1.5 py-2">
                   <BadgeCheck className="mx-auto mb-1 size-4 text-accent" aria-hidden="true" />
@@ -443,6 +470,7 @@ function DetailProduk() {
               variantName={selectedVariant?.name ?? null}
               validityDays={validityDays}
               downloadLimit={downloadLimit}
+              delivery={delivery}
             />
 
             {/* CTA inline hanya ≥sm; mobile memakai sticky bar agar tidak ganda. */}
@@ -483,7 +511,7 @@ function DetailProduk() {
               Penjual
             </h2>
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
-              <div className="flex min-w-0 items-center gap-4 lg:w-[360px] lg:shrink-0 lg:border-r lg:border-border lg:pr-6">
+              <div className="flex min-w-0 items-center gap-4 lg:w-[460px] lg:shrink-0 lg:border-r lg:border-border lg:pr-6">
                 <div className="relative shrink-0">
                   {isRenderableImageUrl(store.logo_url) ? (
                     <img
@@ -514,18 +542,27 @@ function DetailProduk() {
                       <BadgeCheck className="size-4 shrink-0 text-primary" aria-label="Toko resmi" />
                     ) : null}
                   </p>
-                  <div className="mt-2.5 grid grid-cols-2 gap-2">
+                  {/* Di HP ikon di atas label supaya tiga tombol muat sampai 320px. */}
+                  <div className="mt-2.5 grid grid-cols-3 gap-2">
                     <ProductInquiryButton
                       productId={p.id}
                       productName={p.name}
                       isSellerProduct={isSellerProduct}
                       label="Chat"
-                      className="min-h-11 w-full min-w-0 border-primary bg-primary/5 px-3 text-primary hover:bg-primary/10 hover:text-primary"
+                      className={cn(SELLER_ACTION, "border-primary bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary")}
                     />
-                    <Button asChild variant="outline" className="min-h-11 w-full min-w-0 px-3">
+                    <Button asChild variant="outline" className={SELLER_ACTION}>
                       <Link to="/toko/$slug" params={{ slug: store.slug }}>
                         <Store className="size-4" aria-hidden="true" /> Kunjungi
                       </Link>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={SELLER_ACTION}
+                      onClick={openReviewForm}
+                    >
+                      <Star className="size-4" aria-hidden="true" /> Ulasan
                     </Button>
                   </div>
                 </div>
@@ -688,10 +725,12 @@ function AccessPreview({
   variantName,
   validityDays,
   downloadLimit,
+  delivery,
 }: {
   variantName: string | null;
   validityDays: number;
   downloadLimit: number;
+  delivery: Delivery;
 }) {
   const [expiry, setExpiry] = useState<string | null>(null);
   useEffect(() => {
@@ -701,10 +740,11 @@ function AccessPreview({
   }, [validityDays]);
 
   const steps = [
-    { icon: QrCode, label: "Bayar QRIS" },
-    { icon: BadgeCheck, label: "Terverifikasi" },
-    { icon: Download, label: "Masuk Produk saya" },
+    { icon: Wallet, label: "Bayar" },
+    { icon: BadgeCheck, label: "Transaksi selesai" },
+    { icon: Send, label: "Produk langsung terkirim" },
   ];
+  const DeliveryIcon = delivery === "account" ? KeyRound : delivery === "code" ? Ticket : Download;
 
   return (
     <section
@@ -723,13 +763,23 @@ function AccessPreview({
           </span>
         </p>
         <p className="flex items-start gap-2">
-          <Download className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-          <span>
-            <span className="font-semibold">{downloadLimit}x</span> unduhan, tersimpan di akunmu
-          </span>
+          <DeliveryIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+          {delivery === "account" ? (
+            <span>
+              <span className="font-semibold">Akun siap pakai</span>, tinggal salin email &amp; password
+            </span>
+          ) : delivery === "code" ? (
+            <span>
+              <span className="font-semibold">Kode/link</span>, tinggal salin dari Produk saya
+            </span>
+          ) : (
+            <span>
+              <span className="font-semibold">{downloadLimit}x</span> unduhan, tersimpan di akunmu
+            </span>
+          )}
         </p>
       </div>
-      <ol className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+      <ol className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
         {steps.map((s, i) => (
           <li key={s.label} className="flex min-w-0 items-center gap-1.5">
             {i > 0 ? <span className="h-px w-3 shrink-0 bg-primary/40" aria-hidden="true" /> : null}

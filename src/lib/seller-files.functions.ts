@@ -68,7 +68,7 @@ export const listMyProductFiles = createServerFn({ method: "GET" })
 
     const { data: product } = await sb
       .from("digital_products")
-      .select("delivery_mode, available_stock")
+      .select("delivery_mode, code_kind, available_stock")
       .eq("id", data.productId)
       .maybeSingle();
 
@@ -83,7 +83,9 @@ export const listMyProductFiles = createServerFn({ method: "GET" })
     return {
       forbidden: false as const,
       items: rows ?? [],
-      deliveryMode: (product?.delivery_mode ?? "shared") as "shared" | "unique" | "code",
+      deliveryMode: (product?.delivery_mode === "code" && product?.code_kind === "account"
+        ? "account"
+        : (product?.delivery_mode ?? "shared")) as "shared" | "unique" | "code" | "account",
       availableStock: Number(product?.available_stock ?? 0),
     };
   });
@@ -302,7 +304,10 @@ export const setMyDeliveryMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z
-      .object({ productId: z.string().uuid(), mode: z.enum(["shared", "unique", "code"]) })
+      .object({
+        productId: z.string().uuid(),
+        mode: z.enum(["shared", "unique", "code", "account"]),
+      })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -310,9 +315,14 @@ export const setMyDeliveryMode = createServerFn({ method: "POST" })
     const storeId = await verifyOwnership(sb, data.productId, (context as Ctx).userId);
     if (!storeId) return { ok: false as const, message: "Produk bukan milik toko Anda." };
 
+    // Akun memakai jalur stok kode; jenisnya dibedakan lewat code_kind.
+    const isAccount = data.mode === "account";
     const { error } = await sb
       .from("digital_products")
-      .update({ delivery_mode: data.mode })
+      .update({
+        delivery_mode: isAccount ? "code" : data.mode,
+        code_kind: isAccount ? "account" : "code",
+      })
       .eq("id", data.productId);
     if (error) return { ok: false as const, message: "Gagal mengubah mode pengiriman." };
 
@@ -320,6 +330,7 @@ export const setMyDeliveryMode = createServerFn({ method: "POST" })
       shared: "Mode berkas bersama aktif.",
       unique: "Mode stok unik aktif. Berkas nonaktif tidak ikut dijual.",
       code: "Mode kode/link aktif. Tambahkan kode stok di bawah.",
+      account: "Mode akun aktif. Tambahkan stok akun di bawah.",
     };
     return { ok: true as const, message: labels[data.mode] };
   });

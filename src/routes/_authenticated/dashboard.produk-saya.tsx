@@ -69,7 +69,7 @@ function ProdukSaya() {
       <PageHeader
         icon={Package}
         title="Produk saya"
-        description="Akses berkas atau kode/link pembelian Anda. Periksa produk sebelum mengonfirmasi penerimaan."
+        description="Unduh berkas, atau salin akun dan kode/link pembelian Anda. Periksa produk sebelum mengonfirmasi penerimaan."
       />
 
       <RecentlyViewedShelf />

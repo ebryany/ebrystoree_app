@@ -10,14 +10,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { StockInput } from "@/components/product/stock-input";
 import {
   createProductFileUpload,
   deleteProductFile,
+  deleteProductStockCode,
+  ingestProductStockCodes,
   listProductFiles,
+  listProductStockCodes,
   registerProductFile,
   setProductFileActive,
   setProductDeliveryMode,
+  type DeliveryChoice,
 } from "@/lib/product-files.functions";
+
+const MODES: Array<{ value: DeliveryChoice; label: string; hint: string }> = [
+  { value: "shared", label: "Berkas bersama", hint: "Semua pembeli mengunduh berkas versi aktif yang sama." },
+  {
+    value: "unique",
+    label: "Berkas unik",
+    hint: "Setiap pembeli mendapat satu berkas berbeda; produk habis saat stok nol.",
+  },
+  { value: "code", label: "Kode/Link", hint: "Setiap pembeli mendapat satu kode atau link (voucher, serial key)." },
+  {
+    value: "account",
+    label: "Akun",
+    hint: "Setiap pembeli mendapat satu akun (email + password) yang tinggal disalin.",
+  },
+];
 
 type Props = {
   product: { id: string; name: string } | null;
@@ -42,6 +62,9 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   const toggle = useServerFn(setProductFileActive);
   const remove = useServerFn(deleteProductFile);
   const setMode = useServerFn(setProductDeliveryMode);
+  const ingest = useServerFn(ingestProductStockCodes);
+  const fetchCodes = useServerFn(listProductStockCodes);
+  const removeCode = useServerFn(deleteProductStockCode);
 
   const productId = product?.id ?? null;
   const { data, isPending } = useQuery({
@@ -50,14 +73,58 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
     enabled: Boolean(productId),
   });
 
-  const invalidate = () => void qc.invalidateQueries({ queryKey: ["product-files", productId] });
-
-  const deliveryMode: "shared" | "unique" = (data as any)?.deliveryMode ?? "shared";
+  const deliveryMode: DeliveryChoice = (data as any)?.deliveryMode ?? "shared";
   const availableStock: number = Number((data as any)?.availableStock ?? 0);
   const unique = deliveryMode === "unique";
+  const isStockCode = deliveryMode === "code" || deliveryMode === "account";
+
+  const codesQuery = useQuery({
+    queryKey: ["product-stock-codes", productId],
+    queryFn: () => fetchCodes({ data: { productId: productId! } }),
+    enabled: Boolean(productId) && isStockCode,
+  });
+
+  const invalidate = () => {
+    void qc.invalidateQueries({ queryKey: ["product-files", productId] });
+    void qc.invalidateQueries({ queryKey: ["product-stock-codes", productId] });
+  };
+
+  const ingestMutation = useMutation({
+    mutationFn: (codes: string[]) => ingest({ data: { productId: productId!, codes } }),
+  });
+
+  async function addStock(codes: string[]): Promise<boolean> {
+    try {
+      const res: any = await ingestMutation.mutateAsync(codes);
+      if (res?.forbidden) {
+        toast.error(`Izin ${res.permission} dibutuhkan.`);
+        return false;
+      }
+      if (!res.ok) {
+        toast.error(res.message);
+        return false;
+      }
+      toast.success(res.message);
+      invalidate();
+      return true;
+    } catch {
+      toast.error("Stok gagal disimpan.");
+      return false;
+    }
+  }
+
+  const deleteCodeMutation = useMutation({
+    mutationFn: (id: string) => removeCode({ data: { id } }),
+    onSuccess: (res: any) => {
+      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (!res.ok) return toast.error(res.message);
+      toast.success(res.message);
+      invalidate();
+    },
+  });
 
   const modeMutation = useMutation({
-    mutationFn: (mode: "shared" | "unique") => setMode({ data: { productId: productId!, mode } }),
+    mutationFn: (mode: DeliveryChoice) => setMode({ data: { productId: productId!, mode } }),
     onSuccess: (res: any) => {
       if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
       if (!res.ok) return toast.error(res.message);
@@ -143,12 +210,14 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   }
 
   const items: any[] = data && !(data as any).forbidden ? ((data as any).items ?? []) : [];
+  const codeItems: Array<{ id: string; code: string; status: string }> =
+    codesQuery.data && !(codesQuery.data as any).forbidden ? ((codesQuery.data as any).items ?? []) : [];
 
   return (
     <Dialog open={product !== null} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Berkas master — {product?.name}</DialogTitle>
+          <DialogTitle>Pengiriman — {product?.name}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3 rounded-xl border border-border bg-muted/40 p-4">
@@ -156,38 +225,84 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
             <div>
               <p className="text-sm font-semibold">Mode pengiriman</p>
               <p className="text-xs text-muted-foreground">
-                {unique
-                  ? "Stok unik: setiap pembeli mendapat satu berkas berbeda dan produk habis saat stok nol."
-                  : "Berkas bersama: semua pembeli mengunduh berkas versi aktif yang sama."}
+                {MODES.find((m) => m.value === deliveryMode)?.hint}
               </p>
             </div>
-            {unique ? (
+            {unique || isStockCode ? (
               <Badge variant={availableStock > 0 ? "secondary" : "destructive"} className="shrink-0 gap-1">
                 <Package className="size-3" aria-hidden="true" />
                 Stok {availableStock}
               </Badge>
             ) : null}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant={unique ? "outline" : "default"}
-              disabled={modeMutation.isPending}
-              onClick={() => modeMutation.mutate("shared")}
-            >
-              Berkas bersama
-            </Button>
-            <Button
-              size="sm"
-              variant={unique ? "default" : "outline"}
-              disabled={modeMutation.isPending}
-              onClick={() => modeMutation.mutate("unique")}
-            >
-              Stok unik per pembeli
-            </Button>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {MODES.map((m) => (
+              <Button
+                key={m.value}
+                size="sm"
+                className="min-h-11"
+                variant={deliveryMode === m.value ? "default" : "outline"}
+                disabled={modeMutation.isPending}
+                onClick={() => modeMutation.mutate(m.value)}
+              >
+                {m.label}
+              </Button>
+            ))}
           </div>
         </div>
 
+        {isStockCode ? (
+          <div className="space-y-3 rounded-xl border border-border p-4">
+            <StockInput
+              key={deliveryMode}
+              kind={deliveryMode === "account" ? "account" : "code"}
+              pending={ingestMutation.isPending}
+              onSubmit={addStock}
+            />
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold">
+                {deliveryMode === "account" ? "Stok akun" : "Stok kode"} ({codeItems.length})
+              </h3>
+              {codesQuery.isPending ? (
+                <p className="text-sm text-muted-foreground">Memuat…</p>
+              ) : codeItems.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Belum ada stok. Produk belum bisa dibeli.</p>
+              ) : (
+                <ul className="max-h-64 divide-y divide-border overflow-y-auto rounded-lg border border-border">
+                  {codeItems.map((c) => (
+                    <li key={c.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                      <span className="min-w-0 truncate font-mono text-xs">{c.code}</span>
+                      <span className="flex shrink-0 items-center gap-1">
+                        {c.status === "available" ? (
+                          <>
+                            <Badge variant="secondary">Tersedia</Badge>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`Hapus stok ${c.code}`}
+                              disabled={deleteCodeMutation.isPending}
+                              onClick={() => deleteCodeMutation.mutate(c.id)}
+                            >
+                              <Trash2 className="size-4 text-destructive" aria-hidden="true" />
+                            </Button>
+                          </>
+                        ) : (
+                          <Badge variant="outline">
+                            <Lock className="mr-1 size-3" aria-hidden="true" />
+                            {c.status === "assigned" ? "Terjual" : c.status}
+                          </Badge>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        ) : null}
+
+        {isStockCode ? null : (
+        <>
         <div className="space-y-3 rounded-xl border border-border p-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
             <div className="space-y-1.5">
@@ -291,6 +406,8 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
             </ul>
           )}
         </div>
+        </>
+        )}
       </DialogContent>
     </Dialog>
   );

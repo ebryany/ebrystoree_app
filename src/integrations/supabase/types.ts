@@ -802,6 +802,7 @@ export type Database = {
         Row: {
           available_stock: number
           category_id: string | null
+          code_kind: string
           created_at: string
           currency: string
           deleted_at: string | null
@@ -832,6 +833,7 @@ export type Database = {
         Insert: {
           available_stock?: number
           category_id?: string | null
+          code_kind?: string
           created_at?: string
           currency?: string
           deleted_at?: string | null
@@ -862,6 +864,7 @@ export type Database = {
         Update: {
           available_stock?: number
           category_id?: string | null
+          code_kind?: string
           created_at?: string
           currency?: string
           deleted_at?: string | null
@@ -2401,6 +2404,7 @@ export type Database = {
           body: string | null
           created_at: string
           id: string
+          is_verified: boolean
           is_visible: boolean
           order_id: string | null
           product_id: string
@@ -2409,12 +2413,13 @@ export type Database = {
           store_id: string | null
           title: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           body?: string | null
           created_at?: string
           id?: string
+          is_verified?: boolean
           is_visible?: boolean
           order_id?: string | null
           product_id: string
@@ -2423,12 +2428,13 @@ export type Database = {
           store_id?: string | null
           title?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           body?: string | null
           created_at?: string
           id?: string
+          is_verified?: boolean
           is_visible?: boolean
           order_id?: string | null
           product_id?: string
@@ -2437,7 +2443,7 @@ export type Database = {
           store_id?: string | null
           title?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

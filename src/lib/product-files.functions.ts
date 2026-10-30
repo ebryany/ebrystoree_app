@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { decodeAccount } from "./account-stock";
 
 const authz = () => import("./authz.server");
 
@@ -8,6 +9,14 @@ type Ctx = { supabase: any; userId: string };
 
 const BUCKET = "product-files";
 const DEFAULT_MAX_MB = 100;
+
+export type DeliveryChoice = "shared" | "unique" | "code" | "account";
+
+/** Password akun tidak ikut dikirim ke daftar stok; cukup login untuk identifikasi. */
+function maskStockRow(row: { id: string; code: string; status: string; created_at: string; assigned_at: string | null }) {
+  const account = decodeAccount(row.code);
+  return { ...row, code: account ? account.login : row.code, isAccount: Boolean(account) };
+}
 
 async function guard<T>(
   context: Ctx,
@@ -51,7 +60,7 @@ export const listProductFiles = createServerFn({ method: "GET" })
       const sb = await admin();
       const { data: product } = await sb
         .from("digital_products")
-        .select("delivery_mode, available_stock")
+        .select("delivery_mode, code_kind, available_stock")
         .eq("id", data.productId)
         .maybeSingle();
       const { data: rows, error } = await sb
@@ -62,7 +71,11 @@ export const listProductFiles = createServerFn({ method: "GET" })
         .eq("product_id", data.productId)
         .order("created_at", { ascending: false });
       const meta = {
-        deliveryMode: (product?.delivery_mode ?? "shared") as "shared" | "unique",
+        deliveryMode: (product?.delivery_mode === "code"
+          ? product.code_kind === "account"
+            ? "account"
+            : "code"
+          : (product?.delivery_mode ?? "shared")) as DeliveryChoice,
         availableStock: Number(product?.available_stock ?? 0),
       };
       if (error)
@@ -81,18 +94,27 @@ export const listProductFiles = createServerFn({ method: "GET" })
     }),
   );
 
-/** Mengubah mode pengiriman produk digital: berkas bersama atau stok unik per pembeli. */
+/** Mengubah mode pengiriman: berkas bersama, stok berkas unik, kode/link, atau akun. */
 export const setProductDeliveryMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
-    z.object({ productId: z.string().uuid(), mode: z.enum(["shared", "unique"]) }).parse(data),
+    z
+      .object({
+        productId: z.string().uuid(),
+        mode: z.enum(["shared", "unique", "code", "account"]),
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "products.update", async (helpers) => {
       const sb = await admin();
+      const isAccount = data.mode === "account";
       const { error } = await sb
         .from("digital_products")
-        .update({ delivery_mode: data.mode })
+        .update({
+          delivery_mode: isAccount ? "code" : data.mode,
+          code_kind: isAccount ? "account" : "code",
+        })
         .eq("id", data.productId);
       if (error) return { ok: false as const, message: "Gagal mengubah mode pengiriman." };
 
@@ -105,13 +127,89 @@ export const setProductDeliveryMode = createServerFn({ method: "POST" })
         entityId: data.productId,
         after: { delivery_mode: data.mode },
       });
-      return {
-        ok: true as const,
-        message:
-          data.mode === "unique"
-            ? "Mode stok unik aktif. Berkas nonaktif tidak ikut dijual — aktifkan manual bila ingin dijadikan stok."
-            : "Mode berkas bersama aktif.",
+      const messages: Record<DeliveryChoice, string> = {
+        shared: "Mode berkas bersama aktif.",
+        unique:
+          "Mode stok unik aktif. Berkas nonaktif tidak ikut dijual — aktifkan manual bila ingin dijadikan stok.",
+        code: "Mode kode/link aktif. Tambahkan stok kode di bawah.",
+        account: "Mode akun aktif. Tambahkan stok akun di bawah.",
       };
+      return { ok: true as const, message: messages[data.mode] };
+    }),
+  );
+
+/** Menambah stok kode/akun produk (admin). Pesanan yang menunggu stok langsung dipenuhi. */
+export const ingestProductStockCodes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        codes: z.array(z.string().min(1).max(2000)).min(1).max(500),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) =>
+    guard(context as Ctx, "products.update", async (helpers) => {
+      const sb = await admin();
+      const { data: result, error } = await sb.rpc("ingest_stock_codes", {
+        _product_id: data.productId,
+        _codes: data.codes,
+        _source: "admin",
+      });
+      if (error) {
+        const notCode = error.message.includes("PRODUCT_NOT_CODE_MODE");
+        return {
+          ok: false as const,
+          message: notCode ? "Ubah mode pengiriman ke Kode/Link atau Akun dulu." : "Stok gagal disimpan.",
+        };
+      }
+      const r = result as { inserted: number; duplicate: number; fulfilled: number };
+      await helpers.writeAudit(context as Ctx, {
+        action: "product.stock_codes.ingest",
+        entityType: "digital_product",
+        entityId: data.productId,
+        after: { inserted: r.inserted, duplicate: r.duplicate, fulfilled: r.fulfilled },
+      });
+      const parts = [`${r.inserted} stok ditambahkan`];
+      if (r.duplicate) parts.push(`${r.duplicate} duplikat dilewati`);
+      if (r.fulfilled) parts.push(`${r.fulfilled} pesanan yang menunggu langsung terkirim`);
+      return { ok: true as const, message: `${parts.join(", ")}.` };
+    }),
+  );
+
+/** Daftar stok kode/akun produk (admin). Isi akun tidak dikirim; hanya login untuk identifikasi. */
+export const listProductStockCodes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ productId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) =>
+    guard(context as Ctx, "products.view", async () => {
+      const sb = await admin();
+      const { data: rows } = await sb
+        .from("product_stock_codes")
+        .select("id, code, status, created_at, assigned_at")
+        .eq("product_id", data.productId)
+        .order("created_at", { ascending: false })
+        .limit(200);
+      return { items: (rows ?? []).map(maskStockRow) };
+    }),
+  );
+
+/** Hapus satu stok yang belum terjual (admin). */
+export const deleteProductStockCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) =>
+    guard(context as Ctx, "products.update", async () => {
+      const sb = await admin();
+      const { data: rows, error } = await sb
+        .from("product_stock_codes")
+        .delete()
+        .eq("id", data.id)
+        .eq("status", "available")
+        .select("id");
+      if (error || !rows?.length) return { ok: false as const, message: "Stok terjual tidak bisa dihapus." };
+      return { ok: true as const, message: "Stok dihapus." };
     }),
   );
 

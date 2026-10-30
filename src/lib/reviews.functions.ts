@@ -118,7 +118,7 @@ export const listProductReviews = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await supabase
       .from("product_reviews")
-      .select("id, rating, title, body, reviewer_name, created_at")
+      .select("id, rating, title, body, reviewer_name, created_at, is_verified")
       .eq("product_id", data.productId)
       .eq("is_visible", true)
       .order("created_at", { ascending: false })
@@ -165,6 +165,61 @@ export const getMyReviewState = createServerFn({ method: "GET" })
     ]);
 
     return { canReview: Boolean(purchase), myReview: mine ?? null };
+  });
+
+/**
+ * Ulasan tanpa akun (mis. pelanggan yang dulu bertransaksi lewat WhatsApp).
+ * Ditulis lewat service role karena anon tidak punya hak tulis tabel;
+ * dibatasi per IP dan ditandai tidak terverifikasi.
+ */
+export const submitGuestReview = createServerFn({ method: "POST" })
+  .validator((data: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        name: z.string().trim().min(2).max(60),
+        rating: z.number().int().min(1).max(5),
+        body: z.string().trim().max(1000).optional(),
+        // Honeypot: kolom tersembunyi yang hanya diisi bot.
+        website: z.string().max(200).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    if (data.website) return { ok: true as const, error: null };
+
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const ip =
+      (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() ||
+      getRequestHeader("x-real-ip") ||
+      "unknown";
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    const limited = await enforceRateLimit(`ip:${ip}`, "review.guest");
+    if (limited) return { ok: false as const, error: "Terlalu banyak ulasan. Coba lagi nanti." };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: product } = await supabaseAdmin
+      .from("digital_products")
+      .select("id")
+      .eq("id", data.productId)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!product) return { ok: false as const, error: "Produk tidak ditemukan." };
+
+    const { error } = await supabaseAdmin.from("product_reviews").insert({
+      product_id: data.productId,
+      user_id: null,
+      rating: data.rating,
+      body: data.body || null,
+      reviewer_name: data.name,
+      is_verified: false,
+    });
+    if (error) {
+      console.error("[reviews] submitGuestReview gagal:", error.message);
+      return { ok: false as const, error: "Ulasan gagal dikirim. Coba lagi." };
+    }
+    return { ok: true as const, error: null };
   });
 
 export const submitProductReview = createServerFn({ method: "POST" })

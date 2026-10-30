@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { BadgeCheck } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -12,10 +12,136 @@ import { useSession } from "@/hooks/use-session";
 import {
   getMyReviewState,
   listProductReviews,
+  submitGuestReview,
   submitProductReview,
 } from "@/lib/reviews.functions";
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" });
+
+/** Event untuk membuka form ulasan dari tombol lain di halaman produk. */
+export const OPEN_REVIEW_EVENT = "ebry:open-review";
+
+function useOpenReviewEvent(onOpen: () => void) {
+  useEffect(() => {
+    window.addEventListener(OPEN_REVIEW_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_REVIEW_EVENT, onOpen);
+  }, [onOpen]);
+}
+
+/** Ulasan tanpa akun untuk pelanggan yang membeli di luar web (mis. WhatsApp). */
+function GuestReviewForm({ productId }: { productId: string }) {
+  const queryClient = useQueryClient();
+  const submit = useServerFn(submitGuestReview);
+  const [open, setOpen] = useState(false);
+  useOpenReviewEvent(useCallback(() => setOpen(true), []));
+  const [sent, setSent] = useState(false);
+  const [name, setName] = useState("");
+  const [rating, setRating] = useState(0);
+  const [body, setBody] = useState("");
+  const [website, setWebsite] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      submit({ data: { productId, name, rating, body: body || undefined, website: website || undefined } }),
+    onSuccess: (result) => {
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      setSent(true);
+      setOpen(false);
+      toast.success("Terima kasih, ulasan kamu sudah tampil.");
+      queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
+    },
+    onError: () => toast.error("Ulasan gagal dikirim. Coba lagi."),
+  });
+
+  if (sent) {
+    return <p className="text-sm text-muted-foreground">Terima kasih, ulasan kamu sudah kami terima.</p>;
+  }
+
+  if (!open) {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Pernah membeli produk ini? Bagikan pengalamanmu.</p>
+        <Button variant="outline" className="min-h-11" onClick={() => setOpen(true)}>
+          Tulis ulasan
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (name.trim().length < 2) {
+          toast.error("Isi nama kamu dulu.");
+          return;
+        }
+        if (rating < 1) {
+          toast.error("Pilih rating bintang terlebih dahulu.");
+          return;
+        }
+        if (!mutation.isPending) mutation.mutate();
+      }}
+    >
+      <StarInput value={rating} onChange={setRating} disabled={mutation.isPending} />
+      <div>
+        <label htmlFor="guest-review-name" className="text-sm font-medium">
+          Nama
+        </label>
+        <Input
+          id="guest-review-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={60}
+          autoComplete="name"
+          className="mt-1"
+          placeholder="Nama yang tampil di ulasan"
+        />
+      </div>
+      <div>
+        <label htmlFor="guest-review-body" className="text-sm font-medium">
+          Ulasan <span className="text-muted-foreground">(opsional)</span>
+        </label>
+        <Textarea
+          id="guest-review-body"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          maxLength={1000}
+          rows={3}
+          className="mt-1"
+          placeholder="Ceritakan pengalamanmu memakai produk ini"
+        />
+      </div>
+      {/* Honeypot anti-bot: tersembunyi dari pengguna dan pembaca layar. */}
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        className="hidden"
+        name="website"
+      />
+      <p className="text-xs text-muted-foreground">
+        Ulasan tampil dengan label "Transaksi di luar web".
+      </p>
+      <div className="flex gap-2">
+        <Button type="submit" className="min-h-11" disabled={mutation.isPending}>
+          {mutation.isPending ? "Mengirim…" : "Kirim ulasan"}
+        </Button>
+        <Button type="button" variant="ghost" className="min-h-11" onClick={() => setOpen(false)}>
+          Batal
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 export function ProductReviewPanel({ productId }: { productId: string }) {
   const { user } = useSession();
@@ -39,6 +165,7 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
   const [body, setBody] = useState("");
   // Form tertutup default; terbuka otomatis bila pengguna sudah punya ulasan.
   const [formOpen, setFormOpen] = useState(false);
+  useOpenReviewEvent(useCallback(() => setFormOpen(true), []));
 
   useEffect(() => {
     const mine = state.data?.myReview;
@@ -144,17 +271,8 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
           pembeli yang tidak memenuhi syarat tidak disodori form besar.
           Pengguna yang sudah punya ulasan langsung melihat formnya terbuka. */}
       <div className="mt-4 border-y border-border px-4 py-4 sm:px-5">
-        {!user ? (
-          <p className="text-sm text-muted-foreground">
-            <Link to="/auth" className="font-semibold text-primary hover:underline">
-              Masuk
-            </Link>{" "}
-            untuk memberi ulasan setelah pembelianmu diverifikasi.
-          </p>
-        ) : !canReview ? (
-          <p className="text-sm text-muted-foreground">
-            Ulasan terbuka setelah pesanan produk ini lunas — supaya penilaian tetap jujur.
-          </p>
+        {!user || !canReview ? (
+          <GuestReviewForm productId={productId} />
         ) : (
           <>
             {!formOpen ? (
@@ -227,7 +345,19 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
           {shown.map((review) => (
             <li key={review.id} className="py-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm font-semibold">{review.reviewer_name ?? "Pembeli Ebrystore"}</span>
+                <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="text-sm font-semibold">{review.reviewer_name ?? "Pembeli Ebrystore"}</span>
+                  {review.is_verified ? (
+                    <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                      <BadgeCheck className="size-3" aria-hidden="true" />
+                      Pembeli terverifikasi
+                    </span>
+                  ) : (
+                    <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                      Transaksi di luar web
+                    </span>
+                  )}
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {dateFmt.format(new Date(review.created_at))}
                 </span>

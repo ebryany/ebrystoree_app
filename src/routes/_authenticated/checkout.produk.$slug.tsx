@@ -287,8 +287,10 @@ function CheckoutProduk() {
                       : `Produk stok unik: 1 berkas khusus per pesanan. Sisa stok ${stock}.`
                     : codeDelivery
                       ? soldOut
-                        ? "Stok kode habis untuk saat ini."
-                        : `Kode/voucher unik: 1 per pesanan. Sisa stok ${stock}.`
+                        ? "Stok habis untuk saat ini."
+                        : (p as { code_kind?: string }).code_kind === "account"
+                          ? `Akun siap pakai: 1 akun per pesanan. Sisa stok ${stock}.`
+                          : `Kode/voucher unik: 1 per pesanan. Sisa stok ${stock}.`
                       : "Maksimal 10 lisensi per pesanan."}
                 </p>
               </div>

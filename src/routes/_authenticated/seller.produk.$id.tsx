@@ -12,6 +12,7 @@ import {
   UploadCloud,
   Code,
   AlertTriangle,
+  KeyRound,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductVariantEditor } from "@/components/product/variant-editor";
+import { StockInput } from "@/components/product/stock-input";
+import { decodeAccount } from "@/lib/account-stock";
+import type { DeliveryChoice } from "@/lib/product-files.functions";
 import {
   archiveMyProduct,
   getMyProduct,
@@ -287,7 +291,6 @@ function SellerFilesSection({ productId }: { productId: string }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [version, setVersion] = useState("v1");
   const [busy, setBusy] = useState(false);
-  const [codesText, setCodesText] = useState("");
 
   const fetchFiles = useServerFn(listMyProductFiles);
   const prepare = useServerFn(createMyFileUpload);
@@ -306,7 +309,7 @@ function SellerFilesSection({ productId }: { productId: string }) {
   const codesQuery = useQuery({
     queryKey: ["my-stock-codes", productId],
     queryFn: () => fetchCodes({ data: { productId } }),
-    enabled: (data as any)?.deliveryMode === "code",
+    enabled: ["code", "account"].includes((data as any)?.deliveryMode),
   });
 
   const invalidate = () => {
@@ -317,12 +320,13 @@ function SellerFilesSection({ productId }: { productId: string }) {
     void qc.invalidateQueries({ queryKey: ["my-product", productId] });
   };
 
-  const deliveryMode: "shared" | "unique" | "code" = (data as any)?.deliveryMode ?? "shared";
+  const deliveryMode: DeliveryChoice = (data as any)?.deliveryMode ?? "shared";
+  const isStockCode = deliveryMode === "code" || deliveryMode === "account";
   const availableStock: number = Number((data as any)?.availableStock ?? 0);
   const forbidden = (data as any)?.forbidden === true;
 
   const modeMutation = useMutation({
-    mutationFn: (mode: "shared" | "unique" | "code") => setMode({ data: { productId, mode } }),
+    mutationFn: (mode: DeliveryChoice) => setMode({ data: { productId, mode } }),
     onSuccess: (res: any) => {
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
@@ -349,22 +353,24 @@ function SellerFilesSection({ productId }: { productId: string }) {
   });
 
   const codesMutation = useMutation({
-    mutationFn: async () => {
-      const codes = codesText
-        .split(/[\n,;]+/)
-        .map((c) => c.trim())
-        .filter(Boolean);
-      if (codes.length === 0) throw new Error("Masukkan minimal satu kode.");
-      return ingestCodes({ data: { productId, codes } });
-    },
-    onSuccess: (res: any) => {
-      if (!res.ok) return toast.error(res.message);
-      toast.success(res.message);
-      setCodesText("");
-      invalidate();
-    },
-    onError: (e: any) => toast.error(e?.message ?? "Gagal menyimpan kode."),
+    mutationFn: (codes: string[]) => ingestCodes({ data: { productId, codes } }),
   });
+
+  async function addStock(codes: string[]): Promise<boolean> {
+    try {
+      const res: any = await codesMutation.mutateAsync(codes);
+      if (!res.ok) {
+        toast.error(res.message);
+        return false;
+      }
+      toast.success(res.message);
+      invalidate();
+      return true;
+    } catch {
+      toast.error("Gagal menyimpan stok.");
+      return false;
+    }
+  }
 
   async function handleUpload() {
     const files = Array.from(fileInput.current?.files ?? []);
@@ -443,9 +449,11 @@ function SellerFilesSection({ productId }: { productId: string }) {
                 "Stok unik: setiap pembeli mendapat satu berkas berbeda. Produk habis saat stok nol."}
               {deliveryMode === "code" &&
                 "Kode/link: setiap pembeli mendapat satu kode unik (serial key, voucher, dll)."}
+              {deliveryMode === "account" &&
+                "Akun: setiap pembeli mendapat satu akun (email + password) yang tinggal disalin."}
             </p>
           </div>
-          {(deliveryMode === "unique" || deliveryMode === "code") && (
+          {(deliveryMode === "unique" || isStockCode) && (
             <Badge
               variant={availableStock > 0 ? "secondary" : "destructive"}
               className="shrink-0 gap-1"
@@ -481,11 +489,20 @@ function SellerFilesSection({ productId }: { productId: string }) {
             <Code className="mr-1 size-3.5" aria-hidden="true" />
             Kode/Link
           </Button>
+          <Button
+            size="sm"
+            variant={deliveryMode === "account" ? "default" : "outline"}
+            disabled={modeMutation.isPending}
+            onClick={() => modeMutation.mutate("account")}
+          >
+            <KeyRound className="mr-1 size-3.5" aria-hidden="true" />
+            Akun
+          </Button>
         </div>
       </div>
 
       {/* Upload file (shared & unique) */}
-      {deliveryMode !== "code" && (
+      {!isStockCode && (
         <div className="space-y-3 rounded-xl border border-border p-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
             <div className="space-y-1.5">
@@ -524,7 +541,7 @@ function SellerFilesSection({ productId }: { productId: string }) {
       )}
 
       {/* Daftar file */}
-      {deliveryMode !== "code" && (
+      {!isStockCode && (
         <div className="space-y-2">
           <h3 className="text-sm font-semibold">
             {deliveryMode === "unique" ? "Daftar stok berkas" : "Histori versi"}
@@ -615,46 +632,33 @@ function SellerFilesSection({ productId }: { productId: string }) {
       )}
 
       {/* Input stock codes (mode code) */}
-      {deliveryMode === "code" && (
+      {isStockCode && (
         <div className="space-y-3 rounded-xl border border-border p-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="seller-codes">Kode stok</Label>
-            <Textarea
-              id="seller-codes"
-              value={codesText}
-              onChange={(e) => setCodesText(e.target.value)}
-              rows={5}
-              placeholder={"Paste kode, satu per baris:\nABC-123-XYZ\nDEF-456-UVW\nGHI-789-RST"}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Pisahkan kode dengan baris baru, koma, atau titik koma. Maksimal 500 kode per batch.
-            Duplikat otomatis dilewati.
-          </p>
-          <Button
-            onClick={() => codesMutation.mutate()}
-            disabled={codesMutation.isPending || !codesText.trim()}
-            size="sm"
-            className="min-h-11"
-          >
-            <Code className="mr-1 size-4" aria-hidden="true" />
-            {codesMutation.isPending ? "Menyimpan…" : "Tambah kode stok"}
-          </Button>
+          <StockInput
+            key={deliveryMode}
+            kind={deliveryMode === "account" ? "account" : "code"}
+            pending={codesMutation.isPending}
+            onSubmit={addStock}
+          />
 
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold">Daftar kode ({codeItems.length})</h3>
+            <h3 className="text-sm font-semibold">
+              {deliveryMode === "account" ? "Daftar akun" : "Daftar kode"} ({codeItems.length})
+            </h3>
             {codesQuery.isPending ? (
               <p className="text-sm text-muted-foreground">Memuat…</p>
             ) : codeItems.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Belum ada kode. Tambahkan kode agar produk bisa dibeli.
+                Belum ada stok. Tambahkan stok agar produk bisa dibeli.
               </p>
             ) : (
               <div className="max-h-60 overflow-y-auto rounded-lg border border-border">
                 <table className="w-full text-xs">
                   <thead className="sticky top-0 bg-muted">
                     <tr>
-                      <th className="px-3 py-2 text-left font-medium">Kode</th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        {deliveryMode === "account" ? "Login" : "Kode"}
+                      </th>
                       <th className="px-3 py-2 text-left font-medium">Status</th>
                       <th className="px-3 py-2 text-left font-medium">Ditambahkan</th>
                     </tr>
@@ -662,7 +666,9 @@ function SellerFilesSection({ productId }: { productId: string }) {
                   <tbody>
                     {codeItems.map((c: any) => (
                       <tr key={c.id} className="border-t border-border">
-                        <td className="px-3 py-1.5 font-mono">{c.code}</td>
+                        <td className="max-w-[16rem] truncate px-3 py-1.5 font-mono">
+                          {decodeAccount(c.code)?.login ?? c.code}
+                        </td>
                         <td className="px-3 py-1.5">
                           <Badge
                             variant={c.status === "available" ? "secondary" : "outline"}

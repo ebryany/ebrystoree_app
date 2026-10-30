@@ -29,7 +29,7 @@ export const getProductDetail = createServerFn({ method: "GET" })
     const { data: row, error } = await supabase
       .from("digital_products")
       .select(
-        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, available_stock, store_id, stores(name, slug, is_platform), categories(name, slug), product_variants(id, name, price, discount_price, sort_order)",
+        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, code_kind, available_stock, store_id, stores(name, slug, is_platform), categories(name, slug), product_variants(id, name, price, discount_price, sort_order)",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -584,7 +584,7 @@ export const listMyEntitlements = createServerFn({ method: "GET" })
     const { data, error } = await sb
       .from("digital_entitlements")
       .select(
-        "id, download_limit, download_count, valid_until, revoked_at, file_version, order_id, digital_products(name, thumbnail_url, slug, delivery_mode)",
+        "id, download_limit, download_count, valid_until, revoked_at, file_version, order_id, digital_products(name, thumbnail_url, slug, delivery_mode, code_kind)",
       )
       .eq("user_id", (context as Ctx).userId)
       .order("created_at", { ascending: false });
