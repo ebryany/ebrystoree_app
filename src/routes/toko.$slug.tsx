@@ -226,17 +226,19 @@ function Storefront() {
           <header className="grid gap-3 rounded-2xl border border-border bg-card p-3 sm:p-4 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-6">
             {/* Kartu identitas: banner gelap + logo + aksi utama. Overlay hitam
                 tetap dipakai di atas banner apa pun agar teks putih terbaca. */}
-            <div className="relative isolate overflow-hidden rounded-xl bg-primary">
+            <div className="relative isolate overflow-hidden rounded-xl bg-accent-gradient">
               {view.bannerUrl ? (
-                <img
-                  src={view.bannerUrl}
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute inset-0 -z-10 size-full object-cover"
-                  style={{ objectPosition: `50% ${view.bannerPosition}%` }}
-                />
+                <>
+                  <img
+                    src={view.bannerUrl}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 -z-10 size-full object-cover"
+                    style={{ objectPosition: `50% ${view.bannerPosition}%` }}
+                  />
+                  <div className="absolute inset-0 -z-10 bg-accent-gradient opacity-75" aria-hidden="true" />
+                </>
               ) : null}
-              <div className="absolute inset-0 -z-10 bg-black/55" aria-hidden="true" />
               <div className="p-4 text-white">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white/80 bg-surface-selected text-2xl font-bold text-accent sm:size-[72px]">
@@ -252,7 +254,7 @@ function Storefront() {
                     </h1>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {store.is_platform ? (
-                        <span className="inline-flex items-center gap-1 rounded bg-accent px-1.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
+                        <span className="inline-flex items-center gap-1 rounded bg-white px-1.5 py-0.5 text-[11px] font-semibold text-accent">
                           <BadgeCheck className="size-3" aria-hidden="true" />
                           Official
                         </span>
@@ -262,7 +264,7 @@ function Storefront() {
                           Pratinjau
                         </span>
                       ) : null}
-                      <span className="truncate text-xs text-white/80">/toko/{store.slug}</span>
+                      <span className="truncate text-xs text-white/90">/toko/{store.slug}</span>
                     </div>
                   </div>
                 </div>
