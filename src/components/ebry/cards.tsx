@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { ChevronRight, Package } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { InlineToasts } from "@/components/ebry/inline-toasts";
 import { StatusPill } from "@/components/ebry/status";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
@@ -434,6 +435,7 @@ export function BankHeader({
           ))}
         </div>
       </div>
+      <InlineToasts />
     </header>
   );
 }
@@ -672,6 +674,7 @@ export function PageHeader({
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
+      <InlineToasts />
     </header>
   );
 }

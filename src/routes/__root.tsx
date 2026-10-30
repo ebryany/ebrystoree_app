@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { useInlineToastActive } from "@/components/ebry/inline-toasts";
 import { getPublicWebsiteSettings } from "@/lib/website-settings.functions";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
@@ -172,6 +173,7 @@ function RootComponent() {
   const router = useRouter();
   const settings = Route.useLoaderData();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const inlineToasts = useInlineToastActive();
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -200,7 +202,9 @@ function RootComponent() {
       </MaintenanceGate>
       {/* richColors sengaja dilepas: permukaan frosted netral + ikon semantik
           diatur terpusat di components/ui/sonner.tsx untuk semua toast. */}
-      <Toaster position="top-center" />
+      {/* Disembunyikan saat header dashboard terlihat: notifikasi tampil
+          menempel di bawah header (components/ebry/inline-toasts.tsx). */}
+      {inlineToasts ? null : <Toaster position="top-center" />}
     </QueryClientProvider>
   );
 }

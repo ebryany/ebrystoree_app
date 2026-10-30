@@ -26,7 +26,7 @@ type ToasterProps = React.ComponentProps<typeof Sonner>;
  */
 const iconWrap = "grid size-8 shrink-0 place-items-center rounded-full";
 
-const toastIcons = {
+export const toastIcons = {
   success: (
     <span className={cn(iconWrap, "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400")}>
       <CheckCircle2 className="size-4" />
