@@ -39,7 +39,12 @@ function DashboardLayout() {
   const bottomNav: BottomNavItem[] = [
     { to: "/dashboard", label: "Beranda", icon: Home, exact: true },
     { to: "/dashboard/pesanan", label: "Pesanan", icon: ReceiptText },
-    { to: "/dashboard/produk-saya", label: "Produk", icon: Package },
+    {
+      to: "/dashboard/produk-saya",
+      label: "Produk",
+      icon: Package,
+      match: ["/dashboard/produk", "/dashboard/disukai"],
+    },
     { to: "/dashboard/notifikasi", label: "Notifikasi", icon: Bell, badge: unread },
     { to: "/dashboard/pengaturan", label: "Akun", icon: Settings },
   ];

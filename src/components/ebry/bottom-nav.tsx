@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -9,23 +9,32 @@ export type BottomNavItem = {
   icon: LucideIcon;
   exact?: boolean;
   badge?: number;
+  /** Awalan path lain yang juga menandai item ini aktif (mis. katalog + pustaka produk). */
+  match?: string[];
 };
 
 /** Navigasi bawah mobile (ikon + label, target sentuh >= 44px). */
 export function BottomNavigation({ items, ariaLabel }: { items: BottomNavItem[]; ariaLabel: string }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav
       aria-label={ariaLabel}
       className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 shadow-[0_-8px_24px_-18px_hsl(0_0%_0%/0.5)] md:hidden"
     >
       <ul className="mx-auto flex max-w-lg px-1">
-        {items.map((item) => (
+        {items.map((item) => {
+          const matched = item.match?.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+          return (
           <li key={item.to} className="flex-1">
             <Link
               to={item.to}
               activeOptions={{ exact: Boolean(item.exact) }}
               activeProps={{ className: "text-accent", "data-active": "true" }}
-              inactiveProps={{ className: "text-muted-foreground" }}
+              inactiveProps={
+                matched
+                  ? { className: "text-accent", "data-active": "true", "aria-current": "page" }
+                  : { className: "text-muted-foreground" }
+              }
               className="press-scale group relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/60"
             >
               <span className="relative grid size-9 place-items-center rounded-full transition-all duration-200 group-data-[active=true]:bg-accent/12 group-data-[active=true]:-translate-y-0.5">
@@ -49,7 +58,8 @@ export function BottomNavigation({ items, ariaLabel }: { items: BottomNavItem[];
               />
             </Link>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </nav>
   );

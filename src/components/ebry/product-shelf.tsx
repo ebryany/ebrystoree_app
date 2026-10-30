@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Package, Star } from "lucide-react";
 
@@ -18,6 +26,22 @@ export type ProductTileItem = {
   discount_price: number | string | null;
   sold_count?: number;
 };
+
+/**
+ * Gaya kaca (glassmorphism) untuk kartu dan rak. Dipasang per halaman lewat
+ * <ProductGlass>, jadi beranda dan /produk tetap memakai kartu biasa.
+ */
+const GlassContext = createContext(false);
+
+export function ProductGlass({ children }: { children: ReactNode }) {
+  return <GlassContext.Provider value>{children}</GlassContext.Provider>;
+}
+
+const GLASS_TILE =
+  "border-white/60 bg-white/55 shadow-[0_8px_24px_-12px_oklch(0.33_0.062_200/0.35)] ring-1 ring-inset ring-white/40 backdrop-blur-md hover:border-white/90 dark:border-white/10 dark:bg-white/5 dark:ring-white/5 dark:hover:border-white/25";
+
+export const GLASS_SECTION =
+  "bg-[linear-gradient(135deg,oklch(0.94_0.04_195/0.9),oklch(0.97_0.02_95/0.85))] dark:bg-[linear-gradient(135deg,oklch(0.3_0.05_200/0.7),oklch(0.24_0.035_203/0.7))]";
 
 /** Ambang "Top Seller": produk di 3 besar rak terlaris atau sudah laku ≥ 10. */
 const TOP_SELLER_MIN_SOLD = 10;
@@ -64,12 +88,16 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
   const logo = isRenderableImageUrl(item.store_logo_url) ? item.store_logo_url : null;
   const sellerName = official ? (item.store_name ?? "Ebrystore") : item.store_name;
   const hasSeller = Boolean(sellerName);
+  const glass = useContext(GlassContext);
 
   return (
     <Link
       to="/produk/$slug"
       params={{ slug: item.slug }}
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        "group flex h-full flex-col overflow-hidden rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        glass ? GLASS_TILE : "border-border bg-card hover:border-foreground/30",
+      )}
     >
       {/* overflow-hidden wajib: tanpa itu aspect-ratio hanya batas minimum dan
           gambar tinggi ikut memanjangkan bingkai (kartu jadi tidak sejajar). */}
@@ -299,11 +327,13 @@ export function Shelf({
   layout?: "rail" | "grid";
 }) {
   const track = useRef<HTMLUListElement>(null);
+  const glass = useContext(GlassContext);
+  const surface = glass ? GLASS_SECTION : "bg-card";
   if (!items.length) return null;
   const headingId = `shelf-${title.replace(/\W+/g, "-").toLowerCase()}`;
   if (layout === "grid") {
     return (
-      <section aria-labelledby={headingId} className="rounded-2xl bg-card py-3.5 sm:py-4">
+      <section aria-labelledby={headingId} className={cn("rounded-2xl py-3.5 sm:py-4", surface)}>
         <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
           <ShelfHeading id={headingId} title={title} />
           {action}
@@ -319,7 +349,7 @@ export function Shelf({
     );
   }
   return (
-    <section aria-labelledby={headingId} className="@container rounded-2xl bg-card py-3.5 sm:py-4">
+    <section aria-labelledby={headingId} className={cn("@container rounded-2xl py-3.5 sm:py-4", surface)}>
       <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
         <ShelfHeading id={headingId} title={title} />
         <div className="flex items-center gap-3">

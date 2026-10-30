@@ -7,7 +7,7 @@ import { Package, Search } from "lucide-react";
 import { InlineEmpty, PageHeader, SegmentedFilter } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
 import { PopularSellers } from "@/components/ebry/popular-sellers";
-import { ProductTile, Shelf } from "@/components/ebry/product-shelf";
+import { GLASS_SECTION, ProductGlass, ProductTile, Shelf } from "@/components/ebry/product-shelf";
 import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,6 +83,7 @@ function DashboardProduk() {
   }
 
   return (
+    <ProductGlass>
     <div className="space-y-4">
       <PageHeader
         icon={Package}
@@ -132,7 +133,7 @@ function DashboardProduk() {
             </div>
           ) : (
             <>
-              <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <ul className={`grid grid-cols-2 gap-3 rounded-2xl p-3 sm:grid-cols-3 lg:grid-cols-4 ${GLASS_SECTION}`}>
                 {items.map((item) => (
                   <li key={item.id} className="min-w-0">
                     <ProductTile item={item} />
@@ -184,5 +185,6 @@ function DashboardProduk() {
         </>
       )}
     </div>
+    </ProductGlass>
   );
 }
