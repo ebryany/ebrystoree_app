@@ -6,6 +6,8 @@ import { notificationTone } from "@/components/ebry/notification-meta";
 import { cn } from "@/lib/utils";
 
 export type PushNotificationInput = {
+  /** Id notifikasi; dipakai sebagai id toast supaya tidak tampil dobel. */
+  id?: string;
   title: string;
   message?: string | null;
   type?: string | null;
@@ -37,7 +39,7 @@ function NotificationToastCard({
   message,
   type,
   href,
-}: PushNotificationInput & { id: string | number }) {
+}: Omit<PushNotificationInput, "id"> & { id: string | number }) {
   const tone = notificationTone(type);
   const Icon = tone.icon;
 
@@ -105,8 +107,9 @@ function NotificationToastCard({
 }
 
 /** Tampilkan notifikasi gaya push mobile banking (kartu melayang di atas layar). */
-export function pushNotificationToast(input: PushNotificationInput) {
+export function pushNotificationToast({ id: notificationId, ...input }: PushNotificationInput) {
   toast.custom((id) => <NotificationToastCard id={id} {...input} />, {
+    ...(notificationId ? { id: `notif:${notificationId}` } : {}),
     duration: 6500,
     className: "!bg-transparent !border-0 !p-0 !shadow-none",
   });

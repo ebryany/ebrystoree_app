@@ -20,6 +20,17 @@ import { isPayoutStaff, notificationTone, relativeTime } from "@/components/ebry
 import { pushNotificationToast } from "@/components/ebry/notification-toast";
 import { cn } from "@/lib/utils";
 
+const seenNotifications = new Set<string>();
+
+/** true bila id ini belum pernah diproses di tab ini. */
+function claimNotification(id: unknown): boolean {
+  if (typeof id !== "string") return true;
+  if (seenNotifications.has(id)) return false;
+  seenNotifications.add(id);
+  if (seenNotifications.size > 200) seenNotifications.clear();
+  return true;
+}
+
 /** Bubble notifikasi realtime dengan badge jumlah belum dibaca + suara lonceng. */
 export function NotificationBell({ className }: { className?: string }) {
   const { user } = useSession();
@@ -58,10 +69,18 @@ export function NotificationBell({ className }: { className?: string }) {
     enabled: Boolean(user),
     onEvent: (payload) => {
       if (payload.eventType === "INSERT" && payload.new?.title) {
-        playRef.current();
         setPulse(true);
         window.setTimeout(() => setPulse(false), 1600);
+        // Lonceng dipasang lebih dari sekali (header desktop + mobile); hanya
+        // instance pertama yang menerima id ini boleh berbunyi dan menampilkan kartu.
+        if (!claimNotification(payload.new.id)) return;
+        // Pengguna sedang membuka halaman objek notifikasi ini (mis. detail pesanan
+        // yang baru ia batalkan): toast aksi di halaman itu sudah cukup.
+        const related = payload.new.related_id as string | null | undefined;
+        if (related && window.location.pathname.includes(related)) return;
+        playRef.current();
         pushNotificationToast({
+          id: payload.new.id,
           title: payload.new.title,
           message: payload.new.message,
           type: payload.new.type,

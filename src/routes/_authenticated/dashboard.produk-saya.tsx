@@ -10,7 +10,6 @@ import { InlineEmpty } from "@/components/ebry/cards";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Button } from "@/components/ui/button";
 import { StockCodeAccess } from "@/components/ebry/stock-code-access";
-import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import { downloadEntitlement, listMyEntitlements } from "@/lib/orders.functions";
 import { cn } from "@/lib/utils";
 import { CalendarClock, Download, FileArchive, Loader2, Package, ShieldOff, TimerOff } from "lucide-react";
@@ -72,8 +71,6 @@ function ProdukSaya() {
         description="Unduh berkas, atau salin akun dan kode/link pembelian Anda. Periksa produk sebelum mengonfirmasi penerimaan."
       />
 
-      <RecentlyViewedShelf />
-
       {isPending ? (
         <AdminLoading label="Memuat pustaka…" />
       ) : error ? (
@@ -105,61 +102,63 @@ function ProdukSaya() {
             return (
               <li
                 key={e.id}
-                className="group flex flex-col overflow-hidden rounded-2xl bg-card transition-shadow hover:elev-2"
+                className="flex flex-col rounded-2xl bg-card transition-shadow hover:elev-2"
               >
-                <div className="relative h-24 overflow-hidden bg-surface-selected">
-                  {product.thumbnail_url ? (
-                    <img
-                      src={product.thumbnail_url}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      aria-hidden="true"
-                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <span className="grid size-full place-items-center text-muted-foreground">
-                      <FileArchive className="size-8" aria-hidden="true" />
-                    </span>
-                  )}
-                  <span
-                    className={cn(
-                      "absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur",
-                      revoked
-                        ? "bg-destructive/90 text-destructive-foreground"
-                        : expired || quotaExhausted
-                          ? "bg-foreground/70 text-background"
-                          : "bg-success text-success-foreground",
-                    )}
-                  >
-                    {revoked ? (
-                      <>
-                        <ShieldOff className="size-3" aria-hidden="true" /> Dicabut
-                      </>
-                    ) : expired ? (
-                      <>
-                        <TimerOff className="size-3" aria-hidden="true" /> Kedaluwarsa
-                      </>
-                    ) : quotaExhausted ? (
-                      "Kuota habis"
-                    ) : (
-                      "Aktif"
-                    )}
-                  </span>
-                </div>
-
                 <div className="flex flex-1 flex-col gap-3 p-4">
-                  <div>
-                    <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
-                      {product.name ?? "Produk"}
-                    </h2>
-                    <p className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <CalendarClock className="size-3.5" aria-hidden="true" />
-                      {e.valid_until
-                        ? `Berlaku s/d ${new Date(e.valid_until).toLocaleDateString("id-ID", { dateStyle: "medium" })}`
-                        : "Tanpa batas waktu"}
-                      {left !== null && left > 0 && left <= 30 ? ` · ${left} hari lagi` : ""}
-                    </p>
+                  {/* Thumbnail kecil + identitas: nama produk terbaca tanpa banner terpotong. */}
+                  <div className="flex items-start gap-3">
+                    <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-selected text-muted-foreground">
+                      {product.thumbnail_url ? (
+                        <img
+                          src={product.thumbnail_url}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          aria-hidden="true"
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        <FileArchive className="size-6" aria-hidden="true" />
+                      )}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+                          {product.name ?? "Produk"}
+                        </h2>
+                        <span
+                          className={cn(
+                            "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                            revoked
+                              ? "bg-destructive/10 text-destructive"
+                              : expired || quotaExhausted
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-primary/10 text-primary",
+                          )}
+                        >
+                          {revoked ? (
+                            <>
+                              <ShieldOff className="size-3" aria-hidden="true" /> Dicabut
+                            </>
+                          ) : expired ? (
+                            <>
+                              <TimerOff className="size-3" aria-hidden="true" /> Kedaluwarsa
+                            </>
+                          ) : quotaExhausted ? (
+                            "Kuota habis"
+                          ) : (
+                            "Aktif"
+                          )}
+                        </span>
+                      </div>
+                      <p className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <CalendarClock className="size-3.5" aria-hidden="true" />
+                        {e.valid_until
+                          ? `Berlaku s/d ${new Date(e.valid_until).toLocaleDateString("id-ID", { dateStyle: "medium" })}`
+                          : "Tanpa batas waktu"}
+                        {left !== null && left > 0 && left <= 30 ? ` · ${left} hari lagi` : ""}
+                      </p>
+                    </div>
                   </div>
 
                   {!isCode ? <div>
