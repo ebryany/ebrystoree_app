@@ -31,6 +31,9 @@ function row(overrides: Partial<MarketplaceServiceOrderRow> = {}): MarketplaceSe
     requirements_approved_at: null,
     accepted_at: null,
     service_name: "JASA BUAT WEB",
+    seller_response_due_at: null,
+    review_due_at: null,
+    extension_requested_days: null,
     ...overrides,
   };
 }
@@ -39,7 +42,7 @@ describe("service order next action", () => {
   it("tells the seller to approve requirements first", () => {
     const next = serviceOrderNextAction(row());
     expect(next.tone).toBe("action");
-    expect(next.title).toContain("Setujui requirements");
+    expect(next.title).toContain("Setujui atau tolak kebutuhan");
   });
 
   it("asks for delivery while work is in progress and on revision", () => {
@@ -166,7 +169,7 @@ describe("seller page redesign (static source contract)", () => {
 
   it("keeps the layered detail order and the folded agreement", () => {
     const detail = card.slice(card.indexOf("function SellerServiceOrderDetail"));
-    const actionIndex = detail.indexOf("Setujui requirements untuk mulai");
+    const actionIndex = detail.indexOf("Setujui atau tolak kebutuhan");
     const needsIndex = detail.indexOf("Kebutuhan pembeli");
     const agreementIndex = detail.indexOf("<details");
     const historyIndex = detail.indexOf("Hasil terkirim");

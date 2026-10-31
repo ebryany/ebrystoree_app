@@ -6,7 +6,11 @@ import {
   marketplaceServiceCheckoutSchema,
   marketplaceServiceAcceptSchema,
   marketplaceServiceActionSchema,
+  marketplaceServiceCancelOverdueSchema,
   marketplaceServiceComplaintSchema,
+  marketplaceServiceExtensionRequestSchema,
+  marketplaceServiceExtensionResponseSchema,
+  marketplaceServiceRejectSchema,
   marketplaceServiceDeliverySchema,
   marketplaceServiceDraftSchema,
   marketplaceServiceResolutionSchema,
@@ -263,9 +267,7 @@ export type MarketplaceServiceQuote = PublicMarketplaceService & {
 
 export const quoteMarketplaceServiceOrder = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) =>
-    z.object({ serviceId: z.string().uuid() }).strict().parse(data),
-  )
+  .validator((data: unknown) => z.object({ serviceId: z.string().uuid() }).strict().parse(data))
   .handler(async ({ data, context }) => {
     const { data: quote, error } = await (context as Ctx).supabase.rpc(
       "quote_marketplace_service_order",
@@ -292,7 +294,12 @@ export const createMarketplaceServiceOrder = createServerFn({ method: "POST" })
       _requirements: data.requirements,
       _agreement_accepted: data.agreementAccepted,
     });
-    if (error) return { ok: false as const, error: checkoutError(error.message) };
+    if (error)
+      return {
+        ok: false as const,
+        error: checkoutError(error.message),
+        stale: error.message.includes("STALE_QUOTE"),
+      };
     return {
       ok: true as const,
       ...(result as { order_id: string; order_number: string; duplicate: boolean }),
@@ -316,6 +323,16 @@ function orderError(message: string) {
     return "Setujui requirements pembeli terlebih dahulu.";
   if (message.includes("SERVICE_ORDER_CONTRACT_MISSING"))
     return "Kontrak order jasa tidak ditemukan. Muat ulang atau hubungi admin.";
+  if (message.includes("EXTENSION_PENDING"))
+    return "Masih ada pengajuan perpanjangan yang menunggu jawaban pembeli.";
+  if (message.includes("EXTENSION_LIMIT")) return "Perpanjangan maksimal 2 kali per pesanan.";
+  if (message.includes("NO_EXTENSION"))
+    return "Tidak ada pengajuan perpanjangan yang perlu dijawab.";
+  if (message.includes("INVALID_DAYS")) return "Perpanjangan 1 sampai 14 hari.";
+  if (message.includes("NOT_OVERDUE"))
+    return "Tenggat belum lewat. Pembatalan tersedia setelah tenggat terlewati.";
+  if (message.includes("REFUND_ACTIVE"))
+    return "Pesanan ini sudah memiliki proses refund berjalan.";
   if (message.includes("REASON_REQUIRED")) return "Alasan minimal 10 karakter.";
   if (message.includes("URL_REQUIRED")) return "URL wajib HTTPS tanpa kredensial di dalamnya.";
   if (message.includes("NO_ACTIVE_STORE")) return "Toko harus aktif untuk mengelola pesanan jasa.";
@@ -427,6 +444,34 @@ export const openServiceComplaint = createServerFn({ method: "POST" })
     return rpcErrorResult(error) ?? { ok: true as const };
   });
 
+/** Pembeli menyetujui atau menolak perpanjangan tenggat dari seller. */
+export const respondServiceExtension = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => marketplaceServiceExtensionResponseSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const limited = await enforceRateLimit((context as Ctx).userId, "order.create");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { error } = await (context as Ctx).supabase.rpc("respond_service_extension", {
+      _order_id: data.orderId,
+      _approve: data.approve,
+    });
+    return rpcErrorResult(error) ?? { ok: true as const };
+  });
+
+/** Pembeli membatalkan pesanan yang lewat tenggat tanpa hasil; dana kembali ke saldo. */
+export const cancelOverdueServiceOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => marketplaceServiceCancelOverdueSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const limited = await enforceRateLimit((context as Ctx).userId, "order.create");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { error } = await (context as Ctx).supabase.rpc("cancel_overdue_service_order", {
+      _order_id: data.orderId,
+      _reason: data.reason || null,
+    });
+    return rpcErrorResult(error) ?? { ok: true as const };
+  });
+
 export const listMyServiceOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -455,6 +500,35 @@ export const approveServiceRequirements = createServerFn({ method: "POST" })
     if (limited) return { ok: false as const, error: limited.error };
     const { error } = await (context as Ctx).supabase.rpc("approve_service_requirements", {
       _order_id: data.orderId,
+    });
+    return rpcErrorResult(error) ?? { ok: true as const };
+  });
+
+/** Seller menolak kebutuhan pembeli; pesanan dibatalkan dan dana kembali ke saldo pembeli. */
+export const rejectServiceRequirements = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => marketplaceServiceRejectSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const limited = await enforceRateLimit((context as Ctx).userId, "order.create");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { error } = await (context as Ctx).supabase.rpc("reject_service_requirements", {
+      _order_id: data.orderId,
+      _reason: data.reason,
+    });
+    return rpcErrorResult(error) ?? { ok: true as const };
+  });
+
+/** Seller mengajukan tambahan hari; berlaku setelah pembeli menyetujui. */
+export const requestServiceExtension = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => marketplaceServiceExtensionRequestSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const limited = await enforceRateLimit((context as Ctx).userId, "order.create");
+    if (limited) return { ok: false as const, error: limited.error };
+    const { error } = await (context as Ctx).supabase.rpc("request_service_extension", {
+      _order_id: data.orderId,
+      _days: data.days,
+      _reason: data.reason,
     });
     return rpcErrorResult(error) ?? { ok: true as const };
   });
@@ -559,9 +633,7 @@ export const prepareServiceDeliveryUpload = createServerFn({ method: "POST" })
  */
 export const getServiceDeliveryFileUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) =>
-    z.object({ deliveryId: z.string().uuid() }).strict().parse(data),
-  )
+  .validator((data: unknown) => z.object({ deliveryId: z.string().uuid() }).strict().parse(data))
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
     const { data: delivery } = await ctx.supabase

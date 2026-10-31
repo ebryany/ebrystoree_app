@@ -184,7 +184,7 @@ export type MarketplaceServiceEvent = {
   id: number;
   order_id: string;
   event_type: string;
-  actor_role: "buyer" | "seller" | "admin";
+  actor_role: "buyer" | "seller" | "admin" | "system";
   payload: Record<string, any>;
   created_at: string;
 };
@@ -207,6 +207,14 @@ export type MarketplaceServiceOrderContract = {
   accepted_at: string | null;
   work_state: MarketplaceServiceWorkState;
   complaint_open: boolean;
+  /** Batas seller menyetujui/menolak kebutuhan; lewat = refund otomatis. */
+  seller_response_due_at: string | null;
+  /** Batas pembeli meninjau hasil; lewat = diterima otomatis. */
+  review_due_at: string | null;
+  extension_requested_days: number | null;
+  extension_reason: string | null;
+  extension_requested_at: string | null;
+  extension_count: number;
 };
 
 export type MarketplaceServiceOrderRow = {
@@ -223,7 +231,33 @@ export type MarketplaceServiceOrderRow = {
   requirements_approved_at: string | null;
   accepted_at: string | null;
   service_name: string;
+  seller_response_due_at: string | null;
+  review_due_at: string | null;
+  extension_requested_days: number | null;
 };
+
+/** Batas pengajuan perpanjangan tenggat; sama dengan CHECK di database. */
+export const MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS = 14;
+
+export const marketplaceServiceRejectSchema = z
+  .object({ orderId: z.string().uuid(), reason: z.string().trim().min(10).max(1000) })
+  .strict();
+
+export const marketplaceServiceExtensionRequestSchema = z
+  .object({
+    orderId: z.string().uuid(),
+    days: z.number().int().min(1).max(MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS),
+    reason: z.string().trim().min(10).max(1000),
+  })
+  .strict();
+
+export const marketplaceServiceExtensionResponseSchema = z
+  .object({ orderId: z.string().uuid(), approve: z.boolean() })
+  .strict();
+
+export const marketplaceServiceCancelOverdueSchema = z
+  .object({ orderId: z.string().uuid(), reason: z.string().trim().max(1000).default("") })
+  .strict();
 
 export type SellerServiceOrderDetail = {
   order: {

@@ -106,8 +106,8 @@ export function serviceOrderNextAction(row: {
     case "awaiting_requirements":
       return {
         tone: "action",
-        title: "Setujui requirements pembeli",
-        hint: "Periksa kebutuhan pembeli, lalu setujui supaya tenggat mulai berjalan.",
+        title: "Setujui atau tolak kebutuhan",
+        hint: "Respons dalam 24 jam sejak dibayar. Tanpa respons, pesanan batal dan dana kembali ke pembeli.",
       };
     case "in_progress":
       return {
@@ -125,7 +125,7 @@ export function serviceOrderNextAction(row: {
       return {
         tone: "waiting",
         title: "Menunggu pembeli meninjau",
-        hint: "Hasil sudah dikirim. Dana dilepas setelah pembeli menerima.",
+        hint: "Dana dilepas saat pembeli menerima, atau otomatis 3 hari setelah hasil dikirim.",
       };
     case "accepted":
       return {
@@ -177,6 +177,40 @@ export function serviceOrderDeadline(
   return { tone: "normal", label: `Tenggat ${formatDue(dueAt)}` };
 }
 
+/**
+ * Tenggat yang relevan untuk fase saat ini:
+ * - menunggu kebutuhan -> batas respons seller (lewat = refund otomatis);
+ * - hasil dikirim -> jendela tinjau pembeli (lewat = diterima otomatis);
+ * - selain itu -> tenggat pengerjaan.
+ */
+export function serviceOrderPhaseDeadline(
+  row: Pick<
+    MarketplaceServiceOrderRow,
+    "work_state" | "order_status" | "due_at" | "seller_response_due_at" | "review_due_at"
+  >,
+  now: number,
+): ServiceOrderDeadline | null {
+  if (row.order_status !== "paid") return null;
+  if (row.work_state === "awaiting_requirements") {
+    const d = serviceOrderDeadline(row.seller_response_due_at, now);
+    if (!d) return null;
+    if (d.tone === "overdue") return { tone: "overdue", label: "Batas respons lewat" };
+    const hours = Math.max(
+      0,
+      Math.floor((Date.parse(row.seller_response_due_at!) - now) / 3_600_000),
+    );
+    return { tone: hours < 6 ? "overdue" : "soon", label: `Respons ${hours} jam lagi` };
+  }
+  if (row.work_state === "delivered") {
+    const d = serviceOrderDeadline(row.review_due_at, now);
+    if (!d) return null;
+    return { tone: "normal", label: d.label.replace("Tenggat", "Diterima otomatis") };
+  }
+  if (row.work_state === "in_progress" || row.work_state === "revision_requested")
+    return serviceOrderDeadline(row.due_at, now);
+  return null;
+}
+
 export function filterServiceOrders(
   items: MarketplaceServiceOrderRow[],
   tab: ServiceOrderTabKey,
@@ -218,7 +252,7 @@ export function countServiceComplaints(items: MarketplaceServiceOrderRow[]): num
 
 /** Satu baris penjelas per status kerja: apa artinya bagi seller. */
 export const serviceOrderWorkStateHint: Record<MarketplaceServiceWorkState, string> = {
-  awaiting_requirements: "Periksa kebutuhan pembeli, lalu setujui untuk mulai.",
+  awaiting_requirements: "Periksa kebutuhan pembeli, lalu setujui atau tolak.",
   in_progress: "Kerjakan sesuai agreement, lalu kirim hasil sebelum tenggat.",
   delivered: "Menunggu pembeli meninjau hasil yang sudah dikirim.",
   revision_requested: "Pembeli meminta revisi. Kirim versi baru.",

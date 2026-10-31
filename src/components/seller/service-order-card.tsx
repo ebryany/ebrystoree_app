@@ -29,9 +29,12 @@ import {
   approveServiceRequirements,
   getSellerServiceOrder,
   prepareServiceDeliveryUpload,
+  rejectServiceRequirements,
+  requestServiceExtension,
   submitServiceDelivery,
 } from "@/lib/marketplace-service.functions";
 import {
+  MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS,
   MARKETPLACE_SERVICE_DELIVERY_MAX_BYTES,
   MARKETPLACE_SERVICE_DELIVERY_MIME_TYPES,
   marketplaceServiceWorkStateLabels,
@@ -40,7 +43,7 @@ import {
   type SellerServiceOrderDetail,
 } from "@/lib/marketplace-service";
 import {
-  serviceOrderDeadline,
+  serviceOrderPhaseDeadline,
   serviceOrderNextAction,
   serviceOrderWorkStateHint,
   type ServiceOrderNextAction,
@@ -90,7 +93,7 @@ export function ServiceOrderCard({
 }) {
   const reduced = useReducedMotion();
   const next = serviceOrderNextAction(row);
-  const deadline = serviceOrderDeadline(row.due_at, Date.now());
+  const deadline = serviceOrderPhaseDeadline(row, Date.now());
   const NextIcon = NEXT_ACTION_ICON[next.tone];
 
   return (
@@ -178,6 +181,11 @@ export function ServiceOrderCard({
           <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
             Revisi {row.revision_used}/{row.revision_limit}
           </span>
+          {row.extension_requested_days ? (
+            <span className="rounded-full border border-warning/50 bg-warning/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-warning-foreground">
+              Perpanjangan +{row.extension_requested_days} hari menunggu pembeli
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -223,7 +231,10 @@ function SellerServiceOrderDetail({ orderId }: { orderId: string }) {
   const fetchDetail = useServerFn(getSellerServiceOrder);
   const approveRequirements = useServerFn(approveServiceRequirements);
   const submitDeliveryFn = useServerFn(submitServiceDelivery);
+  const rejectFn = useServerFn(rejectServiceRequirements);
+  const extensionFn = useServerFn(requestServiceExtension);
   const [feedback, setFeedback] = useState("");
+  const [rejectOpen, setRejectOpen] = useState(false);
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["seller-service-order", orderId],
     queryFn: () => fetchDetail({ data: { orderId } }),
@@ -261,6 +272,32 @@ function SellerServiceOrderDetail({ orderId }: { orderId: string }) {
       if (result.ok) await invalidate();
     },
     onError: () => setFeedback("Pengiriman hasil gagal. Coba lagi."),
+  });
+  const reject = useMutation({
+    mutationFn: (input: { orderId: string; reason: string }) => rejectFn({ data: input }),
+    onSuccess: async (result) => {
+      setFeedback(
+        result.ok ? "Pesanan ditolak. Dana dikembalikan penuh ke saldo pembeli." : result.error,
+      );
+      if (result.ok) {
+        setRejectOpen(false);
+        await invalidate();
+      }
+    },
+    onError: () => setFeedback("Penolakan gagal diproses. Coba lagi."),
+  });
+  const extension = useMutation({
+    mutationFn: (input: { orderId: string; days: number; reason: string }) =>
+      extensionFn({ data: input }),
+    onSuccess: async (result) => {
+      setFeedback(
+        result.ok
+          ? "Pengajuan perpanjangan dikirim. Tenggat berubah setelah pembeli menyetujui."
+          : result.error,
+      );
+      if (result.ok) await invalidate();
+    },
+    onError: () => setFeedback("Pengajuan perpanjangan gagal. Coba lagi."),
   });
 
   if (isPending)
@@ -309,18 +346,49 @@ function SellerServiceOrderDetail({ orderId }: { orderId: string }) {
       {/* 1. Aksi yang perlu dilakukan sekarang. */}
       {canStart ? (
         <section className="rounded-xl border border-accent/40 bg-accent/8 p-3.5">
-          <h3 className="text-sm font-semibold">Setujui requirements untuk mulai</h3>
+          <h3 className="text-sm font-semibold">Setujui atau tolak kebutuhan</h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Tenggat pengerjaan dihitung dari waktu persetujuan ini.
+            Tenggat pengerjaan dihitung sejak Anda menyetujui.
+            {contract.seller_response_due_at
+              ? ` Respons sebelum ${formatDateTime(contract.seller_response_due_at)}; lewat dari itu pesanan batal otomatis dan dana kembali ke pembeli.`
+              : ""}
           </p>
-          <Button
-            className="mt-3 min-h-11"
-            disabled={approve.isPending}
-            onClick={() => approve.mutate({ orderId })}
-          >
-            {approve.isPending ? "Memproses…" : "Setujui requirements"}
-          </Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              className="min-h-11"
+              disabled={approve.isPending || reject.isPending}
+              onClick={() => approve.mutate({ orderId })}
+            >
+              {approve.isPending ? "Memproses…" : "Setujui & mulai kerjakan"}
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11"
+              aria-expanded={rejectOpen}
+              disabled={approve.isPending || reject.isPending}
+              onClick={() => setRejectOpen((open) => !open)}
+            >
+              Tolak pesanan
+            </Button>
+          </div>
+          {rejectOpen ? (
+            <ReasonForm
+              id={`reject-${orderId}`}
+              label="Alasan menolak (dikirim ke pembeli)"
+              hint="Dana pembeli dikembalikan penuh ke saldo Ebrystore. Tindakan ini tidak dapat dibatalkan."
+              submitLabel="Tolak & kembalikan dana"
+              pending={reject.isPending}
+              destructive
+              onSubmit={(reason) => reject.mutate({ orderId, reason })}
+            />
+          ) : null}
         </section>
+      ) : null}
+
+      {canDeliver && contract.extension_requested_at ? (
+        <p className="rounded-xl border border-warning/50 bg-warning/15 p-3.5 text-sm">
+          Pengajuan perpanjangan +{contract.extension_requested_days} hari menunggu jawaban pembeli.
+        </p>
       ) : null}
 
       {canDeliver ? (
@@ -328,6 +396,14 @@ function SellerServiceOrderDetail({ orderId }: { orderId: string }) {
           orderId={orderId}
           pending={deliver.isPending}
           onSubmit={(input) => deliver.mutate({ orderId, ...input })}
+        />
+      ) : null}
+
+      {canDeliver && !contract.extension_requested_at && contract.extension_count < 2 ? (
+        <ExtensionForm
+          orderId={orderId}
+          pending={extension.isPending}
+          onSubmit={(days, reason) => extension.mutate({ orderId, days, reason })}
         />
       ) : null}
 
@@ -409,6 +485,138 @@ function SellerServiceOrderDetail({ orderId }: { orderId: string }) {
         )}
       </section>
     </div>
+  );
+}
+
+function ReasonForm({
+  id,
+  label,
+  hint,
+  submitLabel,
+  pending,
+  destructive = false,
+  onSubmit,
+}: {
+  id: string;
+  label: string;
+  hint: string;
+  submitLabel: string;
+  pending: boolean;
+  destructive?: boolean;
+  onSubmit: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [validation, setValidation] = useState("");
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (reason.trim().length < 10) {
+      setValidation("Alasan minimal 10 karakter.");
+      return;
+    }
+    setValidation("");
+    onSubmit(reason.trim());
+  }
+  return (
+    <form onSubmit={submit} className="mt-3 space-y-2 border-t border-border pt-3">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea
+        id={id}
+        rows={2}
+        value={reason}
+        onChange={(event) => setReason(event.target.value)}
+        maxLength={1000}
+        aria-invalid={validation ? true : undefined}
+        aria-describedby={`${id}-hint`}
+      />
+      <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+        {hint}
+      </p>
+      {validation ? (
+        <p role="alert" className="text-sm text-destructive">
+          {validation}
+        </p>
+      ) : null}
+      <Button
+        type="submit"
+        variant={destructive ? "destructive" : "default"}
+        className="min-h-11"
+        disabled={pending}
+      >
+        {pending ? "Memproses…" : submitLabel}
+      </Button>
+    </form>
+  );
+}
+
+/** Ajukan tambahan hari; tenggat baru berlaku setelah pembeli menyetujui. */
+function ExtensionForm({
+  orderId,
+  pending,
+  onSubmit,
+}: {
+  orderId: string;
+  pending: boolean;
+  onSubmit: (days: number, reason: string) => void;
+}) {
+  const [days, setDays] = useState(2);
+  const [reason, setReason] = useState("");
+  const [validation, setValidation] = useState("");
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!Number.isInteger(days) || days < 1 || days > MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS) {
+      setValidation(`Tambahan 1 sampai ${MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS} hari.`);
+      return;
+    }
+    if (reason.trim().length < 10) {
+      setValidation("Alasan minimal 10 karakter.");
+      return;
+    }
+    setValidation("");
+    onSubmit(days, reason.trim());
+  }
+  return (
+    <details className="rounded-xl border border-border bg-card">
+      <summary className="flex min-h-11 cursor-pointer items-center px-3.5 py-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+        Butuh waktu tambahan?
+      </summary>
+      <form onSubmit={submit} className="space-y-3 border-t border-border p-3.5">
+        <p className="text-xs text-muted-foreground">
+          Pembeli memutuskan. Bila tenggat lewat tanpa hasil, pembeli bisa membatalkan dengan refund
+          penuh. Maksimal 2 kali per pesanan.
+        </p>
+        <div className="space-y-2">
+          <Label htmlFor={`ext-days-${orderId}`}>Tambahan hari</Label>
+          <Input
+            id={`ext-days-${orderId}`}
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={MARKETPLACE_SERVICE_EXTENSION_MAX_DAYS}
+            value={days}
+            onChange={(event) => setDays(Number(event.target.value))}
+            className="min-h-11 w-28"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`ext-reason-${orderId}`}>Alasan untuk pembeli</Label>
+          <Textarea
+            id={`ext-reason-${orderId}`}
+            rows={2}
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+            maxLength={1000}
+          />
+        </div>
+        {validation ? (
+          <p role="alert" className="text-sm text-destructive">
+            {validation}
+          </p>
+        ) : null}
+        <Button type="submit" variant="outline" className="min-h-11" disabled={pending}>
+          {pending ? "Mengirim…" : "Ajukan perpanjangan"}
+        </Button>
+      </form>
+    </details>
   );
 }
 

@@ -8,10 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatRupiah } from "@/lib/format";
 import {
   acceptServiceDelivery,
+  cancelOverdueServiceOrder,
   getServiceDeliveryFileUrl,
   getServiceOrderDetail,
   openServiceComplaint,
   requestServiceRevision,
+  respondServiceExtension,
 } from "@/lib/marketplace-service.functions";
 import {
   marketplaceServiceWorkStateLabels,
@@ -30,6 +32,11 @@ const eventLabels: Record<string, string> = {
   complaint_opened: "Pembeli mengajukan komplain",
   complaint_resumed: "Admin melanjutkan pekerjaan",
   refund_requested: "Refund diajukan",
+  refunded_to_balance: "Dana dikembalikan ke saldo",
+  auto_accepted: "Hasil diterima otomatis",
+  extension_requested: "Seller meminta perpanjangan",
+  extension_approved: "Perpanjangan disetujui",
+  extension_rejected: "Perpanjangan ditolak",
 };
 
 export function MarketplaceServiceOrderDetail({
@@ -45,7 +52,10 @@ export function MarketplaceServiceOrderDetail({
   const acceptDelivery = useServerFn(acceptServiceDelivery);
   const requestRevision = useServerFn(requestServiceRevision);
   const openComplaint = useServerFn(openServiceComplaint);
+  const respondExtension = useServerFn(respondServiceExtension);
+  const cancelOverdue = useServerFn(cancelOverdueServiceOrder);
   const [feedback, setFeedback] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const fileUrl = useServerFn(getServiceDeliveryFileUrl);
   const download = useMutation({
     mutationFn: (deliveryId: string) => fileUrl({ data: { deliveryId } }),
@@ -97,6 +107,38 @@ export function MarketplaceServiceOrderDetail({
     },
     onError: () => setFeedback("Komplain gagal dikirim. Coba lagi."),
   });
+  const extension = useMutation({
+    mutationFn: (approve: boolean) => respondExtension({ data: { orderId, approve } }),
+    onSuccess: async (result, approve) => {
+      setFeedback(
+        result.ok
+          ? approve
+            ? "Perpanjangan disetujui. Tenggat baru sudah berlaku."
+            : "Perpanjangan ditolak. Tenggat tetap."
+          : result.error,
+      );
+      if (result.ok) await invalidate();
+    },
+    onError: () => setFeedback("Jawaban perpanjangan gagal dikirim. Coba lagi."),
+  });
+  const cancel = useMutation({
+    mutationFn: () => cancelOverdue({ data: { orderId, reason: "" } }),
+    onSuccess: async (result) => {
+      setFeedback(
+        result.ok
+          ? "Pesanan dibatalkan. Dana dikembalikan penuh ke saldo Ebrystore."
+          : result.error,
+      );
+      if (result.ok) {
+        setConfirmCancel(false);
+        await Promise.all([
+          invalidate(),
+          queryClient.invalidateQueries({ queryKey: ["my-credit"] }),
+        ]);
+      }
+    },
+    onError: () => setFeedback("Pembatalan gagal diproses. Coba lagi."),
+  });
 
   if (isPending) return <p role="status">Memuat detail pesanan jasa…</p>;
   if (error)
@@ -129,6 +171,16 @@ export function MarketplaceServiceOrderDetail({
     contract.work_state === "delivered" && !contract.complaint_open && order.status === "paid";
   const canComplain =
     !contract.complaint_open && !contract.accepted_delivery_id && order.status === "paid";
+  const now = Date.now();
+  const isActive = order.status === "paid" && !contract.complaint_open;
+  const extensionPending = isActive && Boolean(contract.extension_requested_at);
+  // Sama dengan syarat cancel_overdue_service_order di database.
+  const canCancelOverdue =
+    isActive &&
+    contract.work_state === "in_progress" &&
+    !contract.latest_delivery_id &&
+    Boolean(contract.due_at) &&
+    Date.parse(contract.due_at!) <= now;
   const agreementFields = (
     <>
       {(
@@ -176,6 +228,83 @@ export function MarketplaceServiceOrderDetail({
       <p role="status" aria-live="polite" className="text-sm">
         {feedback}
       </p>
+
+      {isActive && contract.work_state === "awaiting_requirements" ? (
+        <p className="rounded-lg border border-border bg-card p-4 text-sm">
+          Seller sedang meninjau kebutuhan Anda
+          {contract.seller_response_due_at
+            ? ` dan wajib merespons sebelum ${formatDateTime(contract.seller_response_due_at)}`
+            : ""}
+          . Bila ditolak atau tidak direspons, dana dikembalikan penuh ke saldo Ebrystore.
+        </p>
+      ) : null}
+
+      {extensionPending ? (
+        <section className="space-y-3 rounded-lg border border-warning/50 bg-warning/10 p-4">
+          <h2 className="font-semibold">
+            Seller meminta tambahan {contract.extension_requested_days} hari
+          </h2>
+          {contract.extension_reason ? (
+            <p className="whitespace-pre-wrap break-words text-sm">{contract.extension_reason}</p>
+          ) : null}
+          <p className="text-sm text-muted-foreground">
+            {contract.due_at ? `Tenggat saat ini ${formatDateTime(contract.due_at)}. ` : ""}
+            Bila disetujui, tenggat bertambah {contract.extension_requested_days} hari.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              className="min-h-11"
+              disabled={extension.isPending}
+              onClick={() => extension.mutate(true)}
+            >
+              Setujui perpanjangan
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11"
+              disabled={extension.isPending}
+              onClick={() => extension.mutate(false)}
+            >
+              Tolak
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
+      {canCancelOverdue ? (
+        <section className="space-y-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+          <h2 className="font-semibold">Tenggat terlewati</h2>
+          <p className="text-sm">
+            Seller belum mengirim hasil sejak {formatDateTime(contract.due_at!)}. Anda bisa
+            menunggu, atau membatalkan dan menerima refund penuh {formatRupiah(Number(order.total))}{" "}
+            ke saldo Ebrystore.
+          </p>
+          {confirmCancel ? (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="destructive"
+                className="min-h-11"
+                disabled={cancel.isPending}
+                onClick={() => cancel.mutate()}
+              >
+                {cancel.isPending ? "Memproses…" : "Ya, batalkan & refund"}
+              </Button>
+              <Button
+                variant="outline"
+                className="min-h-11"
+                disabled={cancel.isPending}
+                onClick={() => setConfirmCancel(false)}
+              >
+                Tetap tunggu
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" className="min-h-11" onClick={() => setConfirmCancel(true)}>
+              Batalkan & refund
+            </Button>
+          )}
+        </section>
+      ) : null}
 
       {/* Di halaman pesanan, agreement dilipat agar halaman tidak terasa penuh. */}
       {embedded ? (
@@ -261,6 +390,12 @@ export function MarketplaceServiceOrderDetail({
             Menerima berarti Anda menyetujui versi {latest.version} dan dana seller dilepas.
             Tindakan ini tidak dapat dibatalkan.
           </p>
+          {contract.review_due_at ? (
+            <p className="text-sm font-medium">
+              Tanpa revisi atau komplain sampai {formatDateTime(contract.review_due_at)}, hasil
+              diterima otomatis.
+            </p>
+          ) : null}
           <div className="flex flex-wrap gap-2">
             <Button
               className="min-h-11"
@@ -320,7 +455,9 @@ export function MarketplaceServiceOrderDetail({
                       ? "Anda"
                       : event.actor_role === "seller"
                         ? "Seller"
-                        : "Admin"}
+                        : event.actor_role === "system"
+                          ? "Otomatis"
+                          : "Admin"}
                   </p>
                   {typeof event.payload?.reason === "string" ? (
                     <p className="whitespace-pre-wrap break-words">{event.payload.reason}</p>

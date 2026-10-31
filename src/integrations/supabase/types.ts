@@ -1361,7 +1361,7 @@ export type Database = {
       }
       marketplace_service_events: {
         Row: {
-          actor_id: string
+          actor_id: string | null
           actor_role: string
           created_at: string
           delivery_id: string | null
@@ -1371,7 +1371,7 @@ export type Database = {
           payload: Json
         }
         Insert: {
-          actor_id: string
+          actor_id?: string | null
           actor_role: string
           created_at?: string
           delivery_id?: string | null
@@ -1416,16 +1416,23 @@ export type Database = {
           complaint_open: boolean
           created_at: string
           due_at: string | null
+          extension_count: number
+          extension_reason: string | null
+          extension_requested_at: string | null
+          extension_requested_days: number | null
           latest_delivery_id: string | null
           order_id: string
           prior_order_status: string | null
           prior_work_state: string | null
           ready_at: string | null
+          reminder_count: number
           requirements: Json | null
           requirements_approved_at: string | null
           requirements_version: number
+          review_due_at: string | null
           revision_limit: number
           revision_used: number
+          seller_response_due_at: string | null
           service_id: string
           store_id: string
           updated_at: string
@@ -3675,6 +3682,10 @@ export type Database = {
         Returns: Json
       }
       cancel_own_withdrawal: { Args: { _withdrawal_id: string }; Returns: Json }
+      cancel_overdue_service_order: {
+        Args: { _order_id: string; _reason?: string | null }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           _bucket: string
@@ -3852,8 +3863,11 @@ export type Database = {
           order_status: string
           paid_at: string
           requirements_approved_at: string
+          review_due_at: string
           revision_limit: number
           revision_used: number
+          seller_response_due_at: string
+          extension_requested_days: number
           service_name: string
           total: number
           work_state: string
@@ -4007,8 +4021,20 @@ export type Database = {
         Args: { _order_id: string; _reason: string }
         Returns: Json
       }
+      request_service_extension: {
+        Args: { _days: number; _order_id: string; _reason: string }
+        Returns: Json
+      }
       request_service_revision: {
         Args: { _delivery_id: string; _order_id: string; _reason: string }
+        Returns: Json
+      }
+      reject_service_requirements: {
+        Args: { _order_id: string; _reason: string }
+        Returns: Json
+      }
+      respond_service_extension: {
+        Args: { _approve: boolean; _order_id: string }
         Returns: Json
       }
       request_withdrawal: {
