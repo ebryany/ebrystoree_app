@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "@/components/ebry/status";
 import { CHART_PALETTE } from "@/components/admin/report-charts";
 import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/transaction-labels";
 
@@ -34,44 +34,44 @@ export function StoreChip({ name }: { name: string | null | undefined }) {
   );
 }
 
-const POSITIVE = ["paid", "completed", "published", "done"];
-const WARN = [
-  "awaiting_payment",
-  "payment_under_review",
-  "waiting_verification",
-  "waiting_assignment",
-  "waiting_customer_data",
-  "waiting_customer_review",
-  "pending",
-  "in_progress",
-  "open",
-  "requested",
-  "approved",
-  "processing",
-];
-const NEGATIVE = ["cancelled", "rejected", "failed", "expired", "refunded", "disputed", "blocked"];
+/** Label Indonesia untuk status mentah refund, payout, task, dan top up. */
+export const RAW_STATUS_LABEL: Record<string, string> = {
+  requested: "Diajukan",
+  under_review: "Ditinjau",
+  approved: "Disetujui",
+  rejected: "Ditolak",
+  processing: "Diproses",
+  completed: "Selesai",
+  transferred: "Ditransfer",
+  needs_reconciliation: "Perlu rekonsiliasi",
+  cancelled: "Dibatalkan",
+  open: "Terbuka",
+  in_progress: "Dikerjakan",
+  blocked: "Terhambat",
+  done: "Selesai",
+  waiting_payment: "Menunggu",
+  paid: "Berhasil",
+  expired: "Kedaluwarsa",
+  failed: "Gagal",
+};
 
 export function StatusBadge({
   value,
   kind = "order",
+  label,
 }: {
   value: string;
   kind?: "order" | "payment" | "raw";
+  label?: string;
 }) {
-  const label =
-    kind === "order"
+  const resolved =
+    label ??
+    (kind === "order"
       ? ORDER_STATUS_LABEL[value]
       : kind === "payment"
         ? PAYMENT_STATUS_LABEL[value]
-        : undefined;
-  const variant = POSITIVE.includes(value)
-    ? "default"
-    : NEGATIVE.includes(value)
-      ? "destructive"
-      : WARN.includes(value)
-        ? "secondary"
-        : "outline";
-  return <Badge variant={variant as never}>{label ?? value.replace(/_/g, " ")}</Badge>;
+        : RAW_STATUS_LABEL[value]);
+  return <StatusPill value={value} kind={kind} label={resolved} />;
 }
 
 export function DetailCard({
