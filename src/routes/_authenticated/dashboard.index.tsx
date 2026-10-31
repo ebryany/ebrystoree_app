@@ -5,8 +5,8 @@ import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
   BadgeCheck,
-  Banknote,
   Bell,
+  ChevronRight,
   Compass,
   Download,
   LifeBuoy,
@@ -19,8 +19,10 @@ import {
   ShieldCheck,
   ShoppingCart,
   SlidersHorizontal,
+  Plus,
   Wallet,
   Wrench,
+  X,
 } from "lucide-react";
 
 import { BankListRow, InlineEmpty, StatSummary, RoundMenuGrid } from "@/components/ebry/cards";
@@ -201,57 +203,62 @@ function DashboardRingkasan() {
       </form>
 
       {/* C. Banner saldo: dua CTA (isi saldo + riwayat) */}
+      {/* Kartu saldo ringkas: hitam + kaca. Warna literal (bukan token) karena
+          kartu ini sengaja tetap gelap di tema terang maupun gelap. */}
       <section
         aria-labelledby="saldo-heading"
-        className="relative isolate overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-[0_18px_40px_-20px_oklch(0.33_0.062_200/70%)]"
+        className="relative isolate overflow-hidden rounded-[22px] bg-[oklch(0.16_0.012_210)] text-white shadow-[0_16px_32px_-18px_oklch(0.16_0.012_210/80%)]"
       >
-        {/* Lapisan cahaya di belakang kaca: blob accent/success yang di-blur. */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -left-12 -top-16 -z-10 size-48 rounded-full bg-accent/70 blur-3xl"
+          className="pointer-events-none absolute -right-8 -top-14 -z-10 size-40 rounded-full bg-accent/60 blur-3xl"
         />
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-20 right-0 -z-10 size-56 rounded-full bg-success/45 blur-3xl"
+          className="pointer-events-none absolute -bottom-16 -left-10 -z-10 size-36 rounded-full bg-success/30 blur-3xl"
         />
-        {/* Panel kaca: frosted + kilau diagonal + tepi menyala tipis. */}
-        <div className="relative rounded-3xl border border-primary-foreground/20 bg-gradient-to-br from-primary-foreground/[0.14] via-primary-foreground/[0.05] to-primary-foreground/[0.10] p-5 shadow-[inset_0_1px_0_oklch(1_0_0/25%)] backdrop-blur-xl">
+        <div className="relative rounded-[22px] border border-white/12 bg-gradient-to-br from-white/[0.09] via-white/[0.03] to-white/[0.06] px-4 py-3.5 shadow-[inset_0_1px_0_oklch(1_0_0/18%)] backdrop-blur-xl">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-3xl bg-[linear-gradient(115deg,transparent_35%,oklch(1_0_0/12%)_50%,transparent_65%)]"
+            className="pointer-events-none absolute inset-0 rounded-[22px] bg-[linear-gradient(115deg,transparent_40%,oklch(1_0_0/7%)_52%,transparent_64%)]"
           />
-          <h2
-            id="saldo-heading"
-            className="relative inline-flex rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-2.5 py-1 text-[11px] font-semibold text-primary-foreground/90 backdrop-blur"
-          >
-            Saldo Ebrystore
-          </h2>
-          <p className="relative mt-3 text-[28px] font-bold leading-none tracking-tight tabular-nums">
-            {formatRupiah(creditBalance)}
-          </p>
-          <p className="relative mt-2 max-w-[30ch] text-xs leading-relaxed text-primary-foreground/80">
-            {creditBalance > 0
-              ? "Bisa dipakai untuk membayar pesanan."
-              : "Isi saldo atau terima refund untuk bayar lebih cepat."}
-          </p>
-          <div className="relative mt-4 flex flex-wrap gap-2">
+          <div className="relative flex items-center justify-between gap-2">
+            <h2 id="saldo-heading" className="text-xs font-medium text-white/70">
+              Saldo Ebrystore
+            </h2>
+            <Link
+              to="/dashboard/saldo"
+              className="-mr-2 inline-flex min-h-11 items-center gap-0.5 rounded-full px-2 text-xs font-semibold text-white/85 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            >
+              Riwayat
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="relative -mt-1 flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-2xl font-bold leading-tight tracking-tight tabular-nums">
+                {formatRupiah(creditBalance)}
+              </p>
+              <p className="mt-0.5 truncate text-[11px] text-white/60">
+                {creditBalance > 0
+                  ? "Siap dipakai bayar pesanan"
+                  : "Isi saldo untuk bayar lebih cepat"}
+              </p>
+            </div>
             <button
               type="button"
               onClick={() => setShowTopup((v) => !v)}
               aria-expanded={showTopup}
               aria-controls="panel-isi-saldo"
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary-foreground px-4 text-sm font-semibold text-primary transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/70"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-[oklch(0.16_0.012_210)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
-              <Wallet className="size-4" aria-hidden="true" />
+              {showTopup ? (
+                <X className="size-4" aria-hidden="true" />
+              ) : (
+                <Plus className="size-4" aria-hidden="true" />
+              )}
               {showTopup ? "Tutup" : "Isi saldo"}
             </button>
-            <Link
-              to="/dashboard/saldo"
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-4 text-sm font-semibold text-primary-foreground shadow-[inset_0_1px_0_oklch(1_0_0/20%)] backdrop-blur-md transition-colors hover:bg-primary-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/70"
-            >
-              <Banknote className="size-4" aria-hidden="true" />
-              Riwayat
-            </Link>
           </div>
         </div>
       </section>

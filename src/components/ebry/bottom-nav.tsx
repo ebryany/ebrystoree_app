@@ -32,11 +32,12 @@ export function BottomNavigation({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
+    // Bar mengambang: jarak dari tepi + safe-area, jadi tidak menempel ke gesture bar HP.
     <nav
       aria-label={ariaLabel}
-      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 shadow-[0_-8px_24px_-18px_hsl(0_0%_0%/0.5)] backdrop-blur md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 px-3 md:hidden"
     >
-      <ul className="mx-auto flex max-w-lg gap-1 px-1.5 py-1.5">
+      <ul className="pointer-events-auto mx-auto flex max-w-sm gap-0.5 rounded-full border border-border/70 bg-card/90 p-1 shadow-[0_12px_32px_-14px_oklch(0.22_0.03_205/45%)] backdrop-blur-xl">
         {items.map((item) => {
           const active = isActive(item, pathname);
           return (
@@ -51,18 +52,20 @@ export function BottomNavigation({
               <Link
                 to={item.to}
                 aria-current={active ? "page" : undefined}
-                className="press-scale flex min-h-12 w-full min-w-0 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                className="press-scale flex min-h-11 w-full min-w-0 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               >
                 <span
                   className={cn(
                     "flex h-11 min-w-0 items-center gap-1.5 rounded-full px-3 transition-colors duration-200",
-                    active ? "bg-accent/12 text-accent" : "text-muted-foreground",
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <span className="relative shrink-0">
                     <item.icon className="size-5" aria-hidden="true" />
                     {item.badge ? (
-                      <span className="absolute -right-2 -top-1.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground ring-2 ring-background">
+                      <span className="absolute -right-2 -top-1.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground ring-2 ring-card">
                         {item.badge > 9 ? "9+" : item.badge}
                       </span>
                     ) : null}
