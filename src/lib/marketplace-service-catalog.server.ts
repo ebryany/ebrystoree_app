@@ -115,16 +115,34 @@ export async function readPublicMarketplaceService(
         .eq("work_state", "accepted");
       return countError ? null : (count ?? 0);
     };
-    const [presence, others, serviceDone, storeDone] = await Promise.all([
+    // Penilaian toko dari ulasan jasa yang tampil; gagal = null.
+    const storeRating = async (sid: string) => {
+      const { data: rows, error: ratingError } = await client
+        .from("marketplace_service_reviews")
+        .select("rating")
+        .eq("store_id", sid)
+        .eq("is_visible", true)
+        .limit(3000);
+      if (ratingError) return null;
+      const n = rows?.length ?? 0;
+      return {
+        reviews: n,
+        rating: n ? rows!.reduce((sum, r) => sum + Number(r.rating), 0) / n : null,
+      };
+    };
+    const [presence, others, serviceDone, storeDone, rating] = await Promise.all([
       storeId ? readStorePresence(client, storeId) : null,
       storeId
         ? readPublicStoreServices(storeId, client)
         : Promise.resolve({ items: [] as PublicMarketplaceService[], error: null }),
       countAccepted("service_id", service.id),
       storeId ? countAccepted("store_id", storeId) : null,
+      storeId ? storeRating(storeId) : null,
     ]);
     return {
       stats: {
+        storeRating: rating?.rating ?? null,
+        storeReviews: rating?.reviews ?? 0,
         serviceCompleted: serviceDone,
         storeCompleted: storeDone,
         storeServices: others.error ? null : others.items.length,

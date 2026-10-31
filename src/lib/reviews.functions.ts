@@ -227,6 +227,166 @@ export const submitGuestReview = createServerFn({ method: "POST" })
     return { ok: true as const, error: null };
   });
 
+/* ===================== Ulasan jasa seller ===================== */
+
+// Tabel baru belum ada di tipe Database hasil generate; pakai client tanpa skema.
+type UntypedClient = import("@supabase/supabase-js").SupabaseClient;
+
+async function adminClient(): Promise<UntypedClient> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin as unknown as UntypedClient;
+}
+
+/** Ulasan untuk satu jasa seller (publik; dibaca lewat server, tabel tertutup untuk anon). */
+export const listServiceReviews = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ serviceId: z.string().uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    const client = await adminClient();
+    const { data: rows, error } = await client
+      .from("marketplace_service_reviews")
+      .select("id, rating, title, body, reviewer_name, created_at, is_verified")
+      .eq("service_id", data.serviceId)
+      .eq("is_visible", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error("[reviews] listServiceReviews gagal:", error.message);
+      return {
+        items: [],
+        average: 0,
+        total: 0,
+        error: "Ulasan sedang tidak dapat dimuat." as const,
+      };
+    }
+    const items = (rows ?? []) as Array<{
+      id: string;
+      rating: number;
+      title: string | null;
+      body: string | null;
+      reviewer_name: string | null;
+      created_at: string;
+      is_verified: boolean;
+    }>;
+    const total = items.length;
+    const average = total ? items.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
+    return { items, average, total, error: null };
+  });
+
+/** Boleh memberi ulasan terverifikasi bila hasil jasa ini sudah diterima pemanggil. */
+export const getMyServiceReviewState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ serviceId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const client = await adminClient();
+    const [{ data: accepted }, { data: mine }] = await Promise.all([
+      client
+        .from("marketplace_service_orders")
+        .select("order_id, orders!inner(user_id)")
+        .eq("service_id", data.serviceId)
+        .eq("orders.user_id", userId)
+        .eq("work_state", "accepted")
+        .limit(1)
+        .maybeSingle(),
+      client
+        .from("marketplace_service_reviews")
+        .select("id, rating, title, body")
+        .eq("service_id", data.serviceId)
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
+    return {
+      canReview: Boolean(accepted),
+      myReview:
+        (mine as {
+          id: string;
+          rating: number;
+          title: string | null;
+          body: string | null;
+        } | null) ?? null,
+    };
+  });
+
+export const submitServiceReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        serviceId: z.string().uuid(),
+        rating: z.number().int().min(1).max(5),
+        title: z.string().trim().max(120).optional(),
+        body: z.string().trim().max(1000).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase as unknown as UntypedClient).rpc(
+      "submit_service_review",
+      {
+        _service_id: data.serviceId,
+        _rating: data.rating,
+        _title: data.title,
+        _body: data.body,
+      },
+    );
+    if (error) {
+      console.error("[reviews] submitServiceReview gagal:", error.message);
+      return { ok: false as const, error: error.message };
+    }
+    return { ok: true as const, error: null };
+  });
+
+/** Ulasan jasa tanpa akun (transaksi di luar web): rate limit per IP, tidak terverifikasi. */
+export const submitGuestServiceReview = createServerFn({ method: "POST" })
+  .validator((data: unknown) =>
+    z
+      .object({
+        serviceId: z.string().uuid(),
+        name: z.string().trim().min(2).max(60),
+        rating: z.number().int().min(1).max(5),
+        body: z.string().trim().max(1000).optional(),
+        website: z.string().max(200).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    if (data.website) return { ok: true as const, error: null };
+
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const ip =
+      (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() ||
+      getRequestHeader("x-real-ip") ||
+      "unknown";
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    const limited = await enforceRateLimit(`ip:${ip}`, "review.service.guest");
+    if (limited) return { ok: false as const, error: "Terlalu banyak ulasan. Coba lagi nanti." };
+
+    const client = await adminClient();
+    const { data: service } = await client
+      .from("marketplace_services")
+      .select("id, store_id")
+      .eq("id", data.serviceId)
+      .eq("status", "approved")
+      .maybeSingle();
+    if (!service) return { ok: false as const, error: "Jasa tidak ditemukan." };
+
+    const { error } = await client.from("marketplace_service_reviews").insert({
+      service_id: data.serviceId,
+      store_id: (service as { store_id: string }).store_id,
+      user_id: null,
+      rating: data.rating,
+      body: data.body || null,
+      reviewer_name: data.name,
+      is_verified: false,
+    });
+    if (error) {
+      console.error("[reviews] submitGuestServiceReview gagal:", error.message);
+      return { ok: false as const, error: "Ulasan gagal dikirim. Coba lagi." };
+    }
+    return { ok: true as const, error: null };
+  });
+
 export const submitProductReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>

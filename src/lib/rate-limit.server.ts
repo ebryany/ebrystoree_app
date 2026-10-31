@@ -14,6 +14,7 @@ const DEFAULT_POLICIES = {
   "inquiry.message": { limit: 20, windowSeconds: 60 },
   "social.toggle": { limit: 30, windowSeconds: 60 },
   "review.guest": { limit: 3, windowSeconds: 3600 },
+  "review.service.guest": { limit: 3, windowSeconds: 3600 },
   "po.create": { limit: 5, windowSeconds: 300 },
   "po.message": { limit: 20, windowSeconds: 60 },
   "order.create": { limit: 20, windowSeconds: 60 },

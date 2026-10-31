@@ -15,6 +15,7 @@ import {
   RotateCcw,
   ServerCog,
   ShieldCheck,
+  Star,
   Store,
   Wallet,
 } from "lucide-react";
@@ -26,6 +27,11 @@ import { StickyActionBar } from "@/components/ebry/cards";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import { ServiceChatButton } from "@/components/home/service-chat-button";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import {
+  OPEN_REVIEW_EVENT,
+  ServiceReviewPanel,
+  useReviewSummary,
+} from "@/components/product/review-panel";
 import { useStorePresence } from "@/hooks/use-store-presence";
 import { getPublicMarketplaceService } from "@/lib/catalog.functions";
 import { formatRupiah } from "@/lib/format";
@@ -44,6 +50,11 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 /** Tombol aksi kartu penjual: ikon di atas label di HP, sebaris mulai sm (sama dengan /produk). */
 const SELLER_ACTION =
   "h-auto min-h-11 w-full min-w-0 flex-col gap-0.5 px-1.5 py-1.5 text-xs sm:flex-row sm:gap-2 sm:px-3 sm:text-sm";
+
+function openReviewForm() {
+  window.dispatchEvent(new Event(OPEN_REVIEW_EVENT));
+  document.getElementById("ulasan-produk")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 const monthYearFmt = new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" });
 const fullDateFmt = new Intl.DateTimeFormat("id-ID", {
@@ -123,6 +134,10 @@ function DetailJasa() {
   const stats = data.stats;
   const [active, setActive] = useState(0);
   const presence = useStorePresence(s.store.id, s.store.presence);
+  const { total: reviewTotal, average: reviewAverage } = useReviewSummary({
+    kind: "service",
+    id: s.id,
+  });
 
   useEffect(() => {
     void import("@/lib/analytics-track").then(({ trackEvent }) =>
@@ -256,7 +271,18 @@ function DetailJasa() {
             </h1>
 
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              <span className="text-muted-foreground">{s.category.name}</span>
+              {reviewTotal > 0 ? (
+                <a
+                  href="#ulasan-produk"
+                  className="inline-flex items-center gap-1 font-semibold hover:text-primary"
+                >
+                  <Star className="size-4 fill-aurora text-aurora" aria-hidden="true" />
+                  {reviewAverage.toFixed(1)}
+                  <span className="font-normal text-muted-foreground">({reviewTotal} ulasan)</span>
+                </a>
+              ) : (
+                <span className="text-muted-foreground">Belum ada ulasan</span>
+              )}
               {completed != null ? (
                 <>
                   <span className="h-4 w-px bg-border" aria-hidden="true" />
@@ -354,7 +380,7 @@ function DetailJasa() {
                 <p className="text-xs text-muted-foreground">Dikerjakan oleh</p>
                 <p className="truncate text-base font-semibold">{s.store.name}</p>
                 <PresenceLabel presence={presence} className="mt-0.5" />
-                <div className="mt-2.5 grid grid-cols-2 gap-2">
+                <div className="mt-2.5 grid grid-cols-3 gap-2">
                   <ServiceChatButton
                     serviceId={s.id}
                     serviceName={s.name}
@@ -369,12 +395,27 @@ function DetailJasa() {
                       <Store className="size-4" aria-hidden="true" /> Kunjungi
                     </Link>
                   </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={SELLER_ACTION}
+                    onClick={openReviewForm}
+                  >
+                    <Star className="size-4" aria-hidden="true" /> Ulasan
+                  </Button>
                 </div>
               </div>
             </div>
 
             <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
               {[
+                {
+                  label: "Penilaian",
+                  value:
+                    stats?.storeRating != null
+                      ? `${stats.storeRating.toFixed(1)} ★ (${stats.storeReviews})`
+                      : "Belum ada",
+                },
                 {
                   label: "Jasa",
                   value: stats?.storeServices != null ? String(stats.storeServices) : "—",
@@ -391,7 +432,6 @@ function DetailJasa() {
                     : "—",
                 },
                 { label: "Durasi", value: `${agreement.durationDays} hari` },
-                { label: "Revisi", value: `${agreement.revisionLimit}x` },
                 { label: "Dana", value: "Ditahan" },
               ].map((row) => (
                 <div key={row.label} className="flex min-w-0 items-baseline justify-between gap-2">
@@ -415,6 +455,7 @@ function DetailJasa() {
               {[
                 ["#spesifikasi-jasa", "Spesifikasi"],
                 ["#kesepakatan-jasa", "Kesepakatan"],
+                ["#ulasan-produk", `Ulasan${reviewTotal ? ` (${reviewTotal})` : ""}`],
               ].map(([href, label]) => (
                 <a
                   key={href}
@@ -473,6 +514,8 @@ function DetailJasa() {
                 </Term>
               </dl>
             </section>
+
+            <ServiceReviewPanel serviceId={s.id} />
           </div>
 
           <StoreServicesAside items={data.related} storeSlug={s.store.slug} />

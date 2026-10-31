@@ -11,12 +11,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
 import {
   getMyReviewState,
+  getMyServiceReviewState,
   listProductReviews,
+  listServiceReviews,
   submitGuestReview,
+  submitGuestServiceReview,
   submitProductReview,
+  submitServiceReview,
 } from "@/lib/reviews.functions";
 
-const dateFmt = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" });
+/** Sasaran ulasan: produk digital atau jasa seller. Tampilan panel sama persis. */
+export type ReviewTarget = { kind: "product"; id: string } | { kind: "service"; id: string };
+
+const reviewsKey = (t: ReviewTarget) =>
+  [t.kind === "product" ? "product-reviews" : "service-reviews", t.id] as const;
+const stateKey = (t: ReviewTarget) =>
+  [t.kind === "product" ? "product-review-state" : "service-review-state", t.id] as const;
+const noun = (t: ReviewTarget) => (t.kind === "product" ? "produk" : "jasa");
+
+function fetchReviews(t: ReviewTarget) {
+  return t.kind === "product"
+    ? listProductReviews({ data: { productId: t.id } })
+    : listServiceReviews({ data: { serviceId: t.id } });
+}
+
+const dateFmt = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 /** Event untuk membuka form ulasan dari tombol lain di halaman produk. */
 export const OPEN_REVIEW_EVENT = "ebry:open-review";
@@ -29,9 +52,10 @@ function useOpenReviewEvent(onOpen: () => void) {
 }
 
 /** Ulasan tanpa akun untuk pelanggan yang membeli di luar web (mis. WhatsApp). */
-function GuestReviewForm({ productId }: { productId: string }) {
+function GuestReviewForm({ target }: { target: ReviewTarget }) {
   const queryClient = useQueryClient();
-  const submit = useServerFn(submitGuestReview);
+  const submitProduct = useServerFn(submitGuestReview);
+  const submitService = useServerFn(submitGuestServiceReview);
   const [open, setOpen] = useState(false);
   useOpenReviewEvent(useCallback(() => setOpen(true), []));
   const [sent, setSent] = useState(false);
@@ -41,8 +65,12 @@ function GuestReviewForm({ productId }: { productId: string }) {
   const [website, setWebsite] = useState("");
 
   const mutation = useMutation({
-    mutationFn: () =>
-      submit({ data: { productId, name, rating, body: body || undefined, website: website || undefined } }),
+    mutationFn: (): Promise<{ ok: boolean; error: string | null }> => {
+      const fields = { name, rating, body: body || undefined, website: website || undefined };
+      return target.kind === "product"
+        ? submitProduct({ data: { productId: target.id, ...fields } })
+        : submitService({ data: { serviceId: target.id, ...fields } });
+    },
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error(result.error);
@@ -51,20 +79,25 @@ function GuestReviewForm({ productId }: { productId: string }) {
       setSent(true);
       setOpen(false);
       toast.success("Terima kasih, ulasan kamu sudah tampil.");
-      queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: reviewsKey(target) });
       queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
     },
     onError: () => toast.error("Ulasan gagal dikirim. Coba lagi."),
   });
 
   if (sent) {
-    return <p className="text-sm text-muted-foreground">Terima kasih, ulasan kamu sudah kami terima.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">Terima kasih, ulasan kamu sudah kami terima.</p>
+    );
   }
 
   if (!open) {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">Pernah membeli produk ini? Bagikan pengalamanmu.</p>
+        <p className="text-sm text-muted-foreground">
+          Pernah {target.kind === "product" ? "membeli produk" : "memakai jasa"} ini? Bagikan
+          pengalamanmu.
+        </p>
         <Button variant="outline" className="min-h-11" onClick={() => setOpen(true)}>
           Tulis ulasan
         </Button>
@@ -114,7 +147,7 @@ function GuestReviewForm({ productId }: { productId: string }) {
           maxLength={1000}
           rows={3}
           className="mt-1"
-          placeholder="Ceritakan pengalamanmu memakai produk ini"
+          placeholder={`Ceritakan pengalamanmu memakai ${noun(target)} ini`}
         />
       </div>
       {/* Honeypot anti-bot: tersembunyi dari pengguna dan pembaca layar. */}
@@ -144,22 +177,41 @@ function GuestReviewForm({ productId }: { productId: string }) {
 }
 
 export function ProductReviewPanel({ productId }: { productId: string }) {
+  return <ReviewPanel target={{ kind: "product", id: productId }} />;
+}
+
+export function ServiceReviewPanel({ serviceId }: { serviceId: string }) {
+  return <ReviewPanel target={{ kind: "service", id: serviceId }} />;
+}
+
+/** Ringkasan rating untuk header halaman; berbagi cache dengan panel (query key sama). */
+export function useReviewSummary(target: ReviewTarget) {
+  const reviews = useQuery({ queryKey: reviewsKey(target), queryFn: () => fetchReviews(target) });
+  return { total: reviews.data?.total ?? 0, average: reviews.data?.average ?? 0 };
+}
+
+function ReviewPanel({ target }: { target: ReviewTarget }) {
   const { user } = useSession();
   const queryClient = useQueryClient();
 
   const reviews = useQuery({
-    queryKey: ["product-reviews", productId],
-    queryFn: () => listProductReviews({ data: { productId } }),
+    queryKey: reviewsKey(target),
+    queryFn: () => fetchReviews(target),
   });
 
-  const fetchState = useServerFn(getMyReviewState);
+  const fetchProductState = useServerFn(getMyReviewState);
+  const fetchServiceState = useServerFn(getMyServiceReviewState);
   const state = useQuery({
-    queryKey: ["product-review-state", productId, user?.id ?? "anon"],
-    queryFn: () => fetchState({ data: { productId } }),
+    queryKey: [...stateKey(target), user?.id ?? "anon"],
+    queryFn: () =>
+      target.kind === "product"
+        ? fetchProductState({ data: { productId: target.id } })
+        : fetchServiceState({ data: { serviceId: target.id } }),
     enabled: Boolean(user),
   });
 
-  const submit = useServerFn(submitProductReview);
+  const submitProduct = useServerFn(submitProductReview);
+  const submitService = useServerFn(submitServiceReview);
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -178,15 +230,20 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
   }, [state.data?.myReview]);
 
   const mutation = useMutation({
-    mutationFn: () => submit({ data: { productId, rating, title: title || undefined, body: body || undefined } }),
+    mutationFn: () => {
+      const fields = { rating, title: title || undefined, body: body || undefined };
+      return target.kind === "product"
+        ? submitProduct({ data: { productId: target.id, ...fields } })
+        : submitService({ data: { serviceId: target.id, ...fields } });
+    },
     onSuccess: (result) => {
       if (!result.ok) {
         toast.error("Ulasan gagal dikirim", { description: result.error ?? undefined });
         return;
       }
       toast.success("Terima kasih, ulasan kamu tersimpan.");
-      queryClient.invalidateQueries({ queryKey: ["product-reviews", productId] });
-      queryClient.invalidateQueries({ queryKey: ["product-review-state", productId] });
+      queryClient.invalidateQueries({ queryKey: reviewsKey(target) });
+      queryClient.invalidateQueries({ queryKey: stateKey(target) });
       queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
     },
     onError: () => toast.error("Ulasan gagal dikirim. Coba lagi."),
@@ -243,7 +300,11 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
       ) : null}
 
       {items.length ? (
-        <div className="mx-4 mt-3 flex flex-wrap gap-2 sm:mx-5" role="group" aria-label="Filter ulasan">
+        <div
+          className="mx-4 mt-3 flex flex-wrap gap-2 sm:mx-5"
+          role="group"
+          aria-label="Filter ulasan"
+        >
           {[null, 5, 4, 3, 2, 1].map((star) => {
             const active = starFilter === star;
             const count = star === null ? items.length : counts.find((c) => c.star === star)!.count;
@@ -272,7 +333,7 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
           Pengguna yang sudah punya ulasan langsung melihat formnya terbuka. */}
       <div className="mt-4 border-y border-border px-4 py-4 sm:px-5">
         {!user || !canReview ? (
-          <GuestReviewForm productId={productId} />
+          <GuestReviewForm target={target} />
         ) : (
           <>
             {!formOpen ? (
@@ -317,7 +378,7 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
                     maxLength={1000}
                     rows={3}
                     className="mt-1"
-                    placeholder="Ceritakan pengalamanmu memakai produk ini"
+                    placeholder={`Ceritakan pengalamanmu memakai ${noun(target)} ini`}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -346,7 +407,9 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
             <li key={review.id} className="py-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="text-sm font-semibold">{review.reviewer_name ?? "Pembeli Ebrystore"}</span>
+                  <span className="text-sm font-semibold">
+                    {review.reviewer_name ?? "Pembeli Ebrystore"}
+                  </span>
                   {review.is_verified ? (
                     <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
                       <BadgeCheck className="size-3" aria-hidden="true" />
@@ -365,14 +428,18 @@ export function ProductReviewPanel({ productId }: { productId: string }) {
               <StarRating value={Number(review.rating)} className="mt-1" />
               {review.title ? <p className="mt-2 text-sm font-medium">{review.title}</p> : null}
               {review.body ? (
-                <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{review.body}</p>
+                <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">
+                  {review.body}
+                </p>
               ) : null}
             </li>
           ))}
         </ul>
       ) : (
         <p className="px-4 py-8 text-sm text-muted-foreground sm:px-5">
-          {items.length ? "Tidak ada ulasan dengan bintang ini." : "Belum ada ulasan untuk produk ini."}
+          {items.length
+            ? "Tidak ada ulasan dengan bintang ini."
+            : `Belum ada ulasan untuk ${noun(target)} ini.`}
         </p>
       )}
     </section>
