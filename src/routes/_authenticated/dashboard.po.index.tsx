@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import { useSession } from "@/hooks/use-session";
 import { formatRupiah } from "@/lib/format";
 import { createPoRequest, listMyPoRequests } from "@/lib/po.functions";
 
@@ -48,7 +50,16 @@ function PoListPage() {
   const [deadline, setDeadline] = useState("");
   const [referenceUrl, setReferenceUrl] = useState("");
 
+  const { user } = useSession();
   const { data, isPending, error, refetch } = useQuery({ queryKey: ["po-list"], queryFn: () => fetchList({}) });
+  // Status, penawaran, dan pembayaran PO berubah dari sisi tim; segarkan otomatis.
+  useRealtimeRefresh({
+    channel: "po-list",
+    tables: ["custom_orders", "po_payments"],
+    filter: user ? `user_id=eq.${user.id}` : undefined,
+    enabled: Boolean(user),
+    keys: [["po-list"]],
+  });
 
   async function submit() {
     if (title.trim().length < 5 || description.trim().length < 20) {

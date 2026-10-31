@@ -9,6 +9,7 @@ import { BankListRow, InlineEmpty, PageHeader } from "@/components/ebry/cards";
 import { TopupPanel } from "@/components/ebry/topup-panel";
 import { Button } from "@/components/ui/button";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import { useSession } from "@/hooks/use-session";
 import { getMyCredit } from "@/lib/orders.functions";
 import { formatRupiah } from "@/lib/format";
 
@@ -45,9 +46,13 @@ function SaldoSaya() {
   });
   const [showTopup, setShowTopup] = useState(false);
 
+  const { user } = useSession();
+  // Filter per user: event saldo pengguna lain tidak perlu dikirim ke klien ini.
   useRealtimeRefresh({
     channel: "my-credit",
-    tables: ["credit_ledger"],
+    tables: ["credit_ledger", "credit_topups"],
+    filter: user ? `user_id=eq.${user.id}` : undefined,
+    enabled: Boolean(user),
     keys: [["my-credit"]],
   });
 

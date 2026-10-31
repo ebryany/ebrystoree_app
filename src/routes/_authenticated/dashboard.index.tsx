@@ -93,15 +93,15 @@ function DashboardRingkasan() {
 
   useRealtimeRefresh({
     channel: "dashboard-summary",
-    tables: [
-      "orders",
-      "payments",
-      "operator_assignments",
-      "job_results",
-      "notifications",
-      "credit_ledger",
-    ],
+    tables: ["orders", "payments", "operator_assignments", "job_results", "notifications"],
     keys: [["customer-summary"], ["my-orders"], ["my-credit"]],
+  });
+  useRealtimeRefresh({
+    channel: "dashboard-credit",
+    tables: ["credit_ledger", "credit_topups"],
+    filter: user ? `user_id=eq.${user.id}` : undefined,
+    enabled: Boolean(user),
+    keys: [["my-credit"]],
   });
 
   const fullName =

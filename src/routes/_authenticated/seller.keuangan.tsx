@@ -60,6 +60,13 @@ function SellerFinance() {
     keys: [["seller-ledger"], ["withdrawal-policy"], ["my-withdrawals"]],
     enabled: Boolean(user),
   });
+  // Mutasi ledger dan status payout langsung dari tabelnya; RLS membatasi ke toko sendiri.
+  useRealtimeRefresh({
+    channel: "seller-keuangan-ledger",
+    tables: ["seller_ledger", "withdrawals"],
+    keys: [["seller-ledger"], ["withdrawal-policy"], ["my-withdrawals"]],
+    enabled: Boolean(user),
+  });
 
   if (isPending) {
     return (
@@ -168,54 +175,54 @@ function SellerFinance() {
       </motion.section>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
-      {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
-      <div className="lg:sticky lg:top-24 lg:order-2">
-        <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
-      </div>
+        {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
+        <div className="lg:sticky lg:top-24 lg:order-2">
+          <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
+        </div>
 
-      {/* Mutation list */}
-      <section
-        className="rounded-2xl border border-border bg-card lg:order-1"
-        aria-labelledby="mutasi-heading"
-      >
-        <h2
-          id="mutasi-heading"
-          className="border-b border-border px-4 py-3 text-sm font-bold text-foreground"
+        {/* Mutation list */}
+        <section
+          className="rounded-2xl border border-border bg-card lg:order-1"
+          aria-labelledby="mutasi-heading"
         >
-          Riwayat mutasi
-        </h2>
+          <h2
+            id="mutasi-heading"
+            className="border-b border-border px-4 py-3 text-sm font-bold text-foreground"
+          >
+            Riwayat mutasi
+          </h2>
 
-        {items.length === 0 ? (
-          <InlineEmpty icon={Wallet} text="Belum ada mutasi saldo." />
-        ) : (
-          <motion.ul layout={!reduced} className="px-4" aria-label="Daftar mutasi">
-            <AnimatePresence initial={false}>
-              {items.map((e: any, index: number) => {
-                const credit = e.direction === "credit";
-                return (
-                  <motion.div
-                    key={e.id}
-                    initial={reduced ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{
-                      duration: 0.15,
-                      delay: reduced ? 0 : index * 0.02,
-                    }}
-                  >
-                    <BankListRow
-                      icon={credit ? ArrowDownLeft : ArrowUpRight}
-                      title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.note ? ` — ${e.note}` : ""}`}
-                      subtitle={shortDateTime(e.created_at)}
-                      value={`${credit ? "+" : "−"}${formatRupiah(Number(e.amount))}`}
-                      valueTone={credit ? "positive" : "warning"}
-                    />
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.ul>
-        )}
-      </section>
+          {items.length === 0 ? (
+            <InlineEmpty icon={Wallet} text="Belum ada mutasi saldo." />
+          ) : (
+            <motion.ul layout={!reduced} className="px-4" aria-label="Daftar mutasi">
+              <AnimatePresence initial={false}>
+                {items.map((e: any, index: number) => {
+                  const credit = e.direction === "credit";
+                  return (
+                    <motion.div
+                      key={e.id}
+                      initial={reduced ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{
+                        duration: 0.15,
+                        delay: reduced ? 0 : index * 0.02,
+                      }}
+                    >
+                      <BankListRow
+                        icon={credit ? ArrowDownLeft : ArrowUpRight}
+                        title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.note ? ` — ${e.note}` : ""}`}
+                        subtitle={shortDateTime(e.created_at)}
+                        value={`${credit ? "+" : "−"}${formatRupiah(Number(e.amount))}`}
+                        valueTone={credit ? "positive" : "warning"}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </motion.ul>
+          )}
+        </section>
       </div>
     </div>
   );

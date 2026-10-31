@@ -19,6 +19,7 @@ import {
 import { StatusBadge, formatDateTime } from "@/components/admin/tx-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { formatRupiah } from "@/lib/format";
 import { listManualTopups, reviewManualTopup } from "@/lib/topup-manual.functions";
 import { cn } from "@/lib/utils";
@@ -53,7 +54,14 @@ function AdminTopups() {
     queryKey: ["admin-manual-topups"],
     queryFn: () => fetchList(),
     enabled: canView,
+    // Cadangan bila koneksi realtime putus; event utama datang dari credit_topups.
     refetchInterval: 60_000,
+  });
+  useRealtimeRefresh({
+    channel: "admin-topups",
+    tables: ["credit_topups"],
+    keys: [["admin-manual-topups"]],
+    enabled: canView,
   });
 
   const mutation = useMutation({

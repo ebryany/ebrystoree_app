@@ -16,6 +16,7 @@ import {
   useCan,
 } from "@/components/admin/admin-ui";
 import { StatusBadge, formatDateTime } from "@/components/admin/tx-ui";
+import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { listPayouts } from "@/lib/admin-payout.functions";
 import { formatRupiah } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,12 @@ function AdminPayouts() {
   const { data, isPending, error } = useQuery({
     queryKey: ["admin-payouts", status, query],
     queryFn: () => fetchPayouts({ data: { status: status as any, search: query } }),
+  });
+  useRealtimeRefresh({
+    channel: "admin-payouts",
+    tables: ["withdrawals", "withdrawal_events"],
+    keys: [["admin-payouts"]],
+    enabled: canView,
   });
 
   const items = useMemo<any[]>(() => (data as any)?.items ?? [], [data]);
