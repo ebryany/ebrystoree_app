@@ -17,11 +17,29 @@ const EMOJI_START = /^\p{Extended_Pictographic}/u;
 const EMOJI_PREFIX = /^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u;
 const CHECK_START = /^[✅✔☑]/u;
 const KEY_VALUE = /^([^:\n]{2,32}):\s+(.+)$/;
+// Seller juga sering menempel teks Markdown (## judul, - daftar, 1. langkah, **tebal**).
+const MD_HEADING = /^#{1,6}\s+(.+)$/;
+const BULLET = /^\s*[-*•]\s+(.+)$/;
+const NUMBERED = /^\s*\d+[.)]\s+(.+)$/;
 
 type Node =
   | { kind: "p"; text: string }
   | { kind: "item"; check: boolean; emoji: string; title: string; desc: string | null }
-  | { kind: "kv"; rows: Array<[string, string]> };
+  | { kind: "kv"; rows: Array<[string, string]> }
+  | { kind: "ol"; items: string[] };
+
+/** Buang penanda tebal/miring Markdown; teks tetap apa adanya. */
+const inline = (s: string) =>
+  s
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/__(.+?)__/g, "$1")
+    .replace(/(^|[\s(])[*_]([^*_\n]+)[*_](?=[\s.,!?)]|$)/g, "$1$2");
+
+function pushKv(nodes: Node[], key: string, value: string) {
+  const last = nodes[nodes.length - 1];
+  if (last?.kind === "kv") last.rows.push([key.trim(), value.trim()]);
+  else nodes.push({ kind: "kv", rows: [[key.trim(), value.trim()]] });
+}
 
 type Section = { title: string | null; warning: boolean; nodes: Node[] };
 
@@ -41,7 +59,12 @@ function parse(text: string): Section[] {
     .replace(/\r\n/g, "\n")
     .split(/\n\s*\n+/)
     .map((b) => b.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    // "## Judul" yang langsung diikuti daftar dipisah jadi judul + isi.
+    .flatMap((b) => {
+      const [first, ...rest] = b.split("\n");
+      return MD_HEADING.test(first) && rest.length ? [first, rest.join("\n").trim()] : [b];
+    });
 
   const sections: Section[] = [{ title: null, warning: false, nodes: [] }];
   const current = () => sections[sections.length - 1];
@@ -49,6 +72,31 @@ function parse(text: string): Section[] {
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
     const next = blocks[i + 1];
+
+    const md = block.match(MD_HEADING);
+    if (md && !block.includes("\n")) {
+      const raw = inline(md[1]).trim();
+      sections.push({ title: stripEmoji(raw) || raw, warning: raw.startsWith("⚠"), nodes: [] });
+      continue;
+    }
+
+    const lines = block.split("\n");
+    if (lines.every((l) => BULLET.test(l))) {
+      for (const l of lines) {
+        const t = inline(l.match(BULLET)![1]).trim();
+        const kv = t.match(KEY_VALUE);
+        if (kv) pushKv(current().nodes, kv[1], kv[2]);
+        else current().nodes.push({ kind: "item", check: true, emoji: "", title: t, desc: null });
+      }
+      continue;
+    }
+    if (lines.every((l) => NUMBERED.test(l))) {
+      current().nodes.push({
+        kind: "ol",
+        items: lines.map((l) => inline(l.match(NUMBERED)![1]).trim()),
+      });
+      continue;
+    }
 
     if (isHeading(block, next)) {
       sections.push({ title: stripEmoji(block), warning: block.startsWith("⚠"), nodes: [] });
@@ -89,14 +137,11 @@ function parse(text: string): Section[] {
 
     const kv = block.match(KEY_VALUE);
     if (kv && !block.includes("\n")) {
-      const nodes = current().nodes;
-      const last = nodes[nodes.length - 1];
-      if (last?.kind === "kv") last.rows.push([kv[1].trim(), kv[2].trim()]);
-      else nodes.push({ kind: "kv", rows: [[kv[1].trim(), kv[2].trim()]] });
+      pushKv(current().nodes, kv[1], kv[2]);
       continue;
     }
 
-    current().nodes.push({ kind: "p", text: block });
+    current().nodes.push({ kind: "p", text: inline(block) });
   }
 
   return sections.filter((s) => s.title || s.nodes.length);
@@ -108,21 +153,44 @@ function Items({ nodes }: { nodes: Node[] }) {
       {nodes.map((node, idx) => {
         if (node.kind === "p") {
           return (
-            <p key={idx} className="whitespace-pre-line break-words text-sm leading-7 text-muted-foreground">
+            <p
+              key={idx}
+              className="whitespace-pre-line break-words text-sm leading-7 text-muted-foreground"
+            >
               {node.text}
             </p>
           );
         }
         if (node.kind === "kv") {
           return (
-            <dl key={idx} className="divide-y divide-border rounded-lg border border-border text-sm">
+            <dl
+              key={idx}
+              className="divide-y divide-border rounded-lg border border-border text-sm"
+            >
               {node.rows.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 px-3 py-2 sm:grid-cols-[160px_minmax(0,1fr)]">
+                <div
+                  key={k}
+                  className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 px-3 py-2 sm:grid-cols-[160px_minmax(0,1fr)]"
+                >
                   <dt className="text-muted-foreground">{k}</dt>
                   <dd className="break-words">{v}</dd>
                 </div>
               ))}
             </dl>
+          );
+        }
+        if (node.kind === "ol") {
+          return (
+            <ol
+              key={idx}
+              className="list-decimal space-y-1.5 pl-5 text-sm leading-6 text-muted-foreground marker:font-semibold marker:text-foreground"
+            >
+              {node.items.map((t, ti) => (
+                <li key={ti} className="break-words pl-1">
+                  {t}
+                </li>
+              ))}
+            </ol>
           );
         }
         return null;
@@ -160,7 +228,9 @@ function SectionBody({ nodes }: { nodes: Node[] }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <p className="break-words text-sm font-semibold">{it.title}</p>
+                  <p className={cn("break-words text-sm", it.desc ? "font-semibold" : "leading-6")}>
+                    {it.title}
+                  </p>
                   {it.desc ? (
                     <p className="mt-0.5 whitespace-pre-line break-words text-sm leading-6 text-muted-foreground">
                       {it.desc}
@@ -192,14 +262,15 @@ export function ProductDescription({ text }: { text: string }) {
         {sections.map((s, si) => (
           <div
             key={si}
-            className={cn(
-              s.warning && "rounded-lg border border-warning/40 bg-warning/10 p-4",
-            )}
+            className={cn(s.warning && "rounded-lg border border-warning/40 bg-warning/10 p-4")}
           >
             {s.title ? (
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 {s.warning ? (
-                  <AlertTriangle className="size-4 shrink-0 text-warning-foreground" aria-hidden="true" />
+                  <AlertTriangle
+                    className="size-4 shrink-0 text-warning-foreground"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <span className="h-4 w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
                 )}
@@ -225,7 +296,10 @@ export function ProductDescription({ text }: { text: string }) {
           className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-border text-sm font-medium text-primary hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
         >
           {open ? "Tutup deskripsi" : "Lihat selengkapnya"}
-          <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} aria-hidden="true" />
+          <ChevronDown
+            className={cn("size-4 transition-transform", open && "rotate-180")}
+            aria-hidden="true"
+          />
         </button>
       ) : null}
     </div>
