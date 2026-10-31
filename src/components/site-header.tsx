@@ -29,6 +29,7 @@ import { useSession } from "@/hooks/use-session";
 import { useSiteNav, useWebsiteSettings } from "@/hooks/use-website-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRoles } from "@/lib/admin.functions";
+import { listInquiryUnreadCounts } from "@/lib/inquiries.functions";
 import { cn } from "@/lib/utils";
 
 const NAV_META: Record<string, { description: string; icon: typeof Package }> = {
@@ -61,6 +62,14 @@ export function SiteHeader() {
     queryFn: () => fetchRoles({}),
     enabled: Boolean(user),
   });
+  // Query key sama dengan halaman chat supaya cache & realtime dipakai bersama.
+  const fetchChatUnread = useServerFn(listInquiryUnreadCounts);
+  const { data: chatUnreadData } = useQuery({
+    queryKey: ["inquiry-unread"],
+    queryFn: () => fetchChatUnread({}),
+    enabled: Boolean(user),
+  });
+  const chatUnread = (chatUnreadData?.items ?? []).reduce((sum, r) => sum + Number(r.unread), 0);
   const isAdmin = Boolean(access?.isAdmin);
   const isOperator = Boolean(access?.roles?.includes("operator"));
   const displayName =
@@ -228,10 +237,24 @@ export function SiteHeader() {
             {/* Mobile: cukup keranjang, notifikasi, avatar, menu. Pencarian dan
                 chat pindah ke dalam menu supaya baris ini tidak pernah patah. */}
             <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:hidden">
-              <CartButton />
+              {/* Notifikasi (dengan angka) ada di header dashboard; di sini cukup chat. */}
               {user ? (
                 <>
-                  <NotificationBell />
+                  <Link
+                    to="/dashboard/chat"
+                    aria-label={chatUnread ? `Chat, ${chatUnread} belum dibaca` : "Chat"}
+                    className="relative grid min-h-11 min-w-11 place-items-center rounded-full text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <MessagesSquare className="size-5" aria-hidden="true" />
+                    {chatUnread ? (
+                      <span
+                        aria-hidden="true"
+                        className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground shadow-sm"
+                      >
+                        {chatUnread > 9 ? "9+" : chatUnread}
+                      </span>
+                    ) : null}
+                  </Link>
                   <Link
                     to="/dashboard"
                     aria-label="Akun saya"

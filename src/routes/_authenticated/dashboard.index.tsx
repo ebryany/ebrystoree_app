@@ -1,38 +1,38 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
+  BadgeCheck,
   Banknote,
   Bell,
   Compass,
   Download,
   LifeBuoy,
   MessageSquarePlus,
+  MessagesSquare,
   Package,
   ReceiptText,
   RotateCcw,
+  Search,
+  ShieldCheck,
+  ShoppingCart,
+  SlidersHorizontal,
   Wallet,
   Wrench,
 } from "lucide-react";
 
-import {
-  BalanceCard,
-  BankHeader,
-  BankListRow,
-  InlineEmpty,
-  StatSummary,
-  RoundMenuGrid,
-} from "@/components/ebry/cards";
+import { BankListRow, InlineEmpty, StatSummary, RoundMenuGrid } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
+import { NotificationBell } from "@/components/ebry/notification-bell";
 import { SellerEntryCard } from "@/components/ebry/seller-entry-card";
 import { PopularSellers } from "@/components/ebry/popular-sellers";
 import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
 import { StatusPill } from "@/components/ebry/status";
 import { TopupPanel } from "@/components/ebry/topup-panel";
-import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
+import { useCart } from "@/lib/cart-store";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { useAvatarUrl } from "@/hooks/use-avatar-url";
 import { getCustomerSummary, getMyCredit, getMyProfile } from "@/lib/orders.functions";
@@ -57,6 +57,13 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardRingkasan,
 });
 
+const TRUST = [
+  { icon: ShieldCheck, label: "Dana ditahan sampai selesai" },
+  { icon: BadgeCheck, label: "Jasa ditinjau admin" },
+  { icon: MessagesSquare, label: "Chat sebelum pesan" },
+  { icon: RotateCcw, label: "Refund ke saldo" },
+];
+
 function DashboardRingkasan() {
   const fetchSummary = useServerFn(getCustomerSummary);
   const fetchProfile = useServerFn(getMyProfile);
@@ -76,6 +83,9 @@ function DashboardRingkasan() {
   });
   const creditBalance = creditData?.balance ?? 0;
   const [showTopup, setShowTopup] = useState(false);
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const { count: cartCount } = useCart();
   const profile = (profileData as any)?.profile;
   const avatarUrl = useAvatarUrl(profile?.avatar_url ?? null);
 
@@ -124,57 +134,137 @@ function DashboardRingkasan() {
 
   const subtitle = needsAction ? `${needsAction} hal menunggu tindakanmu` : "Semua pesananmu aman";
 
-  return (
-    <div className="-mt-5 space-y-4 md:mt-0">
-      {/* A. Header bersih (netral) */}
-      <BankHeader
-        name={firstName}
-        subtitle={subtitle}
-        avatarUrl={avatarUrl}
-        initials={initials}
-        actions={[{ to: "/dashboard/notifikasi", icon: Bell, label: "Buka notifikasi" }]}
-      />
+  function submitSearch(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const q = query.trim();
+    void navigate({ to: "/produk", search: (q ? { q } : {}) as never });
+  }
 
-      {/* B. Kartu saldo ala ATM bank — tombol Isi Saldo di kiri tautan riwayat */}
-      <BalanceCard
-        label="Saldo Ebrystore"
-        credit={{
-          value: formatRupiah(creditBalance),
-          caption:
-            creditBalance > 0
-              ? "Bisa dipakai untuk membayar pesanan"
-              : "Belum ada saldo. Isi saldo atau terima refund pesanan yang dibatalkan.",
-          to: "/dashboard/saldo",
-        }}
-        actionLabel="Riwayat saldo"
-        actionIcon={Banknote}
-        action={
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="min-h-11"
-            onClick={() => setShowTopup((v) => !v)}
-            aria-expanded={showTopup}
-            aria-controls="panel-isi-saldo"
+  return (
+    <div className="-mt-5 space-y-5 md:mt-0">
+      {/* A. Sapaan + tombol bulat notifikasi & keranjang */}
+      <header className="flex items-center gap-3 pt-5 md:pt-0">
+        <Link
+          to="/dashboard/pengaturan"
+          aria-label="Buka profil saya"
+          className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-surface-selected text-sm font-semibold text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {avatarUrl ? <img src={avatarUrl} alt="" className="size-full object-cover" /> : initials}
+        </Link>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
+          <h1 className="truncate text-lg font-bold text-foreground">Halo, {firstName}</h1>
+        </div>
+        <NotificationBell className="size-11 shrink-0 rounded-full border border-border bg-card hover:bg-muted" />
+        <Link
+          to="/keranjang"
+          aria-label={cartCount ? `Keranjang, ${cartCount} item` : "Keranjang"}
+          className="relative grid size-11 shrink-0 place-items-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ShoppingCart className="size-5" aria-hidden="true" />
+          {cartCount ? (
+            <span
+              aria-hidden="true"
+              className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold leading-4 text-accent-foreground ring-2 ring-background"
+            >
+              {cartCount > 9 ? "9+" : cartCount}
+            </span>
+          ) : null}
+        </Link>
+      </header>
+
+      {/* B. Pencarian produk */}
+      <form role="search" onSubmit={submitSearch} className="relative">
+        <label htmlFor="dash-search" className="sr-only">
+          Cari produk atau jasa
+        </label>
+        <Search
+          className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <input
+          id="dash-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Cari produk atau jasa…"
+          maxLength={80}
+          className="h-12 w-full rounded-full border border-border bg-card pl-12 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <Link
+          to="/produk"
+          aria-label="Buka katalog dengan filter"
+          className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <SlidersHorizontal className="size-4" aria-hidden="true" />
+        </Link>
+      </form>
+
+      {/* C. Banner saldo: dua CTA (isi saldo + riwayat) */}
+      <section
+        aria-labelledby="saldo-heading"
+        className="relative isolate overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-[0_18px_40px_-20px_oklch(0.33_0.062_200/70%)]"
+      >
+        {/* Lapisan cahaya di belakang kaca: blob accent/success yang di-blur. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-12 -top-16 -z-10 size-48 rounded-full bg-accent/70 blur-3xl"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-20 right-0 -z-10 size-56 rounded-full bg-success/45 blur-3xl"
+        />
+        {/* Panel kaca: frosted + kilau diagonal + tepi menyala tipis. */}
+        <div className="relative rounded-3xl border border-primary-foreground/20 bg-gradient-to-br from-primary-foreground/[0.14] via-primary-foreground/[0.05] to-primary-foreground/[0.10] p-5 shadow-[inset_0_1px_0_oklch(1_0_0/25%)] backdrop-blur-xl">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-3xl bg-[linear-gradient(115deg,transparent_35%,oklch(1_0_0/12%)_50%,transparent_65%)]"
+          />
+          <h2
+            id="saldo-heading"
+            className="relative inline-flex rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-2.5 py-1 text-[11px] font-semibold text-primary-foreground/90 backdrop-blur"
           >
-            <Wallet className="mr-1.5 size-4" aria-hidden="true" />
-            {showTopup ? "Tutup" : "Isi Saldo"}
-          </Button>
-        }
-        panel={
-          showTopup ? (
-            <div id="panel-isi-saldo" className="mt-4 border-t border-white/40 pt-4">
-              <TopupPanel
-                onPaid={async () => {
-                  setShowTopup(false);
-                  await refetch();
-                }}
-              />
-            </div>
-          ) : null
-        }
-      />
+            Saldo Ebrystore
+          </h2>
+          <p className="relative mt-3 text-[28px] font-bold leading-none tracking-tight tabular-nums">
+            {formatRupiah(creditBalance)}
+          </p>
+          <p className="relative mt-2 max-w-[30ch] text-xs leading-relaxed text-primary-foreground/80">
+            {creditBalance > 0
+              ? "Bisa dipakai untuk membayar pesanan."
+              : "Isi saldo atau terima refund untuk bayar lebih cepat."}
+          </p>
+          <div className="relative mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setShowTopup((v) => !v)}
+              aria-expanded={showTopup}
+              aria-controls="panel-isi-saldo"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary-foreground px-4 text-sm font-semibold text-primary transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/70"
+            >
+              <Wallet className="size-4" aria-hidden="true" />
+              {showTopup ? "Tutup" : "Isi saldo"}
+            </button>
+            <Link
+              to="/dashboard/saldo"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-4 text-sm font-semibold text-primary-foreground shadow-[inset_0_1px_0_oklch(1_0_0/20%)] backdrop-blur-md transition-colors hover:bg-primary-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/70"
+            >
+              <Banknote className="size-4" aria-hidden="true" />
+              Riwayat
+            </Link>
+          </div>
+        </div>
+      </section>
+      {showTopup ? (
+        <div id="panel-isi-saldo" className="rounded-2xl border border-border bg-card p-4">
+          <TopupPanel
+            onPaid={async () => {
+              setShowTopup(false);
+              await refetch();
+            }}
+          />
+        </div>
+      ) : null}
 
       {/* C. Ringkasan aktivitas — kartu terpisah */}
       <StatSummary
@@ -240,15 +330,39 @@ function DashboardRingkasan() {
 
       {/* D. Menu aksi ikon bulat */}
       <section aria-labelledby="shortcut-heading" className="rounded-2xl bg-card p-4">
-        <h2 id="shortcut-heading" className="mb-3 text-sm font-bold text-foreground">
-          Mau ke mana?
-        </h2>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <h2 id="shortcut-heading" className="text-sm font-bold text-foreground">
+            Mau ke mana?
+          </h2>
+          <Link
+            to="/produk"
+            className="flex min-h-11 items-center gap-1 text-xs font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Lihat katalog <ArrowRight className="size-3.5" aria-hidden="true" />
+          </Link>
+        </div>
         <RoundMenuGrid items={shortcuts} />
       </section>
 
       <RecentlyViewedShelf />
 
       <PopularSellers />
+
+      {/* Jaminan: hanya mekanisme yang memang berjalan di platform. */}
+      <section aria-label="Jaminan transaksi" className="rounded-2xl bg-card p-4">
+        <ul className="grid grid-cols-4 gap-2">
+          {TRUST.map((t) => (
+            <li key={t.label} className="flex flex-col items-center gap-1.5 text-center">
+              <span className="grid size-10 place-items-center rounded-full bg-success/12 text-success">
+                <t.icon className="size-5" aria-hidden="true" />
+              </span>
+              <span className="text-[11px] font-medium leading-tight text-foreground">
+                {t.label}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* E. Pintu masuk seller (status mengikuti kondisi toko) */}
       <SellerEntryCard />

@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import {
-  ArrowUp,
+  Camera,
   Check,
   CheckCheck,
   ChevronDown,
@@ -18,7 +18,7 @@ import {
   Loader2,
   MapPin,
   Paperclip,
-  Plus,
+  SendHorizontal,
 } from "lucide-react";
 
 import { StatusPill } from "@/components/ebry/status";
@@ -215,10 +215,10 @@ export function ChatWindow({
           : "lg:h-[calc(100dvh-8rem)]",
       )}
     >
-      <header className="flex items-center gap-2 border-b border-border/70 bg-card px-2 py-2 sm:px-3">
+      <header className="flex items-center gap-2.5 border-b border-border/70 bg-card px-2 py-2.5 sm:px-3">
         {backSlot}
         <span className="relative shrink-0" aria-hidden="true">
-          <span className="grid size-10 place-items-center rounded-full bg-gradient-to-br from-primary/80 to-primary text-sm font-semibold text-primary-foreground">
+          <span className="grid size-11 place-items-center rounded-full bg-surface-selected text-base font-semibold text-accent">
             {initial}
           </span>
           {partnerOnline ? (
@@ -272,13 +272,17 @@ export function ChatWindow({
           return (
             <div key={message.id}>
               {dayBreak ? (
-                <p className="py-3 text-center text-[11px] font-medium text-muted-foreground">
-                  {chatDayLabel(message.created_at)}
+                <p className="flex justify-center py-3">
+                  <span className="rounded-full bg-card px-3 py-1 text-[11px] font-semibold text-muted-foreground shadow-sm ring-1 ring-border/70">
+                    {chatDayLabel(message.created_at)}
+                  </span>
                 </p>
               ) : null}
               {index === unreadDividerIndex ? (
-                <p className="py-2 text-center text-[11px] font-semibold text-primary">
+                <p className="flex items-center gap-2 py-2 text-[11px] font-semibold text-accent">
+                  <span className="h-px flex-1 bg-accent/30" aria-hidden="true" />
                   Pesan baru
+                  <span className="h-px flex-1 bg-accent/30" aria-hidden="true" />
                 </p>
               ) : null}
               {message.is_system ? (
@@ -319,9 +323,7 @@ export function ChatWindow({
                   : "bg-primary text-primary-foreground opacity-70",
               )}
             >
-              {item.attachmentLabel ? (
-                <p className="font-medium">{item.attachmentLabel}</p>
-              ) : null}
+              {item.attachmentLabel ? <p className="font-medium">{item.attachmentLabel}</p> : null}
               {item.body ? <p className="whitespace-pre-line break-words">{item.body}</p> : null}
               <p className="mt-0.5 flex items-center justify-end gap-1 text-[11px]">
                 {item.status === "sending" ? (
@@ -335,7 +337,7 @@ export function ChatWindow({
                     onClick={() => onRetry(item.tempId, item.body)}
                     className="min-h-6 font-semibold text-destructive underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
                   >
-                    Gagal, ketuk untuk kirim ulang
+                    Gagal, coba lagi
                   </button>
                 )}
               </p>
@@ -345,7 +347,7 @@ export function ChatWindow({
 
         {partnerTyping ? (
           <div className="flex justify-start pt-1.5">
-            <div className="flex items-center gap-1 rounded-[20px] rounded-bl-md bg-muted px-4 py-3">
+            <div className="flex items-center gap-1 rounded-[20px] rounded-bl-md bg-secondary px-4 py-3">
               <span className="sr-only">Lawan bicara sedang mengetik</span>
               {[0, 1, 2].map((dot) => (
                 <span
@@ -428,12 +430,16 @@ const Bubble = memo(function Bubble({
 }) {
   const isImage = attachment?.kind === "image";
   return (
-    <div className={cn("flex", mine ? "justify-end" : "justify-start", groupStart ? "pt-2" : "pt-0.5")}>
+    <div
+      className={cn("flex", mine ? "justify-end" : "justify-start", groupStart ? "pt-2" : "pt-0.5")}
+    >
       <div
         className={cn(
           "max-w-[78%] rounded-[20px] text-[15px] leading-snug sm:max-w-[65%]",
           isImage ? "p-1" : "px-3.5 py-2",
-          mine ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
+          mine
+            ? "bg-primary text-primary-foreground"
+            : "bg-secondary text-secondary-foreground ring-1 ring-border/50",
           // Ekor bubble hanya di pesan terakhir sebuah kelompok, seperti iMessage.
           groupEnd && (mine ? "rounded-br-md" : "rounded-bl-md"),
         )}
@@ -442,7 +448,9 @@ const Bubble = memo(function Bubble({
           <AttachmentView attachment={attachment} url={attachmentUrl} mine={mine} />
         ) : null}
         {body ? (
-          <p className={cn("whitespace-pre-line break-words", isImage && "px-2.5 pt-1.5")}>{body}</p>
+          <p className={cn("whitespace-pre-line break-words", isImage && "px-2.5 pt-1.5")}>
+            {body}
+          </p>
         ) : null}
         <p
           className={cn(
@@ -506,7 +514,10 @@ function AttachmentView({
     if (!url)
       return (
         <div className="grid aspect-[4/3] w-56 max-w-full place-items-center rounded-2xl bg-background/30">
-          <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-label="Memuat foto" />
+          <Loader2
+            className="size-5 animate-spin motion-reduce:animate-none"
+            aria-label="Memuat foto"
+          />
         </div>
       );
     return (
@@ -596,7 +607,7 @@ function Composer({
   return (
     <form
       onSubmit={submit}
-      className="pb-safe flex items-end gap-2 border-t border-border/70 bg-card px-2 py-2 sm:px-3"
+      className="pb-safe flex items-end gap-2 border-t border-border/70 bg-card px-2 py-2.5 sm:px-3"
     >
       {onAttach ? (
         <>
@@ -620,22 +631,37 @@ function Composer({
               e.target.value = "";
             }}
           />
+        </>
+      ) : null}
+      <div
+        className={cn(
+          "flex min-h-12 flex-1 items-end rounded-[24px] border border-border bg-background focus-within:border-accent/60",
+          onAttach ? "pl-1 pr-1" : "px-4",
+        )}
+      >
+        {onAttach ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
                 aria-label="Lampirkan"
-                className="grid size-11 shrink-0 place-items-center rounded-full text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Plus className="size-6" aria-hidden="true" />
+                <Paperclip className="size-5" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-48">
-              <DropdownMenuItem className="min-h-11 gap-3" onSelect={() => imageRef.current?.click()}>
+              <DropdownMenuItem
+                className="min-h-11 gap-3"
+                onSelect={() => imageRef.current?.click()}
+              >
                 <ImageIcon className="size-5 text-primary" aria-hidden="true" /> Foto
               </DropdownMenuItem>
-              <DropdownMenuItem className="min-h-11 gap-3" onSelect={() => fileRef.current?.click()}>
-                <Paperclip className="size-5 text-primary" aria-hidden="true" /> File
+              <DropdownMenuItem
+                className="min-h-11 gap-3"
+                onSelect={() => fileRef.current?.click()}
+              >
+                <FileText className="size-5 text-primary" aria-hidden="true" /> File
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="min-h-11 gap-3"
@@ -645,9 +671,7 @@ function Composer({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </>
-      ) : null}
-      <div className="flex min-h-11 flex-1 items-center rounded-[22px] border border-border bg-background px-4 focus-within:border-primary/50">
+        ) : null}
         <textarea
           ref={inputRef}
           value={draft}
@@ -658,18 +682,28 @@ function Composer({
           onKeyDown={keyDown}
           rows={1}
           maxLength={2000}
-          placeholder="Pesan"
+          placeholder="Tulis pesan…"
           aria-label="Tulis pesan"
-          className="max-h-[120px] w-full resize-none bg-transparent py-2.5 text-base leading-snug outline-none placeholder:text-muted-foreground sm:text-[15px]"
+          className="max-h-[120px] min-w-0 flex-1 resize-none bg-transparent px-1 py-3 text-base leading-snug outline-none placeholder:text-muted-foreground sm:text-[15px]"
         />
+        {onAttach ? (
+          <button
+            type="button"
+            aria-label="Kirim foto"
+            onClick={() => imageRef.current?.click()}
+            className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Camera className="size-5" aria-hidden="true" />
+          </button>
+        ) : null}
       </div>
       <button
         type="submit"
         aria-label="Kirim pesan"
         disabled={!draft.trim()}
-        className="grid size-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <ArrowUp className="size-5" strokeWidth={2.5} aria-hidden="true" />
+        <SendHorizontal className="size-5" aria-hidden="true" />
       </button>
     </form>
   );
