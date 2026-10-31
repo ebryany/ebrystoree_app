@@ -78,6 +78,81 @@ export async function readPublicMarketplaceServices(
 }
 
 /**
+ * Satu jasa publik untuk halaman preview (/jasa/$id) plus jasa lain dari toko
+ * yang sama. Syarat kelayakan sama dengan katalog; selain itu = tidak ditemukan.
+ */
+export async function readPublicMarketplaceService(
+  id: string,
+  client: SupabaseClient = supabaseAdmin as unknown as SupabaseClient,
+) {
+  try {
+    const { data, error } = await client
+      .from("marketplace_services")
+      .select(
+        "id, name, price, agreement, media, store:stores!inner(id, name, slug, logo_url, created_at), category:categories!inner(name, slug)",
+      )
+      .eq("id", id)
+      .eq("status", "approved")
+      .eq("store.status", "active")
+      .eq("category.kind", "service")
+      .eq("category.is_active", true)
+      .is("category.deleted_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return { service: null, related: [], stats: null, error: null };
+
+    const row = data as { store: { created_at?: string } };
+    // Skema membuang key yang tidak dikenal (store.created_at), jadi dibaca terpisah dari `row`.
+    const service = publicServiceSchema.parse(data);
+    const { readStorePresence } = await import("./store-presence");
+    const storeId = service.store.id;
+    // Jumlah pesanan yang hasilnya sudah diterima pembeli; gagal = null (angka disembunyikan).
+    const countAccepted = async (column: "service_id" | "store_id", value: string) => {
+      const { count, error: countError } = await client
+        .from("marketplace_service_orders")
+        .select("order_id", { count: "exact", head: true })
+        .eq(column, value)
+        .eq("work_state", "accepted");
+      return countError ? null : (count ?? 0);
+    };
+    const [presence, others, serviceDone, storeDone] = await Promise.all([
+      storeId ? readStorePresence(client, storeId) : null,
+      storeId
+        ? readPublicStoreServices(storeId, client)
+        : Promise.resolve({ items: [] as PublicMarketplaceService[], error: null }),
+      countAccepted("service_id", service.id),
+      storeId ? countAccepted("store_id", storeId) : null,
+    ]);
+    return {
+      stats: {
+        serviceCompleted: serviceDone,
+        storeCompleted: storeDone,
+        storeServices: others.error ? null : others.items.length,
+      },
+      service: {
+        ...service,
+        store: {
+          ...service.store,
+          presence: presence ?? undefined,
+          created_at: row.store.created_at ?? null,
+        },
+      },
+      related: others.items
+        .filter((s) => s.id !== service.id)
+        .slice(0, 6)
+        .map((s) => ({ ...s, store: { ...s.store, presence: presence ?? undefined } })),
+      error: null,
+    };
+  } catch (error) {
+    console.error(
+      "[catalog] detail jasa gagal:",
+      error instanceof Error ? error.message : "Query failed",
+    );
+    return { service: null, related: [], stats: null, error: "Jasa tidak dapat dimuat." };
+  }
+}
+
+/**
  * Jasa approved milik satu toko untuk storefront publik. Proyeksi dan syarat
  * kelayakan sama dengan katalog: listing approved, toko aktif, kategori jasa
  * aktif. Anon tidak pernah menyentuh tabel langsung; query ini server-only.
@@ -90,7 +165,7 @@ export async function readPublicStoreServices(
     const { data, error } = await client
       .from("marketplace_services")
       .select(
-        "id, name, price, agreement, media, store:stores!inner(name, slug), category:categories!inner(name, slug)",
+        "id, name, price, agreement, media, store:stores!inner(id, name, slug, logo_url), category:categories!inner(name, slug)",
       )
       .eq("store_id", storeId)
       .eq("status", "approved")

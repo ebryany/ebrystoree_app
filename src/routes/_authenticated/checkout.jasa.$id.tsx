@@ -145,7 +145,10 @@ function CheckoutJasa() {
   if (error || !quote) {
     return (
       <Shell>
-        <div role="alert" className="mx-auto max-w-md rounded-2xl border border-border bg-card p-6 text-center">
+        <div
+          role="alert"
+          className="mx-auto max-w-md rounded-2xl border border-border bg-card p-6 text-center"
+        >
           <h1 className="font-display text-lg font-semibold">Jasa tidak dapat dimuat</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             {data?.error ?? "Periksa kembali status jasa atau koneksi Anda."}
@@ -179,7 +182,8 @@ function CheckoutJasa() {
   return (
     <Shell>
       <Link
-        to="/layanan"
+        to="/jasa/$id"
+        params={{ id }}
         className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
@@ -232,7 +236,9 @@ function CheckoutJasa() {
                             aria-pressed={index === activeMedia}
                             className={cn(
                               "block size-11 overflow-hidden rounded-lg border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
-                              index === activeMedia ? "border-primary" : "border-transparent opacity-70",
+                              index === activeMedia
+                                ? "border-primary"
+                                : "border-transparent opacity-70",
                             )}
                           >
                             {entry.kind === "image" ? (
@@ -270,7 +276,11 @@ function CheckoutJasa() {
                 </Link>
 
                 <dl className="mt-3 grid grid-cols-2 gap-2">
-                  <Fact icon={CalendarClock} label="Pengerjaan" value={`${agreement.durationDays} hari`} />
+                  <Fact
+                    icon={CalendarClock}
+                    label="Pengerjaan"
+                    value={`${agreement.durationDays} hari`}
+                  />
                   <Fact icon={RotateCcw} label="Revisi" value={`${agreement.revisionLimit}x`} />
                 </dl>
                 <p className="mt-4 font-display text-2xl font-bold tabular-nums">
@@ -426,7 +436,10 @@ function CheckoutJasa() {
                 className="inline-flex min-h-11 items-center gap-1.5 text-muted-foreground hover:text-foreground disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
               >
                 <RefreshCw
-                  className={cn("size-3.5", isFetching && "animate-spin motion-reduce:animate-none")}
+                  className={cn(
+                    "size-3.5",
+                    isFetching && "animate-spin motion-reduce:animate-none",
+                  )}
                   aria-hidden="true"
                 />
                 Muat ulang harga
@@ -500,7 +513,15 @@ function Term({
   );
 }
 
-function StepChip({ index, label, active = false }: { index: number; label: string; active?: boolean }) {
+function StepChip({
+  index,
+  label,
+  active = false,
+}: {
+  index: number;
+  label: string;
+  active?: boolean;
+}) {
   return (
     <li
       aria-current={active ? "step" : undefined}

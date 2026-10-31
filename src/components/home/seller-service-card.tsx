@@ -83,7 +83,7 @@ export function SellerServiceCard({
           title={item.name}
         >
           <Link
-            to="/checkout/jasa/$id"
+            to="/jasa/$id"
             params={{ id: item.id }}
             className="rounded-sm after:absolute after:inset-0 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

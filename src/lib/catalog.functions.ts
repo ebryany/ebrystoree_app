@@ -284,6 +284,14 @@ export const listPublicMarketplaceServices = createServerFn({ method: "GET" })
     return readPublicMarketplaceServices(data);
   });
 
+/** Detail publik satu jasa seller (halaman preview sebelum checkout). */
+export const getPublicMarketplaceService = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    const { readPublicMarketplaceService } = await import("./marketplace-service-catalog.server");
+    return readPublicMarketplaceService(data.id);
+  });
+
 export const listServices = createServerFn({ method: "GET" })
   .validator((data: unknown) => listInput.parse(data))
   .handler(async ({ data }) => {

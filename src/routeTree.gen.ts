@@ -29,6 +29,7 @@ import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as JasaIdRouteImport } from './routes/jasa.$id'
 import { Route as LayananIndexRouteImport } from './routes/layanan.index'
 import { Route as LayananSlugRouteImport } from './routes/layanan.$slug'
 import { Route as PIdRouteImport } from './routes/p.$id'
@@ -223,6 +224,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
   getParentRoute: () => AuthRoute,
+} as any)
+const JasaIdRoute = JasaIdRouteImport.update({
+  id: '/jasa/$id',
+  path: '/jasa/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LayananIndexRoute = LayananIndexRouteImport.update({
   id: '/layanan/',
@@ -780,6 +786,7 @@ export interface FileRoutesByFullPath {
   '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/jasa/$id': typeof JasaIdRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
@@ -889,6 +896,7 @@ export interface FileRoutesByTo {
   '/akun': typeof AuthenticatedAkunRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/jasa/$id': typeof JasaIdRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
@@ -1004,6 +1012,7 @@ export interface FileRoutesById {
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/jasa/$id': typeof JasaIdRoute
   '/layanan/$slug': typeof LayananSlugRoute
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
@@ -1120,6 +1129,7 @@ export interface FileRouteTypes {
     | '/seller'
     | '/artikel/$slug'
     | '/auth/callback'
+    | '/jasa/$id'
     | '/layanan/$slug'
     | '/p/$id'
     | '/produk/$slug'
@@ -1229,6 +1239,7 @@ export interface FileRouteTypes {
     | '/akun'
     | '/artikel/$slug'
     | '/auth/callback'
+    | '/jasa/$id'
     | '/layanan/$slug'
     | '/p/$id'
     | '/produk/$slug'
@@ -1343,6 +1354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/seller'
     | '/artikel/$slug'
     | '/auth/callback'
+    | '/jasa/$id'
     | '/layanan/$slug'
     | '/p/$id'
     | '/produk/$slug'
@@ -1453,6 +1465,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ArtikelSlugRoute: typeof ArtikelSlugRoute
+  JasaIdRoute: typeof JasaIdRoute
   LayananSlugRoute: typeof LayananSlugRoute
   PIdRoute: typeof PIdRoute
   ProdukSlugRoute: typeof ProdukSlugRoute
@@ -1617,6 +1630,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/jasa/$id': {
+      id: '/jasa/$id'
+      path: '/jasa/$id'
+      fullPath: '/jasa/$id'
+      preLoaderRoute: typeof JasaIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/layanan/': {
       id: '/layanan/'
@@ -2534,6 +2554,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ArtikelSlugRoute: ArtikelSlugRoute,
+  JasaIdRoute: JasaIdRoute,
   LayananSlugRoute: LayananSlugRoute,
   PIdRoute: PIdRoute,
   ProdukSlugRoute: ProdukSlugRoute,

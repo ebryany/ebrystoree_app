@@ -54,7 +54,7 @@ export function ServiceTile({ item }: { item: PublicMarketplaceService }) {
       <div className="flex flex-1 flex-col p-2.5">
         <h3 className="line-clamp-2 text-sm font-medium leading-snug transition-colors group-hover:text-accent">
           <Link
-            to="/checkout/jasa/$id"
+            to="/jasa/$id"
             params={{ id: item.id }}
             title={item.name}
             className="rounded-sm after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
