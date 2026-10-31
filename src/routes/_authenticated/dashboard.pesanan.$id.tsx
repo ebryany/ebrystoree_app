@@ -3,6 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Banknote,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  Loader2,
+  Package,
+  QrCode,
+  Wallet,
+} from "lucide-react";
 
 import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
 import {
@@ -17,9 +28,8 @@ import { ManualPayment } from "@/components/ebry/manual-payment";
 import { DigitalReceiptPanel } from "@/components/ebry/digital-receipt";
 import { MarketplaceServiceOrderDetail } from "@/components/ebry/marketplace-service-order";
 import { canSubmitManualProof } from "@/lib/manual-payment";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "@/components/ebry/status";
 import { Button } from "@/components/ui/button";
-
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -33,7 +43,8 @@ import {
 import { getOrderFulfillment, reviewJobResult } from "@/lib/fulfillment.functions";
 import { getServiceOrderDetail } from "@/lib/marketplace-service.functions";
 import { formatRupiah } from "@/lib/format";
-import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/transaction-labels";
+import { PAYMENT_STATUS_LABEL } from "@/lib/transaction-labels";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pesanan/$id")({
   head: () => ({
@@ -242,23 +253,36 @@ function DetailPesanan() {
     await refresh();
   }
 
+  const amountDue = Number(order.amount_due ?? order.total);
+  const creditUsed = Number(order.credit_used ?? 0);
+  const balance = credit?.balance ?? 0;
+  const creditCoversAll = balance >= amountDue;
+  const showMethodSwitch = manualReady && qrisEnabled;
+
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <Link
-            to="/dashboard/pesanan"
-            search={{ filter: "all" }}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            ← Kembali ke daftar pesanan
-          </Link>
-          <h1 className="mt-1 text-2xl font-bold">{order.order_number}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Dibuat {new Date(order.created_at).toLocaleString("id-ID")}
-          </p>
+    <div className="space-y-5 sm:space-y-6">
+      <header className="min-w-0">
+        <Link
+          to="/dashboard/pesanan"
+          search={{ filter: "all" }}
+          className="-ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-md px-1 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Daftar pesanan
+        </Link>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="min-w-0 break-all font-display text-xl font-bold tracking-tight sm:text-2xl">
+            {order.order_number}
+          </h1>
+          <StatusPill value={order.status} kind="order" />
         </div>
-        <Badge variant="secondary">{ORDER_STATUS_LABEL[order.status] ?? order.status}</Badge>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Dibuat{" "}
+          {new Date(order.created_at).toLocaleString("id-ID", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })}
+        </p>
       </header>
 
       {/* Lini masa paling atas, lebar penuh: pelacakan adalah fokus halaman ini. */}
@@ -270,71 +294,119 @@ function DetailPesanan() {
           fulfillment={fulfillment}
           serviceEvents={serviceOrder?.events ?? []}
           serviceWorkState={serviceOrder?.contract?.work_state ?? null}
+          realtimeChannel={`order-${id}`}
         />
       ) : null}
 
-      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="min-w-0 space-y-6">
-          <section className="rounded-xl border border-border bg-card p-5">
-            <h2 className="font-semibold">Item pesanan</h2>
-            <ul className="mt-3 space-y-2 text-sm">
-              {data.items.map((item: any) => (
-                <li key={item.id} className="flex justify-between gap-4">
-                  <span>
-                    {item.name_snapshot} ×{item.quantity}
-                  </span>
-                  <span>{formatRupiah(Number(item.total))}</span>
-                </li>
-              ))}
-            </ul>
-            <dl className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotal</dt>
-                <dd>{formatRupiah(Number(order.subtotal))}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Biaya admin</dt>
-                <dd>{formatRupiah(Number(order.admin_fee))}</dd>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <dt>Total</dt>
-                <dd>{formatRupiah(Number(order.total))}</dd>
-              </div>
-            </dl>
-          </section>
-
+      <div className="grid min-w-0 gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
+        <div className="min-w-0 space-y-5 sm:space-y-6">
           {canPay ? (
-            <section className="rounded-xl border border-border bg-card p-5">
-              <h2 className="font-semibold">Pembayaran</h2>
+            <section
+              aria-labelledby="pay-title"
+              className="rounded-2xl border border-border bg-card p-4 sm:p-6"
+            >
+              <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+                <div>
+                  <h2 id="pay-title" className="font-display text-lg font-semibold">
+                    Selesaikan pembayaran
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Pesanan diproses setelah pembayaran terverifikasi.
+                  </p>
+                </div>
+                <p className="text-right">
+                  <span className="block text-xs text-muted-foreground">Sisa tagihan</span>
+                  <span className="font-display text-xl font-bold tabular-nums">
+                    {formatRupiah(amountDue)}
+                  </span>
+                </p>
+              </div>
 
               {/* Pakai saldo Ebrystore (opsional) */}
-              {(credit?.balance ?? 0) > 0 && Number(order.credit_used ?? 0) === 0 ? (
-                <div className="mt-3 rounded-lg border border-accent/40 bg-accent/5 p-3">
-                  <p className="text-sm font-semibold text-foreground">Saldo Ebrystore tersedia</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Kamu punya saldo {formatRupiah(credit?.balance ?? 0)}. Pakai untuk mengurangi
-                    tagihan pesanan ini.
-                  </p>
+              {balance > 0 && creditUsed === 0 ? (
+                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-accent/40 bg-accent/5 p-3.5 sm:flex-row sm:items-center">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">
+                    <Wallet className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">Saldo Ebrystore {formatRupiah(balance)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {creditCoversAll
+                        ? "Cukup untuk melunasi pesanan ini tanpa transfer."
+                        : "Pakai untuk mengurangi tagihan, sisanya dibayar di bawah."}
+                    </p>
+                  </div>
                   <Button
-                    size="sm"
-                    className="mt-3 min-h-10"
+                    className="min-h-11 w-full sm:w-auto"
                     disabled={applyingCredit}
                     onClick={handleUseCredit}
                   >
-                    {applyingCredit
-                      ? "Menerapkan…"
-                      : `Pakai saldo ${formatRupiah(Math.min(credit?.balance ?? 0, Number(order.total)))}`}
+                    {applyingCredit ? (
+                      <>
+                        <Loader2
+                          className="size-4 animate-spin motion-reduce:animate-none"
+                          aria-hidden="true"
+                        />
+                        Menerapkan…
+                      </>
+                    ) : creditCoversAll ? (
+                      `Bayar pakai saldo`
+                    ) : (
+                      `Pakai saldo ${formatRupiah(Math.min(balance, amountDue))}`
+                    )}
                   </Button>
                 </div>
               ) : null}
 
-              {Number(order.credit_used ?? 0) > 0 ? (
-                <div className="mt-3 rounded-lg border border-success/30 bg-success/5 p-3">
-                  <p className="text-sm font-semibold text-foreground">Saldo terpakai</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {formatRupiah(Number(order.credit_used))} dari saldo · sisa tagihan{" "}
-                    <strong>{formatRupiah(Number(order.amount_due ?? order.total))}</strong>
+              {creditUsed > 0 ? (
+                <div className="mt-4 flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-3.5">
+                  <CheckCircle2 className="size-5 shrink-0 text-success" aria-hidden="true" />
+                  <p className="text-sm">
+                    Saldo terpakai <strong>{formatRupiah(creditUsed)}</strong>. Sisa tagihan{" "}
+                    <strong>{formatRupiah(amountDue)}</strong>.
                   </p>
+                </div>
+              ) : null}
+
+              {balance > 0 && creditUsed === 0 && (manualReady || qrisEnabled) ? (
+                <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                  atau bayar langsung
+                  <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                </div>
+              ) : (
+                <div className="h-5" aria-hidden="true" />
+              )}
+
+              {showMethodSwitch ? (
+                <div
+                  role="radiogroup"
+                  aria-label="Metode pembayaran"
+                  className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1"
+                >
+                  {(
+                    [
+                      [false, `Transfer ${data.manualAccount.method}`, Banknote],
+                      [true, "QRIS", QrCode],
+                    ] as const
+                  ).map(([value, label, Icon]) => (
+                    <button
+                      key={label}
+                      type="button"
+                      role="radio"
+                      aria-checked={useQris === value}
+                      onClick={() => setUseQris(value)}
+                      className={cn(
+                        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
+                        useQris === value
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <Icon className="size-4" aria-hidden="true" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
               ) : null}
 
@@ -350,22 +422,12 @@ function DetailPesanan() {
                   onSubmitted={refresh}
                 />
               ) : null}
-              {manualReady && !useQris && qrisEnabled ? (
-                <Button
-                  variant="outline"
-                  className="mt-4 min-h-11"
-                  onClick={() => setUseQris(true)}
-                >
-                  Gunakan QRIS, bukan transfer manual
-                </Button>
-              ) : null}
-              {useQris && manualReady && qrisEnabled ? (
-                <Button variant="ghost" className="mt-4 min-h-11" onClick={() => setUseQris(false)}>
-                  Kembali ke transfer manual
-                </Button>
-              ) : null}
               {showQris && sumopodEnabled && shopeepayEnabled ? (
-                <div className="mt-4 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Penyedia QRIS">
+                <div
+                  className="grid grid-cols-2 gap-2"
+                  role="radiogroup"
+                  aria-label="Penyedia QRIS"
+                >
                   {(
                     [
                       ["sumopod", "QRIS"],
@@ -386,7 +448,7 @@ function DetailPesanan() {
                 </div>
               ) : null}
               {showQris ? (
-                <div className="mt-4">
+                <div className={sumopodEnabled && shopeepayEnabled ? "mt-4" : undefined}>
                   <QrisPayment
                     key={qrisProvider}
                     paymentId={payment.id}
@@ -396,7 +458,7 @@ function DetailPesanan() {
                 </div>
               ) : null}
               {noMethodAvailable ? (
-                <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-muted-foreground">
+                <p className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-muted-foreground">
                   Belum ada metode pembayaran yang aktif. Hubungi tim Ebrystore untuk menyelesaikan
                   pembayaran pesanan ini.
                 </p>
@@ -405,12 +467,19 @@ function DetailPesanan() {
           ) : null}
 
           {payment?.provider === "manual" && payment.status === "waiting_verification" ? (
-            <section className="rounded-xl border border-border bg-card p-5" role="status">
-              <h2 className="font-semibold">Bukti sedang diperiksa</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Finance memeriksa transfer Anda. Pesanan belum lunas sampai pembayaran disetujui.
-                Jangan transfer ulang saat pemeriksaan berlangsung.
-              </p>
+            <section
+              className="flex gap-3 rounded-2xl border border-info/30 bg-info/5 p-4 sm:p-5"
+              role="status"
+            >
+              <Clock className="mt-0.5 size-5 shrink-0 text-info" aria-hidden="true" />
+              <div>
+                <h2 className="font-semibold">Bukti sedang diperiksa</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Finance memeriksa transfer Anda. Pesanan belum lunas sampai pembayaran disetujui.
+                  Jangan transfer ulang saat pemeriksaan berlangsung; halaman ini diperbarui
+                  otomatis.
+                </p>
+              </div>
             </section>
           ) : null}
 
@@ -488,20 +557,80 @@ function DetailPesanan() {
           ) : null}
         </div>
 
-        <aside className="min-w-0 space-y-6">
-          <section className="rounded-xl border border-border bg-card p-5">
-            <h2 className="font-semibold">Pembayaran</h2>
-            <ul className="mt-3 space-y-3 text-sm">
-              {data.payments.map((p: any) => (
-                <li key={p.id}>
-                  <p className="font-medium">{p.payment_number}</p>
-                  <p className="text-muted-foreground">
-                    {PAYMENT_STATUS_LABEL[p.status] ?? p.status} ·{" "}
-                    {formatRupiah(Number(p.expected_amount))}
+        <aside className="min-w-0 space-y-5 sm:space-y-6 lg:sticky lg:top-20">
+          <section
+            aria-labelledby="summary-title"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-5"
+          >
+            <h2 id="summary-title" className="font-semibold">
+              Ringkasan pesanan
+            </h2>
+            <ul className="mt-3 space-y-3">
+              {data.items.map((item: any) => (
+                <li key={item.id} className="flex items-start gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                    <Package className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="break-words text-sm font-medium leading-snug">
+                      {item.name_snapshot}
+                    </p>
+                    <p className="text-xs text-muted-foreground tabular-nums">
+                      {item.quantity} ×{" "}
+                      {formatRupiah(Number(item.total) / Number(item.quantity || 1))}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-sm font-medium tabular-nums">
+                    {formatRupiah(Number(item.total))}
                   </p>
                 </li>
               ))}
             </ul>
+            <dl className="mt-4 space-y-1.5 border-t border-border pt-3 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Subtotal</dt>
+                <dd className="tabular-nums">{formatRupiah(Number(order.subtotal))}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Biaya admin</dt>
+                <dd className="tabular-nums">{formatRupiah(Number(order.admin_fee))}</dd>
+              </div>
+              {creditUsed > 0 ? (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Saldo terpakai</dt>
+                  <dd className="tabular-nums text-success">−{formatRupiah(creditUsed)}</dd>
+                </div>
+              ) : null}
+              <div className="flex items-end justify-between gap-4 pt-1">
+                <dt className="font-semibold">Total</dt>
+                <dd className="font-display text-lg font-bold tabular-nums">
+                  {formatRupiah(Number(order.total))}
+                </dd>
+              </div>
+            </dl>
+
+            {data.payments.length > 0 ? (
+              <div className="mt-4 border-t border-border pt-3">
+                <h3 className="text-xs font-semibold text-muted-foreground">Tagihan</h3>
+                <ul className="mt-2 space-y-2">
+                  {data.payments.map((p: any) => (
+                    <li key={p.id} className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate font-mono text-xs">{p.payment_number}</p>
+                        <p className="text-xs text-muted-foreground tabular-nums">
+                          {formatRupiah(Number(p.expected_amount))}
+                        </p>
+                      </div>
+                      <StatusPill
+                        value={p.status}
+                        kind="payment"
+                        label={PAYMENT_STATUS_LABEL[p.status] ?? p.status}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </section>
 
           {data.entitlements.length > 0 ? (
@@ -517,44 +646,64 @@ function DetailPesanan() {
           ) : null}
 
           {canCancel || canRefund ? (
-            <section className="rounded-xl border border-border bg-card p-5">
-              <h2 className="font-semibold">{canCancel ? "Batalkan pesanan" : "Ajukan refund"}</h2>
-              <Label htmlFor="reason" className="mt-3 block">
-                Alasan
-              </Label>
-              <Textarea
-                id="reason"
-                value={reason}
-                maxLength={500}
-                onChange={(e) => setReason(e.target.value)}
-                className="mt-1"
-                placeholder={
-                  canCancel ? "Contoh: salah pilih produk" : "Jelaskan alasan pengajuan refund"
-                }
-              />
-              <Button
-                variant="outline"
-                className="mt-3 w-full"
-                disabled={busy}
-                onClick={canCancel ? handleCancel : handleRefund}
-              >
-                {canCancel ? "Batalkan pesanan" : "Ajukan refund"}
-              </Button>
-              {canRefund ? (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Refund dapat diajukan maksimal 7 hari setelah pembayaran.
+            // Aksi destruktif dilipat agar tidak bersaing dengan langkah utama (bayar).
+            <details
+              className="group rounded-2xl border border-border bg-card"
+              open={reason.length > 0 || undefined}
+            >
+              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:px-5 [&::-webkit-details-marker]:hidden">
+                {canCancel ? "Ingin membatalkan pesanan?" : "Ajukan refund"}
+                <ChevronDown
+                  className="size-4 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+                  aria-hidden="true"
+                />
+              </summary>
+              <div className="border-t border-border p-4 sm:p-5">
+                <Label htmlFor="reason">Alasan</Label>
+                <Textarea
+                  id="reason"
+                  value={reason}
+                  maxLength={500}
+                  rows={3}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="mt-1.5"
+                  placeholder={
+                    canCancel ? "Contoh: salah pilih produk" : "Jelaskan alasan pengajuan refund"
+                  }
+                />
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  {canCancel
+                    ? "Pesanan yang dibatalkan tidak dapat dipulihkan. Jangan batalkan bila sudah transfer."
+                    : "Refund dapat diajukan maksimal 7 hari setelah pembayaran."}
                 </p>
-              ) : null}
-            </section>
+                <Button
+                  variant={canCancel ? "destructive" : "outline"}
+                  className="mt-3 min-h-11 w-full"
+                  disabled={busy}
+                  onClick={canCancel ? handleCancel : handleRefund}
+                >
+                  {busy ? "Memproses…" : canCancel ? "Batalkan pesanan" : "Ajukan refund"}
+                </Button>
+              </div>
+            </details>
           ) : null}
 
           {data.refunds.length > 0 ? (
-            <section className="rounded-xl border border-border bg-card p-5">
+            <section className="rounded-2xl border border-border bg-card p-4 sm:p-5">
               <h2 className="font-semibold">Refund</h2>
-              <ul className="mt-3 space-y-2 text-sm">
+              <ul className="mt-3 space-y-2">
                 {data.refunds.map((r: any) => (
-                  <li key={r.refund_number}>
-                    {r.refund_number} · {r.status} · {formatRupiah(Number(r.amount))}
+                  <li
+                    key={r.refund_number}
+                    className="flex flex-wrap items-center justify-between gap-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-mono text-xs">{r.refund_number}</p>
+                      <p className="text-xs text-muted-foreground tabular-nums">
+                        {formatRupiah(Number(r.amount))}
+                      </p>
+                    </div>
+                    <StatusPill value={r.status} kind="raw" />
                   </li>
                 ))}
               </ul>

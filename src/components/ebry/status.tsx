@@ -28,6 +28,7 @@ const WAITING = [
   "issued",
   "awaiting_requirements",
   "revision_requested",
+  "needs_reconciliation",
 ];
 const PROGRESS = [
   "payment_under_review",
@@ -42,8 +43,18 @@ const PROGRESS = [
   "revision_in_progress",
   "submitted",
   "in_review",
+  "transferred",
 ];
-const DANGER = ["cancelled", "rejected", "failed", "expired", "disputed", "blocked", "refunded", "archived"];
+const DANGER = [
+  "cancelled",
+  "rejected",
+  "failed",
+  "expired",
+  "disputed",
+  "blocked",
+  "refunded",
+  "archived",
+];
 
 export function statusTone(value: string): StatusTone {
   // Pemanggil boleh mengirim nama tone langsung (mis. "success" untuk toko aktif).

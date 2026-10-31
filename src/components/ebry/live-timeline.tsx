@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Check,
   CheckCircle2,
+  ChevronDown,
   ClipboardCheck,
   CreditCard,
   FileCheck2,
@@ -14,6 +16,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { realtimeStatusKey, type RealtimeConnectionStatus } from "@/hooks/use-realtime-refresh";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUS_LABEL } from "@/lib/transaction-labels";
 
@@ -56,6 +59,9 @@ const MARKETPLACE_STAGE_LABEL: Record<string, string> = {
   in_progress: "Sedang dikerjakan",
   delivered: "Hasil dikirim, menunggu peninjauan",
   accepted: "Diterima pembeli",
+  revision_requested: "Revisi sedang dikerjakan",
+  complaint_open: "Komplain ditinjau admin",
+  refunded: "Dana dikembalikan",
 };
 
 const MARKETPLACE_STAGE_ORDER: Record<string, number> = {
@@ -186,7 +192,13 @@ export function buildOrderEvents(input: {
   for (const e of serviceEvents) {
     const label = MARKETPLACE_EVENT_LABEL[e.event_type] ?? e.event_type;
     const actor =
-      e.actor_role === "buyer" ? "Pembeli" : e.actor_role === "seller" ? "Seller" : "Admin";
+      e.actor_role === "buyer"
+        ? "Pembeli"
+        : e.actor_role === "seller"
+          ? "Seller"
+          : e.actor_role === "system"
+            ? "Otomatis"
+            : "Admin";
     const detail =
       typeof e.payload?.reason === "string"
         ? e.payload.reason
@@ -205,11 +217,13 @@ export function buildOrderEvents(input: {
           ? FileCheck2
           : e.event_type === "revision_requested" || e.event_type === "complaint_opened"
             ? MessageSquareWarning
-            : e.event_type === "accepted"
+            : e.event_type === "accepted" || e.event_type === "auto_accepted"
               ? PackageCheck
               : Radio,
       tone:
-        e.event_type === "complaint_opened" || e.event_type === "refund_requested"
+        e.event_type === "complaint_opened" ||
+        e.event_type === "refund_requested" ||
+        e.event_type === "refunded_to_balance"
           ? "danger"
           : "accent",
     });
@@ -287,9 +301,67 @@ const MARKETPLACE_EVENT_LABEL: Record<string, string> = {
   complaint_opened: "Pembeli mengajukan komplain",
   complaint_resumed: "Admin melanjutkan pekerjaan",
   refund_requested: "Refund diajukan",
+  refunded_to_balance: "Dana dikembalikan ke saldo",
+  auto_accepted: "Hasil diterima otomatis",
+  extension_requested: "Seller meminta perpanjangan",
+  extension_approved: "Perpanjangan disetujui",
+  extension_rejected: "Perpanjangan ditolak",
 };
 
-/** Timeline pesanan realtime: rel tahapan + feed aktivitas langsung. */
+const FEED_PREVIEW = 4;
+
+/** Status koneksi realtime yang ditulis useRealtimeRefresh untuk channel tertentu. */
+function useRealtimeStatus(channel?: string): RealtimeConnectionStatus | null {
+  const { data } = useQuery({
+    queryKey: realtimeStatusKey(channel ?? "none"),
+    queryFn: () => null as RealtimeConnectionStatus | null,
+    enabled: false,
+    staleTime: Infinity,
+  });
+  return channel ? (data ?? null) : null;
+}
+
+function LivePill({ status }: { status: RealtimeConnectionStatus | null }) {
+  // Tanpa channel: anggap tersambung lewat polling; jangan klaim "live" palsu.
+  const tone =
+    status === "subscribed"
+      ? { text: "Live", wrap: "border-success/30 bg-success/10 text-success", dot: "bg-success" }
+      : status === "reconnecting"
+        ? {
+            text: "Menyambung ulang",
+            wrap: "border-warning/40 bg-warning/15 text-warning-foreground",
+            dot: "bg-warning",
+          }
+        : status === "error"
+          ? {
+              text: "Offline",
+              wrap: "border-border bg-muted text-muted-foreground",
+              dot: "bg-muted-foreground",
+            }
+          : {
+              text: "Memperbarui otomatis",
+              wrap: "border-border bg-muted text-muted-foreground",
+              dot: "bg-muted-foreground",
+            };
+  return (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
+        tone.wrap,
+      )}
+    >
+      <span className="relative flex size-2" aria-hidden="true">
+        {status === "subscribed" ? (
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-70 motion-reduce:hidden" />
+        ) : null}
+        <span className={cn("relative inline-flex size-2 rounded-full", tone.dot)} />
+      </span>
+      {tone.text}
+    </span>
+  );
+}
+
+/** Timeline pesanan realtime: kartu tahap aktif + rel tahapan + feed aktivitas. */
 export function LiveOrderTimeline({
   order,
   histories,
@@ -297,6 +369,7 @@ export function LiveOrderTimeline({
   fulfillment,
   serviceEvents,
   serviceWorkState,
+  realtimeChannel,
   className,
 }: {
   order: any;
@@ -307,9 +380,13 @@ export function LiveOrderTimeline({
   serviceEvents?: any[];
   /** work_state kontrak jasa; menentukan tahap aktif untuk marketplace_service. */
   serviceWorkState?: string | null;
+  /** Nama channel useRealtimeRefresh; dipakai untuk indikator koneksi. */
+  realtimeChannel?: string;
   className?: string;
 }) {
   const now = useNow();
+  const connection = useRealtimeStatus(realtimeChannel);
+  const [expanded, setExpanded] = useState(false);
   const events = useMemo(
     () => buildOrderEvents({ order, histories, payments, fulfillment, serviceEvents }),
     [order, histories, payments, fulfillment, serviceEvents],
@@ -333,6 +410,21 @@ export function LiveOrderTimeline({
     "refund_requested",
     "disputed",
   ].includes(order?.status);
+  const finished = !terminal && currentIndex >= (stageOrder[stages[stages.length - 1]] ?? 99);
+
+  const labelFor = (stage: string) =>
+    isMarketplace
+      ? (MARKETPLACE_STAGE_LABEL[stage] ?? ORDER_STATUS_LABEL[stage] ?? stage)
+      : (ORDER_STATUS_LABEL[stage] ?? stage);
+  const stagePos = Math.max(
+    0,
+    stages.findIndex((s) => (stageOrder[s] ?? 0) >= currentIndex),
+  );
+  const currentLabel = terminal
+    ? (MARKETPLACE_STAGE_LABEL[stageKey] ?? ORDER_STATUS_LABEL[order.status] ?? order.status)
+    : labelFor(stageKey);
+  const nextStage = !terminal && !finished ? stages[stagePos + 1] : undefined;
+  const CurrentIcon = STAGE_ICON[stages[stagePos]] ?? ClipboardCheck;
 
   // Sorot event baru yang masuk lewat realtime.
   const knownRef = useRef<Set<string> | null>(null);
@@ -353,63 +445,124 @@ export function LiveOrderTimeline({
   }, [events]);
 
   const latest = events[0];
+  const visible = expanded ? events : events.slice(0, FEED_PREVIEW);
+  const hidden = events.length - visible.length;
 
   return (
     <section
-      className={cn("min-w-0 rounded-2xl border border-border bg-card p-5", className)}
-      aria-live="polite"
+      aria-labelledby="order-timeline-title"
+      className={cn("min-w-0 rounded-2xl border border-border bg-card p-4 sm:p-5", className)}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">Lini masa pesanan</h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-70" />
-            <span className="relative inline-flex size-2 rounded-full bg-success" />
-          </span>
-          Pantauan langsung
-        </span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 id="order-timeline-title" className="font-semibold">
+            Lini masa pesanan
+          </h2>
+          <p className="mt-0.5 text-xs text-muted-foreground" aria-live="polite">
+            {latest ? `Pembaruan terakhir ${relative(latest.at, now)}` : "Belum ada aktivitas."}
+          </p>
+        </div>
+        <LivePill status={connection} />
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {latest ? `Pembaruan terakhir ${relative(latest.at, now)}` : "Belum ada aktivitas."}
-      </p>
 
-      {terminal ? (
-        <p className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
-          Status pesanan saat ini:{" "}
-          {isMarketplace
-            ? (MARKETPLACE_STAGE_LABEL[stageKey] ??
-              ORDER_STATUS_LABEL[order.status] ??
-              order.status)
-            : (ORDER_STATUS_LABEL[order.status] ?? order.status)}
-          .
-        </p>
-      ) : null}
+      {/* Kartu tahap aktif: informasi utama, terbaca tanpa menggeser stepper. */}
+      <div
+        className={cn(
+          "mt-4 rounded-xl border p-3.5",
+          terminal
+            ? "border-destructive/30 bg-destructive/5"
+            : finished
+              ? "border-success/30 bg-success/5"
+              : "border-accent/30 bg-accent/5",
+        )}
+        aria-live="polite"
+      >
+        <div className="flex items-center gap-3">
+          <span
+            className={cn(
+              "grid size-10 shrink-0 place-items-center rounded-full",
+              terminal
+                ? "bg-destructive/10 text-destructive"
+                : finished
+                  ? "bg-success text-success-foreground"
+                  : "bg-accent text-accent-foreground",
+            )}
+          >
+            {finished ? (
+              <Check className="size-5" aria-hidden="true" />
+            ) : (
+              <CurrentIcon className="size-5" aria-hidden="true" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              {terminal
+                ? "Status pesanan"
+                : finished
+                  ? "Selesai"
+                  : `Tahap ${stagePos + 1} dari ${stages.length}`}
+            </p>
+            <p className="break-words font-semibold leading-snug">{currentLabel}</p>
+            {nextStage ? (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Berikutnya: {labelFor(nextStage)}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        {!terminal ? (
+          // Segmen progres ringkas untuk layar sempit; stepper lengkap di md ke atas.
+          <ol aria-label="Tahapan pesanan" className="mt-3 flex gap-1 md:hidden">
+            {stages.map((stage, i) => {
+              const idx = stageOrder[stage] ?? 0;
+              return (
+                <li
+                  key={stage}
+                  aria-current={i === stagePos && !finished ? "step" : undefined}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full",
+                    idx < currentIndex || finished
+                      ? "bg-accent"
+                      : i === stagePos
+                        ? "bg-accent/50 motion-safe:animate-pulse"
+                        : "bg-border",
+                  )}
+                >
+                  <span className="sr-only">
+                    {labelFor(stage)}
+                    {idx < currentIndex || finished
+                      ? " (selesai)"
+                      : i === stagePos
+                        ? " (berjalan)"
+                        : ""}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        ) : null}
+      </div>
 
-      {/* Stepper horizontal kiri ke kanan; dapat digeser di layar sempit. */}
-      <div className="-mx-5 mt-4 overflow-x-auto px-5 pb-1">
-        <ol aria-label="Tahapan pesanan" className="flex min-w-max items-start md:min-w-0">
+      {/* Stepper horizontal penuh untuk tablet/desktop. */}
+      {!terminal ? (
+        <ol aria-label="Tahapan pesanan" className="mt-5 hidden items-start md:flex">
           {stages.map((stage, i) => {
             const idx = stageOrder[stage] ?? 0;
-            const done = !terminal && idx < currentIndex;
-            const active = !terminal && idx === currentIndex;
+            const done = idx < currentIndex || finished;
+            const active = !finished && idx === currentIndex;
             const Icon = STAGE_ICON[stage] ?? ClipboardCheck;
-            const label = isMarketplace
-              ? (MARKETPLACE_STAGE_LABEL[stage] ?? ORDER_STATUS_LABEL[stage] ?? stage)
-              : (ORDER_STATUS_LABEL[stage] ?? stage);
             const last = i === stages.length - 1;
-            const leftFilled = !terminal && idx <= currentIndex && i > 0;
-            const rightFilled = !terminal && idx < currentIndex && !last;
             return (
               <li
                 key={stage}
-                className="flex w-[7rem] shrink-0 flex-col items-center px-0.5 md:w-auto md:min-w-0 md:flex-1"
+                className="flex min-w-0 flex-1 flex-col items-center px-0.5"
                 aria-current={active ? "step" : undefined}
               >
                 <div className="flex w-full items-center">
                   <span
                     className={cn(
                       "h-0.5 flex-1 rounded-full",
-                      i === 0 ? "bg-transparent" : leftFilled ? "bg-accent" : "bg-border",
+                      i === 0 ? "bg-transparent" : idx <= currentIndex ? "bg-accent" : "bg-border",
                     )}
                     aria-hidden="true"
                   />
@@ -432,14 +585,14 @@ export function LiveOrderTimeline({
                   <span
                     className={cn(
                       "h-0.5 flex-1 rounded-full",
-                      last ? "bg-transparent" : rightFilled ? "bg-accent" : "bg-border",
+                      last ? "bg-transparent" : idx < currentIndex ? "bg-accent" : "bg-border",
                     )}
                     aria-hidden="true"
                   />
                 </div>
                 <p
                   className={cn(
-                    "mt-2 text-center text-[11px] leading-tight md:text-xs",
+                    "mt-2 text-center text-xs leading-tight",
                     active
                       ? "font-semibold text-foreground"
                       : done
@@ -447,39 +600,43 @@ export function LiveOrderTimeline({
                         : "text-muted-foreground",
                   )}
                 >
-                  {label}
+                  {labelFor(stage)}
                 </p>
-                {active ? (
-                  <span className="mt-0.5 text-[10px] font-medium text-accent">
-                    Sedang berjalan
-                  </span>
-                ) : null}
               </li>
             );
           })}
         </ol>
-      </div>
+      ) : null}
 
       {/* Riwayat aktivitas */}
-      <h3 className="mt-5 text-xs font-semibold text-muted-foreground">Riwayat aktivitas</h3>
-      <ol className="mt-2 space-y-0">
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <h3 className="text-xs font-semibold text-muted-foreground">Riwayat aktivitas</h3>
+        {events.length > 0 ? (
+          <span className="text-xs tabular-nums text-muted-foreground">
+            {events.length} catatan
+          </span>
+        ) : null}
+      </div>
+      <ol className="mt-3" id="order-activity-feed">
         {events.length === 0 ? (
           <li className="text-sm text-muted-foreground">Belum ada perubahan status.</li>
         ) : (
-          events.map((event, i) => {
+          visible.map((event, i) => {
             const isNew = fresh.includes(event.id);
+            const isLatest = i === 0;
             const Icon = event.icon;
             return (
               <li
                 key={event.id}
                 className={cn(
-                  "relative flex gap-3 pb-5 last:pb-0",
-                  isNew && "animate-in fade-in slide-in-from-top-2 duration-500",
+                  "relative flex gap-3 pb-4 last:pb-0",
+                  isNew &&
+                    "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-500",
                 )}
               >
-                {i !== events.length - 1 ? (
+                {i !== visible.length - 1 ? (
                   <span
-                    className="absolute left-[15px] top-8 h-[calc(100%-1.5rem)] w-0.5 rounded-full bg-border"
+                    className="absolute left-[15px] top-8 h-[calc(100%-1.75rem)] w-0.5 rounded-full bg-border"
                     aria-hidden="true"
                   />
                 ) : null}
@@ -488,39 +645,79 @@ export function LiveOrderTimeline({
                     "z-10 grid size-8 shrink-0 place-items-center rounded-full border",
                     event.tone === "danger"
                       ? "border-destructive/30 bg-destructive/10 text-destructive"
-                      : event.tone === "accent"
-                        ? "border-accent/40 bg-accent/10 text-accent"
-                        : "border-border bg-background text-muted-foreground",
-                    isNew && "ring-2 ring-accent/40",
+                      : isLatest
+                        ? "border-accent bg-accent text-accent-foreground"
+                        : event.tone === "accent"
+                          ? "border-accent/40 bg-accent/10 text-accent"
+                          : "border-border bg-background text-muted-foreground",
+                    isNew && "ring-4 ring-accent/25",
                   )}
                 >
                   <Icon className="size-4" aria-hidden="true" />
                 </span>
-                <div className="min-w-0 flex-1 pt-1">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <p className="text-sm font-semibold">{event.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{relative(event.at, now)}</p>
+                <div
+                  className={cn(
+                    "min-w-0 flex-1 pt-1",
+                    isLatest && "rounded-lg bg-muted/50 px-3 py-2 -mt-1",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="min-w-0 break-words text-sm font-semibold leading-snug">
+                      {event.title}
+                      {isNew ? (
+                        <span className="ml-1.5 inline-flex rounded-full bg-accent/15 px-1.5 py-px align-middle text-[10px] font-semibold text-accent">
+                          Baru
+                        </span>
+                      ) : null}
+                    </p>
+                    <time
+                      dateTime={event.at}
+                      title={new Date(event.at).toLocaleString("id-ID", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                      className="shrink-0 whitespace-nowrap pt-0.5 text-[11px] tabular-nums text-muted-foreground"
+                    >
+                      {relative(event.at, now)}
+                    </time>
                   </div>
                   {event.description ? (
-                    <p className="mt-0.5 text-sm text-muted-foreground">{event.description}</p>
+                    <p className="mt-0.5 line-clamp-3 break-words text-[13px] text-muted-foreground">
+                      {event.description}
+                    </p>
                   ) : null}
-                  <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
+                  <p className="mt-0.5 text-[11px] tabular-nums text-muted-foreground/80">
                     {new Date(event.at).toLocaleString("id-ID", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
-                  {isNew ? (
-                    <span className="mt-1 inline-flex rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent">
-                      Baru
-                    </span>
-                  ) : null}
                 </div>
               </li>
             );
           })
         )}
       </ol>
+      {events.length > FEED_PREVIEW ? (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls="order-activity-feed"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          {expanded ? "Ringkas riwayat" : `Lihat ${hidden} aktivitas lainnya`}
+          <ChevronDown
+            className={cn(
+              "size-4 transition-transform motion-reduce:transition-none",
+              expanded && "rotate-180",
+            )}
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
     </section>
   );
 }
