@@ -322,7 +322,7 @@ export function InquiryThread({
           <Link
             to="/produk/$slug"
             params={{ slug: product.slug }}
-            className="flex items-center gap-2.5 border-b border-border/70 bg-card px-3 py-2 transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            className="flex min-h-11 items-center gap-2.5 border-t border-border/60 px-3 py-1.5 transition-colors hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
           >
             <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-secondary">
               {thumbnail ? <img src={thumbnail} alt="" className="size-full object-cover" /> : null}

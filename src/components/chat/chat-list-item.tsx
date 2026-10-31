@@ -23,54 +23,47 @@ export function ChatListItemContent({
 }) {
   const initial = (title.trim()[0] ?? "?").toUpperCase();
   const hasUnread = unread > 0;
+  // Tata letak baris WhatsApp iOS: avatar 52px, nama + waktu, pratinjau 2 baris + badge.
   return (
     <div className="flex min-w-0 items-center gap-3">
       <span
         aria-hidden="true"
-        className={cn(
-          "grid size-12 shrink-0 place-items-center rounded-full text-base font-semibold",
-          hasUnread ? "bg-accent text-accent-foreground" : "bg-surface-selected text-accent",
-        )}
+        className="grid size-[52px] shrink-0 place-items-center rounded-full bg-surface-selected text-lg font-semibold text-accent"
       >
         {initial}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <p
-            className={cn(
-              "truncate text-sm text-foreground",
-              hasUnread ? "font-bold" : "font-semibold",
-            )}
-          >
+          <p className="truncate text-[16px] font-semibold leading-tight text-foreground">
             {title}
           </p>
           <span
             className={cn(
-              "shrink-0 text-[11px] tabular-nums",
-              hasUnread ? "font-semibold text-accent" : "text-muted-foreground",
+              "shrink-0 text-[13px] tabular-nums",
+              hasUnread ? "font-medium text-success" : "text-muted-foreground",
             )}
           >
             {lastMessageAt ? shortChatTime(lastMessageAt) : ""}
           </span>
         </div>
-        <div className="mt-1 flex items-center justify-between gap-2">
+        <div className="mt-0.5 flex items-start justify-between gap-2">
           <p
             className={cn(
-              "truncate text-xs",
-              hasUnread ? "font-medium text-foreground" : "text-muted-foreground",
+              "line-clamp-2 text-[14px] leading-snug",
+              hasUnread ? "text-foreground" : "text-muted-foreground",
             )}
           >
             {previewPrefix && preview ? (
-              <span className="text-muted-foreground">{previewPrefix} </span>
+              <span className="font-medium text-muted-foreground">{previewPrefix} </span>
             ) : null}
             {preview || "Belum ada pesan"}
           </p>
           {hasUnread ? (
             <span
               aria-label={unreadAria ?? `${unread} pesan belum dibaca`}
-              className="grid min-w-5 shrink-0 place-items-center rounded-full bg-accent px-1.5 text-[10px] font-bold leading-5 text-accent-foreground tabular-nums"
+              className="mt-0.5 grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-success px-1.5 text-[11px] font-semibold text-success-foreground tabular-nums"
             >
-              {unread > 9 ? "9+" : unread}
+              {unread > 99 ? "99+" : unread}
             </span>
           ) : null}
         </div>

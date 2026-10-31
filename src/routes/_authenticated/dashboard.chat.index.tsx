@@ -35,9 +35,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/chat/")({
 
 type Tab = "all" | "unread";
 
-const ROUND_BTN =
-  "grid size-11 shrink-0 place-items-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-
 function ChatListPage() {
   const fetchList = useServerFn(listMyInquiries);
   const fetchUnread = useServerFn(listInquiryUnreadCounts);
@@ -54,7 +51,6 @@ function ChatListPage() {
   });
 
   const [tab, setTab] = useState<Tab>("all");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
 
   const unreadById = new Map(
@@ -76,59 +72,50 @@ function ChatListPage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
-      {/* Bar atas: kembali, judul tengah, tombol cari */}
-      <header className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center">
-        <Link to="/dashboard" aria-label="Kembali ke beranda akun" className={ROUND_BTN}>
-          <ChevronLeft className="size-5" aria-hidden="true" />
-        </Link>
-        <h1 className="text-center text-base font-bold">Chat</h1>
-        <button
-          type="button"
-          onClick={() => {
-            setSearchOpen((v) => !v);
-            if (searchOpen) setQ("");
-          }}
-          aria-expanded={searchOpen}
-          aria-controls="chat-search"
-          aria-label={searchOpen ? "Tutup pencarian" : "Cari percakapan"}
-          className={ROUND_BTN}
+    <div className="mx-auto w-full max-w-2xl">
+      {/* Bar atas gaya iOS: tombol kembali teks, judul besar di bawahnya. */}
+      <header className="-mx-2 flex min-h-11 items-center">
+        <Link
+          to="/dashboard"
+          className="inline-flex min-h-11 items-center gap-0.5 rounded-lg pr-3 text-[17px] text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {searchOpen ? (
-            <X className="size-5" aria-hidden="true" />
-          ) : (
-            <Search className="size-5" aria-hidden="true" />
-          )}
-        </button>
+          <ChevronLeft className="size-6" aria-hidden="true" />
+          Akun
+        </Link>
       </header>
+      <h1 className="mt-1 text-[32px] font-bold leading-tight tracking-[-0.02em]">Chat</h1>
 
-      {searchOpen ? (
-        <div className="relative">
-          <label htmlFor="chat-search" className="sr-only">
-            Cari percakapan
-          </label>
-          <Search
-            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <input
-            id="chat-search"
-            type="search"
-            autoFocus
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Cari produk atau isi pesan…"
-            className="h-12 w-full rounded-full border border-border bg-card pl-11 pr-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-      ) : null}
+      {/* Pencarian selalu tampil, seperti WhatsApp iOS. */}
+      <div className="relative mt-3">
+        <label htmlFor="chat-search" className="sr-only">
+          Cari percakapan
+        </label>
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <input
+          id="chat-search"
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Cari"
+          className="h-11 w-full rounded-xl bg-muted pl-10 pr-10 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-search-cancel-button]:hidden"
+        />
+        {q ? (
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            aria-label="Hapus pencarian"
+            className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground"
+          >
+            <X className="size-4" aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
 
-      {/* Tab tersegmentasi */}
-      <div
-        role="tablist"
-        aria-label="Saring percakapan"
-        className="grid grid-cols-2 gap-1 rounded-full bg-muted p-1"
-      >
+      {/* Chip filter seperti WhatsApp: Semua / Belum dibaca. */}
+      <div role="tablist" aria-label="Saring percakapan" className="mt-3 flex gap-2">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -137,68 +124,67 @@ function ChatListPage() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               tab === t.id
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-success/15 text-success"
+                : "bg-muted text-muted-foreground hover:text-foreground",
             )}
           >
             {t.label}
             {t.count ? (
-              <span
-                className={cn(
-                  "grid min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-bold leading-5 tabular-nums",
-                  tab === t.id ? "bg-primary-foreground/20" : "bg-accent text-accent-foreground",
-                )}
-              >
-                {t.count > 9 ? "9+" : t.count}
-              </span>
+              <span className="tabular-nums">{t.count > 99 ? "99+" : t.count}</span>
             ) : null}
           </button>
         ))}
       </div>
 
-      {isPending ? <AdminLoading /> : null}
-      {error || data?.error ? <ErrorState onRetry={() => refetch()} /> : null}
+      <div className="mt-2 space-y-4">
+        {isPending ? <AdminLoading /> : null}
+        {error || data?.error ? <ErrorState onRetry={() => refetch()} /> : null}
 
-      {data && !data.error && items.length === 0 ? (
-        <EmptyState
-          icon={MessagesSquare}
-          title="Belum ada percakapan"
-          description="Buka salah satu produk lalu tekan “Tanya ketersediaan” untuk mulai chat."
-          action={
-            <Button asChild>
-              <Link to="/produk">Lihat katalog produk</Link>
-            </Button>
-          }
-        />
-      ) : null}
+        {data && !data.error && items.length === 0 ? (
+          <EmptyState
+            icon={MessagesSquare}
+            title="Belum ada percakapan"
+            description="Buka salah satu produk lalu tekan “Tanya ketersediaan” untuk mulai chat."
+            action={
+              <Button asChild>
+                <Link to="/produk">Lihat katalog produk</Link>
+              </Button>
+            }
+          />
+        ) : null}
 
-      {items.length > 0 && visible.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">
-          {needle ? "Tidak ada percakapan yang cocok." : "Semua pesan sudah dibaca."}
-        </p>
-      ) : null}
+        {items.length > 0 && visible.length === 0 ? (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            {needle ? "Tidak ada percakapan yang cocok." : "Semua pesan sudah dibaca."}
+          </p>
+        ) : null}
 
-      <ul className="space-y-2">
-        {visible.map((item) => (
-          <li key={item.id}>
-            <Link
-              to="/dashboard/chat/$id"
-              params={{ id: item.id }}
-              className="block rounded-2xl border border-border bg-card p-3.5 transition-colors hover:border-accent/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+        {/* Daftar polos dengan garis pemisah inset (mulai sejajar teks, bukan avatar). */}
+        <ul className="-mx-4 sm:mx-0" aria-label="Daftar percakapan">
+          {visible.map((item) => (
+            <li
+              key={item.id}
+              className="relative after:absolute after:bottom-0 after:left-[80px] after:right-0 after:h-px after:bg-border/70 last:after:hidden"
             >
-              <ChatListItemContent
-                title={item.subject}
-                preview={item.last_message_body}
-                previewPrefix={item.last_message_role === "customer" ? "Anda:" : undefined}
-                lastMessageAt={item.last_message_at}
-                unread={unreadById.get(item.id) ?? 0}
-              />
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <Link
+                to="/dashboard/chat/$id"
+                params={{ id: item.id }}
+                className="block px-4 py-2.5 transition-colors hover:bg-muted/60 active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:rounded-xl"
+              >
+                <ChatListItemContent
+                  title={item.subject}
+                  preview={item.last_message_body}
+                  previewPrefix={item.last_message_role === "customer" ? "Anda:" : undefined}
+                  lastMessageAt={item.last_message_at}
+                  unread={unreadById.get(item.id) ?? 0}
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

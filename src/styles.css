@@ -82,6 +82,9 @@
   --color-discount: var(--discount);
   --color-discount-foreground: var(--discount-foreground);
   --color-selected: var(--selected);
+  --color-chat-out: var(--chat-out);
+  --color-chat-out-foreground: var(--chat-out-foreground);
+  --color-chat-wallpaper: var(--chat-wallpaper);
   --ease-ebry: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Marketplace density scale — jarak/ritme konsisten untuk layout padat. */
@@ -155,6 +158,10 @@
   --border: oklch(0.9 0.012 195);
   --input: oklch(0.9 0.012 195);
   --ring: oklch(0.52 0.098 195);
+  /* Chat gaya WhatsApp: bubble keluar mint-teal, latar krem lembut. */
+  --chat-out: oklch(0.925 0.05 172);
+  --chat-out-foreground: oklch(0.22 0.03 205);
+  --chat-wallpaper: oklch(0.955 0.013 90);
   --chart-1: oklch(0.62 0.14 200);
   --chart-2: oklch(0.52 0.098 195);
   --chart-3: oklch(0.6 0.13 158);
@@ -236,6 +243,9 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.68 0.1 192);
+  --chat-out: oklch(0.37 0.065 182);
+  --chat-out-foreground: oklch(0.97 0.008 95);
+  --chat-wallpaper: oklch(0.16 0.025 205);
   --chart-1: oklch(0.72 0.11 200);
   --chart-2: oklch(0.68 0.1 192);
   --chart-3: oklch(0.68 0.13 158);
@@ -439,6 +449,16 @@
    layer yang sama, dan urutan menangnya tidak dapat dipastikan. */
 @utility rounded-control {
   border-radius: var(--radius-control) !important;
+}
+
+/* Latar percakapan: pola titik halus (tanpa gambar) di atas warna wallpaper. */
+@utility chat-wallpaper {
+  background-color: var(--chat-wallpaper);
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--foreground) 7%, transparent) 1px,
+    transparent 1.2px
+  );
+  background-size: 18px 18px;
 }
 
 @utility press-scale {

@@ -13,11 +13,12 @@ import {
   Check,
   CheckCheck,
   ChevronDown,
+  Clock,
   FileText,
   ImageIcon,
   Loader2,
   MapPin,
-  Paperclip,
+  Plus,
   SendHorizontal,
 } from "lucide-react";
 
@@ -121,7 +122,66 @@ function clockTime(value: string) {
   return new Date(value).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Jendela chat gaya iOS: header ringkas, bubble bersambung, centang baca, composer pil. */
+/** Ekor bubble gaya WhatsApp di sudut atas pesan pertama sebuah kelompok. */
+function BubbleTail({ mine }: { mine: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 8 13"
+      className={cn(
+        "absolute top-0 h-[13px] w-2",
+        mine ? "-right-2 text-chat-out" : "-left-2 -scale-x-100 text-card",
+      )}
+    >
+      <path fill="currentColor" d="M0 0h8L1.6 9.4C1 10.3 0 9.9 0 8.8z" />
+    </svg>
+  );
+}
+
+/** Jam + centang. Dirender dua kali: tak terlihat (penyedia ruang) dan absolut di pojok. */
+function BubbleMeta({
+  time,
+  mine,
+  read,
+  sending,
+  overlay,
+}: {
+  time: string;
+  mine: boolean;
+  read?: boolean;
+  sending?: boolean;
+  overlay?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 whitespace-nowrap text-[11px] leading-none tabular-nums",
+        overlay
+          ? "rounded-full bg-black/40 px-1.5 py-1 text-white"
+          : mine
+            ? "text-chat-out-foreground/60"
+            : "text-muted-foreground",
+      )}
+    >
+      {time}
+      {mine ? (
+        sending ? (
+          <Clock className="size-3" aria-label="Mengirim" />
+        ) : read ? (
+          // Centang dua biru = sudah dibaca, seperti WhatsApp.
+          <CheckCheck
+            className={cn("size-4", !overlay && "text-sky-500 dark:text-sky-400")}
+            aria-label="Dibaca"
+          />
+        ) : (
+          <Check className="size-3.5" aria-label="Terkirim" />
+        )
+      ) : null}
+    </span>
+  );
+}
+
+/** Jendela chat gaya WhatsApp iOS: header kaca, wallpaper, bubble berekor, composer kaca. */
 export function ChatWindow({
   title,
   partnerName,
@@ -208,38 +268,45 @@ export function ChatWindow({
   return (
     <div
       className={cn(
-        "mx-auto flex h-[calc(100dvh-9rem)] min-h-[26rem] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card",
-        // Panel desktop: isi tinggi wadah dua kolom; di HP tetap layar penuh.
+        // HP: layar penuh menutup header situs & bottom nav, seperti aplikasi chat native.
+        "fixed inset-0 z-50 flex flex-col overflow-hidden bg-card",
+        "md:relative md:inset-auto md:z-auto md:mx-auto md:h-[calc(100dvh-9rem)] md:min-h-[26rem] md:w-full md:max-w-3xl md:rounded-2xl md:border md:border-border",
+        // Panel desktop: isi tinggi wadah dua kolom.
         embedded
           ? "lg:mx-0 lg:h-full lg:min-h-0 lg:max-w-none lg:rounded-none lg:border-0"
           : "lg:h-[calc(100dvh-8rem)]",
       )}
     >
-      <header className="flex items-center gap-2.5 border-b border-border/70 bg-card px-2 py-2.5 sm:px-3">
-        {backSlot}
-        <span className="relative shrink-0" aria-hidden="true">
-          <span className="grid size-11 place-items-center rounded-full bg-surface-selected text-base font-semibold text-accent">
-            {initial}
+      {/* Header kaca gaya iOS: kembali, avatar + nama di tengah-kiri, status di kanan. */}
+      <header className="pt-safe z-10 border-b border-border/60 bg-card/85 backdrop-blur-xl">
+        <div className="flex min-h-14 items-center gap-2 px-1.5 sm:px-2">
+          {backSlot}
+          <span className="relative shrink-0" aria-hidden="true">
+            <span className="grid size-10 place-items-center rounded-full bg-surface-selected text-[15px] font-semibold text-accent">
+              {initial}
+            </span>
+            {partnerOnline ? (
+              <span className="absolute bottom-0 right-0 size-3 rounded-full bg-success ring-2 ring-card" />
+            ) : null}
           </span>
-          {partnerOnline ? (
-            <span className="absolute bottom-0 right-0 size-3 rounded-full bg-success ring-2 ring-card" />
-          ) : null}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-semibold leading-tight">{partnerName}</p>
-          <p
-            aria-live="polite"
-            className={cn(
-              "truncate text-xs leading-tight",
-              partnerTyping || partnerOnline ? "text-success" : "text-muted-foreground",
-            )}
-          >
-            {presence}
-          </p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[16px] font-semibold leading-tight tracking-[-0.01em]">
+              {partnerName}
+            </p>
+            <p
+              aria-live="polite"
+              className={cn(
+                "truncate text-[12px] leading-tight",
+                partnerTyping ? "text-success" : "text-muted-foreground",
+              )}
+            >
+              {presence}
+            </p>
+          </div>
+          <StatusPill value={status} kind="raw" label={statusLabel} className="mr-1.5 shrink-0" />
         </div>
-        <StatusPill value={status} kind="raw" label={statusLabel} />
+        {productSlot}
       </header>
-      {productSlot}
       <span className="sr-only">{title}</span>
 
       <div
@@ -247,15 +314,15 @@ export function ChatWindow({
         onScroll={handleScroll}
         role="log"
         aria-label="Riwayat pesan"
-        className="relative flex-1 overflow-y-auto overscroll-contain bg-background px-3 py-3 sm:px-4"
+        className="chat-wallpaper relative flex-1 overflow-y-auto overscroll-contain px-3 py-2 sm:px-[6%]"
       >
         {hasMore ? (
-          <div className="pb-3 text-center">
+          <div className="pb-2 pt-1 text-center">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="min-h-9 rounded-full text-xs text-primary"
+              className="min-h-9 rounded-full bg-card/90 text-xs text-primary shadow-sm"
               disabled={loadingMore}
               onClick={onLoadMore}
             >
@@ -272,22 +339,22 @@ export function ChatWindow({
           return (
             <div key={message.id}>
               {dayBreak ? (
-                <p className="flex justify-center py-3">
-                  <span className="rounded-full bg-card px-3 py-1 text-[11px] font-semibold text-muted-foreground shadow-sm ring-1 ring-border/70">
+                <p className="sticky top-1 z-[1] flex justify-center py-2">
+                  <span className="rounded-lg bg-card/90 px-2.5 py-1 text-[12px] font-medium text-muted-foreground shadow-sm">
                     {chatDayLabel(message.created_at)}
                   </span>
                 </p>
               ) : null}
               {index === unreadDividerIndex ? (
-                <p className="flex items-center gap-2 py-2 text-[11px] font-semibold text-accent">
-                  <span className="h-px flex-1 bg-accent/30" aria-hidden="true" />
+                <p className="-mx-3 my-2 bg-card/70 py-1 text-center text-[12px] font-semibold text-accent sm:-mx-[6%]">
                   Pesan baru
-                  <span className="h-px flex-1 bg-accent/30" aria-hidden="true" />
                 </p>
               ) : null}
               {message.is_system ? (
-                <p className="py-1.5 text-center text-[11px] text-muted-foreground">
-                  {message.body}
+                <p className="flex justify-center py-1.5">
+                  <span className="max-w-[85%] rounded-lg bg-card/90 px-2.5 py-1 text-center text-[12px] text-muted-foreground shadow-sm">
+                    {message.body}
+                  </span>
                 </p>
               ) : (
                 <Bubble
@@ -314,40 +381,45 @@ export function ChatWindow({
         })}
 
         {pending.map((item) => (
-          <div key={item.tempId} className="flex justify-end pt-0.5">
+          <div key={item.tempId} className="flex justify-end pr-2 pt-0.5">
             <div
               className={cn(
-                "max-w-[78%] rounded-[20px] rounded-br-md px-3.5 py-2 text-[15px] leading-snug",
+                "relative max-w-[80%] rounded-[18px] px-3 pb-1.5 pt-1.5 text-[16px] leading-[1.3] shadow-[0_1px_0.5px_oklch(0_0_0/13%)] sm:max-w-[65%]",
                 item.status === "failed"
                   ? "border border-destructive bg-card text-foreground"
-                  : "bg-primary text-primary-foreground opacity-70",
+                  : "bg-chat-out text-chat-out-foreground",
               )}
             >
               {item.attachmentLabel ? <p className="font-medium">{item.attachmentLabel}</p> : null}
-              {item.body ? <p className="whitespace-pre-line break-words">{item.body}</p> : null}
-              <p className="mt-0.5 flex items-center justify-end gap-1 text-[11px]">
-                {item.status === "sending" ? (
-                  <Loader2
-                    className="size-3 animate-spin motion-reduce:animate-none"
-                    aria-label="Mengirim"
-                  />
-                ) : (
+              {item.status === "sending" ? (
+                <p className="whitespace-pre-line break-words">
+                  {item.body}
+                  <span className="ml-2 inline-block align-bottom">
+                    <BubbleMeta time="" mine sending />
+                  </span>
+                </p>
+              ) : (
+                <>
+                  {item.body ? (
+                    <p className="whitespace-pre-line break-words">{item.body}</p>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => onRetry(item.tempId, item.body)}
-                    className="min-h-6 font-semibold text-destructive underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+                    className="mt-0.5 min-h-6 text-[12px] font-semibold text-destructive underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
                   >
                     Gagal, coba lagi
                   </button>
-                )}
-              </p>
+                </>
+              )}
             </div>
           </div>
         ))}
 
         {partnerTyping ? (
-          <div className="flex justify-start pt-1.5">
-            <div className="flex items-center gap-1 rounded-[20px] rounded-bl-md bg-secondary px-4 py-3">
+          <div className="flex justify-start pl-2 pt-1.5">
+            <div className="relative flex items-center gap-1 rounded-[18px] bg-card px-4 py-3 shadow-[0_1px_0.5px_oklch(0_0_0/13%)]">
+              <BubbleTail mine={false} />
               <span className="sr-only">Lawan bicara sedang mengetik</span>
               {[0, 1, 2].map((dot) => (
                 <span
@@ -370,7 +442,7 @@ export function ChatWindow({
               setShowJump(false);
               scrollToBottom(true);
             }}
-            className="sticky bottom-2 ml-auto grid size-11 place-items-center rounded-full border border-border bg-card text-foreground shadow-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            className="sticky bottom-2 z-[1] ml-auto grid size-11 place-items-center rounded-full bg-card/95 text-muted-foreground shadow-[0_2px_8px_oklch(0_0_0/18%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
           >
             <ChevronDown className="size-5" aria-hidden="true" />
           </button>
@@ -378,7 +450,7 @@ export function ChatWindow({
       </div>
 
       {closed ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/70 bg-card px-4 py-3 text-sm text-muted-foreground">
+        <div className="pb-safe flex flex-wrap items-center justify-between gap-2 border-t border-border/60 bg-card/85 px-4 py-3 text-sm text-muted-foreground backdrop-blur-xl">
           <span>Percakapan ini sudah ditutup.</span>
           {canToggleClosed ? (
             <Button variant="outline" size="sm" className="min-h-11" onClick={onToggleClosed}>
@@ -429,46 +501,55 @@ const Bubble = memo(function Bubble({
   read: boolean;
 }) {
   const isImage = attachment?.kind === "image";
+  // Foto tanpa caption: jam ditumpuk di atas foto seperti WhatsApp.
+  const overlayMeta = isImage && !body;
   return (
     <div
-      className={cn("flex", mine ? "justify-end" : "justify-start", groupStart ? "pt-2" : "pt-0.5")}
+      className={cn(
+        "flex",
+        mine ? "justify-end pr-2" : "justify-start pl-2",
+        groupStart ? "pt-2" : "pt-0.5",
+        // groupEnd dipakai untuk jarak bawah kelompok agar ritme baca lebih rapi.
+        groupEnd && "pb-0.5",
+      )}
     >
       <div
         className={cn(
-          "max-w-[78%] rounded-[20px] text-[15px] leading-snug sm:max-w-[65%]",
-          isImage ? "p-1" : "px-3.5 py-2",
-          mine
-            ? "bg-primary text-primary-foreground"
-            : "bg-secondary text-secondary-foreground ring-1 ring-border/50",
-          // Ekor bubble hanya di pesan terakhir sebuah kelompok, seperti iMessage.
-          groupEnd && (mine ? "rounded-br-md" : "rounded-bl-md"),
+          "relative max-w-[80%] rounded-[18px] text-[16px] leading-[1.3] shadow-[0_1px_0.5px_oklch(0_0_0/13%)] sm:max-w-[65%]",
+          isImage ? "p-[3px]" : "px-3 pb-1.5 pt-1.5",
+          mine ? "bg-chat-out text-chat-out-foreground" : "bg-card text-card-foreground",
+          // Ekor hanya di pesan pertama kelompok; sudut atasnya dibuat siku.
+          groupStart && (mine ? "rounded-tr-[4px]" : "rounded-tl-[4px]"),
         )}
       >
+        {groupStart ? <BubbleTail mine={mine} /> : null}
         {attachment ? (
-          <AttachmentView attachment={attachment} url={attachmentUrl} mine={mine} />
+          <div className="relative">
+            <AttachmentView attachment={attachment} url={attachmentUrl} mine={mine} />
+            {overlayMeta ? (
+              <span className="absolute bottom-1.5 right-1.5">
+                <BubbleMeta time={time} mine={mine} read={read} overlay />
+              </span>
+            ) : null}
+            {!isImage && !body ? (
+              <span className="flex justify-end pt-0.5">
+                <BubbleMeta time={time} mine={mine} read={read} />
+              </span>
+            ) : null}
+          </div>
         ) : null}
         {body ? (
-          <p className={cn("whitespace-pre-line break-words", isImage && "px-2.5 pt-1.5")}>
+          <p className={cn("whitespace-pre-line break-words", isImage && "px-2 pb-1 pt-1")}>
             {body}
+            {/* Penyedia ruang tak terlihat supaya jam absolut tidak menimpa teks baris terakhir. */}
+            <span className="invisible ml-2 inline-block align-bottom" aria-hidden="true">
+              <BubbleMeta time={time} mine={mine} read={read} />
+            </span>
+            <span className={cn("absolute bottom-1.5", isImage ? "right-2.5" : "right-3")}>
+              <BubbleMeta time={time} mine={mine} read={read} />
+            </span>
           </p>
         ) : null}
-        <p
-          className={cn(
-            "mt-0.5 flex items-center justify-end gap-1 text-[11px] tabular-nums",
-            isImage && "px-2.5 pb-1",
-            mine ? "text-primary-foreground/70" : "text-muted-foreground",
-          )}
-        >
-          <span>{time}</span>
-          {mine ? (
-            read ? (
-              // Centang dua biru = sudah dibaca (kontras di atas primary terang/gelap).
-              <CheckCheck className="size-4 text-sky-400 dark:text-sky-700" aria-label="Dibaca" />
-            ) : (
-              <Check className="size-3.5" aria-label="Terkirim" />
-            )
-          ) : null}
-        </p>
       </div>
     </div>
   );
@@ -495,7 +576,7 @@ function AttachmentView({
         <span
           className={cn(
             "grid size-10 shrink-0 place-items-center rounded-full",
-            mine ? "bg-primary-foreground/15" : "bg-background",
+            mine ? "bg-chat-out-foreground/10" : "bg-muted",
           )}
         >
           <MapPin className="size-5" aria-hidden="true" />
@@ -527,7 +608,7 @@ function AttachmentView({
           alt={attachment.name}
           loading="lazy"
           decoding="async"
-          className="max-h-80 w-auto max-w-full rounded-2xl object-cover"
+          className="max-h-80 w-auto max-w-full rounded-[15px] object-cover"
         />
       </a>
     );
@@ -545,7 +626,7 @@ function AttachmentView({
       <span
         className={cn(
           "grid size-10 shrink-0 place-items-center rounded-xl",
-          mine ? "bg-primary-foreground/15" : "bg-background",
+          mine ? "bg-chat-out-foreground/10" : "bg-muted",
         )}
       >
         <FileText className="size-5" aria-hidden="true" />
@@ -572,6 +653,7 @@ function Composer({
   onAttach?: (input: ChatAttachInput) => void;
 }) {
   const [draft, setDraft] = useState("");
+  const hasText = draft.trim().length > 0;
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const imageRef = useRef<HTMLInputElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -607,7 +689,7 @@ function Composer({
   return (
     <form
       onSubmit={submit}
-      className="pb-safe flex items-end gap-2 border-t border-border/70 bg-card px-2 py-2.5 sm:px-3"
+      className="pb-safe flex items-end gap-1 border-t border-border/60 bg-card/85 px-1.5 py-1.5 backdrop-blur-xl sm:px-2"
     >
       {onAttach ? (
         <>
@@ -633,45 +715,40 @@ function Composer({
           />
         </>
       ) : null}
-      <div
-        className={cn(
-          "flex min-h-12 flex-1 items-end rounded-[24px] border border-border bg-background focus-within:border-accent/60",
-          onAttach ? "pl-1 pr-1" : "px-4",
-        )}
-      >
-        {onAttach ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label="Lampirkan"
-                className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Paperclip className="size-5" aria-hidden="true" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" className="w-48">
-              <DropdownMenuItem
-                className="min-h-11 gap-3"
-                onSelect={() => imageRef.current?.click()}
-              >
-                <ImageIcon className="size-5 text-primary" aria-hidden="true" /> Foto
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="min-h-11 gap-3"
-                onSelect={() => fileRef.current?.click()}
-              >
-                <FileText className="size-5 text-primary" aria-hidden="true" /> File
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="min-h-11 gap-3"
-                onSelect={() => onAttach({ kind: "location" })}
-              >
-                <MapPin className="size-5 text-primary" aria-hidden="true" /> Lokasi saya
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : null}
+      {onAttach ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="Lampirkan"
+              className="grid size-11 shrink-0 place-items-center rounded-full text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Plus className="size-6" strokeWidth={2.25} aria-hidden="true" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-52 rounded-2xl p-1.5">
+            <DropdownMenuItem
+              className="min-h-11 gap-3 rounded-xl"
+              onSelect={() => imageRef.current?.click()}
+            >
+              <ImageIcon className="size-5 text-primary" aria-hidden="true" /> Foto
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="min-h-11 gap-3 rounded-xl"
+              onSelect={() => fileRef.current?.click()}
+            >
+              <FileText className="size-5 text-primary" aria-hidden="true" /> Dokumen
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="min-h-11 gap-3 rounded-xl"
+              onSelect={() => onAttach({ kind: "location" })}
+            >
+              <MapPin className="size-5 text-primary" aria-hidden="true" /> Lokasi saya
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null}
+      <div className="my-1 flex min-h-9 flex-1 items-end rounded-[18px] border border-border bg-background px-3 focus-within:border-accent/60">
         <textarea
           ref={inputRef}
           value={draft}
@@ -682,29 +759,34 @@ function Composer({
           onKeyDown={keyDown}
           rows={1}
           maxLength={2000}
-          placeholder="Tulis pesan…"
+          placeholder="Pesan"
           aria-label="Tulis pesan"
-          className="max-h-[120px] min-w-0 flex-1 resize-none bg-transparent px-1 py-3 text-base leading-snug outline-none placeholder:text-muted-foreground sm:text-[15px]"
+          // text-base (16px) mencegah iOS Safari auto-zoom saat input difokus.
+          className="max-h-[120px] min-w-0 flex-1 resize-none bg-transparent py-[7px] text-base leading-snug outline-none placeholder:text-muted-foreground"
         />
-        {onAttach ? (
-          <button
-            type="button"
-            aria-label="Kirim foto"
-            onClick={() => imageRef.current?.click()}
-            className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Camera className="size-5" aria-hidden="true" />
-          </button>
-        ) : null}
       </div>
-      <button
-        type="submit"
-        aria-label="Kirim pesan"
-        disabled={!draft.trim()}
-        className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <SendHorizontal className="size-5" aria-hidden="true" />
-      </button>
+      {/* Seperti WhatsApp iOS: kosong = kamera, ada teks = tombol kirim. */}
+      {onAttach && !hasText ? (
+        <button
+          type="button"
+          aria-label="Kirim foto"
+          onClick={() => imageRef.current?.click()}
+          className="grid size-11 shrink-0 place-items-center rounded-full text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Camera className="size-6" aria-hidden="true" />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          aria-label="Kirim pesan"
+          disabled={!hasText}
+          className="press-scale group grid size-11 shrink-0 place-items-center rounded-full disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
+            <SendHorizontal className="size-[18px]" aria-hidden="true" />
+          </span>
+        </button>
+      )}
     </form>
   );
 }
