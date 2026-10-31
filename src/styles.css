@@ -183,6 +183,11 @@
     oklch(0.34 0.07 205) 100%
   );
   --gradient-aurora: linear-gradient(110deg, oklch(0.87 0.13 86) 0%, oklch(0.76 0.16 69) 100%);
+  /* Panel auth terang: kabut teal di kiri atas, cahaya amber di kanan bawah. */
+  --gradient-auth-glow:
+    radial-gradient(110% 75% at 0% 0%, oklch(0.9 0.06 195 / 90%) 0%, transparent 62%),
+    radial-gradient(90% 70% at 100% 100%, oklch(0.92 0.09 82 / 85%) 0%, transparent 60%),
+    linear-gradient(160deg, oklch(0.97 0.02 195) 0%, oklch(0.96 0.03 92) 100%);
 
   --motion-fast: 120ms;
   --motion-base: 200ms;
@@ -252,6 +257,10 @@
     oklch(0.32 0.06 205) 100%
   );
   --gradient-accent: linear-gradient(100deg, oklch(0.5 0.1 192) 0%, oklch(0.38 0.08 205) 100%);
+  --gradient-auth-glow:
+    radial-gradient(110% 75% at 0% 0%, oklch(0.36 0.07 195 / 90%) 0%, transparent 62%),
+    radial-gradient(90% 70% at 100% 100%, oklch(0.42 0.08 75 / 55%) 0%, transparent 60%),
+    linear-gradient(160deg, oklch(0.22 0.035 203) 0%, oklch(0.26 0.04 200) 100%);
   --shadow-card: 0 1px 2px oklch(0 0 0 / 30%), 0 8px 24px oklch(0 0 0 / 28%);
   --shadow-lifted: 0 2px 4px oklch(0 0 0 / 34%), 0 18px 40px oklch(0 0 0 / 40%);
 }
@@ -291,6 +300,25 @@
 
 @utility bg-aurora-gradient {
   background-image: var(--gradient-aurora);
+}
+
+@utility bg-auth-glow {
+  background-image: var(--gradient-auth-glow);
+}
+
+/* Orb kaca panel auth: melayang pelan; motion-reduce global menghentikannya. */
+@keyframes auth-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@utility animate-auth-float {
+  animation: auth-float 9s ease-in-out infinite;
 }
 
 @utility auth-grid {
