@@ -27,7 +27,7 @@ import {
   setInquiryStatus,
   type ChatAttachment,
 } from "@/lib/inquiries.functions";
-import { formatRupiah } from "@/lib/format";
+import { formatRupiah, priceDetails } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 
 export const INQUIRY_STATUS_LABEL: Record<string, string> = {
@@ -159,8 +159,15 @@ export function InquiryThread({
   async function sendAttachment(input: ChatAttachInput) {
     const tempId = crypto.randomUUID();
     const label =
-      input.kind === "image" ? "📷 Foto" : input.kind === "location" ? "📍 Lokasi" : `📎 ${input.file.name}`;
-    setPending((prev) => [...prev, { tempId, body: "", status: "sending", attachmentLabel: label }]);
+      input.kind === "image"
+        ? "📷 Foto"
+        : input.kind === "location"
+          ? "📍 Lokasi"
+          : `📎 ${input.file.name}`;
+    setPending((prev) => [
+      ...prev,
+      { tempId, body: "", status: "sending", attachmentLabel: label },
+    ]);
     const drop = () => setPending((prev) => prev.filter((p) => p.tempId !== tempId));
 
     try {
@@ -265,14 +272,12 @@ export function InquiryThread({
         : "Tim Ebrystore"
       : `Pembeli · ${data.customerName}`;
   const partnerName =
-    mode === "customer" ? (data.store?.name ?? "Tim Ebrystore") : (data.customerName ?? "Pelanggan");
+    mode === "customer"
+      ? (data.store?.name ?? "Tim Ebrystore")
+      : (data.customerName ?? "Pelanggan");
   const myReadAt = mode === "customer" ? inquiry.customer_read_at : inquiry.merchant_read_at;
   const partnerReadAt = mode === "customer" ? inquiry.merchant_read_at : inquiry.customer_read_at;
-  const finalPrice = product
-    ? Number(product.discount_price) > 0 && Number(product.discount_price) < Number(product.price)
-      ? Number(product.discount_price)
-      : Number(product.price)
-    : 0;
+  const finalPrice = product ? priceDetails(product.price, product.discount_price).price : 0;
   const thumbnail =
     product?.thumbnail_url && isRenderableImageUrl(product.thumbnail_url)
       ? product.thumbnail_url

@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SpotLightItem } from "@/components/ui/spotlight";
 import { addToCart } from "@/lib/cart-store";
+import { priceDetails } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 
 const idr = new Intl.NumberFormat("id-ID", {
@@ -74,19 +75,13 @@ export function MarketplaceProductCard({
 }) {
   const home = variant === "home";
   const [added, setAdded] = useState(false);
-  const basePrice = Number(item.price);
-  const discountPrice = Number(item.discount_price);
-  const validPrice = Number.isFinite(basePrice) && basePrice >= 0;
-  const hasDiscount =
-    validPrice &&
-    item.discount_price != null &&
-    Number.isFinite(discountPrice) &&
-    discountPrice > 0 &&
-    discountPrice < basePrice;
-  const price = hasDiscount ? discountPrice : basePrice;
-  // Persen diskon dibulatkan ke bilangan bulat; hanya dihitung saat harga asal
-  // benar-benar lebih besar supaya tidak ada pembagian nol atau angka negatif.
-  const discountPct = hasDiscount ? Math.round((1 - discountPrice / basePrice) * 100) : 0;
+  const validPrice = Number.isFinite(Number(item.price)) && Number(item.price) >= 0;
+  const {
+    price,
+    basePrice,
+    hasDiscount,
+    discountPercent: discountPct,
+  } = priceDetails(item.price, item.discount_price);
   const thumbnail = isRenderableImageUrl(item.thumbnail_url) ? item.thumbnail_url : null;
 
   // Kerangka kartu, dari atas ke bawah:
@@ -369,9 +364,11 @@ export function MarketplaceServiceCard({ item }: { item: ServiceCardItem }) {
 }
 
 export function ProductCard({ item }: { item: ProductCardItem }) {
-  const hasDiscount = item.discount_price != null && Number(item.discount_price) > 0;
-  const price = Number(hasDiscount ? item.discount_price : item.price);
-  const discountPct = hasDiscount ? Math.round((1 - price / Number(item.price)) * 100) : 0;
+  const {
+    price,
+    hasDiscount,
+    discountPercent: discountPct,
+  } = priceDetails(item.price, item.discount_price);
 
   return (
     <Link

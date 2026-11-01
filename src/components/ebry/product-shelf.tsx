@@ -10,7 +10,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Package, Star } from "lucide-react";
 
-import { formatRupiah } from "@/lib/format";
+import { formatRupiah, priceDetails } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import type { StorePresence } from "@/lib/store-presence";
@@ -53,7 +53,8 @@ const TOP_SELLER_MIN_SOLD = 10;
 
 /** Format ringkas ala marketplace: 280000 -> "280rb", 1500000 -> "1,5jt". */
 export function shortRupiah(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`;
+  if (n >= 1_000_000)
+    return `${(n / 1_000_000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`;
   if (n >= 1_000) return `${Math.round(n / 1_000)}rb`;
   return String(n);
 }
@@ -61,7 +62,10 @@ export function shortRupiah(n: number) {
 function MiniStars({ value }: { value: number }) {
   const full = Math.round(value);
   return (
-    <span className="flex items-center gap-0.5" aria-label={`Rating toko ${value.toFixed(1)} dari 5`}>
+    <span
+      className="flex items-center gap-0.5"
+      aria-label={`Rating toko ${value.toFixed(1)} dari 5`}
+    >
       {Array.from({ length: 5 }, (_, i) => (
         <Star
           key={i}
@@ -81,11 +85,11 @@ function MiniStars({ value }: { value: number }) {
  *   kartu disorot; di layar sentuh selalu tampil karena tidak ada hover.
  */
 export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: number }) {
-  const base = Number(item.price);
-  const disc = item.discount_price == null ? NaN : Number(item.discount_price);
-  const hasDiscount = Number.isFinite(disc) && disc > 0 && disc < base;
-  const price = hasDiscount ? disc : base;
-  const discountPct = hasDiscount ? Math.round((1 - disc / base) * 100) : 0;
+  const {
+    price,
+    hasDiscount,
+    discountPercent: discountPct,
+  } = priceDetails(item.price, item.discount_price);
   const thumb = isRenderableImageUrl(item.thumbnail_url) ? item.thumbnail_url : null;
   const sold = item.sold_count ?? 0;
   const topSeller = (rank != null && rank <= 3) || sold >= TOP_SELLER_MIN_SOLD;
@@ -366,7 +370,10 @@ export function Shelf({
     );
   }
   return (
-    <section aria-labelledby={headingId} className={cn("@container rounded-2xl py-3.5 sm:py-4", surface)}>
+    <section
+      aria-labelledby={headingId}
+      className={cn("@container rounded-2xl py-3.5 sm:py-4", surface)}
+    >
       <div className="flex min-h-11 items-center justify-between gap-3 px-4 sm:px-5">
         <ShelfHeading id={headingId} title={title} />
         <div className="flex items-center gap-3">

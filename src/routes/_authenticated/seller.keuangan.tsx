@@ -2,7 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowDownLeft, ArrowUpRight, Clock, Info, TrendingUp, Wallet } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  ChevronDown,
+  Clock,
+  Info,
+  ReceiptText,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 
 import { CountUp } from "@/components/admin/report-widgets";
 import { BankListRow, InlineEmpty } from "@/components/ebry/cards";
@@ -123,12 +132,96 @@ function SellerFinance() {
         </Button>
       </header>
 
-      {/* Ringkasan dana: saldo utama + posisi dana lain, satu baris di desktop. */}
+      {/* Mobile & tablet: kartu saldo ringkas, gaya sama dengan kartu saldo pembeli.
+          Warna literal karena kartu ini sengaja tetap gelap di tema terang maupun gelap. */}
       <motion.section
         initial={reduced ? false : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="grid overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-px"
+        className="relative isolate overflow-hidden rounded-[22px] bg-[oklch(0.16_0.012_210)] text-white shadow-[0_16px_32px_-18px_oklch(0.16_0.012_210/80%)] lg:hidden"
+        aria-label="Saldo toko"
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-10 -top-16 -z-10 size-44 rounded-full bg-accent/55 blur-3xl"
+        />
+        <div className="rounded-[22px] border border-white/12 bg-gradient-to-br from-white/[0.09] via-white/[0.03] to-white/[0.06] shadow-[inset_0_1px_0_oklch(1_0_0/18%)]">
+          <div className="px-4 pb-4 pt-4">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-white/70">
+              <Wallet className="size-4 shrink-0" aria-hidden="true" />
+              Saldo tersedia
+            </p>
+            <p className="mt-1 truncate text-[28px] font-bold leading-tight tracking-tight tabular-nums">
+              <CountUp value={balance} format={formatRupiah} />
+            </p>
+            <p className="mt-0.5 text-[11px] text-white/60">
+              {balance > 0 ? "Bisa ditarik ke rekening." : "Saldo masuk setelah pesanan selesai."}
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <a
+                href="#tarik-saldo"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-[oklch(0.16_0.012_210)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              >
+                <ArrowUpRight className="size-4" aria-hidden="true" />
+                Tarik saldo
+              </a>
+              <a
+                href="#mutasi-heading"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-white/25 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              >
+                <ReceiptText className="size-4" aria-hidden="true" />
+                Mutasi
+              </a>
+            </div>
+          </div>
+          <dl className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10">
+            {[
+              { label: "Ditahan", value: data?.held ?? 0 },
+              { label: "Cadangan refund", value: data?.reserved ?? 0 },
+              { label: "Total masuk", value: totalIncome },
+            ].map((k) => (
+              <div key={k.label} className="min-w-0 px-3 py-3">
+                <dt className="truncate text-[11px] text-white/60">{k.label}</dt>
+                <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums">
+                  {formatRupiah(k.value)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </motion.section>
+      {/* Penjelasan singkat posisi dana (mobile), karena kartu di atas hanya memuat angka. */}
+      <details className="group rounded-2xl border border-border bg-card px-4 text-xs text-muted-foreground lg:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 font-medium text-foreground [&::-webkit-details-marker]:hidden">
+          <Info className="size-4 shrink-0 text-accent" aria-hidden="true" />
+          Arti setiap angka
+          <ChevronDown
+            className="ml-auto size-4 transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
+        </summary>
+        <ul className="space-y-1.5 pb-3 leading-relaxed">
+          <li>
+            <b className="font-semibold text-foreground">Ditahan</b>: menunggu pembeli konfirmasi
+            penerimaan.
+          </li>
+          <li>
+            <b className="font-semibold text-foreground">Cadangan refund</b>: dibekukan selama
+            refund diproses.
+          </li>
+          <li>
+            <b className="font-semibold text-foreground">Total masuk</b>: jumlah semua mutasi masuk
+            ({txCount} mutasi tercatat).
+          </li>
+        </ul>
+      </details>
+
+      {/* Desktop: saldo utama + posisi dana lain dalam satu baris. */}
+      <motion.section
+        initial={reduced ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="hidden gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr]"
         aria-label="Saldo toko"
       >
         <div className="bg-card p-5">
@@ -176,7 +269,7 @@ function SellerFinance() {
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
-        <div className="lg:sticky lg:top-24 lg:order-2">
+        <div id="tarik-saldo" className="scroll-mt-24 lg:sticky lg:top-24 lg:order-2">
           <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
         </div>
 

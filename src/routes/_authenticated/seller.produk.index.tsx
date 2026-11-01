@@ -10,7 +10,7 @@ import { StatusPill } from "@/components/ebry/status";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatRupiah } from "@/lib/format";
+import { formatRupiah, priceDetails } from "@/lib/format";
 import { listMyStoreProducts, getMyInventorySummary } from "@/lib/seller.functions";
 import { cn } from "@/lib/utils";
 
@@ -107,8 +107,9 @@ function SellerProducts() {
     return items.filter((p) => match(p) && (!term || p.name.toLowerCase().includes(term)));
   }, [items, tab, q]);
 
-  const inv = (inventoryQ.data as { summary?: { low_stock: number; threshold: number } } | undefined)
-    ?.summary;
+  const inv = (
+    inventoryQ.data as { summary?: { low_stock: number; threshold: number } } | undefined
+  )?.summary;
 
   return (
     <div className="space-y-4">
@@ -129,7 +130,10 @@ function SellerProducts() {
 
       {counts.stock > 0 || (inv?.low_stock ?? 0) > 0 ? (
         <div className="flex items-start gap-2.5 rounded-2xl border border-warning/40 bg-warning/10 p-3.5 text-sm">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning-foreground" aria-hidden="true" />
+          <AlertTriangle
+            className="mt-0.5 size-4 shrink-0 text-warning-foreground"
+            aria-hidden="true"
+          />
           <p className="text-muted-foreground">
             {counts.stock > 0 ? (
               <strong className="text-foreground">{counts.stock} produk stok habis. </strong>
@@ -221,8 +225,7 @@ function SellerProducts() {
 
 function ProductCard({ p }: { p: Product }) {
   const modLabel = MOD_LABEL[p.moderation_status] ?? p.moderation_status;
-  const price = Number(p.discount_price ?? p.price);
-  const hasDiscount = p.discount_price != null && Number(p.discount_price) < Number(p.price);
+  const { price, hasDiscount } = priceDetails(p.price, p.discount_price);
   const stock = stockLabel(p);
   const statusText =
     p.status === "published" ? "Tayang" : p.status === "archived" ? "Diarsipkan" : "Draf";
