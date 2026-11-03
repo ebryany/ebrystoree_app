@@ -13,7 +13,12 @@ export default defineTool({
       .record(z.string().max(80), z.unknown())
       .describe('Peta key -> nilai baru, contoh {"site_tagline":"Belanja digital lebih mudah"}.'),
   },
-  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   handler: async ({ values }, ctx) => {
     const denied = authGuard(ctx);
     if (denied) return denied;
@@ -23,28 +28,44 @@ export default defineTool({
     const normalized: { key: string; value: unknown; isPublic: boolean; section: string }[] = [];
     for (const [key, raw] of entries) {
       const field = FIELD_BY_KEY.get(key);
-      if (!field) return errorResult(`Key "${key}" tidak dikenal. Pakai get_website_settings untuk melihat key yang tersedia.`);
+      if (!field)
+        return errorResult(
+          `Key "${key}" tidak dikenal. Pakai get_website_settings untuk melihat key yang tersedia.`,
+        );
       if (field.readOnly) return errorResult(`Key "${key}" hanya bisa dibaca.`);
       const result = validateField(field, raw);
       if (!result.ok) return errorResult(`${field.label}: ${result.error}`);
       const section = SETTING_SECTIONS.find((s) => s.fields.some((f) => f.key === key));
-      normalized.push({ key, value: result.value, isPublic: field.isPublic, section: section?.id ?? "lain" });
+      normalized.push({
+        key,
+        value: result.value,
+        isPublic: field.isPublic,
+        section: section?.id ?? "lain",
+      });
     }
 
     const supabase = supabaseForUser(ctx);
     const { data: existing } = await supabase
       .from("system_settings")
       .select("key, value")
-      .in("key", normalized.map((n) => n.key));
+      .in(
+        "key",
+        normalized.map((n) => n.key),
+      );
     const before = new Map((existing ?? []).map((r: any) => [r.key, r.value]));
 
-    const changed = normalized.filter((n) => JSON.stringify(before.get(n.key)) !== JSON.stringify(n.value));
-    if (!changed.length) return jsonResult({ changed: 0, note: "Nilai sudah sama, tidak ada perubahan." });
+    const changed = normalized.filter(
+      (n) => JSON.stringify(before.get(n.key)) !== JSON.stringify(n.value),
+    );
+    if (!changed.length)
+      return jsonResult({ changed: 0, note: "Nilai sudah sama, tidak ada perubahan." });
 
-    const { error } = await supabase
-      .from("system_settings")
-      .upsert(changed.map((n) => ({ key: n.key, value: n.value, is_public: n.isPublic })), { onConflict: "key" });
+    const { error } = await supabase.from("system_settings").upsert(
+      changed.map((n) => ({ key: n.key, value: n.value, is_public: n.isPublic })),
+      { onConflict: "key" },
+    );
     if (error) return errorResult(`Gagal menyimpan: ${error.message}`);
+    (await import("@/lib/website-settings.server")).clearPublicSettingsCache();
 
     for (const item of changed) {
       const field = FIELD_BY_KEY.get(item.key)!;

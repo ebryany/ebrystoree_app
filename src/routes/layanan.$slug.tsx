@@ -18,6 +18,7 @@ import {
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { DetailSkeleton } from "@/components/ebry/detail-skeleton";
 import { StickyActionBar, formatIDR } from "@/components/ebry/cards";
 import { EmptyState } from "@/components/ebry/states";
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,8 @@ export const Route = createFileRoute("/layanan/$slug")({
       linkLabel="Kembali ke daftar layanan"
     />
   ),
+  pendingMs: 150,
+  pendingComponent: () => <DetailSkeleton label="Memuat layanan" />,
   notFoundComponent: LayananTidakDitemukan,
   component: DetailLayanan,
 });

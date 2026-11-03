@@ -22,6 +22,7 @@ import {
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { DetailSkeleton } from "@/components/ebry/detail-skeleton";
 import { Button } from "@/components/ui/button";
 import { StickyActionBar } from "@/components/ebry/cards";
 import { OPEN_REVIEW_EVENT, ProductReviewPanel } from "@/components/product/review-panel";
@@ -108,6 +109,8 @@ export const Route = createFileRoute("/produk/$slug")({
       linkLabel="Kembali ke katalog"
     />
   ),
+  pendingMs: 150,
+  pendingComponent: () => <DetailSkeleton label="Memuat produk" />,
   notFoundComponent: ProdukTidakDitemukan,
   component: DetailProduk,
 });

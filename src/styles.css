@@ -594,6 +594,16 @@
   animation: shimmer-slide var(--speed) linear infinite;
 }
 
+/* Garis progress navigasi: cepat di awal, melambat mendekati 80%. */
+@keyframes nav-progress {
+  from {
+    transform: scaleX(0.1);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* Kata berganti di judul hero: masuk halus, tidak ada lompatan tata letak
    karena lebar sudah ditahan oleh kata terpanjang. */
 @keyframes word-in {

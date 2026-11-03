@@ -17,8 +17,27 @@ function coerce(rows: Row[], base: Record<string, unknown>) {
   return out as Record<string, any>;
 }
 
+// Cache singkat di memori proses: setiap halaman SSR membaca pengaturan publik,
+// jadi tanpa cache setiap kunjungan menambah satu query ke database.
+const PUBLIC_TTL_MS = 30_000;
+let publicCache: { at: number; value: Awaited<ReturnType<typeof fetchPublicSettings>> } | null =
+  null;
+
+/** Dipanggil setelah admin menyimpan pengaturan agar perubahan langsung tampil. */
+export function clearPublicSettingsCache() {
+  publicCache = null;
+}
+
 /** Nilai publik (anon) — dipakai SSR header/footer/metadata/maintenance. */
 export async function readPublicSettings() {
+  if (publicCache && Date.now() - publicCache.at < PUBLIC_TTL_MS) return publicCache.value;
+  const value = await fetchPublicSettings();
+  // Hasil fallback (gagal baca DB) tidak di-cache supaya segera pulih.
+  if (value.updatedAt !== null) publicCache = { at: Date.now(), value };
+  return value;
+}
+
+async function fetchPublicSettings() {
   const { createPublicClient } = await import("./supabase-public.server");
   try {
     const supabase = createPublicClient();
@@ -43,9 +62,7 @@ export async function isFeatureEnabled(key: string) {
   return value === undefined ? Boolean(field?.default) : Boolean(value);
 }
 
-export async function readAllSettings(supabase: {
-  from: (t: "system_settings") => any;
-}) {
+export async function readAllSettings(supabase: { from: (t: "system_settings") => any }) {
   const { data, error } = await supabase.from("system_settings").select("key, value, updated_at");
   if (error) throw error;
   const rows = (data ?? []) as Row[];
@@ -57,5 +74,8 @@ export async function readAllSettings(supabase: {
 }
 
 function latest(rows: Row[]) {
-  return rows.reduce<string | null>((acc, r) => (!acc || r.updated_at > acc ? r.updated_at : acc), null);
+  return rows.reduce<string | null>(
+    (acc, r) => (!acc || r.updated_at > acc ? r.updated_at : acc),
+    null,
+  );
 }

@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useInlineToastActive } from "@/components/ebry/inline-toasts";
 import { getPublicWebsiteSettings } from "@/lib/website-settings.functions";
 import { MaintenanceGate } from "@/components/maintenance-gate";
+import { NavProgress } from "@/components/ebry/nav-progress";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl, SITE_ORIGIN } from "@/lib/seo-url";
 import { useStorePresenceHeartbeat } from "@/hooks/use-store-presence-heartbeat";
@@ -67,6 +68,8 @@ function ErrorComponent({ error }: { error: Error }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: () => getPublicWebsiteSettings(),
+  // Pengaturan publik jarang berubah: jangan ambil ulang di setiap pindah halaman.
+  staleTime: 5 * 60_000,
   head: ({ loaderData, match, matches }) => {
     const failureHead = routeFailureHead([...matches, match]);
     const s: Record<string, any> = (loaderData as any)?.values ?? {};
@@ -81,7 +84,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const ogDescription = String(s.seo_og_description || description);
     // Gambar pratinjau link harus URL absolut yang bisa diunduh crawler WhatsApp.
     const ogImage = ogImageUrl(
-      String(s.seo_og_image || s.site_og_image_url || s.site_square_logo_url || s.site_logo_url || ""),
+      String(
+        s.seo_og_image || s.site_og_image_url || s.site_square_logo_url || s.site_logo_url || "",
+      ),
     );
     const verification = [
       { name: "google-site-verification", content: "5V5oY0ERtp1nkZTxzinF-GwbMZwJAj3fSTiYPUwaCIg" },
@@ -209,6 +214,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <NavProgress />
       <MaintenanceGate settings={(settings as any)?.values ?? {}}>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />

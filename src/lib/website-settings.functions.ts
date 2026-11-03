@@ -136,6 +136,7 @@ export const saveWebsiteSection = createServerFn({ method: "POST" })
         console.error("[settings] upsert gagal:", error.message);
         return { ok: false as const, error: "Pengaturan gagal disimpan." };
       }
+      (await store()).clearPublicSettingsCache();
 
       for (const item of changed) {
         const field = FIELD_BY_KEY.get(item.key)!;
@@ -189,6 +190,7 @@ export const resetWebsiteSection = createServerFn({ method: "POST" })
 
       const { error } = await sb.from("system_settings").upsert(rows, { onConflict: "key" });
       if (error) return { ok: false as const, error: "Reset gagal dijalankan." };
+      (await store()).clearPublicSettingsCache();
 
       await helpers.writeAudit(context as Ctx, {
         action: "website_setting_reset",
