@@ -1,14 +1,19 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
+import { sanitizeSearchTerm } from "@/lib/utils";
 import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
 
 export default defineTool({
   name: "list_users",
   title: "Daftar pengguna & role",
-  description: "Menampilkan pengguna beserta email, nama, dan role yang dimiliki. Bisa dicari dan difilter per role.",
+  description:
+    "Menampilkan pengguna beserta email, nama, dan role yang dimiliki. Bisa dicari dan difilter per role.",
   inputSchema: {
     search: z.string().trim().max(120).optional().describe("Cari nama atau email."),
-    role: z.enum(["all", "customer", "operator", "support", "finance", "admin", "super_admin"]).optional().describe("Filter role."),
+    role: z
+      .enum(["all", "customer", "operator", "support", "finance", "admin", "super_admin"])
+      .optional()
+      .describe("Filter role."),
     limit: z.number().int().min(1).max(100).optional().describe("Jumlah baris (default 30)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
@@ -20,7 +25,8 @@ export default defineTool({
     // profiles and user_roles have no PostgREST-detectable relationship
     // (user_roles.user_id references auth.users), so join in memory.
     let query = supabase.from("profiles").select("id, full_name, email, phone, created_at");
-    if (search) query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
+    const term = sanitizeSearchTerm(search ?? "");
+    if (term) query = query.or(`full_name.ilike.%${term}%,email.ilike.%${term}%`);
     const { data: profiles, error } = await query
       .order("created_at", { ascending: false })
       .limit(limit ?? 30);

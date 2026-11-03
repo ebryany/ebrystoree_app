@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isHttpUrl } from "@/lib/utils";
 import { enforceRateLimit } from "./rate-limit.server";
 
 type Ctx = { supabase: any; userId: string };
@@ -23,7 +24,13 @@ export const createPoRequest = createServerFn({ method: "POST" })
         title: z.string().trim().min(5).max(120),
         description: z.string().trim().min(20).max(4000),
         categoryId: z.string().uuid().optional(),
-        referenceUrl: z.string().trim().url().max(500).optional().or(z.literal("")),
+        referenceUrl: z
+          .string()
+          .trim()
+          .max(500)
+          .refine(isHttpUrl, "Tautan harus diawali http:// atau https://")
+          .optional()
+          .or(z.literal("")),
         budgetEstimate: z.number().int().min(0).max(1_000_000_000).optional(),
         deadlineAt: z.string().datetime().optional(),
       })
@@ -46,7 +53,8 @@ export const createPoRequest = createServerFn({ method: "POST" })
       })
       .select("id, request_number")
       .maybeSingle();
-    if (error || !row) return { ok: false as const, error: rpcError(error?.message ?? "Permintaan gagal dibuat.") };
+    if (error || !row)
+      return { ok: false as const, error: rpcError(error?.message ?? "Permintaan gagal dibuat.") };
 
     await supabase.from("po_messages").insert({
       request_id: row.id,
@@ -74,7 +82,9 @@ export const listMyPoRequests = createServerFn({ method: "GET" })
 
 export const listAllPoRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: unknown) => z.object({ status: z.string().max(30).optional() }).parse(data ?? {}))
+  .validator((data: unknown) =>
+    z.object({ status: z.string().max(30).optional() }).parse(data ?? {}),
+  )
   .handler(async ({ data, context }) => {
     const { supabase } = context as Ctx;
     let query = supabase
@@ -89,11 +99,17 @@ export const listAllPoRequests = createServerFn({ method: "GET" })
     const userIds = Array.from(new Set((rows ?? []).map((r: any) => r.user_id)));
     const nameById = new Map<string, string>();
     if (userIds.length) {
-      const { data: profiles } = await supabase.from("profiles").select("id, full_name, email").in("id", userIds);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
       for (const p of profiles ?? []) nameById.set(p.id, p.full_name || p.email || "Pelanggan");
     }
     return {
-      items: (rows ?? []).map((r: any) => ({ ...r, customer_name: nameById.get(r.user_id) ?? "Pelanggan" })),
+      items: (rows ?? []).map((r: any) => ({
+        ...r,
+        customer_name: nameById.get(r.user_id) ?? "Pelanggan",
+      })),
       error: null,
     };
   });
@@ -110,7 +126,8 @@ export const getPoRequest = createServerFn({ method: "GET" })
       .select(REQUEST_FIELDS)
       .eq("id", data.id)
       .maybeSingle();
-    if (!request) return { request: null, messages: [], payments: [], isOwner: false, customerName: null };
+    if (!request)
+      return { request: null, messages: [], payments: [], isOwner: false, customerName: null };
 
     const [{ data: messages }, { data: payments }, { data: profile }] = await Promise.all([
       supabase
@@ -121,7 +138,9 @@ export const getPoRequest = createServerFn({ method: "GET" })
         .limit(300),
       supabase
         .from("po_payments")
-        .select("id, stage, amount, status, proof_path, sender_name, note, reject_reason, verified_at, created_at")
+        .select(
+          "id, stage, amount, status, proof_path, sender_name, note, reject_reason, verified_at, created_at",
+        )
         .eq("request_id", data.id)
         .order("created_at", { ascending: true }),
       supabase.from("profiles").select("full_name, email").eq("id", request.user_id).maybeSingle(),
@@ -139,7 +158,9 @@ export const getPoRequest = createServerFn({ method: "GET" })
 export const sendPoMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
-    z.object({ requestId: z.string().uuid(), body: z.string().trim().min(1).max(2000) }).parse(data),
+    z
+      .object({ requestId: z.string().uuid(), body: z.string().trim().min(1).max(2000) })
+      .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as Ctx;
@@ -149,7 +170,8 @@ export const sendPoMessage = createServerFn({ method: "POST" })
       .eq("id", data.requestId)
       .maybeSingle();
     if (!request) return { ok: false as const, error: "Permintaan tidak ditemukan." };
-    if (request.status === "cancelled") return { ok: false as const, error: "Permintaan sudah dibatalkan." };
+    if (request.status === "cancelled")
+      return { ok: false as const, error: "Permintaan sudah dibatalkan." };
 
     const isOwner = request.user_id === userId;
     const { error } = await supabase.from("po_messages").insert({
@@ -222,7 +244,9 @@ export const submitPoProof = createServerFn({ method: "POST" })
 export const cancelPoRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
-    z.object({ requestId: z.string().uuid(), reason: z.string().trim().min(5).max(300) }).parse(data),
+    z
+      .object({ requestId: z.string().uuid(), reason: z.string().trim().min(5).max(300) })
+      .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { error } = await (context as Ctx).supabase.rpc("po_cancel_request", {
@@ -286,7 +310,13 @@ export const deliverPoResult = createServerFn({ method: "POST" })
       .object({
         requestId: z.string().uuid(),
         note: z.string().trim().max(1000).optional(),
-        resultUrl: z.string().trim().url().max(500).optional().or(z.literal("")),
+        resultUrl: z
+          .string()
+          .trim()
+          .max(500)
+          .refine(isHttpUrl, "Tautan harus diawali http:// atau https://")
+          .optional()
+          .or(z.literal("")),
       })
       .parse(data),
   )

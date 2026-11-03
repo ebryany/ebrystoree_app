@@ -41,10 +41,19 @@ export const Route = createFileRoute("/api/public/payments/webhook/shopeepay")({
           publicKey: cfg.shopeepayPublicKey,
         });
         if (!signatureValid) {
-          return json({ responseCode: "4015600", responseMessage: "Unauthorized. Invalid signature" }, 401);
+          console.warn(
+            `[shopeepay] signature webhook tidak valid ip=${request.headers.get("cf-connecting-ip") ?? "-"}`,
+          );
+          return json(
+            { responseCode: "4015600", responseMessage: "Unauthorized. Invalid signature" },
+            401,
+          );
         }
         if (!sp.timestampFresh(timestamp)) {
-          return json({ responseCode: "4015600", responseMessage: "Unauthorized. Stale timestamp" }, 401);
+          return json(
+            { responseCode: "4015600", responseMessage: "Unauthorized. Stale timestamp" },
+            401,
+          );
         }
 
         let payload: unknown;

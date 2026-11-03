@@ -24,8 +24,11 @@ export type PriceDetails = {
 /** Untuk tampilan: menerima nilai mentah dari Supabase (number, string, atau null). */
 export function priceDetails(price: unknown, discountPrice: unknown): PriceDetails {
   const basePrice = Number.isFinite(Number(price)) ? Number(price) : 0;
+  // Diskon negatif ditolak CHECK di DB; abaikan agar tampilan tidak mengarang potongan.
   const discount =
-    discountPrice == null || !Number.isFinite(Number(discountPrice)) ? null : Number(discountPrice);
+    discountPrice == null || !Number.isFinite(Number(discountPrice)) || Number(discountPrice) < 0
+      ? null
+      : Number(discountPrice);
   const finalPrice = effectivePrice(basePrice, discount);
   const hasDiscount = finalPrice < basePrice;
   return {

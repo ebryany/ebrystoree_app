@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { isHttpUrl } from "@/lib/utils";
 
 export function formatWhen(value: string | null | undefined) {
   if (!value) return "-";
@@ -22,26 +23,44 @@ const ASSIGNMENT_LABEL: Record<string, string> = {
   cancelled: "Dibatalkan",
 };
 
-export function AssignmentSummary({ assignment, operatorName }: { assignment: any; operatorName?: string | null }) {
-  if (!assignment) return <p className="text-sm text-muted-foreground">Belum ada operator yang ditugaskan.</p>;
+export function AssignmentSummary({
+  assignment,
+  operatorName,
+}: {
+  assignment: any;
+  operatorName?: string | null;
+}) {
+  if (!assignment)
+    return <p className="text-sm text-muted-foreground">Belum ada operator yang ditugaskan.</p>;
   return (
     <div className="space-y-1 text-sm">
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary">{ASSIGNMENT_LABEL[assignment.status] ?? assignment.status}</Badge>
+        <Badge variant="secondary">
+          {ASSIGNMENT_LABEL[assignment.status] ?? assignment.status}
+        </Badge>
         {operatorName ? <span className="font-medium">{operatorName}</span> : null}
       </div>
       <p className="text-muted-foreground">Ditugaskan {formatWhen(assignment.assigned_at)}</p>
       <p className="text-muted-foreground">Deadline {formatWhen(assignment.deadline_at)}</p>
       {assignment.started_at ? (
-        <p className="text-muted-foreground">Mulai dikerjakan {formatWhen(assignment.started_at)}</p>
+        <p className="text-muted-foreground">
+          Mulai dikerjakan {formatWhen(assignment.started_at)}
+        </p>
       ) : null}
     </div>
   );
 }
 
-export function ProgressList({ items, showInternal = false }: { items: any[]; showInternal?: boolean }) {
+export function ProgressList({
+  items,
+  showInternal = false,
+}: {
+  items: any[];
+  showInternal?: boolean;
+}) {
   const rows = showInternal ? items : items.filter((p) => p.is_public);
-  if (!rows.length) return <p className="text-sm text-muted-foreground">Belum ada catatan progres.</p>;
+  if (!rows.length)
+    return <p className="text-sm text-muted-foreground">Belum ada catatan progres.</p>;
   const latest = rows[0];
   return (
     <div className="space-y-4">
@@ -55,7 +74,10 @@ export function ProgressList({ items, showInternal = false }: { items: any[]; sh
       <ol className="space-y-3 border-l border-border pl-4">
         {rows.map((p) => (
           <li key={p.id} className="relative text-sm">
-            <span className="absolute -left-[21px] top-1.5 size-2 rounded-full bg-primary" aria-hidden="true" />
+            <span
+              className="absolute -left-[21px] top-1.5 size-2 rounded-full bg-primary"
+              aria-hidden="true"
+            />
             <p className="font-medium">
               {p.percent}%{!p.is_public ? " · internal" : ""}
             </p>
@@ -69,7 +91,8 @@ export function ProgressList({ items, showInternal = false }: { items: any[]; sh
 }
 
 export function ResultList({ items }: { items: any[] }) {
-  if (!items.length) return <p className="text-sm text-muted-foreground">Belum ada hasil pekerjaan yang dikirim.</p>;
+  if (!items.length)
+    return <p className="text-sm text-muted-foreground">Belum ada hasil pekerjaan yang dikirim.</p>;
   return (
     <ul className="space-y-3">
       {items.map((r) => (
@@ -83,7 +106,7 @@ export function ResultList({ items }: { items: any[] }) {
           </div>
           <p className="mt-1">{r.summary}</p>
           {r.delivery_note ? <p className="mt-1 text-muted-foreground">{r.delivery_note}</p> : null}
-          {r.result_url ? (
+          {r.result_url && isHttpUrl(r.result_url) ? (
             <a
               href={r.result_url}
               target="_blank"
@@ -100,7 +123,8 @@ export function ResultList({ items }: { items: any[] }) {
 }
 
 export function RevisionList({ items }: { items: any[] }) {
-  if (!items.length) return <p className="text-sm text-muted-foreground">Belum ada permintaan revisi.</p>;
+  if (!items.length)
+    return <p className="text-sm text-muted-foreground">Belum ada permintaan revisi.</p>;
   return (
     <ul className="space-y-2 text-sm">
       {items.map((r) => (

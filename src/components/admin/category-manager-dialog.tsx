@@ -20,7 +20,8 @@ import {
   type CategoryIconKey,
   type CategoryTone,
 } from "@/lib/category-icons";
-import { cn } from "@/lib/utils";
+import { cn, isRenderableImageUrl } from "@/lib/utils";
+import { ImageUploader } from "@/components/admin/image-uploader";
 
 type Kind = "product" | "service";
 
@@ -31,6 +32,8 @@ type Draft = {
   /** null = otomatis dari nama. */
   icon: CategoryIconKey | null;
   tone: CategoryTone | null;
+  /** Gambar PNG/JPEG unggahan; bila ada, menggantikan ikon bawaan. */
+  imageUrl: string;
 };
 
 type CategoryRow = {
@@ -41,9 +44,10 @@ type CategoryRow = {
   is_active: boolean;
   icon: string | null;
   tone: string | null;
+  image_url?: string | null;
 };
 
-const EMPTY: Draft = { name: "", isActive: true, icon: null, tone: null };
+const EMPTY: Draft = { name: "", isActive: true, icon: null, tone: null, imageUrl: "" };
 
 const COPY: Record<Kind, { title: string; empty: string; placeholder: string }> = {
   product: {
@@ -61,9 +65,18 @@ const COPY: Record<Kind, { title: string; empty: string; placeholder: string }> 
 function CategoryBadgeIcon({
   category,
 }: {
-  category: { name: string; icon?: string | null; tone?: string | null };
+  category: { name: string; icon?: string | null; tone?: string | null; image?: string | null };
 }) {
   const style = resolveCategoryStyle(category);
+  if (isRenderableImageUrl(category.image)) {
+    return (
+      <img
+        src={category.image}
+        alt=""
+        className="size-10 shrink-0 rounded-lg border border-border bg-card object-contain p-1"
+      />
+    );
+  }
   return (
     <span
       className={cn(
@@ -110,6 +123,7 @@ export function CategoryManagerDialog({
           isActive: d.isActive,
           icon: d.icon,
           tone: d.tone,
+          imageUrl: d.imageUrl || null,
         },
       }),
     onSuccess: (res: any) => {
@@ -135,7 +149,7 @@ export function CategoryManagerDialog({
         <div className="space-y-4">
           <div className="space-y-4 rounded-xl border border-border bg-muted/30 p-4">
             <div className="flex items-end gap-3">
-              <CategoryBadgeIcon category={draft} />
+              <CategoryBadgeIcon category={{ ...draft, image: draft.imageUrl }} />
               <div className="min-w-0 flex-1 space-y-1.5">
                 <Label htmlFor={`kategori-nama-${kind}`}>
                   {draft.id ? "Ubah kategori" : "Kategori baru"}
@@ -150,8 +164,18 @@ export function CategoryManagerDialog({
               </div>
             </div>
 
+            <ImageUploader
+              value={draft.imageUrl}
+              onChange={(imageUrl) => setDraft((d) => ({ ...d, imageUrl }))}
+              folder="categories"
+              label="Gambar ikon"
+              hint="PNG atau JPG persegi, latar transparan disarankan. Maks 3 MB. Bila diisi, menggantikan ikon di bawah."
+            />
+
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium">Ikon</legend>
+              <legend className="text-sm font-medium">
+                Ikon bawaan{draft.imageUrl ? " (dipakai bila gambar dihapus)" : ""}
+              </legend>
               <div
                 role="radiogroup"
                 aria-label="Ikon kategori"
@@ -274,12 +298,12 @@ export function CategoryManagerDialog({
             ) : (
               items.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 p-3">
-                  <CategoryBadgeIcon category={c} />
+                  <CategoryBadgeIcon category={{ ...c, image: c.image_url }} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{c.name}</p>
                     <p className="truncate text-xs text-muted-foreground">
                       {c.slug}
-                      {!c.icon && !c.tone ? " · ikon otomatis" : ""}
+                      {c.image_url ? " · gambar" : !c.icon && !c.tone ? " · ikon otomatis" : ""}
                     </p>
                   </div>
                   <Badge variant={c.is_active ? "default" : "secondary"}>
@@ -296,6 +320,7 @@ export function CategoryManagerDialog({
                         isActive: c.is_active !== false,
                         icon: (c.icon as CategoryIconKey | null) ?? null,
                         tone: (c.tone as CategoryTone | null) ?? null,
+                        imageUrl: c.image_url ?? "",
                       })
                     }
                   >

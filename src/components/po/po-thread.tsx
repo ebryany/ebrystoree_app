@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { formatRupiah } from "@/lib/format";
+import { isHttpUrl } from "@/lib/utils";
 import {
   cancelPoRequest,
   deliverPoResult,
@@ -118,7 +119,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
   async function handleSend() {
     const body = message.trim();
     if (body.length < 1) return;
-    const ok = await run(() => postMessage({ data: { requestId: id, body } }) as any, "Pesan terkirim.");
+    const ok = await run(
+      () => postMessage({ data: { requestId: id, body } }) as any,
+      "Pesan terkirim.",
+    );
     if (ok) setMessage("");
   }
 
@@ -148,7 +152,8 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
       return;
     }
     await run(
-      () => uploadProof({ data: { paymentId, filePath: path, senderName: senderName.trim() } }) as any,
+      () =>
+        uploadProof({ data: { paymentId, filePath: path, senderName: senderName.trim() } }) as any,
       "Bukti pembayaran terkirim.",
     );
   }
@@ -176,24 +181,32 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
           </div>
           <StatusPill value={status} label={PO_STATUS_LABEL[status] ?? status} />
         </div>
-        <p className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">{request.description}</p>
+        <p className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">
+          {request.description}
+        </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           <div>
             <dt className="text-xs text-muted-foreground">Estimasi budget</dt>
-            <dd className="font-semibold">{request.budget_estimate ? formatRupiah(request.budget_estimate) : "-"}</dd>
+            <dd className="font-semibold">
+              {request.budget_estimate ? formatRupiah(request.budget_estimate) : "-"}
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Tenggat diinginkan</dt>
             <dd className="font-semibold">
-              {request.deadline_at ? new Date(request.deadline_at).toLocaleDateString("id-ID") : "-"}
+              {request.deadline_at
+                ? new Date(request.deadline_at).toLocaleDateString("id-ID")
+                : "-"}
             </dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Nilai penawaran</dt>
-            <dd className="font-semibold">{request.quoted_total ? formatRupiah(request.quoted_total) : "-"}</dd>
+            <dd className="font-semibold">
+              {request.quoted_total ? formatRupiah(request.quoted_total) : "-"}
+            </dd>
           </div>
         </dl>
-        {request.reference_url ? (
+        {request.reference_url && isHttpUrl(request.reference_url) ? (
           <a
             href={request.reference_url}
             target="_blank"
@@ -218,7 +231,12 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
             <Button
               size="sm"
               disabled={busy}
-              onClick={() => run(() => respondQuote({ data: { requestId: id, accept: true } }) as any, "Penawaran disetujui.")}
+              onClick={() =>
+                run(
+                  () => respondQuote({ data: { requestId: id, accept: true } }) as any,
+                  "Penawaran disetujui.",
+                )
+              }
             >
               Setujui & bayar DP
             </Button>
@@ -226,7 +244,12 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
               size="sm"
               variant="outline"
               disabled={busy}
-              onClick={() => run(() => respondQuote({ data: { requestId: id, accept: false } }) as any, "Penawaran ditolak.")}
+              onClick={() =>
+                run(
+                  () => respondQuote({ data: { requestId: id, accept: false } }) as any,
+                  "Penawaran ditolak.",
+                )
+              }
             >
               Tolak penawaran
             </Button>
@@ -240,16 +263,31 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="po-total">Total harga (Rp)</Label>
-              <Input id="po-total" inputMode="numeric" value={quoteTotal} onChange={(e) => setQuoteTotal(e.target.value)} />
+              <Input
+                id="po-total"
+                inputMode="numeric"
+                value={quoteTotal}
+                onChange={(e) => setQuoteTotal(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="po-dp">Persen DP</Label>
-              <Input id="po-dp" inputMode="numeric" value={quoteDp} onChange={(e) => setQuoteDp(e.target.value)} />
+              <Input
+                id="po-dp"
+                inputMode="numeric"
+                value={quoteDp}
+                onChange={(e) => setQuoteDp(e.target.value)}
+              />
             </div>
           </div>
           <div className="mt-3">
             <Label htmlFor="po-note">Catatan penawaran</Label>
-            <Textarea id="po-note" value={quoteNote} onChange={(e) => setQuoteNote(e.target.value)} rows={3} />
+            <Textarea
+              id="po-note"
+              value={quoteNote}
+              onChange={(e) => setQuoteNote(e.target.value)}
+              rows={3}
+            />
           </div>
           <Button
             className="mt-3"
@@ -281,11 +319,21 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
           <div className="mt-3 space-y-3">
             <div>
               <Label htmlFor="po-result-note">Catatan hasil</Label>
-              <Textarea id="po-result-note" rows={3} value={resultNote} onChange={(e) => setResultNote(e.target.value)} />
+              <Textarea
+                id="po-result-note"
+                rows={3}
+                value={resultNote}
+                onChange={(e) => setResultNote(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="po-result-url">Tautan hasil (opsional)</Label>
-              <Input id="po-result-url" value={resultUrl} onChange={(e) => setResultUrl(e.target.value)} placeholder="https://" />
+              <Input
+                id="po-result-url"
+                value={resultUrl}
+                onChange={(e) => setResultUrl(e.target.value)}
+                placeholder="https://"
+              />
             </div>
             <Button
               size="sm"
@@ -294,7 +342,11 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
                 run(
                   () =>
                     deliver({
-                      data: { requestId: id, note: resultNote.trim() || undefined, resultUrl: resultUrl.trim() },
+                      data: {
+                        requestId: id,
+                        note: resultNote.trim() || undefined,
+                        resultUrl: resultUrl.trim(),
+                      },
                     }) as any,
                   "Hasil dikirim ke pelanggan.",
                 )
@@ -313,7 +365,11 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
           {mode === "customer" ? (
             <div className="mt-3">
               <Label htmlFor="po-sender">Nama pengirim transfer</Label>
-              <Input id="po-sender" value={senderName} onChange={(e) => setSenderName(e.target.value)} />
+              <Input
+                id="po-sender"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+              />
               <p className="mt-2 text-xs text-muted-foreground">
                 Transfer DANA 087782462607 (FEBRYANUS TAMBING), lalu unggah bukti di bawah.
               </p>
@@ -327,7 +383,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
                     <p className="text-sm font-semibold">{STAGE_LABEL[pay.stage] ?? pay.stage}</p>
                     <p className="text-sm text-muted-foreground">{formatRupiah(pay.amount)}</p>
                   </div>
-                  <StatusPill value={pay.status} label={PAY_STATUS_LABEL[pay.status] ?? pay.status} />
+                  <StatusPill
+                    value={pay.status}
+                    label={PAY_STATUS_LABEL[pay.status] ?? pay.status}
+                  />
                 </div>
                 {pay.reject_reason ? (
                   <p className="mt-2 text-xs text-destructive">Ditolak: {pay.reject_reason}</p>
@@ -365,7 +424,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
                           disabled={busy}
                           onClick={() =>
                             run(
-                              () => verifyPayment({ data: { paymentId: pay.id, decision: "approve" } }) as any,
+                              () =>
+                                verifyPayment({
+                                  data: { paymentId: pay.id, decision: "approve" },
+                                }) as any,
                               "Pembayaran diverifikasi.",
                             )
                           }
@@ -380,7 +442,11 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
                             run(
                               () =>
                                 verifyPayment({
-                                  data: { paymentId: pay.id, decision: "reject", reason: "Bukti tidak sesuai" },
+                                  data: {
+                                    paymentId: pay.id,
+                                    decision: "reject",
+                                    reason: "Bukti tidak sesuai",
+                                  },
                                 }) as any,
                               "Bukti ditolak.",
                             )
@@ -401,8 +467,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
       {request.result_note || request.result_url ? (
         <section className="rounded-2xl border border-success/30 bg-success/5 p-5">
           <h2 className="text-sm font-semibold">Hasil pekerjaan</h2>
-          {request.result_note ? <p className="mt-2 whitespace-pre-wrap text-sm">{request.result_note}</p> : null}
-          {request.result_url ? (
+          {request.result_note ? (
+            <p className="mt-2 whitespace-pre-wrap text-sm">{request.result_note}</p>
+          ) : null}
+          {request.result_url && isHttpUrl(request.result_url) ? (
             <a
               href={request.result_url}
               target="_blank"
@@ -428,7 +496,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
             messages.map((msg) => {
               const mine = msg.sender_id === user?.id && !msg.is_system;
               return (
-                <div key={msg.id} className={msg.is_system ? "text-center" : mine ? "flex justify-end" : "flex"}>
+                <div
+                  key={msg.id}
+                  className={msg.is_system ? "text-center" : mine ? "flex justify-end" : "flex"}
+                >
                   {msg.is_system ? (
                     <p className="mx-auto max-w-md rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
                       {msg.body}
@@ -440,8 +511,11 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.body}</p>
-                      <p className={`mt-1 text-[11px] ${mine ? "opacity-80" : "text-muted-foreground"}`}>
-                        {msg.sender_role === "customer" ? "Pelanggan" : "Tim Ebrystore"} • {formatTime(msg.created_at)}
+                      <p
+                        className={`mt-1 text-[11px] ${mine ? "opacity-80" : "text-muted-foreground"}`}
+                      >
+                        {msg.sender_role === "customer" ? "Pelanggan" : "Tim Ebrystore"} •{" "}
+                        {formatTime(msg.created_at)}
                       </p>
                     </div>
                   )}
@@ -459,7 +533,11 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
             placeholder="Tulis pesan untuk tim…"
             disabled={status === "cancelled"}
           />
-          <Button size="icon" disabled={busy || status === "cancelled" || !message.trim()} onClick={() => void handleSend()}>
+          <Button
+            size="icon"
+            disabled={busy || status === "cancelled" || !message.trim()}
+            onClick={() => void handleSend()}
+          >
             {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
             <span className="sr-only">Kirim</span>
           </Button>
@@ -473,7 +551,10 @@ export function PoThread({ id, mode }: { id: string; mode: "customer" | "staff" 
           disabled={busy}
           onClick={() =>
             run(
-              () => cancelRequest({ data: { requestId: id, reason: "Dibatalkan oleh pelanggan" } }) as any,
+              () =>
+                cancelRequest({
+                  data: { requestId: id, reason: "Dibatalkan oleh pelanggan" },
+                }) as any,
               "Permintaan dibatalkan.",
             )
           }

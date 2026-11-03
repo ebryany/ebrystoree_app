@@ -153,9 +153,7 @@ export function SellerJoinSection({
           variants={reveal}
           className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border px-5 py-4 sm:px-7"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Toko yang sudah berjualan
-          </p>
+          <p className="text-xs font-semibold text-muted-foreground">Toko yang sudah berjualan</p>
           <ul className="flex min-w-0 flex-wrap gap-2">
             {stores.map((store) => (
               <li key={store.slug}>

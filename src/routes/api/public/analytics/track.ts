@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { createHash } from "node:crypto";
 
+import { clientIpFrom } from "@/lib/client-ip.server";
+
 /**
  * Endpoint penerima event analytics.
  *
@@ -94,8 +96,7 @@ export const Route = createFileRoute("/api/public/analytics/track")({
         if (!parsed.success) return ok;
 
         const userAgent = request.headers.get("user-agent") ?? "";
-        const forwarded = request.headers.get("x-forwarded-for") ?? "";
-        const ip = forwarded.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+        const ip = clientIpFrom((name) => request.headers.get(name)) ?? "unknown";
         const today = new Date().toISOString().slice(0, 10);
         const hash = sessionHash(ip, userAgent, today);
         const bot = isBot(userAgent || null);

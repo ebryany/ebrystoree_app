@@ -5,6 +5,8 @@
  */
 import { getRequestHeader } from "@tanstack/react-start/server";
 
+import { clientIpFrom } from "./client-ip.server";
+
 export type AuthzContext = { supabase: any; userId: string };
 
 export class ForbiddenError extends Error {
@@ -41,8 +43,7 @@ export async function loadAccess(context: AuthzContext): Promise<Access> {
 
 function clientIp(): string | null {
   try {
-    const fwd = getRequestHeader("x-forwarded-for");
-    return fwd ? fwd.split(",")[0]!.trim() : null;
+    return clientIpFrom((name) => getRequestHeader(name));
   } catch {
     return null;
   }
@@ -94,6 +95,15 @@ export async function assertPermission(context: AuthzContext, permission: string
     return access;
   }
 
+  // Penolakan dicatat supaya percobaan akses admin oleh akun biasa/curian terlihat.
+  console.warn(
+    `[authz] ditolak user=${context.userId} permission=${permission} ip=${clientIp() ?? "-"}`,
+  );
+  await writeAudit(context, {
+    action: "permission.denied",
+    entityType: "permission",
+    after: { permission },
+  });
   throw new ForbiddenError(permission);
 }
 

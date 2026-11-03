@@ -1491,6 +1491,8 @@ export function isSafeUrl(value: string) {
   const v = value.trim();
   if (!v) return false;
   if (/^(javascript|data|vbscript|file):/i.test(v)) return false;
+  // "//evil.com" dan "/\evil.com" dibuka browser sebagai domain lain.
+  if (v.startsWith("//") || v.startsWith("/\\") || /[\p{Cc}]/u.test(v)) return false;
   if (v.startsWith("/") || v.startsWith("#")) return true;
   try {
     const u = new URL(v);

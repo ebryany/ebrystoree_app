@@ -165,7 +165,12 @@ export function MarketplaceProductCard({
             tentu sudah diunggah, itu urusan halaman detail.
             `relative z-10` menaikkan tautan toko di atas stretched-link judul
             (`after:inset-0`), supaya tetap bisa diklik tanpa nested anchor. */}
-        {item.store_name ? (
+        {!item.store_name && item.is_official ? (
+          <p className="mt-2 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+            <ShieldCheck className="size-3 shrink-0 text-accent" aria-hidden="true" />
+            <span className="truncate">Toko resmi</span>
+          </p>
+        ) : item.store_name ? (
           <p className="mt-2 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
             <Store className="size-3 shrink-0" aria-hidden="true" />
             {linkStore && item.store_slug ? (
@@ -183,7 +188,10 @@ export function MarketplaceProductCard({
               </span>
             )}
             {item.is_official ? (
-              <ShieldCheck className="size-3 shrink-0 text-accent" aria-hidden="true" />
+              <>
+                <ShieldCheck className="size-3 shrink-0 text-accent" aria-hidden="true" />
+                <span className="sr-only">Toko resmi</span>
+              </>
             ) : null}
           </p>
         ) : null}
@@ -356,6 +364,178 @@ export function MarketplaceServiceCard({ item }: { item: ServiceCardItem }) {
           ) : null}
           <span className="font-bold tabular-nums text-price text-lg sm:text-xl">
             {cheapest ? idr.format(Number(cheapest.price)) : "Lihat paket"}
+          </span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export type PlatformServiceItem = Omit<ServiceCardItem, "service_packages"> & {
+  category?: { slug: string | null; name: string | null } | null;
+  service_packages?: Array<{
+    id: string;
+    name?: string | null;
+    price: number | string;
+    estimated_days: number | null;
+    free_revisions: number | null;
+    is_active: boolean | null;
+  }> | null;
+};
+
+/**
+ * Kartu layanan platform di beranda. Isinya data nyata saja: kategori, daftar
+ * paket (nama, durasi, harga), rentang harga, dan estimasi. Varian `featured`
+ * dipakai untuk item pertama: media di kiri, paket di kanan.
+ */
+export function PlatformServiceCard({
+  item,
+  featured = false,
+}: {
+  item: PlatformServiceItem;
+  featured?: boolean;
+}) {
+  const packages = (item.service_packages ?? [])
+    .filter(
+      (p) => p.is_active !== false && Number.isFinite(Number(p.price)) && Number(p.price) >= 0,
+    )
+    .sort((a, b) => Number(a.price) - Number(b.price));
+  const min = packages[0] ? Number(packages[0].price) : null;
+  const max = packages.length ? Number(packages[packages.length - 1].price) : null;
+  const days = packages.map((p) => p.estimated_days).filter((d): d is number => !!d && d > 0);
+  const minDays = days.length ? Math.min(...days) : null;
+  const maxDays = days.length ? Math.max(...days) : null;
+  const thumbnail = isRenderableImageUrl(item.thumbnail_url ?? null) ? item.thumbnail_url : null;
+  const categoryName = item.category?.name?.replace(/\s+/g, " ").trim() || null;
+  const shown = packages.slice(0, featured ? 4 : 3);
+
+  return (
+    <article
+      className={cn(
+        "group relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card",
+        "transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-card",
+        "focus-within:border-accent/50 motion-reduce:transition-colors motion-reduce:hover:translate-y-0",
+        featured && "md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]",
+      )}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden border-b border-border bg-surface-selected",
+          featured ? "aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r" : "aspect-[16/10]",
+        )}
+      >
+        {thumbnail ? (
+          <img
+            src={thumbnail}
+            alt=""
+            width={640}
+            height={400}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          />
+        ) : (
+          <span className="flex size-full min-h-40 items-center justify-center">
+            <span className="font-display text-5xl font-bold text-muted-foreground/30">
+              {(item.name.trim()[0] ?? "?").toUpperCase()}
+            </span>
+          </span>
+        )}
+        {categoryName ? (
+          <span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-sm">
+            {categoryName}
+          </span>
+        ) : null}
+      </div>
+
+      <div className={cn("flex min-w-0 flex-1 flex-col", featured ? "p-4 sm:p-6" : "p-4")}>
+        <h3
+          className={cn(
+            "line-clamp-2 break-words font-semibold leading-snug",
+            featured ? "text-lg sm:text-xl" : "text-base",
+          )}
+        >
+          <Link
+            to="/layanan/$slug"
+            params={{ slug: item.slug }}
+            className="rounded-sm after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {item.name}
+          </Link>
+        </h3>
+        {item.short_description ? (
+          <p
+            className={cn(
+              "mt-1.5 break-words text-sm leading-relaxed text-muted-foreground",
+              featured ? "line-clamp-3" : "line-clamp-2",
+            )}
+          >
+            {item.short_description}
+          </p>
+        ) : null}
+
+        {shown.length ? (
+          <ul
+            aria-label="Paket tersedia"
+            className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface text-sm"
+          >
+            {shown.map((p) => (
+              <li key={p.id} className="flex min-w-0 items-center gap-3 px-3 py-2">
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{p.name || "Paket"}</span>
+                  <span className="mt-0.5 flex flex-wrap gap-x-2.5 text-xs text-muted-foreground">
+                    {p.estimated_days ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Timer className="size-3 shrink-0" aria-hidden="true" />
+                        {p.estimated_days} hari
+                      </span>
+                    ) : null}
+                    {p.free_revisions != null ? (
+                      <span className="inline-flex items-center gap-1">
+                        <RefreshCcw className="size-3 shrink-0" aria-hidden="true" />
+                        {p.free_revisions} revisi
+                      </span>
+                    ) : null}
+                  </span>
+                </span>
+                <span className="shrink-0 font-semibold tabular-nums">
+                  {idr.format(Number(p.price))}
+                </span>
+              </li>
+            ))}
+            {packages.length > shown.length ? (
+              <li className="px-3 py-2 text-xs text-muted-foreground">
+                +{packages.length - shown.length} paket lainnya
+              </li>
+            ) : null}
+          </ul>
+        ) : null}
+
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-4">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">
+              {min === null
+                ? "Paket belum tersedia"
+                : packages.length > 1 && min !== max
+                  ? "Mulai dari"
+                  : "Harga paket"}
+              {minDays ? (
+                <span>
+                  {" "}
+                  · {minDays === maxDays ? `${minDays} hari` : `${minDays}–${maxDays} hari`}
+                </span>
+              ) : null}
+            </p>
+            <p className="font-bold tabular-nums text-price text-xl">
+              {min === null ? "Lihat paket" : idr.format(min)}
+            </p>
+          </div>
+          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors group-hover:bg-primary/90">
+            Pilih paket
+            <ArrowRight
+              className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
+              aria-hidden="true"
+            />
           </span>
         </div>
       </div>

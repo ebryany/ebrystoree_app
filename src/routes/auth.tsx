@@ -29,14 +29,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { listRecentReviews } from "@/lib/reviews.functions";
-import { cn } from "@/lib/utils";
+import { cn, safeInternalPath } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { next?: string; mode?: "masuk" | "daftar" } => {
-    const next = typeof s["next"] === "string" ? s["next"] : "";
+    const next = safeInternalPath(s["next"]);
     const mode = s["mode"] === "daftar" ? "daftar" : undefined;
     return {
-      ...(next.startsWith("/") && !next.startsWith("//") ? { next } : {}),
+      ...(next ? { next } : {}),
       ...(mode ? { mode } : {}),
     };
   },

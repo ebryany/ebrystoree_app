@@ -60,6 +60,11 @@ const supabaseConnectSources = supabaseOrigin
   ? `${supabaseOrigin} ${supabaseOrigin.replace(/^https:/, "wss:")}`
   : "";
 
+// Preview Lovable memuat situs di iframe *.lovable.app; di produksi siapa pun bisa
+// membuat situs *.lovable.app, jadi framing hanya diizinkan dari origin sendiri.
+const isProduction = process.env.NODE_ENV === "production";
+const frameAncestors = isProduction ? "'self'" : "'self' https://*.lovable.app";
+
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
@@ -68,7 +73,7 @@ const CSP = [
   "img-src 'self' data: blob: https:",
   `connect-src 'self' ${supabaseConnectSources} https://*.lovable.app`.replace(/\s+/g, " ").trim(),
   "frame-src 'self' https://*.sumopod.com https://*.pymnt.app https://checkout.pymnt.app",
-  "frame-ancestors 'self' https://*.lovable.app",
+  `frame-ancestors ${frameAncestors}`,
   "base-uri 'self'",
   "form-action 'self'",
   "object-src 'none'",
@@ -77,18 +82,21 @@ const CSP = [
 
 function applySecurityHeaders(response: Response): Response {
   const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.includes("text/html")) return response;
+  const isHtml = contentType.includes("text/html");
   const headers = new Headers(response.headers);
-  headers.set("Content-Security-Policy", CSP);
-  headers.set("X-Frame-Options", "SAMEORIGIN");
+  // Berlaku untuk semua respons (HTML, JSON server function, API, gambar).
   headers.set("X-Content-Type-Options", "nosniff");
-  headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), interest-cohort=()",
-  );
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // HSTS diabaikan browser pada koneksi non-TLS, jadi aman dikirim juga di dev lokal.
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  if (isHtml) {
+    headers.set("Content-Security-Policy", CSP);
+    headers.set("X-Frame-Options", "SAMEORIGIN");
+    headers.set(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), interest-cohort=()",
+    );
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

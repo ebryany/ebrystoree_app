@@ -7,6 +7,7 @@ import {
   type CategoryIconKey,
   type CategoryTone,
 } from "@/lib/category-icons";
+import { sanitizeSearchTerm } from "@/lib/utils";
 
 const authz = () => import("./authz.server");
 
@@ -181,11 +182,17 @@ export const listCategories = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) =>
     guard(context as Ctx, "products.view", async () => {
-      const { data } = await context.supabase
-        .from("categories")
-        .select("id, name, slug, kind, is_active, icon, tone")
-        .is("deleted_at", null)
-        .order("sort_order");
+      const query = (columns: string) =>
+        (context.supabase as any)
+          .from("categories")
+          .select(columns)
+          .is("deleted_at", null)
+          .order("sort_order");
+      let { data, error } = await query("id, name, slug, kind, is_active, icon, tone, image_url");
+      // Sebelum migrasi image_url diterapkan, daftar tetap bisa dimuat.
+      if (error && /image_url/.test(error.message)) {
+        ({ data } = await query("id, name, slug, kind, is_active, icon, tone"));
+      }
       return { forbidden: false as const, items: data ?? [] };
     }),
   );
@@ -203,6 +210,14 @@ const categoryInput = z.object({
     .enum(CATEGORY_TONE_KEYS as [CategoryTone, ...CategoryTone[]])
     .nullable()
     .optional(),
+  /** Gambar ikon hasil unggah admin; hanya path bucket kategori yang diterima. */
+  imageUrl: z
+    .string()
+    .trim()
+    .max(300)
+    .regex(/^\/api\/public\/catalog-image\/categories\/[A-Za-z0-9._-]+$/, "Gambar tidak valid.")
+    .nullable()
+    .optional(),
 });
 
 export const saveCategory = createServerFn({ method: "POST" })
@@ -217,7 +232,15 @@ export const saveCategory = createServerFn({ method: "POST" })
         is_active: data.isActive,
         ...(data.icon !== undefined ? { icon: data.icon } : {}),
         ...(data.tone !== undefined ? { tone: data.tone } : {}),
+        ...(data.imageUrl !== undefined ? { image_url: data.imageUrl } : {}),
       };
+      const failure = (message: string) => ({
+        forbidden: false as const,
+        ok: false,
+        message: /image_url/.test(message)
+          ? "Gambar kategori belum aktif di database. Hubungi admin teknis."
+          : message,
+      });
 
       if (data.id) {
         const { data: before } = await context.supabase
@@ -231,7 +254,7 @@ export const saveCategory = createServerFn({ method: "POST" })
           .eq("id", data.id)
           .select()
           .maybeSingle();
-        if (error) return { forbidden: false as const, ok: false, message: error.message };
+        if (error) return failure(error.message);
         await helpers.writeAudit(context as Ctx, {
           action: "category.update",
           entityType: "categories",
@@ -247,7 +270,7 @@ export const saveCategory = createServerFn({ method: "POST" })
         .insert(payload)
         .select()
         .maybeSingle();
-      if (error) return { forbidden: false as const, ok: false, message: error.message };
+      if (error) return failure(error.message);
       await helpers.writeAudit(context as Ctx, {
         action: "category.create",
         entityType: "categories",
@@ -472,28 +495,49 @@ export const deleteProduct = createServerFn({ method: "POST" })
 /* Layanan akademik                                                     */
 /* ------------------------------------------------------------------ */
 
+const SERVICE_SORTS = {
+  updated_desc: { column: "updated_at", ascending: false },
+  created_desc: { column: "created_at", ascending: false },
+  name_asc: { column: "name", ascending: true },
+  name_desc: { column: "name", ascending: false },
+} as const;
+
+const adminServiceListQuery = listQuery.extend({
+  categoryId: z.string().uuid().nullable().optional().default(null),
+  sort: z
+    .enum(Object.keys(SERVICE_SORTS) as [keyof typeof SERVICE_SORTS])
+    .optional()
+    .default("updated_desc"),
+});
+
 export const listAdminServices = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => listQuery.parse(d ?? {}))
+  .validator((d: unknown) => adminServiceListQuery.parse(d ?? {}))
   .handler(async ({ context, data }) =>
     guard(context as Ctx, "services.view", async () => {
       const from = (data.page - 1) * data.pageSize;
       let q = context.supabase
         .from("services")
         .select(
-          "id, name, slug, status, order_capacity, updated_at, category_id, short_description, description, thumbnail_url, requirements_note, service_packages(id, name, price, estimated_days, is_active)",
+          "id, name, slug, status, order_capacity, created_at, updated_at, category_id, short_description, description, thumbnail_url, requirements_note, category:categories!services_category_id_fkey(id, name), service_packages(id, name, price, estimated_days, is_active)",
           { count: "exact" },
         )
         .is("deleted_at", null);
 
-      if (data.search) q = q.ilike("name", `%${data.search}%`);
+      const term = sanitizeSearchTerm(data.search ?? "");
+      if (term) q = q.ilike("name", `%${term}%`);
       if (data.status !== "all") q = q.eq("status", data.status);
+      if (data.categoryId) q = q.eq("category_id", data.categoryId);
 
+      const sort = SERVICE_SORTS[data.sort];
       const {
         data: items,
         count,
         error,
-      } = await q.order("updated_at", { ascending: false }).range(from, from + data.pageSize - 1);
+      } = await q
+        .order(sort.column, { ascending: sort.ascending })
+        .order("id", { ascending: true })
+        .range(from, from + data.pageSize - 1);
 
       if (error)
         return {
@@ -503,6 +547,39 @@ export const listAdminServices = createServerFn({ method: "POST" })
           error: "Data layanan tidak dapat dimuat.",
         };
       return { forbidden: false as const, items: items ?? [], total: count ?? 0, error: null };
+    }),
+  );
+
+/** Angka ringkasan dari database; null bila hitungan gagal (jangan ditebak). */
+export const getAdminServiceStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    guard(context as Ctx, "services.view", async () => {
+      const sb = (context as Ctx).supabase;
+      const count = (status?: string) => {
+        let q = sb.from("services").select("id", { count: "exact", head: true });
+        q = q.is("deleted_at", null);
+        return status ? q.eq("status", status) : q;
+      };
+      const [total, published, draft, archived, moderation] = await Promise.all([
+        count(),
+        count("published"),
+        count("draft"),
+        count("archived"),
+        sb
+          .from("marketplace_services")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "in_review"),
+      ]);
+      const value = (r: { count: number | null; error: unknown }) => (r.error ? null : r.count);
+      return {
+        forbidden: false as const,
+        total: value(total),
+        published: value(published),
+        draft: value(draft),
+        archived: value(archived),
+        pendingModeration: value(moderation),
+      };
     }),
   );
 
@@ -524,6 +601,16 @@ export const saveService = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const permission = data.id ? "services.update" : "services.create";
     return guard(context as Ctx, permission, async (helpers) => {
+      let academicCategoryId: string | null = null;
+      if (data.categoryId) {
+        const { data: cat } = await context.supabase
+          .from("categories")
+          .select("slug")
+          .eq("id", data.categoryId)
+          .maybeSingle();
+        const { isAcademicCategorySlug } = await import("./service-types");
+        if (isAcademicCategorySlug(cat?.slug)) academicCategoryId = data.categoryId;
+      }
       const payload = {
         name: data.name,
         slug: helpers.slugify(data.name),
@@ -534,7 +621,7 @@ export const saveService = createServerFn({ method: "POST" })
         requirements_note: data.requirementsNote || null,
         order_capacity: data.orderCapacity ?? null,
         status: data.status,
-        academic_category_id: data.categoryId ?? null,
+        academic_category_id: academicCategoryId,
       };
 
       if (data.id) {
@@ -596,7 +683,12 @@ export const setServiceStatus = createServerFn({ method: "POST" })
         .eq("id", data.id);
       if (error) return { forbidden: false as const, ok: false, message: error.message };
       await helpers.writeAudit(context as Ctx, {
-        action: data.status === "published" ? "service.publish" : "service.unpublish",
+        action:
+          data.status === "published"
+            ? "service.publish"
+            : data.status === "archived"
+              ? "service.archive"
+              : "service.unpublish",
         entityType: "services",
         entityId: data.id,
         before,
@@ -837,10 +929,8 @@ export const listAdminUsers = createServerFn({ method: "POST" })
         .from("profiles")
         .select("id, full_name, email, phone, created_at", { count: "exact" });
 
-      if (data.search) {
-        const s = data.search.toLowerCase();
-        q = q.or(`email.ilike.%${s}%,full_name.ilike.%${data.search}%`);
-      }
+      const s = sanitizeSearchTerm(data.search ?? "");
+      if (s) q = q.or(`email.ilike.%${s}%,full_name.ilike.%${s}%`);
 
       const {
         data: profiles,

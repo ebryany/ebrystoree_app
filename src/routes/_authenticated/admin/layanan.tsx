@@ -1,8 +1,20 @@
-import { cloneElement, isValidElement, useId, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { cloneElement, isValidElement, useEffect, useId, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { FolderTree, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Archive,
+  ExternalLink,
+  FolderTree,
+  ImageOff,
+  MoreHorizontal,
+  Package,
+  Pencil,
+  Plus,
+  Trash2,
+  Upload,
+  Undo2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -12,6 +24,9 @@ import {
   EmptyRow,
   ForbiddenState,
   Pager,
+  SearchField,
+  StatStrip,
+  StatusTabs,
   useCan,
 } from "@/components/admin/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -53,7 +68,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   deleteService,
+  getAdminServiceStats,
   listAdminServices,
   listCategories,
   saveService,
@@ -62,17 +85,19 @@ import {
 import { ServiceOptionsDialog } from "@/components/admin/service-options-dialog";
 import { CategoryManagerDialog } from "@/components/admin/category-manager-dialog";
 import { formatRupiah } from "@/lib/format";
+import { isRenderableImageUrl } from "@/lib/utils";
+import { summarizeServicePackages } from "@/lib/admin-service-list";
+import { isAcademicCategorySlug } from "@/lib/service-types";
 
 export const Route = createFileRoute("/_authenticated/admin/layanan")({
   head: () => ({
     meta: [
-      { title: "Kelola Layanan Akademik — Admin Ebrystore" },
+      { title: "Manajemen Layanan — Admin Ebrystore" },
       {
         name: "description",
-        content: "CRUD layanan akademik Ebrystore: buat, ubah, terbitkan, dan arsipkan layanan.",
+        content: "Kelola layanan, kategori, harga, publikasi, dan pesanan jasa Ebrystore.",
       },
-      { property: "og:title", content: "Kelola Layanan Akademik — Admin Ebrystore" },
-      { property: "og:description", content: "Manajemen katalog layanan akademik Ebrystore." },
+      { property: "og:title", content: "Manajemen Layanan — Admin Ebrystore" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -81,6 +106,23 @@ export const Route = createFileRoute("/_authenticated/admin/layanan")({
 });
 
 const PAGE_SIZE = 10;
+
+type ServiceStatus = "draft" | "published" | "archived";
+type StatusFilter = "all" | ServiceStatus;
+type SortKey = "updated_desc" | "created_desc" | "name_asc" | "name_desc";
+
+const STATUS_LABEL: Record<ServiceStatus, string> = {
+  draft: "Draft",
+  published: "Aktif",
+  archived: "Tidak aktif",
+};
+
+const SORT_LABEL: Record<SortKey, string> = {
+  updated_desc: "Terakhir diubah",
+  created_desc: "Terbaru dibuat",
+  name_asc: "Nama A–Z",
+  name_desc: "Nama Z–A",
+};
 
 type FormState = {
   id?: string;
@@ -91,7 +133,7 @@ type FormState = {
   thumbnailUrl: string;
   requirementsNote: string;
   orderCapacity: string;
-  status: "draft" | "published" | "archived";
+  status: ServiceStatus;
 };
 
 const emptyForm: FormState = {
@@ -105,29 +147,65 @@ const emptyForm: FormState = {
   status: "draft",
 };
 
+const dateFmt = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+function useDebounced<T>(value: T, ms: number) {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return v;
+}
+
 function AdminLayanan() {
   const qc = useQueryClient();
   const canCreate = useCan("services.create");
   const canUpdate = useCan("services.update");
   const canDelete = useCan("services.delete");
 
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<"all" | "draft" | "published" | "archived">("all");
+  const [searchInput, setSearchInput] = useState("");
+  const search = useDebounced(searchInput.trim().slice(0, 120), 300);
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [categoryId, setCategoryId] = useState<string>("all");
+  const [sort, setSort] = useState<SortKey>("updated_desc");
   const [page, setPage] = useState(1);
   const [form, setForm] = useState<FormState | null>(null);
   const [optionsTarget, setOptionsTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
+  useEffect(() => setPage(1), [search, status, categoryId, sort]);
+
   const fetchItems = useServerFn(listAdminServices);
+  const fetchStats = useServerFn(getAdminServiceStats);
   const fetchCategories = useServerFn(listCategories);
   const save = useServerFn(saveService);
   const publish = useServerFn(setServiceStatus);
   const remove = useServerFn(deleteService);
 
-  const { data, isPending, error } = useQuery({
-    queryKey: ["admin-services", search, status, page],
-    queryFn: () => fetchItems({ data: { search, status, page, pageSize: PAGE_SIZE } }),
+  const { data, isPending, error, isFetching } = useQuery({
+    queryKey: ["admin-services", search, status, categoryId, sort, page],
+    queryFn: () =>
+      fetchItems({
+        data: {
+          search,
+          status,
+          categoryId: categoryId === "all" ? null : categoryId,
+          sort,
+          page,
+          pageSize: PAGE_SIZE,
+        },
+      }),
+    placeholderData: keepPreviousData,
+  });
+  const stats = useQuery({
+    queryKey: ["admin-services", "stats"],
+    queryFn: () => fetchStats(),
   });
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -140,38 +218,30 @@ function AdminLayanan() {
     void qc.invalidateQueries({ queryKey: ["admin-audit"] });
   };
 
+  const handleResult = (res: any, after?: () => void) => {
+    if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+    if (!res?.ok) return toast.error(res?.message ?? "Aksi gagal.");
+    toast.success(res.message);
+    after?.();
+    invalidate();
+  };
+
   const saveMutation = useMutation({
     mutationFn: (payload: any) => save({ data: payload }),
-    onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
-      if (!res.ok) return toast.error(res.message);
-      toast.success(res.message);
-      setForm(null);
-      invalidate();
-    },
+    onSuccess: (res: any) => handleResult(res, () => setForm(null)),
     onError: (e: any) => toast.error(e?.message ?? "Gagal menyimpan layanan."),
   });
 
   const statusMutation = useMutation({
-    mutationFn: (payload: { id: string; status: "draft" | "published" | "archived" }) =>
-      publish({ data: payload }),
-    onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
-      if (!res.ok) return toast.error(res.message);
-      toast.success(res.message);
-      invalidate();
-    },
+    mutationFn: (payload: { id: string; status: ServiceStatus }) => publish({ data: payload }),
+    onSuccess: (res: any) => handleResult(res),
+    onError: () => toast.error("Status layanan gagal diubah."),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
-    onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
-      if (!res.ok) return toast.error(res.message);
-      toast.success(res.message);
-      setDeleteTarget(null);
-      invalidate();
-    },
+    onSuccess: (res: any) => handleResult(res, () => setDeleteTarget(null)),
+    onError: () => toast.error("Layanan gagal dihapus."),
   });
 
   const submit = () => {
@@ -190,181 +260,219 @@ function AdminLayanan() {
     });
   };
 
-  const serviceCategories = (
+  const serviceCategories: { id: string; name: string; slug?: string }[] = (
     categories && !("forbidden" in categories && categories.forbidden)
       ? (categories as any).items
       : []
   ).filter((c: any) => c.kind === "service");
 
+  const openEdit = (s: any) =>
+    setForm({
+      id: s.id,
+      name: s.name,
+      categoryId: s.category_id ?? "none",
+      shortDescription: s.short_description ?? "",
+      description: s.description ?? "",
+      thumbnailUrl: s.thumbnail_url ?? "",
+      requirementsNote: s.requirements_note ?? "",
+      orderCapacity: s.order_capacity != null ? String(s.order_capacity) : "",
+      status: s.status,
+    });
+
+  const statsData =
+    stats.data && !("forbidden" in stats.data && stats.data.forbidden) ? (stats.data as any) : null;
+  const statValue = (v: number | null | undefined) =>
+    stats.isPending ? "…" : v == null ? "—" : v.toLocaleString("id-ID");
+
+  const actions: RowActions = {
+    canUpdate,
+    canDelete,
+    busy: statusMutation.isPending,
+    onEdit: openEdit,
+    onPackages: (s) => setOptionsTarget({ id: s.id, name: s.name }),
+    onStatus: (s, next) => statusMutation.mutate({ id: s.id, status: next }),
+    onDelete: (s) => setDeleteTarget({ id: s.id, name: s.name }),
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5">
       <AdminPageHeader
-        crumb="Layanan Akademik"
-        title="Layanan akademik"
-        description="Kelola layanan akademik beserta paket harga dan add-on."
+        crumb="Layanan"
+        title="Manajemen Layanan"
+        description="Kelola layanan, kategori, harga, publikasi, dan pesanan jasa Ebrystore."
         actions={
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" onClick={() => setCategoryOpen(true)}>
-              <FolderTree className="mr-1 size-4" aria-hidden="true" />
-              Kategori jasa
+          canCreate ? (
+            <Button className="min-h-11" onClick={() => setForm(emptyForm)}>
+              <Plus className="mr-1 size-4" aria-hidden="true" />
+              Tambah Layanan
             </Button>
-            {canCreate ? (
-              <Button size="sm" onClick={() => setForm(emptyForm)}>
-                <Plus className="mr-1 size-4" aria-hidden="true" />
-                Layanan baru
-              </Button>
-            ) : null}
-          </div>
+          ) : null
         }
       />
+
+      {stats.error || (stats.data as any)?.forbidden ? null : (
+        <StatStrip
+          items={[
+            { label: "Total layanan", value: statValue(statsData?.total) },
+            { label: "Aktif", value: statValue(statsData?.published), tone: "success" },
+            { label: "Draft", value: statValue(statsData?.draft) },
+            {
+              label: "Menunggu moderasi",
+              value: statValue(statsData?.pendingModeration),
+              tone: statsData?.pendingModeration ? "warning" : "neutral",
+              hint: "Jasa seller",
+            },
+            { label: "Tidak aktif", value: statValue(statsData?.archived) },
+          ]}
+        />
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" className="min-h-11" onClick={() => setCategoryOpen(true)}>
+          <FolderTree className="mr-1 size-4" aria-hidden="true" />
+          Kelola kategori
+        </Button>
+        <Button asChild variant="outline" className="min-h-11">
+          <Link to="/admin/seller/jasa">Moderasi jasa seller</Link>
+        </Button>
+        <Button asChild variant="outline" className="min-h-11">
+          <Link to="/admin/pengerjaan">Pesanan jasa</Link>
+        </Button>
+      </div>
       <CategoryManagerDialog kind="service" open={categoryOpen} onOpenChange={setCategoryOpen} />
 
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
-        <Input
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value.slice(0, 120));
-          }}
-          placeholder="Cari nama layanan…"
-          aria-label="Cari layanan"
-        />
-        <Select
+      <section aria-label="Daftar layanan" className="space-y-3">
+        <StatusTabs
+          label="Filter status"
           value={status}
-          onValueChange={(v) => {
-            setPage(1);
-            setStatus(v as typeof status);
-          }}
-        >
-          <SelectTrigger aria-label="Filter status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Terbit</SelectItem>
-            <SelectItem value="archived">Arsip</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          onChange={(v) => setStatus(v as StatusFilter)}
+          options={[
+            { value: "all", label: "Semua" },
+            { value: "published", label: "Aktif" },
+            { value: "draft", label: "Draft" },
+            { value: "archived", label: "Tidak aktif" },
+          ]}
+        />
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_200px_180px]">
+          <SearchField
+            id="admin-service-search"
+            label="Cari layanan"
+            placeholder="Cari nama layanan…"
+            value={searchInput}
+            onChange={setSearchInput}
+          />
+          <Select value={categoryId} onValueChange={setCategoryId}>
+            <SelectTrigger className="min-h-11 bg-card" aria-label="Filter kategori">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua kategori</SelectItem>
+              {serviceCategories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+            <SelectTrigger className="min-h-11 bg-card" aria-label="Urutkan">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(SORT_LABEL) as SortKey[]).map((k) => (
+                <SelectItem key={k} value={k}>
+                  {SORT_LABEL[k]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {isPending ? (
-        <AdminLoading />
-      ) : error ? (
-        <AdminError />
-      ) : data.forbidden ? (
-        <ForbiddenState permission={data.permission} />
-      ) : data.error ? (
-        <AdminError message={data.error} />
-      ) : data.items.length === 0 ? (
-        <EmptyRow message="Belum ada layanan yang cocok dengan filter ini." />
-      ) : (
-        <>
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Paket</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.items.map((s: any) => {
-                  const packages = s.service_packages ?? [];
-                  const cheapest = packages.length
-                    ? Math.min(...packages.map((p: any) => Number(p.price)))
-                    : null;
-                  return (
-                    <TableRow key={s.id}>
-                      <TableCell className="max-w-64">
-                        <p className="truncate font-medium">{s.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">{s.slug}</p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={s.status === "published" ? "default" : "secondary"}>
-                          {s.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {packages.length} paket
-                        {cheapest !== null ? (
-                          <span className="block text-xs">mulai {formatRupiah(cheapest)}</span>
-                        ) : null}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setOptionsTarget({ id: s.id, name: s.name })}
-                          >
-                            Paket
-                          </Button>
-                          {canUpdate ? (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  statusMutation.mutate({
-                                    id: s.id,
-                                    status: s.status === "published" ? "draft" : "published",
-                                  })
-                                }
-                              >
-                                {s.status === "published" ? "Unpublish" : "Publish"}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={`Ubah ${s.name}`}
-                                onClick={() =>
-                                  setForm({
-                                    id: s.id,
-                                    name: s.name,
-                                    categoryId: s.category_id ?? "none",
-                                    shortDescription: s.short_description ?? "",
-                                    description: s.description ?? "",
-                                    thumbnailUrl: s.thumbnail_url ?? "",
-                                    requirementsNote: s.requirements_note ?? "",
-                                    orderCapacity:
-                                      s.order_capacity != null ? String(s.order_capacity) : "",
-                                    status: s.status,
-                                  })
-                                }
-                              >
-                                <Pencil className="size-4" aria-hidden="true" />
-                              </Button>
-                            </>
-                          ) : null}
-                          {canDelete ? (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Hapus ${s.name}`}
-                              onClick={() => setDeleteTarget({ id: s.id, name: s.name })}
-                            >
-                              <Trash2 className="size-4 text-destructive" aria-hidden="true" />
-                            </Button>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+        {isPending ? (
+          <AdminLoading label="Memuat layanan…" />
+        ) : error ? (
+          <AdminError message="Daftar layanan tidak dapat dimuat. Muat ulang halaman." />
+        ) : data.forbidden ? (
+          <ForbiddenState permission={data.permission} />
+        ) : data.error ? (
+          <AdminError message={data.error} />
+        ) : data.items.length === 0 ? (
+          <EmptyRow
+            message={
+              search || status !== "all" || categoryId !== "all"
+                ? "Tidak ada layanan yang cocok dengan filter ini."
+                : "Belum ada layanan. Tambahkan layanan pertama."
+            }
+          />
+        ) : (
+          <div className={isFetching ? "opacity-70 transition-opacity" : undefined}>
+            <ul className="space-y-2 md:hidden">
+              {data.items.map((s: any) => (
+                <li key={s.id}>
+                  <ServiceCard service={s} actions={actions} />
+                </li>
+              ))}
+            </ul>
+            <div className="hidden overflow-x-auto rounded-xl border border-border bg-card md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Layanan</TableHead>
+                    <TableHead>Kategori</TableHead>
+                    <TableHead>Harga</TableHead>
+                    <TableHead>Estimasi</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Diubah</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.items.map((s: any) => {
+                    const sum = summarizeServicePackages(s.service_packages);
+                    return (
+                      <TableRow key={s.id}>
+                        <TableCell className="max-w-72">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <Thumb url={s.thumbnail_url} />
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">{s.name}</p>
+                              <p className="truncate text-xs text-muted-foreground">
+                                {sum.activeCount} paket aktif
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">{s.category?.name ?? "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap text-sm">
+                          <PriceText sum={sum} />
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                          <EstimateText sum={sum} />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={s.status} />
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                          {dateFmt.format(new Date(s.updated_at))}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <RowMenu service={s} actions={actions} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+            <Pager page={page} pageSize={PAGE_SIZE} total={data.total} onChange={setPage} />
           </div>
-          <Pager page={page} pageSize={PAGE_SIZE} total={data.total} onChange={setPage} />
-        </>
-      )}
+        )}
+      </section>
 
       <Dialog open={form !== null} onOpenChange={(o) => !o && setForm(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{form?.id ? "Ubah layanan" : "Layanan baru"}</DialogTitle>
+            <DialogTitle>{form?.id ? "Ubah layanan" : "Tambah layanan"}</DialogTitle>
           </DialogHeader>
           {form ? (
             <div className="space-y-4">
@@ -385,13 +493,20 @@ function AdminLayanan() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Tanpa kategori</SelectItem>
-                    {serviceCategories.map((c: any) => (
+                    {serviceCategories.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  {isAcademicCategorySlug(
+                    serviceCategories.find((c) => c.id === form.categoryId)?.slug,
+                  )
+                    ? "Formulir pemesanan: Akademik (data tugas, tenggat kampus, pernyataan integritas)."
+                    : "Formulir pemesanan: Jasa umum (brief proyek, referensi, lampiran)."}
+                </p>
               </Field>
               <Field label="Deskripsi singkat">
                 <Input
@@ -432,29 +547,32 @@ function AdminLayanan() {
                     }
                   />
                 </Field>
+                <Field label="Status">
+                  <Select
+                    value={form.status}
+                    onValueChange={(v) => setForm({ ...form, status: v as ServiceStatus })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Aktif</SelectItem>
+                      <SelectItem value="archived">Tidak aktif</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
               </div>
-              <Field label="Status">
-                <Select
-                  value={form.status}
-                  onValueChange={(v) => setForm({ ...form, status: v as FormState["status"] })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Terbit</SelectItem>
-                    <SelectItem value="archived">Arsip</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
+              <p className="text-xs text-muted-foreground">
+                Harga dan estimasi diatur per paket lewat menu “Paket & harga”.
+              </p>
             </div>
           ) : null}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setForm(null)}>
+            <Button variant="outline" className="min-h-11" onClick={() => setForm(null)}>
               Batal
             </Button>
-            <Button onClick={submit} disabled={saveMutation.isPending}>
+            <Button className="min-h-11" onClick={submit} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? "Menyimpan…" : "Simpan"}
             </Button>
           </DialogFooter>
@@ -464,7 +582,12 @@ function AdminLayanan() {
       <ServiceOptionsDialog
         service={optionsTarget}
         canWrite={canUpdate}
-        onOpenChange={(o) => !o && setOptionsTarget(null)}
+        onOpenChange={(o) => {
+          if (!o) {
+            setOptionsTarget(null);
+            invalidate();
+          }
+        }}
       />
 
       <AlertDialog open={deleteTarget !== null} onOpenChange={(o) => !o && setDeleteTarget(null)}>
@@ -472,8 +595,8 @@ function AdminLayanan() {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus layanan?</AlertDialogTitle>
             <AlertDialogDescription>
-              Layanan “{deleteTarget?.name}” akan diarsipkan (soft delete). Tindakan ini tercatat di
-              audit log.
+              Layanan “{deleteTarget?.name}” disembunyikan dari katalog dan admin (soft delete).
+              Pesanan lama tetap tersimpan. Tindakan ini tercatat di audit log.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -487,6 +610,172 @@ function AdminLayanan() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+type Summary = ReturnType<typeof summarizeServicePackages>;
+
+type RowActions = {
+  canUpdate: boolean;
+  canDelete: boolean;
+  busy: boolean;
+  onEdit: (s: any) => void;
+  onPackages: (s: any) => void;
+  onStatus: (s: any, next: ServiceStatus) => void;
+  onDelete: (s: any) => void;
+};
+
+function StatusBadge({ status }: { status: ServiceStatus }) {
+  return (
+    <Badge variant={status === "published" ? "default" : "secondary"} className="whitespace-nowrap">
+      {STATUS_LABEL[status] ?? status}
+    </Badge>
+  );
+}
+
+function PriceText({ sum }: { sum: Summary }) {
+  if (sum.minPrice === null) return <span className="text-muted-foreground">Belum ada paket</span>;
+  if (sum.minPrice === sum.maxPrice) return <span>{formatRupiah(sum.minPrice)}</span>;
+  return <span>Mulai {formatRupiah(sum.minPrice)}</span>;
+}
+
+function EstimateText({ sum }: { sum: Summary }) {
+  if (sum.minDays === null) return <>—</>;
+  if (sum.minDays === sum.maxDays) return <>{sum.minDays} hari</>;
+  return (
+    <>
+      {sum.minDays}–{sum.maxDays} hari
+    </>
+  );
+}
+
+function Thumb({ url }: { url: string | null }) {
+  return isRenderableImageUrl(url) ? (
+    <img
+      src={url}
+      alt=""
+      loading="lazy"
+      className="size-11 shrink-0 rounded-lg border border-border object-cover"
+    />
+  ) : (
+    <span className="grid size-11 shrink-0 place-items-center rounded-lg border border-border bg-muted text-muted-foreground">
+      <ImageOff className="size-4" aria-hidden="true" />
+    </span>
+  );
+}
+
+function ServiceCard({ service: s, actions }: { service: any; actions: RowActions }) {
+  const sum = summarizeServicePackages(s.service_packages);
+  return (
+    <article className="flex min-w-0 gap-3 rounded-xl border border-border bg-card p-3">
+      <Thumb url={s.thumbnail_url} />
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="min-w-0 break-words text-sm font-semibold leading-snug">{s.name}</h3>
+          <RowMenu service={s} actions={actions} />
+        </div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          <StatusBadge status={s.status} />
+          <span className="truncate">{s.category?.name ?? "Tanpa kategori"}</span>
+        </div>
+        <p className="text-sm font-medium">
+          <PriceText sum={sum} />
+          {sum.minDays !== null ? (
+            <span className="font-normal text-muted-foreground">
+              {" "}
+              · <EstimateText sum={sum} />
+            </span>
+          ) : null}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {sum.activeCount} paket aktif · diubah {dateFmt.format(new Date(s.updated_at))}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function RowMenu({ service: s, actions }: { service: any; actions: RowActions }) {
+  const status = s.status as ServiceStatus;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 shrink-0"
+          aria-label={`Aksi untuk ${s.name}`}
+        >
+          <MoreHorizontal className="size-4" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        {actions.canUpdate ? (
+          <DropdownMenuItem className="min-h-11" onSelect={() => actions.onEdit(s)}>
+            <Pencil className="mr-2 size-4" aria-hidden="true" />
+            Ubah detail
+          </DropdownMenuItem>
+        ) : null}
+        <DropdownMenuItem className="min-h-11" onSelect={() => actions.onPackages(s)}>
+          <Package className="mr-2 size-4" aria-hidden="true" />
+          Paket & harga
+        </DropdownMenuItem>
+        {status === "published" ? (
+          <DropdownMenuItem asChild className="min-h-11">
+            <a href={`/layanan/${s.slug}`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 size-4" aria-hidden="true" />
+              Lihat halaman publik
+            </a>
+          </DropdownMenuItem>
+        ) : null}
+        {actions.canUpdate ? (
+          <>
+            <DropdownMenuSeparator />
+            {status !== "published" ? (
+              <DropdownMenuItem
+                className="min-h-11"
+                disabled={actions.busy}
+                onSelect={() => actions.onStatus(s, "published")}
+              >
+                <Upload className="mr-2 size-4" aria-hidden="true" />
+                Publikasikan
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                className="min-h-11"
+                disabled={actions.busy}
+                onSelect={() => actions.onStatus(s, "draft")}
+              >
+                <Undo2 className="mr-2 size-4" aria-hidden="true" />
+                Jadikan draft
+              </DropdownMenuItem>
+            )}
+            {status !== "archived" ? (
+              <DropdownMenuItem
+                className="min-h-11"
+                disabled={actions.busy}
+                onSelect={() => actions.onStatus(s, "archived")}
+              >
+                <Archive className="mr-2 size-4" aria-hidden="true" />
+                Nonaktifkan
+              </DropdownMenuItem>
+            ) : null}
+          </>
+        ) : null}
+        {actions.canDelete ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="min-h-11 text-destructive focus:text-destructive"
+              onSelect={() => actions.onDelete(s)}
+            >
+              <Trash2 className="mr-2 size-4" aria-hidden="true" />
+              Hapus
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

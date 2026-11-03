@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isHttpUrl } from "@/lib/utils";
 
 const authz = () => import("./authz.server");
 const tx = () => import("./transaction.server");
@@ -37,9 +38,13 @@ export const listOperators = createServerFn({ method: "GET" })
       .in("role", ["operator", "admin", "super_admin"]);
     const ids = Array.from(new Set((roles ?? []).map((r: any) => r.user_id)));
     if (!ids.length) return { forbidden: false as const, items: [] };
-    const { data: profiles } = await ctx.supabase.from("profiles").select("id, full_name, email").in("id", ids);
+    const { data: profiles } = await ctx.supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .in("id", ids);
     const roleMap = new Map<string, string[]>();
-    for (const r of roles ?? []) roleMap.set(r.user_id, [...(roleMap.get(r.user_id) ?? []), r.role]);
+    for (const r of roles ?? [])
+      roleMap.set(r.user_id, [...(roleMap.get(r.user_id) ?? []), r.role]);
     const items = (profiles ?? []).map((p: any) => ({
       id: p.id,
       name: p.full_name || p.email || p.id.slice(0, 8),
@@ -85,20 +90,24 @@ export const listMyAssignments = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await can(ctx, "orders.fulfill"))) return { forbidden: true as const, items: [] as any[] };
+    if (!(await can(ctx, "orders.fulfill")))
+      return { forbidden: true as const, items: [] as any[] };
     // Scope "all" hanya untuk staf yang boleh menugaskan operator.
     const seeAll = data.scope === "all" && (await can(ctx, "orders.assign"));
 
     let q = ctx.supabase
       .from("operator_assignments")
-      .select("id, order_id, operator_id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at")
+      .select(
+        "id, order_id, operator_id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at",
+      )
       .order("assigned_at", { ascending: false });
     if (!seeAll) q = q.eq("operator_id", ctx.userId);
     if (data.filter === "active") q = q.in("status", ["assigned", "accepted", "in_progress"]);
     if (data.filter === "done") q = q.in("status", ["completed", "released", "cancelled"]);
 
     const { data: rows, error } = await q;
-    if (error) return { forbidden: false as const, items: [], error: "Daftar tugas tidak dapat dimuat." };
+    if (error)
+      return { forbidden: false as const, items: [], error: "Daftar tugas tidak dapat dimuat." };
 
     const orderIds = (rows ?? []).map((r: any) => r.order_id);
     const { data: orders } = orderIds.length
@@ -108,12 +117,17 @@ export const listMyAssignments = createServerFn({ method: "GET" })
           .in("id", orderIds)
       : { data: [] as any[] };
     const { data: items } = orderIds.length
-      ? await ctx.supabase.from("order_items").select("order_id, name_snapshot, item_type").in("order_id", orderIds)
+      ? await ctx.supabase
+          .from("order_items")
+          .select("order_id, name_snapshot, item_type")
+          .in("order_id", orderIds)
       : { data: [] as any[] };
 
     const orderMap = new Map((orders ?? []).map((o: any) => [o.id, o]));
 
-    const operatorIds = Array.from(new Set((rows ?? []).map((r: any) => r.operator_id).filter(Boolean)));
+    const operatorIds = Array.from(
+      new Set((rows ?? []).map((r: any) => r.operator_id).filter(Boolean)),
+    );
     const { data: operatorProfiles } = operatorIds.length
       ? await ctx.supabase.from("profiles").select("id, full_name, email").in("id", operatorIds)
       : { data: [] as any[] };
@@ -133,7 +147,8 @@ export const listMyAssignments = createServerFn({ method: "GET" })
       : { data: [] as any[] };
 
     const percentMap = new Map<string, number>();
-    for (const p of progressRows ?? []) if (!percentMap.has(p.order_id)) percentMap.set(p.order_id, p.percent);
+    for (const p of progressRows ?? [])
+      if (!percentMap.has(p.order_id)) percentMap.set(p.order_id, p.percent);
     const revisionMap = new Map<string, number>();
     for (const r of revisionRows ?? []) {
       if (r.status === "open" || r.status === "in_progress")
@@ -150,7 +165,8 @@ export const listMyAssignments = createServerFn({ method: "GET" })
         percent: percentMap.get(a.order_id) ?? 0,
         openRevisions: revisionMap.get(a.order_id) ?? 0,
         serviceName:
-          (items ?? []).find((i: any) => i.order_id === a.order_id && i.item_type === "service")?.name_snapshot ?? null,
+          (items ?? []).find((i: any) => i.order_id === a.order_id && i.item_type === "service")
+            ?.name_snapshot ?? null,
       })),
       error: null,
     };
@@ -170,7 +186,9 @@ export const getOrderFulfillment = createServerFn({ method: "GET" })
         .maybeSingle(),
       sb
         .from("operator_assignments")
-        .select("id, operator_id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at, internal_note")
+        .select(
+          "id, operator_id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at, internal_note",
+        )
         .eq("order_id", data.orderId)
         .order("assigned_at", { ascending: false })
         .limit(1)
@@ -182,7 +200,9 @@ export const getOrderFulfillment = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false }),
       sb
         .from("job_results")
-        .select("id, version, summary, delivery_note, result_url, status, submitted_at, reviewed_at")
+        .select(
+          "id, version, summary, delivery_note, result_url, status, submitted_at, reviewed_at",
+        )
         .eq("order_id", data.orderId)
         .order("version", { ascending: false }),
       sb
@@ -192,7 +212,9 @@ export const getOrderFulfillment = createServerFn({ method: "GET" })
         .order("sequence", { ascending: false }),
       sb
         .from("service_order_details")
-        .select("package_snapshot, addons_snapshot, requirements, requirements_note, estimated_days, revision_allowance, internal_deadline")
+        .select(
+          "package_snapshot, addons_snapshot, requirements, requirements_note, estimated_days, revision_allowance, internal_deadline",
+        )
         .eq("order_id", data.orderId)
         .maybeSingle(),
     ]);
@@ -204,7 +226,7 @@ export const getOrderFulfillment = createServerFn({ method: "GET" })
         .select("full_name, email")
         .eq("id", assignment.data.operator_id)
         .maybeSingle();
-      operatorName = p ? (p.full_name || p.email) : null;
+      operatorName = p ? p.full_name || p.email : null;
     }
 
     return {
@@ -249,7 +271,14 @@ export const submitJobResult = createServerFn({ method: "POST" })
         orderId: z.string().uuid(),
         summary: z.string().trim().min(5).max(2000),
         deliveryNote: z.string().trim().max(2000).optional().nullable(),
-        resultUrl: z.string().trim().url().max(500).optional().or(z.literal("")).nullable(),
+        resultUrl: z
+          .string()
+          .trim()
+          .max(500)
+          .refine(isHttpUrl, "Tautan harus diawali http:// atau https://")
+          .optional()
+          .or(z.literal(""))
+          .nullable(),
       })
       .parse(data),
   )
@@ -310,9 +339,14 @@ export const listPendingAssignment = createServerFn({ method: "GET" })
         .in("status", ["assigned", "accepted", "in_progress"]),
       ctx.supabase
         .from("service_order_details")
-        .select("order_id, scope_review_status, scope_review_note, estimated_days, customer_deadline")
+        .select(
+          "order_id, scope_review_status, scope_review_note, estimated_days, customer_deadline",
+        )
         .in("order_id", ids),
-      ctx.supabase.from("order_items").select("order_id, name_snapshot, item_type").in("order_id", ids),
+      ctx.supabase
+        .from("order_items")
+        .select("order_id, name_snapshot, item_type")
+        .in("order_id", ids),
     ]);
 
     const busy = new Set((assigns ?? []).map((a: any) => a.order_id));
@@ -328,7 +362,8 @@ export const listPendingAssignment = createServerFn({ method: "GET" })
           scopeNote: detailMap.get(o.id)?.scope_review_note ?? null,
           customerDeadline: detailMap.get(o.id)?.customer_deadline ?? null,
           serviceName:
-            (items ?? []).find((i: any) => i.order_id === o.id && i.item_type === "service")?.name_snapshot ?? null,
+            (items ?? []).find((i: any) => i.order_id === o.id && i.item_type === "service")
+              ?.name_snapshot ?? null,
         })),
     };
   });

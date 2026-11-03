@@ -3,9 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpen,
+  Briefcase,
   ChevronRight,
   ClipboardList,
-  GraduationCap,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_META: Record<string, { description: string; icon: typeof Package }> = {
   "/produk": { description: "Produk digital dari berbagai toko", icon: Package },
-  "/layanan": { description: "Pendampingan akademik dari platform", icon: GraduationCap },
+  "/layanan": { description: "Jasa website, desain, IT, konten, dan akademik", icon: Briefcase },
   "/bantuan": { description: "Cara pesan, bayar, dan menerima produk", icon: HelpCircle },
   "/artikel": { description: "Panduan dari tim Ebrystore", icon: BookOpen },
 };

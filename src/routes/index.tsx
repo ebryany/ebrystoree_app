@@ -1,7 +1,7 @@
 import { Component, Suspense, type ReactNode } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { GraduationCap } from "lucide-react";
+import { Briefcase, FileText, ListChecks, MessagesSquare, Wallet } from "lucide-react";
 
 import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
@@ -9,7 +9,7 @@ import { HomeHero } from "@/components/home/hero";
 import { SellerJoinSection } from "@/components/home/home-hero";
 import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { ServiceTile } from "@/components/home/service-tile";
-import { MarketplaceServiceCard } from "@/components/home/catalog-cards";
+import { PlatformServiceCard, type PlatformServiceItem } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
 import { PRODUCT_GRID, SeeAllLink } from "@/components/ebry/product-shelf";
 import { FeaturedSellers } from "@/components/home/featured-sellers";
@@ -32,8 +32,8 @@ const shelvesQuery = queryOptions({
 });
 
 const servicesQuery = queryOptions({
-  queryKey: ["storefront-services", 3],
-  queryFn: () => listServices({ data: { pageSize: 3 } }),
+  queryKey: ["storefront-services", 4],
+  queryFn: () => listServices({ data: { pageSize: 4 } }),
 });
 
 const sellerServicesQuery = queryOptions({
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Cari produk digital, bandingkan harga, dan lihat toko di Ebrystore. Tersedia juga layanan pendampingan akademik dari platform.",
+          "Marketplace produk digital dan jasa: template, akun premium, jasa website, desain, IT, sampai akademik. Bandingkan harga dan toko, bayar lewat QRIS.",
       },
       {
         name: "keywords",
@@ -144,24 +144,30 @@ function Beranda() {
 
   return (
     <PageShell>
-      {/* Hero pita lebar penuh: diletakkan di luar wadah berlebar tetap supaya
-          latar gradiennya menyentuh tepi layar, bukan terkurung kotak. */}
       <HomeHero />
-      {/* Lebar konten sama dengan blok hero (max-w-7xl, 88rem di 2xl) dan ikut
-          di tengah, jadi tepi kiri-kanan semua section sejajar dengan hero. */}
-      <div className="w-full px-4 pb-16 pt-10 sm:px-6 sm:pt-12 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl space-y-12 sm:space-y-16 2xl:max-w-[88rem]">
+      {/* Urutan mengikuti cara orang belanja: kategori, lanjut yang terakhir
+          dilihat, katalog produk, lalu jasa, toko, ulasan, dan ajakan buka toko. */}
+      <div className="w-full px-4 pb-16 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-14 2xl:max-w-[88rem]">
           <SectionSuspense
             fallback={
-              <div className="h-32 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
+              <div className="h-32 animate-pulse rounded-xl bg-muted/60 motion-reduce:animate-none" />
             }
             queryKey={homeCategoriesQuery.queryKey}
           >
             <CategoryRail />
           </SectionSuspense>
+          <RecentlyViewedShelf />
           <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
             <ProductShelves />
           </SectionSuspense>
+        </div>
+      </div>
+
+      {/* Jasa di pita sendiri: alur jasa (brief, pengerjaan, serah terima)
+          berbeda dari produk instan, jadi dipisah secara visual. */}
+      <div className="w-full border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-12 2xl:max-w-[88rem]">
           <section aria-labelledby="jasa-heading">
             <SectionHeader
               id="jasa-heading"
@@ -176,14 +182,16 @@ function Beranda() {
               <SellerServicesSection />
             </SectionSuspense>
           </section>
+          {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
+          <PlatformServicesSection />
+        </div>
+      </div>
+
+      <div className="w-full px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:px-8">
+        <div className="defer-render mx-auto w-full max-w-7xl space-y-10 sm:space-y-14 2xl:max-w-[88rem]">
           <FeaturedSellers />
-          <RecentlyViewedShelf />
-          <div className="defer-render space-y-12 sm:space-y-16">
-            <ReviewMarqueeSection />
-            {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
-            <PlatformServicesSection />
-            <SellerJoinSection stores={proofStores} />
-          </div>
+          <ReviewMarqueeSection />
+          <SellerJoinSection stores={proofStores} />
         </div>
       </div>
     </PageShell>
@@ -255,22 +263,79 @@ function SellerServicesSection() {
 function PlatformServicesSection() {
   const query = useSuspenseQuery(servicesQuery);
   if (query.data.error || query.data.items.length === 0) return null;
+  const [first, ...rest] = query.data.items as PlatformServiceItem[];
   return (
     <section aria-labelledby="layanan-heading">
       <p className="mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <GraduationCap className="size-4" aria-hidden="true" /> Layanan dari platform
+        <Briefcase className="size-4" aria-hidden="true" /> Layanan dari platform
       </p>
       <SectionHeader
         id="layanan-heading"
-        title="Pendampingan akademik"
-        desc="Pilih paket, kirim kebutuhan, dan pantau progres pengerjaan."
+        title="Jasa dikerjakan tim Ebrystore"
+        desc="Website, desain, IT, konten, sampai tugas akademik. Pilih paket, kirim brief, pantau progres."
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {query.data.items.map((item) => (
-          <MarketplaceServiceCard key={item.id} item={item} />
+        <div className="min-w-0 sm:col-span-2">
+          <PlatformServiceCard item={first} featured />
+        </div>
+        <OrderFlowPanel />
+        {rest.map((item) => (
+          <PlatformServiceCard key={item.id} item={item} />
         ))}
       </div>
     </section>
+  );
+}
+
+const ORDER_FLOW = [
+  {
+    icon: ListChecks,
+    title: "Pilih paket",
+    desc: "Harga dan durasi tiap paket terlihat sejak awal.",
+  },
+  { icon: FileText, title: "Kirim brief", desc: "Tulis kebutuhan, lampirkan referensi atau aset." },
+  { icon: Wallet, title: "Bayar", desc: "Total dihitung sistem, lalu unggah bukti bayar." },
+  {
+    icon: MessagesSquare,
+    title: "Pantau & terima",
+    desc: "Progres, chat, dan hasil ada di dasbor pesanan.",
+  },
+] as const;
+
+function OrderFlowPanel() {
+  return (
+    <aside
+      aria-labelledby="alur-jasa-heading"
+      className="flex min-w-0 flex-col rounded-xl border border-border bg-card p-4 sm:col-span-2 lg:col-span-1"
+    >
+      <h3 id="alur-jasa-heading" className="text-sm font-semibold">
+        Cara pesan jasa
+      </h3>
+      <ol className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+        {ORDER_FLOW.map((step, i) => (
+          <li key={step.title} className="flex min-w-0 gap-3">
+            <span className="relative grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface text-primary">
+              <step.icon className="size-4" aria-hidden="true" />
+              <span className="absolute -right-1.5 -top-1.5 grid size-4 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                {i + 1}
+              </span>
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">{step.title}</span>
+              <span className="block text-xs leading-relaxed text-muted-foreground">
+                {step.desc}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <Link
+        to="/layanan"
+        className="mt-4 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-4 text-sm font-semibold hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:mt-auto"
+      >
+        Lihat semua jasa
+      </Link>
+    </aside>
   );
 }
 

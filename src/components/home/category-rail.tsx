@@ -8,7 +8,7 @@ import {
   resolveCategoryStyle,
   type CategoryTone as Tone,
 } from "@/lib/category-icons";
-import { cn } from "@/lib/utils";
+import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { SectionHeader } from "@/components/home/section-header";
 
 const categoriesQuery = queryOptions({
@@ -28,6 +28,7 @@ type CategoryItem = {
   slug: string;
   icon?: string | null;
   tone?: string | null;
+  image_url?: string | null;
 };
 type CategoryPayload = { items?: CategoryItem[]; error?: string | null };
 
@@ -45,6 +46,8 @@ type Tile = {
   label: string;
   icon: LucideIcon;
   tone: Tone;
+  /** Gambar ikon unggahan admin; bila valid, menggantikan ikon bawaan. */
+  image?: string | null;
   to: "/layanan" | "/produk";
   kategori?: string;
 };
@@ -70,6 +73,7 @@ export function CategoryRail() {
       key: `p-${c.id}`,
       label: c.name,
       ...styleFor(c),
+      image: c.image_url,
       to: "/produk" as const,
       kategori: c.slug,
     })),
@@ -78,6 +82,7 @@ export function CategoryRail() {
       key: `s-${c.id}`,
       label: c.name,
       ...styleFor(c),
+      image: c.image_url,
       to: "/layanan" as const,
       kategori: c.slug,
     })),
@@ -106,14 +111,26 @@ export function CategoryRail() {
                 search={t.kategori ? ({ kategori: t.kategori } as never) : undefined}
                 className="group flex min-h-14 items-center gap-3 rounded-xl border border-border bg-card p-2.5 transition-[border-color,box-shadow] duration-200 hover:border-accent/40 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
               >
-                <span
-                  className={cn(
-                    "grid size-10 shrink-0 place-items-center rounded-lg",
-                    TONES[t.tone],
-                  )}
-                >
-                  <t.icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
-                </span>
+                {isRenderableImageUrl(t.image) ? (
+                  <img
+                    src={t.image}
+                    alt=""
+                    width={40}
+                    height={40}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-10 shrink-0 rounded-lg object-contain"
+                  />
+                ) : (
+                  <span
+                    className={cn(
+                      "grid size-10 shrink-0 place-items-center rounded-lg",
+                      TONES[t.tone],
+                    )}
+                  >
+                    <t.icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+                  </span>
+                )}
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium capitalize text-foreground group-hover:text-accent">
                     {t.label.toLowerCase()}

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sanitizeSearchTerm } from "@/lib/utils";
 
 const authz = () => import("./authz.server");
 
@@ -37,12 +38,22 @@ export const searchNotificationRecipients = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) =>
     guard(context as Ctx, "notifications.broadcast", async () => {
       let q = (context as Ctx).supabase.from("profiles").select("id, full_name, email");
-      if (data.search) q = q.or(`email.ilike.%${data.search}%,full_name.ilike.%${data.search}%`);
+      const s = sanitizeSearchTerm(data.search);
+      if (s) q = q.or(`email.ilike.%${s}%,full_name.ilike.%${s}%`);
       const { data: rows, error } = await q.order("created_at", { ascending: false }).limit(20);
-      if (error) return { forbidden: false as const, items: [], error: "Daftar pengguna tidak dapat dimuat." };
+      if (error)
+        return {
+          forbidden: false as const,
+          items: [],
+          error: "Daftar pengguna tidak dapat dimuat.",
+        };
       return {
         forbidden: false as const,
-        items: (rows ?? []).map((r: any) => ({ id: r.id as string, name: (r.full_name as string) ?? "Tanpa nama", email: (r.email as string) ?? "" })),
+        items: (rows ?? []).map((r: any) => ({
+          id: r.id as string,
+          name: (r.full_name as string) ?? "Tanpa nama",
+          email: (r.email as string) ?? "",
+        })),
         error: null,
       };
     }),
@@ -66,20 +77,40 @@ export const sendAdminNotification = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) =>
     guard(context as Ctx, "notifications.broadcast", async () => {
-      const { data: result, error } = await (context as Ctx).supabase.rpc("admin_broadcast_notification", {
-        _title: data.title,
-        _message: data.message,
-        _audience: data.audience,
-        _role: data.audience === "role" ? (data.role ?? null) : null,
-        _user_ids: data.audience === "users" ? (data.userIds ?? []) : null,
-        _type: data.type,
-        _link: data.link ?? null,
-      });
+      const { data: result, error } = await (context as Ctx).supabase.rpc(
+        "admin_broadcast_notification",
+        {
+          _title: data.title,
+          _message: data.message,
+          _audience: data.audience,
+          _role: data.audience === "role" ? (data.role ?? null) : null,
+          _user_ids: data.audience === "users" ? (data.userIds ?? []) : null,
+          _type: data.type,
+          _link: data.link ?? null,
+        },
+      );
       if (error) {
         const msg = String(error.message ?? "");
-        if (msg.includes("FORBIDDEN")) return { forbidden: false as const, ok: false, recipients: 0, error: "Anda tidak berhak mengirim notifikasi." };
-        if (msg.includes("INVALID")) return { forbidden: false as const, ok: false, recipients: 0, error: "Data pengiriman tidak lengkap." };
-        return { forbidden: false as const, ok: false, recipients: 0, error: "Notifikasi gagal dikirim." };
+        if (msg.includes("FORBIDDEN"))
+          return {
+            forbidden: false as const,
+            ok: false,
+            recipients: 0,
+            error: "Anda tidak berhak mengirim notifikasi.",
+          };
+        if (msg.includes("INVALID"))
+          return {
+            forbidden: false as const,
+            ok: false,
+            recipients: 0,
+            error: "Data pengiriman tidak lengkap.",
+          };
+        return {
+          forbidden: false as const,
+          ok: false,
+          recipients: 0,
+          error: "Notifikasi gagal dikirim.",
+        };
       }
       return {
         forbidden: false as const,
@@ -101,7 +132,8 @@ export const listBroadcastHistory = createServerFn({ method: "GET" })
         .eq("action", "notification.broadcast_sent")
         .order("created_at", { ascending: false })
         .limit(20);
-      if (error) return { forbidden: false as const, items: [], error: "Riwayat tidak dapat dimuat." };
+      if (error)
+        return { forbidden: false as const, items: [], error: "Riwayat tidak dapat dimuat." };
       return {
         forbidden: false as const,
         items: (data ?? []).map((r: any) => ({

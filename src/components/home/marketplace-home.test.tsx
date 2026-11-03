@@ -49,7 +49,13 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,
   useQuery: () => ({ data: null, isPending: false, error: null }),
-  useQueryClient: () => ({ resetQueries: vi.fn() }),
+  useMutation: () => ({ mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false }),
+  useQueryClient: () => ({
+    resetQueries: vi.fn(),
+    invalidateQueries: vi.fn(),
+    setQueryData: vi.fn(),
+    getQueryData: vi.fn(),
+  }),
   useSuspenseQuery: ({ queryKey }: { queryKey: string[] }) => ({
     data:
       queryKey[0] === "product-detail"
@@ -64,8 +70,13 @@ vi.mock("@tanstack/react-query", () => ({
           }
         : queryKey[0] === "categories"
           ? { product: state.categories, service: state.serviceCategories }
-          : queryKey[0] === "storefront-products"
-            ? state.products
+          : queryKey[0] === "storefront-shelves"
+            ? {
+                latest: state.products.items,
+                bestSellers: [],
+                shelves: [],
+                error: state.products.error,
+              }
             : queryKey[0] === "storefront-seller-services"
               ? state.sellerServices
               : state.services,
@@ -75,6 +86,7 @@ vi.mock("@tanstack/react-query", () => ({
 
 vi.mock("@/lib/catalog.functions", () => ({
   listProducts: vi.fn(),
+  listProductShelves: vi.fn(),
   listServices: vi.fn(),
   listPublicMarketplaceServices: vi.fn(),
   listCatalogCategories: vi.fn(),
@@ -115,9 +127,11 @@ import { Route as ProductRoute } from "@/routes/produk.$slug";
 import { saveMyProduct } from "@/lib/seller.functions";
 import { isRenderableImageUrl } from "@/lib/utils";
 import { BannerBackground } from "./banner-background";
+import { HeroBannerBackground } from "./hero-banner-background";
 import {
   MarketplaceProductCard,
   MarketplaceServiceCard,
+  PlatformServiceCard,
   type ProductCardItem,
 } from "./catalog-cards";
 import { FIELD_BY_KEY, bannerAssetUrl, validateField } from "@/lib/website-settings";
@@ -210,7 +224,7 @@ describe("Product thumbnail validation", () => {
     }
     state.detailThumbnail = url;
     expect(detail()).not.toContain("<img");
-    expect(detail()).toContain("grid aspect-[4/3]");
+    expect(detail()).toContain("grid aspect-square");
     if (url) expect(() => validateSeller(url)).toThrow("Gambar tidak valid");
   });
 
@@ -237,22 +251,21 @@ describe("Marketplace home", () => {
     const html = home();
     expect(html.match(/href="\/produk\/template-asli"/g)).toHaveLength(1);
     expect(html).toContain("Jasa seller");
-    expect(html).toContain("Layanan dari platform");
     expect(html).not.toMatch(/Ribuan|Populer:|Rekomendasi untukmu|Siap dikirim/);
   });
-
-
 
   it("keeps search and explicit empty states when catalogues are empty", () => {
     const html = home();
     expect(html).toContain("Belum ada produk tersedia.");
-    expect(html).toContain("Belum ada layanan tersedia.");
-    expect(html).toContain('href="/produk"');
+    // Layanan platform tanpa paket aktif tidak dirender sama sekali.
+    expect(html).not.toContain("Layanan dari platform");
     expect(html).toContain("Belum ada jasa seller tersedia.");
   });
 
   it("shows separate retryable errors without masking them as empty catalogues", () => {
     state.products.error = "Katalog produk gagal";
+    state.sellerServices.error = "Katalog jasa gagal";
+    // Layanan platform yang error disembunyikan, bukan ditampilkan sebagai alert.
     state.services.error = "Katalog layanan gagal";
     const html = home();
     // Dua section dengan data: produk dan jasa seller.
@@ -268,21 +281,21 @@ describe("Home banner background", () => {
   const mainUrl = `/api/public/catalog-image/branding/home/${uuid}.jpg`;
   const mobileUrl = `/api/public/catalog-image/branding/home/${uuid}.webp`;
 
-  it("renders the uploaded banner without overlaying the old search panel", () => {
-    state.settings = {
+  // Hero asli tidak memasang banner admin; renderer banner diuji langsung.
+  const banner = (settings: Record<string, unknown>) =>
+    renderToStaticMarkup(<HeroBannerBackground settings={settings} />);
+
+  it("renders the uploaded banner as a decorative background", () => {
+    const html = banner({
       home_banner_image_url: mainUrl,
       home_banner_mobile_image_url: mobileUrl,
-      home_banner_alt: "Pesan banner admin",
-    };
-    const html = home();
-    // Banner dirender sebagai latar hero (bukan carousel embla).
+    });
     expect(html).toContain('id="hero-banner-host"');
     expect(html).toContain(`srcSet="${mobileUrl}"`);
     expect(html).toContain(`src="${mainUrl}"`);
-    expect(html).toContain('alt="Pesan banner admin"');
+    expect(html).toContain('aria-hidden="true"');
     expect(html).toContain("object-cover");
-    expect(html).not.toContain("Banner berikutnya");
-    expect(html).not.toContain("Cari kebutuhan digitalmu di Ebrystore.");
+    expect(home()).not.toContain("Cari kebutuhan digitalmu di Ebrystore.");
   });
 
   it("stays neutral when the main image is empty, invalid, or mobile-only", () => {
@@ -292,10 +305,7 @@ describe("Home banner background", () => {
       { home_banner_image_url: "/api/public/catalog-image/branding/home/../../etc/passwd.jpg" },
       { home_banner_image_url: "/api/public/catalog-image/branding/home/not-a-uuid.jpg" },
     ]) {
-      state.settings = settings as Record<string, unknown>;
-      // Banner tidak valid: host banner hero tidak dirender sama sekali
-      // (carousel produk tetap ada, jadi asersi tidak menyentuhnya).
-      expect(home()).not.toContain('id="hero-banner-host"');
+      expect(banner(settings)).toBe("");
     }
   });
 
@@ -366,19 +376,17 @@ describe("Banner settings validation", () => {
 });
 
 describe("Home-only product cards", () => {
-  it("opts home into the roomy grid and real product description", () => {
+  it("shows home products in a tabbed 2-column-on-mobile grid", () => {
     state.products.items = [{ ...product, short_description: "File template untuk presentasi" }];
     const html = home();
-    // Deret kartu beranda: carousel horizontal. Lebar kartu setengah layar di
-    // mobile, sepertiga di sm, seperempat di lg.
-    expect(html).toContain("basis-[calc(50%-0.375rem)]");
-    expect(html).toContain("lg:basis-1/4");
-    expect(html).toContain('aria-roledescription="carousel"');
-    expect(html).toContain("File template untuk presentasi");
-    expect(html).toContain("h-full rounded-xl");
-    // Harga: bobot dan ukuran dipisah di cn(), jadi diperiksa terpisah.
-    expect(html).toContain("font-bold tabular-nums");
-    expect(html).toContain("text-lg sm:text-xl");
+    expect(html).toContain("grid grid-cols-2");
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain('role="tabpanel"');
+    expect(html).toContain("h-full flex-col overflow-hidden rounded-xl");
+    expect(html).toContain("Template asli");
+    // Tile ringkas tidak memuat deskripsi, dan tidak ada carousel lama.
+    expect(html).not.toContain("File template untuk presentasi");
+    expect(html).not.toContain('aria-roledescription="carousel"');
   });
 
   it("keeps the default card appearance and hides home-only content", () => {
@@ -440,7 +448,13 @@ describe.each(["default", "home"] as const)("Marketplace price display (%s)", (v
     expect(html).not.toContain("Siap dikirim");
   });
 
-  it.each([null, 0, -1, 100000, 120000, "NaN", "Infinity"])(
+  it("shows discount_price 0 as free, matching checkout SQL (v_unit := discount_price)", () => {
+    const html = card({ discount_price: 0 }, variant);
+    expect(html).toContain("-100%");
+    expect(html).toMatch(/100[.]000/);
+  });
+
+  it.each([null, -1, 100000, 120000, "NaN", "Infinity"])(
     "ignores invalid or non-discount price %s",
     (discount_price) => {
       const html = card({ discount_price }, variant);
@@ -495,6 +509,56 @@ describe.each(["default", "home"] as const)("Marketplace price display (%s)", (v
       />,
     );
     expect(html).toMatch(/50[.]000/);
+    expect(html).not.toContain("NaN");
+  });
+
+  it("platform service card shows real packages, range and category only", () => {
+    const html = renderToStaticMarkup(
+      <PlatformServiceCard
+        featured
+        item={{
+          id: "s-web",
+          name: "Jasa Web",
+          slug: "jasa-web",
+          short_description: null,
+          category: { slug: "jasa-digital-ebry", name: "Jasa Digital  Ebry" },
+          service_packages: [
+            {
+              id: "b",
+              name: "Pro",
+              price: 900000,
+              estimated_days: 7,
+              free_revisions: 3,
+              is_active: true,
+            },
+            {
+              id: "a",
+              name: "Basic",
+              price: 300000,
+              estimated_days: 3,
+              free_revisions: 1,
+              is_active: true,
+            },
+            {
+              id: "x",
+              name: "Lama",
+              price: 1,
+              estimated_days: 1,
+              free_revisions: 0,
+              is_active: false,
+            },
+          ],
+        }}
+      />,
+    );
+    expect(html).toContain("Jasa Digital Ebry");
+    expect(html.indexOf("Basic")).toBeLessThan(html.indexOf("Pro"));
+    expect(html).not.toContain("Lama");
+    expect(html).toContain("Mulai dari");
+    expect(html).toContain("3–7 hari");
+    expect(html).toMatch(/300[.]000/);
+    // "NaN" dicek case-sensitive: /nan/i cocok dengan "layanan".
+    expect(html).not.toMatch(/terjual|rating|★/i);
     expect(html).not.toContain("NaN");
   });
 });

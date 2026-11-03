@@ -1,3 +1,6 @@
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
+
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
@@ -10,11 +13,79 @@ function safeName(name: string): string {
 }
 
 function decodeBase64(raw: string): Uint8Array {
-  const cleaned = raw.includes(",") && raw.trim().startsWith("data:") ? raw.slice(raw.indexOf(",") + 1) : raw;
+  const cleaned =
+    raw.includes(",") && raw.trim().startsWith("data:") ? raw.slice(raw.indexOf(",") + 1) : raw;
   const binary = atob(cleaned.replace(/\s+/g, ""));
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return bytes;
+}
+
+/** Tolak IP loopback, privat, link-local (metadata cloud), CGNAT, dan multicast. */
+function isPrivateAddress(ip: string): boolean {
+  const v4 = ip.startsWith("::ffff:") ? ip.slice(7) : ip;
+  if (isIP(v4) === 4) {
+    const [a, b] = v4.split(".").map(Number) as [number, number];
+    return (
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      a >= 224
+    );
+  }
+  const lower = ip.toLowerCase();
+  return (
+    lower === "::" ||
+    lower === "::1" ||
+    lower.startsWith("fc") ||
+    lower.startsWith("fd") ||
+    lower.startsWith("fe80") ||
+    lower.startsWith("ff")
+  );
+}
+
+/** Pencegah SSRF: hanya https ke host yang semua IP-nya publik. */
+async function assertPublicHttpsUrl(raw: string): Promise<string | null> {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" || url.username || url.password) return null;
+  if (url.port && url.port !== "443") return null;
+  const host = url.hostname.replace(/^\[|\]$/g, "");
+  const addresses = isIP(host) ? [host] : (await lookup(host, { all: true })).map((r) => r.address);
+  if (addresses.length === 0 || addresses.some(isPrivateAddress)) return null;
+  return url.toString();
+}
+
+async function readLimited(res: Response, limit: number): Promise<Uint8Array> {
+  if (!res.body) return new Uint8Array(await res.arrayBuffer());
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel();
+      throw new Error("too_large");
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
 }
 
 export default defineTool({
@@ -25,13 +96,41 @@ export default defineTool({
   inputSchema: {
     product_id: z.string().uuid().describe("ID produk digital tujuan."),
     filename: z.string().trim().min(1).max(180).describe("Nama berkas asli, termasuk ekstensi."),
-    version: z.string().trim().min(1).max(40).default("v1").describe("Label versi berkas, misal v1."),
-    content_base64: z.string().min(4).optional().describe("Isi berkas dalam base64 (boleh data URL)."),
-    source_url: z.string().url().max(1000).optional().describe("URL sumber berkas bila tidak mengirim base64."),
-    mime_type: z.string().trim().max(120).optional().describe("Tipe MIME berkas, contoh application/pdf."),
-    make_active: z.boolean().default(true).describe("Jadikan versi aktif (mode shared). Diabaikan pada mode unique."),
+    version: z
+      .string()
+      .trim()
+      .min(1)
+      .max(40)
+      .default("v1")
+      .describe("Label versi berkas, misal v1."),
+    content_base64: z
+      .string()
+      .min(4)
+      .optional()
+      .describe("Isi berkas dalam base64 (boleh data URL)."),
+    source_url: z
+      .string()
+      .url()
+      .max(1000)
+      .optional()
+      .describe("URL sumber berkas bila tidak mengirim base64."),
+    mime_type: z
+      .string()
+      .trim()
+      .max(120)
+      .optional()
+      .describe("Tipe MIME berkas, contoh application/pdf."),
+    make_active: z
+      .boolean()
+      .default(true)
+      .describe("Jadikan versi aktif (mode shared). Diabaikan pada mode unique."),
   },
-  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: false,
+    openWorldHint: true,
+  },
   handler: async (input, ctx) => {
     const denied = authGuard(ctx);
     if (denied) return denied;
@@ -55,9 +154,15 @@ export default defineTool({
       if (input.content_base64) {
         bytes = decodeBase64(input.content_base64);
       } else {
-        const res = await fetch(input.source_url!);
-        if (!res.ok) return errorResult(`Gagal mengunduh berkas dari source_url (HTTP ${res.status}).`);
-        bytes = new Uint8Array(await res.arrayBuffer());
+        const source = await assertPublicHttpsUrl(input.source_url!);
+        if (!source) return errorResult("source_url harus https ke host publik.");
+        // redirect: "error" supaya host publik tidak bisa mengalihkan ke alamat internal.
+        const res = await fetch(source, { redirect: "error", signal: AbortSignal.timeout(60_000) });
+        if (!res.ok)
+          return errorResult(`Gagal mengunduh berkas dari source_url (HTTP ${res.status}).`);
+        const declared = Number(res.headers.get("content-length") ?? "0");
+        if (declared > MAX_BYTES) return errorResult("Ukuran berkas melebihi batas 100 MB.");
+        bytes = await readLimited(res, MAX_BYTES);
         if (!input.mime_type) contentType = res.headers.get("content-type") ?? contentType;
       }
     } catch {
@@ -73,7 +178,10 @@ export default defineTool({
     if (uploadError) return errorResult(`Unggahan gagal: ${uploadError.message}`);
 
     if (input.make_active && !unique) {
-      await supabase.from("digital_product_files").update({ is_active: false }).eq("product_id", input.product_id);
+      await supabase
+        .from("digital_product_files")
+        .update({ is_active: false })
+        .eq("product_id", input.product_id);
     }
 
     const { data: inserted, error } = await supabase
@@ -91,11 +199,16 @@ export default defineTool({
       .maybeSingle();
     if (error || !inserted) {
       await supabase.storage.from(BUCKET).remove([path]);
-      return errorResult(error?.message ?? "Berkas gagal dicatat; akun mungkin tidak punya izin kelola produk.");
+      return errorResult(
+        error?.message ?? "Berkas gagal dicatat; akun mungkin tidak punya izin kelola produk.",
+      );
     }
 
     if (input.make_active && !unique) {
-      await supabase.from("digital_products").update({ version: input.version }).eq("id", input.product_id);
+      await supabase
+        .from("digital_products")
+        .update({ version: input.version })
+        .eq("id", input.product_id);
     }
 
     await supabase.rpc("write_audit_log", {
@@ -103,7 +216,12 @@ export default defineTool({
       _entity_type: "digital_product",
       _entity_id: input.product_id,
       _before: null,
-      _after: { file_id: inserted.id, version: input.version, size_bytes: bytes.byteLength, source: "mcp" },
+      _after: {
+        file_id: inserted.id,
+        version: input.version,
+        size_bytes: bytes.byteLength,
+        source: "mcp",
+      },
       _reason: null,
       _ip: null,
       _trace_id: null,
@@ -111,8 +229,14 @@ export default defineTool({
 
     return jsonResult({
       uploaded: inserted,
-      product: { id: product.id, name: product.name, delivery_mode: product.delivery_mode ?? "shared" },
-      note: unique ? "Berkas ditambahkan sebagai satu slot stok unik." : "Berkas tersimpan sebagai versi produk.",
+      product: {
+        id: product.id,
+        name: product.name,
+        delivery_mode: product.delivery_mode ?? "shared",
+      },
+      note: unique
+        ? "Berkas ditambahkan sebagai satu slot stok unik."
+        : "Berkas tersimpan sebagai versi produk.",
     });
   },
 });

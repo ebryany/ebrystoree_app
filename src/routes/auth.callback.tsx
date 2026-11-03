@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { safeInternalPath } from "@/lib/utils";
 
 /**
  * Callback OAuth (Google) untuk Supabase Auth.
@@ -23,10 +24,11 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const Route = createFileRoute("/auth/callback")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>): { code?: string; next?: string; error?: string } => {
-    const rawNext = typeof s["next"] === "string" ? s["next"] : "";
-    // Hanya path internal. "//evil.com" dan "https://evil.com" ditolak.
-    const safeNext = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "";
+  validateSearch: (
+    s: Record<string, unknown>,
+  ): { code?: string; next?: string; error?: string } => {
+    // Hanya path internal. "//evil.com", "/\evil.com" dan "https://evil.com" ditolak.
+    const safeNext = safeInternalPath(s["next"]);
     return {
       ...(typeof s["code"] === "string" ? { code: s["code"] } : {}),
       ...(safeNext ? { next: safeNext } : {}),
@@ -34,10 +36,7 @@ export const Route = createFileRoute("/auth/callback")({
     };
   },
   head: () => ({
-    meta: [
-      { title: "Menyelesaikan masuk — Ebrystore" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Menyelesaikan masuk — Ebrystore" }, { name: "robots", content: "noindex" }],
   }),
   component: AuthCallback,
 });

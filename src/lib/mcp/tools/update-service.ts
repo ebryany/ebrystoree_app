@@ -27,6 +27,11 @@ export default defineTool({
     const patch = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined));
     if (!Object.keys(patch).length) return errorResult("Tidak ada perubahan yang dikirim.");
     const supabase = supabaseForUser(ctx);
+    if (fields.category_id) {
+      const { data: cat } = await supabase.from("categories").select("slug").eq("id", fields.category_id).maybeSingle();
+      const { isAcademicCategorySlug } = await import("@/lib/service-types");
+      patch.academic_category_id = isAcademicCategorySlug(cat?.slug) ? fields.category_id : null;
+    }
     const { data: before } = await supabase.from("services").select("*").eq("id", id).maybeSingle();
     const { data, error } = await supabase
       .from("services")

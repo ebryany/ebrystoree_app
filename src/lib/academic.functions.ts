@@ -109,6 +109,67 @@ export const createAcademicOrder = createServerFn({ method: "POST" })
     };
   });
 
+/* ---------------- Pesanan jasa umum (non-akademik) ---------------- */
+
+const generalBriefSchema = z.object({
+  title: z.string().trim().min(3).max(200),
+  description: z.string().trim().min(20).max(4000),
+  deliverables: z.string().trim().max(2000).optional().default(""),
+  references: z.string().trim().max(2000).optional().default(""),
+  deadline_at: z.string().max(40).nullable().optional(),
+});
+
+export const createGeneralServiceOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        serviceId: z.string().uuid(),
+        packageId: z.string().uuid(),
+        addonIds: z.array(z.string().uuid()).max(20).default([]),
+        brief: generalBriefSchema,
+        noCredentialAccepted: z.literal(true),
+        draftKey: z.string().uuid().nullable().optional(),
+        idempotencyKey: z.string().min(8).max(64),
+        note: z.string().trim().max(500).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { isFeatureEnabled } = await import("./website-settings.server");
+    if (!(await isFeatureEnabled("feature_checkout")))
+      return { ok: false as const, error: "Fitur ini sedang dinonaktifkan sementara oleh admin." };
+    const { looksLikeSecret } = await import("./service-types");
+    const text = [data.brief.description, data.brief.deliverables, data.brief.references, data.note]
+      .filter(Boolean)
+      .join("\n");
+    if (looksLikeSecret(text))
+      return {
+        ok: false as const,
+        error:
+          "Brief tampaknya berisi kata sandi, token, atau kunci rahasia. Hapus dulu; akses dibagikan lewat chat pesanan bila benar-benar diperlukan.",
+      };
+    const helpers = await tx();
+    const { data: result, error } = await (context as Ctx).supabase.rpc(
+      "create_general_service_order",
+      {
+        _service_id: data.serviceId,
+        _package_id: data.packageId,
+        _addon_ids: data.addonIds,
+        _brief: { ...data.brief, deadline_at: data.brief.deadline_at || null },
+        _no_credential_accepted: data.noCredentialAccepted,
+        _draft_key: data.draftKey ?? null,
+        _idempotency_key: data.idempotencyKey,
+        _customer_note: data.note ?? null,
+      },
+    );
+    if (error) return { ok: false as const, error: helpers.rpcErrorMessage(error.message) };
+    return {
+      ok: true as const,
+      ...(result as { order_id: string; order_number: string; duplicate: boolean }),
+    };
+  });
+
 /* ---------------- Lampiran akademik ---------------- */
 
 const ATTACHMENT_TYPES = [

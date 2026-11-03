@@ -27,14 +27,20 @@ export const listCatalogCategories = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { createPublicClient } = await import("./supabase-public.server");
     const supabase = createPublicClient();
-    const { data: rows, error } = await supabase
-      .from("categories")
-      .select("id, name, slug, icon, tone")
-      .eq("kind", data.kind)
-      .eq("is_active", true)
-      .is("deleted_at", null)
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true });
+    const query = (columns: string) =>
+      supabase
+        .from("categories")
+        .select(columns)
+        .eq("kind", data.kind)
+        .eq("is_active", true)
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true });
+    let { data: rows, error } = await query("id, name, slug, icon, tone, image_url");
+    // Kolom image_url belum ada (migrasi belum diterapkan): tetap tampil dengan ikon bawaan.
+    if (error && /image_url/.test(error.message)) {
+      ({ data: rows, error } = await query("id, name, slug, icon, tone"));
+    }
 
     if (error) {
       console.error("[catalog] listCatalogCategories gagal:", error.message);
@@ -45,11 +51,22 @@ export const listCatalogCategories = createServerFn({ method: "GET" })
           slug: string;
           icon: string | null;
           tone: string | null;
+          image_url: string | null;
         }[],
         error: "Kategori sedang tidak dapat dimuat.",
       };
     }
-    return { items: rows ?? [], error: null };
+    return {
+      items: ((rows ?? []) as unknown as Record<string, unknown>[]).map((r) => ({
+        id: r.id as string,
+        name: r.name as string,
+        slug: r.slug as string,
+        icon: (r.icon as string | null) ?? null,
+        tone: (r.tone as string | null) ?? null,
+        image_url: (r.image_url as string | null | undefined) ?? null,
+      })),
+      error: null,
+    };
   });
 
 async function resolveCategoryId(
@@ -306,7 +323,7 @@ export const listServices = createServerFn({ method: "GET" })
     let query = supabase
       .from("services")
       .select(
-        "id, name, slug, short_description, thumbnail_url, service_packages(id, name, price, estimated_days, free_revisions, is_active)",
+        "id, name, slug, short_description, thumbnail_url, category:categories!services_category_id_fkey(slug, name), service_packages(id, name, price, estimated_days, free_revisions, is_active)",
         { count: "exact" },
       )
       .eq("status", "published")
@@ -377,7 +394,7 @@ export const getServiceDetail = createServerFn({ method: "GET" })
     const { data: row, error } = await supabase
       .from("services")
       .select(
-        "id, name, slug, short_description, description, thumbnail_url, requirements_note, order_capacity, supported_education_levels, supported_outputs, supported_citation_styles, requires_quality_review, allows_attachments, requires_rubric, requires_dataset, default_revision_limit, categories:academic_category_id(slug, name), service_packages(id, name, description, price, estimated_days, free_revisions, sla_hours, priority, is_active, sort_order, urgency_supported, quality_review_included, maximum_pages), service_addons(id, name, description, price, is_active, sort_order)",
+        "id, name, slug, short_description, description, thumbnail_url, requirements_note, order_capacity, supported_education_levels, supported_outputs, supported_citation_styles, requires_quality_review, allows_attachments, requires_rubric, requires_dataset, default_revision_limit, categories:academic_category_id(slug, name), category:categories!services_category_id_fkey(slug, name), service_packages(id, name, description, price, estimated_days, free_revisions, sla_hours, priority, is_active, sort_order, urgency_supported, quality_review_included, maximum_pages), service_addons(id, name, description, price, is_active, sort_order)",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -399,5 +416,15 @@ export const getServiceDetail = createServerFn({ method: "GET" })
       .filter((a) => a.is_active !== false)
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
-    return { service: { ...row, service_packages: packages, service_addons: addons }, error: null };
+    // Jasa platform tidak punya store_id: penjualnya toko resmi Ebrystore.
+    const { loadStoreCard } = await import("./store-card.server");
+    const { seller, sellerStats } = await loadStoreCard(supabase, null).catch(() => ({
+      seller: null,
+      sellerStats: null,
+    }));
+
+    return {
+      service: { ...row, service_packages: packages, service_addons: addons, seller, sellerStats },
+      error: null,
+    };
   });

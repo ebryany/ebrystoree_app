@@ -20,9 +20,7 @@ export type ProductVariant = {
 /* ---------------- Katalog publik: detail produk ---------------- */
 
 export const getProductDetail = createServerFn({ method: "GET" })
-  .validator((data: unknown) =>
-    z.object({ slug: z.string().trim().min(1).max(120) }).parse(data),
-  )
+  .validator((data: unknown) => z.object({ slug: z.string().trim().min(1).max(120) }).parse(data))
   .handler(async ({ data }) => {
     const { createPublicClient } = await import("./supabase-public.server");
     const supabase = createPublicClient();
@@ -53,77 +51,11 @@ export const getProductDetail = createServerFn({ method: "GET" })
         : [];
 
     // Produk tanpa store_id adalah produk platform: tampilkan sebagai toko resmi.
-    type SellerRow = {
-      id: string;
-      name: string;
-      slug: string;
-      is_platform: boolean;
-      logo_url: string | null;
-      created_at: string;
-    };
-    let seller: SellerRow | null = null;
-    if (rest.store_id) {
-      const { data: s } = await supabase
-        .from("stores")
-        .select("id, name, slug, is_platform, logo_url, created_at")
-        .eq("id", rest.store_id)
-        .maybeSingle();
-      seller = (s as SellerRow | null) ?? null;
-    } else {
-      const { data: s } = await supabase
-        .from("stores")
-        .select("id, name, slug, is_platform, logo_url, created_at")
-        .eq("is_platform", true)
-        .eq("status", "active")
-        .limit(1)
-        .maybeSingle();
-      seller = (s as SellerRow | null) ?? null;
-    }
-
-    // Statistik toko dari data nyata; kegagalan hanya mengosongkan angka.
-    let sellerStats: {
-      products: number;
-      sold: number;
-      rating: number | null;
-      reviews: number;
-    } | null = null;
-    if (seller) {
-      const ownerFilter = seller.is_platform
-        ? `store_id.is.null,store_id.eq.${seller.id}`
-        : `store_id.eq.${seller.id}`;
-      const { data: storeProducts } = await supabase
-        .from("digital_products")
-        .select("id, sold_count")
-        .or(ownerFilter)
-        .eq("status", "published")
-        .is("deleted_at", null)
-        .limit(1000);
-      const ids = (storeProducts ?? []).map((r) => r.id as string);
-      let rating: number | null = null;
-      let reviewCount = 0;
-      if (ids.length) {
-        const { data: rv } = await supabase
-          .from("product_reviews")
-          .select("rating")
-          .eq("is_visible", true)
-          .in("product_id", ids)
-          .limit(3000);
-        reviewCount = rv?.length ?? 0;
-        if (reviewCount) rating = rv!.reduce((s, r) => s + Number(r.rating), 0) / reviewCount;
-      }
-      sellerStats = {
-        products: ids.length,
-        sold: (storeProducts ?? []).reduce((s, r) => s + Number(r.sold_count ?? 0), 0),
-        rating,
-        reviews: reviewCount,
-      };
-    }
-
-    const { readStorePresence } = await import("./store-presence");
-    const presence = seller ? await readStorePresence(supabase, seller.id) : null;
+    const { loadStoreCard } = await import("./store-card.server");
+    const { seller, sellerStats } = await loadStoreCard(supabase, rest.store_id ?? null);
 
     return {
-      product: { ...rest, variants, seller: seller ? { ...seller, presence } : null, sellerStats },
+      product: { ...rest, variants, seller, sellerStats },
       error: null,
     };
   });
@@ -611,7 +543,8 @@ export const downloadEntitlement = createServerFn({ method: "POST" })
     let ip: string | null = null;
     let ua: string | null = null;
     try {
-      ip = (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() || null;
+      const { clientIpFrom } = await import("./client-ip.server");
+      ip = clientIpFrom((name) => getRequestHeader(name));
       ua = getRequestHeader("user-agent") ?? null;
     } catch {
       /* header opsional */

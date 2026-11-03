@@ -57,7 +57,7 @@ export function HomeHero() {
             id="hero-heading"
             className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl"
           >
-            Belanja di Ebrystore
+            Marketplace
             <span className="mt-1 block">
               <WordAnimator
                 words={WORDS}
@@ -67,8 +67,8 @@ export function HomeHero() {
             </span>
           </h1>
           <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base xl:mt-5 xl:max-w-2xl xl:text-lg">
-            Produk digital dan jasa dari toko terpilih. Harga jelas di depan, dan setiap pesanan
-            bisa dipantau sampai tuntas.
+            Produk digital dan jasa dari banyak toko dalam satu tempat. Bandingkan harga dan toko,
+            lalu pantau setiap pesanan sampai tuntas.
           </p>
 
           <form

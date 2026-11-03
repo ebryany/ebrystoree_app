@@ -193,11 +193,8 @@ export const submitGuestReview = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (data.website) return { ok: true as const, error: null };
 
-    const { getRequestHeader } = await import("@tanstack/react-start/server");
-    const ip =
-      (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() ||
-      getRequestHeader("x-real-ip") ||
-      "unknown";
+    const { requestClientIp } = await import("./client-ip.server");
+    const ip = (await requestClientIp()) ?? "unknown";
     const { enforceRateLimit } = await import("./rate-limit.server");
     const limited = await enforceRateLimit(`ip:${ip}`, "review.guest");
     if (limited) return { ok: false as const, error: "Terlalu banyak ulasan. Coba lagi nanti." };
@@ -353,11 +350,8 @@ export const submitGuestServiceReview = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (data.website) return { ok: true as const, error: null };
 
-    const { getRequestHeader } = await import("@tanstack/react-start/server");
-    const ip =
-      (getRequestHeader("x-forwarded-for") ?? "").split(",")[0]?.trim() ||
-      getRequestHeader("x-real-ip") ||
-      "unknown";
+    const { requestClientIp } = await import("./client-ip.server");
+    const ip = (await requestClientIp()) ?? "unknown";
     const { enforceRateLimit } = await import("./rate-limit.server");
     const limited = await enforceRateLimit(`ip:${ip}`, "review.service.guest");
     if (limited) return { ok: false as const, error: "Terlalu banyak ulasan. Coba lagi nanti." };

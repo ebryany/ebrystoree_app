@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   ShoppingCart,
   Star,
-  Store,
   Ticket,
   UserCheck,
   Wallet,
@@ -38,8 +37,7 @@ import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { recordProductView } from "@/lib/recently-viewed";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
 import { ogImageUrl } from "@/lib/seo-url";
-import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
-import { useStorePresence } from "@/hooks/use-store-presence";
+import { SellerCard, SELLER_ACTION, joinedLabel, ratingLabel } from "@/components/ebry/seller-card";
 import type { StorePresence } from "@/lib/store-presence";
 
 const detailQuery = (slug: string) =>
@@ -50,16 +48,11 @@ const detailQuery = (slug: string) =>
 
 type Delivery = "file" | "code" | "account";
 
-/** Tombol aksi kartu penjual: ikon di atas label di HP, sebaris mulai sm. */
-const SELLER_ACTION =
-  "h-auto min-h-11 w-full min-w-0 flex-col gap-0.5 px-1.5 py-1.5 text-xs sm:flex-row sm:gap-2 sm:px-3 sm:text-sm";
-
 function openReviewForm() {
   window.dispatchEvent(new Event(OPEN_REVIEW_EVENT));
   document.getElementById("ulasan-produk")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-const monthYearFmt = new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" });
 const fullDateFmt = new Intl.DateTimeFormat("id-ID", {
   day: "numeric",
   month: "long",
@@ -200,7 +193,6 @@ function DetailProduk() {
   const soldOut = uniqueStock && stock < 1;
   const validityDays = p.validity_days ?? 365;
   const store = p.seller as DetailStore;
-  const presence = useStorePresence(store?.id, store?.presence);
   const stats = p.sellerStats;
   const category = (p as { categories?: { name: string; slug: string } | null }).categories ?? null;
   const isSellerProduct = Boolean(store && !store.is_platform);
@@ -269,11 +261,16 @@ function DetailProduk() {
               ? "Stok unik per pembeli"
               : "Berkas digital (kuota sama per pembeli)",
     },
-    ...(delivery === "file" ? [{ label: "Kuota unduhan", value: `${downloadLimit}x per pembelian` }] : []),
+    ...(delivery === "file"
+      ? [{ label: "Kuota unduhan", value: `${downloadLimit}x per pembelian` }]
+      : []),
     { label: "Masa akses", value: `${validityDays} hari sejak pembayaran terverifikasi` },
     ...(p.version ? [{ label: "Versi", value: p.version }] : []),
     ...(variants.length ? [{ label: "Pilihan variasi", value: `${variants.length} variasi` }] : []),
-    { label: "Pengiriman", value: "Langsung terkirim ke menu Produk saya setelah transaksi selesai" },
+    {
+      label: "Pengiriman",
+      value: "Langsung terkirim ke menu Produk saya setelah transaksi selesai",
+    },
     ...(uniqueStock ? [{ label: "Stok", value: soldOut ? "Habis" : `${stock} tersedia` }] : []),
   ];
 
@@ -357,9 +354,7 @@ function DetailProduk() {
                 >
                   <Star className="size-4 fill-aurora text-aurora" aria-hidden="true" />
                   {reviewAverage.toFixed(1)}
-                  <span className="font-normal text-muted-foreground">
-                    ({reviewTotal} ulasan)
-                  </span>
+                  <span className="font-normal text-muted-foreground">({reviewTotal} ulasan)</span>
                 </a>
               ) : (
                 <span className="text-muted-foreground">Belum ada ulasan</span>
@@ -512,101 +507,42 @@ function DetailProduk() {
 
         {/* ===== Kartu toko: hanya statistik nyata ===== */}
         {store ? (
-          <section
-            aria-labelledby="penjual-judul"
-            className="mt-4 rounded-xl border border-border bg-card p-4 sm:p-5"
-          >
-            <h2 id="penjual-judul" className="sr-only">
-              Penjual
-            </h2>
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
-              <div className="flex min-w-0 items-center gap-4 lg:w-[460px] lg:shrink-0 lg:border-r lg:border-border lg:pr-6">
-                <div className="relative shrink-0">
-                  {isRenderableImageUrl(store.logo_url) ? (
-                    <img
-                      src={store.logo_url!}
-                      alt=""
-                      loading="lazy"
-                      className="size-16 rounded-full border border-border bg-surface object-cover sm:size-20"
-                    />
-                  ) : (
-                    <span
-                      className="grid size-16 place-items-center rounded-full border border-border bg-surface-selected font-display text-2xl font-bold text-primary sm:size-20"
-                      aria-hidden="true"
-                    >
-                      {(store.name.trim()[0] ?? "?").toUpperCase()}
-                    </span>
-                  )}
-                  <OnlineDot presence={presence} />
-                  {store.is_platform ? (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                      Official
-                    </span>
-                  ) : null}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Dijual oleh</p>
-                  <p className="flex min-w-0 items-center gap-1.5">
-                    <span className="truncate text-base font-semibold">{store.name}</span>
-                    {store.is_platform ? (
-                      <BadgeCheck className="size-4 shrink-0 text-primary" aria-label="Toko resmi" />
-                    ) : null}
-                  </p>
-                  <PresenceLabel presence={presence} className="mt-0.5" />
-                  {/* Di HP ikon di atas label supaya tiga tombol muat sampai 320px. */}
-                  <div className="mt-2.5 grid grid-cols-3 gap-2">
-                    <ProductInquiryButton
-                      productId={p.id}
-                      productName={p.name}
-                      isSellerProduct={isSellerProduct}
-                      label="Chat"
-                      className={cn(SELLER_ACTION, "border-primary bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary")}
-                    />
-                    <Button asChild variant="outline" className={SELLER_ACTION}>
-                      <Link to="/toko/$slug" params={{ slug: store.slug }}>
-                        <Store className="size-4" aria-hidden="true" /> Kunjungi
-                      </Link>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className={SELLER_ACTION}
-                      onClick={openReviewForm}
-                    >
-                      <Star className="size-4" aria-hidden="true" /> Ulasan
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
-                {[
-                  {
-                    label: "Penilaian",
-                    value:
-                      stats?.rating != null
-                        ? `${stats.rating.toFixed(1)} ★ (${stats.reviews})`
-                        : "Belum ada",
-                  },
-                  { label: "Produk", value: stats ? String(stats.products) : "—" },
-                  {
-                    label: "Terjual",
-                    value: stats ? new Intl.NumberFormat("id-ID").format(stats.sold) : "—",
-                  },
-                  { label: "Bergabung", value: monthYearFmt.format(new Date(store.created_at)) },
-                  { label: "Pengiriman", value: "Otomatis" },
-                  { label: "Pembayaran", value: "QRIS" },
-                ].map((s) => (
-                  <div key={s.label} className="flex min-w-0 items-baseline justify-between gap-2">
-                    <dt className="shrink-0 text-muted-foreground">{s.label}</dt>
-                    <dd className="truncate text-right font-semibold tabular-nums text-price">
-                      {s.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </section>
+          <SellerCard
+            store={store}
+            stats={[
+              { label: "Penilaian", value: ratingLabel(stats) },
+              { label: "Produk", value: stats ? String(stats.products) : "—" },
+              {
+                label: "Terjual",
+                value: stats ? new Intl.NumberFormat("id-ID").format(stats.sold) : "—",
+              },
+              { label: "Bergabung", value: joinedLabel(store.created_at) },
+              { label: "Pengiriman", value: "Otomatis" },
+              { label: "Pembayaran", value: "QRIS" },
+            ]}
+            chat={
+              <ProductInquiryButton
+                productId={p.id}
+                productName={p.name}
+                isSellerProduct={isSellerProduct}
+                label="Chat"
+                className={cn(
+                  SELLER_ACTION,
+                  "border-primary bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary",
+                )}
+              />
+            }
+            thirdAction={
+              <Button
+                type="button"
+                variant="outline"
+                className={SELLER_ACTION}
+                onClick={openReviewForm}
+              >
+                <Star className="size-4" aria-hidden="true" /> Ulasan
+              </Button>
+            }
+          />
         ) : null}
 
         {/* ===== Konten + sidebar ===== */}
@@ -777,7 +713,8 @@ function AccessPreview({
           <DeliveryIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
           {delivery === "account" ? (
             <span>
-              <span className="font-semibold">Akun siap pakai</span>, tinggal salin email &amp; password
+              <span className="font-semibold">Akun siap pakai</span>, tinggal salin email &amp;
+              password
             </span>
           ) : delivery === "code" ? (
             <span>
@@ -834,7 +771,10 @@ function StoreProductsAside({ storeSlug, currentId }: { storeSlug: string; curre
       {isLoading ? (
         <div className="mt-2 space-y-3" aria-hidden="true">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-lg bg-muted motion-reduce:animate-none" />
+            <div
+              key={i}
+              className="h-16 animate-pulse rounded-lg bg-muted motion-reduce:animate-none"
+            />
           ))}
         </div>
       ) : (

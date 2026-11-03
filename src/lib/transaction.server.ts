@@ -11,7 +11,8 @@ const RPC_ERROR_MESSAGE: Record<string, string> = {
   OUT_OF_STOCK: "Stok produk ini sudah habis. Silakan pilih produk lain atau hubungi kami.",
   VARIANT_UNAVAILABLE: "Variasi yang dipilih sudah tidak tersedia. Pilih variasi lain.",
   VARIANT_REQUIRED: "Pilih variasi produk terlebih dahulu.",
-  VARIANT_UNSUPPORTED: "Variasi hanya tersedia untuk produk dengan berkas yang sama untuk semua pembeli.",
+  VARIANT_UNSUPPORTED:
+    "Variasi hanya tersedia untuk produk dengan berkas yang sama untuk semua pembeli.",
   VARIANT_INVALID: "Data variasi tidak valid. Periksa nama dan harga setiap variasi.",
   STORE_SUSPENDED: "Toko penjual sedang ditangguhkan. Pesanan tidak dapat diproses saat ini.",
   SERVICE_UNAVAILABLE: "Layanan tidak tersedia atau sudah tidak diterbitkan.",
@@ -45,6 +46,11 @@ const RPC_ERROR_MESSAGE: Record<string, string> = {
   SCOPE_FLAG_INVALID: "Penanda cakupan tidak dikenal.",
   CATEGORY_INACTIVE: "Kategori akademik layanan ini sedang tidak aktif.",
   ADDON_INVALID: "Ada tambahan yang sudah tidak tersedia.",
+  CREDENTIAL_ACK_REQUIRED: "Setujui pernyataan untuk tidak mengirim kata sandi atau kredensial.",
+  BRIEF_REQUIRED: "Lengkapi nama proyek dan kebutuhan (minimal 20 karakter).",
+  WRONG_SERVICE_FLOW: "Layanan ini memakai formulir akademik. Muat ulang halaman checkout.",
+  // Fungsi alur jasa umum belum dipasang di database.
+  create_general_service_order: "Checkout jasa ini belum aktif. Hubungi admin.",
 };
 
 export function rpcErrorMessage(message: string | undefined | null): string {

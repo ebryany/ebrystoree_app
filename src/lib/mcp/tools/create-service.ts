@@ -70,11 +70,18 @@ export default defineTool({
     const { data: existing } = await supabase.from("services").select("id").eq("slug", slug).maybeSingle();
     if (existing) return errorResult(`Slug "${slug}" sudah dipakai layanan lain.`);
 
+    let academicCategoryId: string | null = null;
+    if (input.category_id) {
+      const { data: cat } = await supabase.from("categories").select("slug").eq("id", input.category_id).maybeSingle();
+      const { isAcademicCategorySlug } = await import("@/lib/service-types");
+      if (isAcademicCategorySlug(cat?.slug)) academicCategoryId = input.category_id;
+    }
+
     const row = {
       name: input.name,
       slug,
       status: input.status ?? "draft",
-      ...(input.category_id ? { category_id: input.category_id, academic_category_id: input.category_id } : {}),
+      ...(input.category_id ? { category_id: input.category_id, academic_category_id: academicCategoryId } : {}),
       ...(input.short_description ? { short_description: input.short_description } : {}),
       ...(input.description ? { description: input.description } : {}),
       ...(input.requirements_note ? { requirements_note: input.requirements_note } : {}),
