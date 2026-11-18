@@ -32,6 +32,9 @@ import { getMyRoles } from "@/lib/admin.functions";
 import { listInquiryUnreadCounts } from "@/lib/inquiries.functions";
 import { cn } from "@/lib/utils";
 
+// Match Tailwind's lg breakpoint, where the mobile controls are hidden.
+const DESKTOP_NAV_QUERY = "(min-width: 64rem)";
+
 const NAV_META: Record<string, { description: string; icon: typeof Package }> = {
   "/produk": { description: "Produk digital dari berbagai toko", icon: Package },
   "/layanan": { description: "Jasa website, desain, IT, konten, dan akademik", icon: Briefcase },
@@ -50,6 +53,7 @@ export function SiteHeader() {
   const [term, setTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
+  const homeLinkRef = useRef<HTMLAnchorElement>(null);
   // Header mengecil setelah digulir: di puncak halaman tampil lega, saat
   // menggulir jadi ramping supaya konten dapat lebih banyak ruang.
   const settings = useWebsiteSettings();
@@ -92,6 +96,25 @@ export function SiteHeader() {
     setSearchOpen(false);
   }
 
+  useEffect(() => {
+    const desktop = window.matchMedia(DESKTOP_NAV_QUERY);
+    function closeMobileOverlays() {
+      if (!desktop.matches) return;
+      setOpen(false);
+      setSearchOpen(false);
+    }
+
+    desktop.addEventListener("change", closeMobileOverlays);
+    closeMobileOverlays();
+    return () => desktop.removeEventListener("change", closeMobileOverlays);
+  }, []);
+
+  function restoreMobileOverlayFocus(event: Event) {
+    event.preventDefault();
+    const target = window.matchMedia(DESKTOP_NAV_QUERY).matches ? homeLinkRef : menuTriggerRef;
+    target.current?.focus({ preventScroll: true });
+  }
+
   // Fokuskan input saat panel pencarian terbuka. Ditunda satu frame supaya
   // dialog selesai dipasang; tanpa jeda ini, browser mobile kadang membuka
   // keyboard sebelum input ada di DOM.
@@ -113,6 +136,7 @@ export function SiteHeader() {
             )}
           >
             <Link
+              ref={homeLinkRef}
               to="/"
               className={cn(
                 "flex min-h-11 min-w-0 shrink items-center justify-start gap-2 rounded-md text-base font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:text-lg",
@@ -295,10 +319,7 @@ export function SiteHeader() {
           side="right"
           className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 [&>button]:hidden sm:max-w-md lg:hidden"
           aria-describedby={undefined}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            menuTriggerRef.current?.focus();
-          }}
+          onCloseAutoFocus={restoreMobileOverlayFocus}
         >
           <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
             <SheetTitle className="min-w-0 truncate text-lg">{brandName}</SheetTitle>
@@ -480,10 +501,7 @@ export function SiteHeader() {
         <DialogContent
           className="top-0 left-0 flex h-[100dvh] max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0 [&>button]:hidden lg:hidden"
           aria-describedby={undefined}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            menuTriggerRef.current?.focus();
-          }}
+          onCloseAutoFocus={restoreMobileOverlayFocus}
         >
           <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
             <DialogTitle className="sr-only">Cari produk</DialogTitle>
