@@ -50,6 +50,26 @@ async function verifyOwnership(sb: any, productId: string, userId: string): Prom
   return data.store_id;
 }
 
+/** Reset moderasi eksplisit saat mengubah versi via service role agar file baru tetap ditinjau ulang. */
+async function resetProductModerationForVersion(sb: any, productId: string, version: string | null) {
+  const { data: currentProd } = await sb
+    .from("digital_products")
+    .select("status")
+    .eq("id", productId)
+    .maybeSingle();
+  await sb
+    .from("digital_products")
+    .update({
+      ...(version ? { version } : {}),
+      moderation_status: "pending",
+      moderation_note: null,
+      reviewed_by: null,
+      reviewed_at: null,
+      ...(currentProd?.status === "published" ? { status: "draft" } : {}),
+    })
+    .eq("id", productId);
+}
+
 /* ---------- Daftar file produk seller ---------- */
 
 export const listMyProductFiles = createServerFn({ method: "GET" })
@@ -204,7 +224,7 @@ export const registerMyFile = createServerFn({ method: "POST" })
     }
 
     if (data.makeActive && !unique) {
-      await sb.from("digital_products").update({ version: data.version }).eq("id", data.productId);
+      await resetProductModerationForVersion(sb, data.productId, data.version);
     }
 
     return {
@@ -253,7 +273,7 @@ export const setMyFileActive = createServerFn({ method: "POST" })
         .from("digital_product_files")
         .update({ is_active: false })
         .eq("product_id", file.product_id);
-      await sb.from("digital_products").update({ version: file.version }).eq("id", file.product_id);
+      await resetProductModerationForVersion(sb, file.product_id, file.version);
     }
     const { error } = await sb
       .from("digital_product_files")

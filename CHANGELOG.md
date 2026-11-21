@@ -2,6 +2,13 @@
 
 ## 2026-11-21
 
+### Hardening keamanan aplikasi, proxy media, moderasi file seller, dan ekspor CSV
+
+- **Proxy media publik (`SEC-01`)**: Menambahkan `try/catch` untuk `decodeURIComponent` (`404` pada URI cacat), whitelist ekstensi raster (`jpg`/`jpeg`/`png`/`webp`/`avif`), pemetaan MIME eksplisit dari ekstensi, dan `Content-Security-Policy: default-src 'none'; sandbox` pada `src/routes/api/public/catalog-image.$.tsx`, `src/routes/api/public/service-media.$.tsx`, dan `src/routes/api/public/og-image.$.tsx`.
+- **Moderasi file produk seller (`SEC-02`)**: Menambahkan `resetProductModerationForVersion` di `src/lib/seller-files.functions.ts` agar pembaruan versi file lewat `supabaseAdmin` tetap mereset `moderation_status` ke `pending` dan menurunkan produk `published` ke `draft`.
+- **CSV Injection, JioFarm, OAuth Redirect & QRIS (`SEC-03` s.d. `SEC-05`)**: Menetralkan awalan formula spreadsheet (`=`, `+`, `-`, `@`, `\t`, `\r`) di `src/lib/mcp/tools/export-orders-csv.ts`; menambah batas ukuran payload 128 KB (`413`) di `src/routes/api/public/integrations/jiofarm/links.ts` dan filter `.is("deleted_at", null)` di `src/lib/stock-codes.server.ts`; menambah validasi skema `http:`/`https:` di `src/routes/[.]lovable.oauth.consent.tsx` serta filter `.eq("user_id", ...)` eksplisit di `checkQrisPayment` (`src/lib/payments.functions.ts`).
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, targeted `eslint` keluar `0`, `npm run test:unit` lulus **55/55 file, 678/678 test** (termasuk `src/lib/__tests__/security-audit-20261121.test.ts`).
+
 ### Dokumentasi System Design, endpoint `/api/health`, dan sinkronisasi migrasi SQL produksi
 
 - Menambahkan paket dokumentasi arsitektur di `docs/system-design/` (Deliverables 01–13).

@@ -13,6 +13,8 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
 
+const MAX_INGEST_BYTES = 128 * 1024;
+
 export const Route = createFileRoute("/api/public/integrations/jiofarm/links")({
   server: {
     handlers: {
@@ -20,9 +22,18 @@ export const Route = createFileRoute("/api/public/integrations/jiofarm/links")({
         const { authorizeIngest, adminClient, resolveCodeProduct } = await import("@/lib/stock-codes.server");
         if (!authorizeIngest(request)) return json({ error: "unauthorized" }, 401);
 
+        const declared = Number(request.headers.get("content-length") ?? "0");
+        if (Number.isFinite(declared) && declared > MAX_INGEST_BYTES) {
+          return json({ error: "payload too large" }, 413);
+        }
+
         let payload: unknown;
         try {
-          payload = await request.json();
+          const raw = await request.text();
+          if (Buffer.byteLength(raw, "utf8") > MAX_INGEST_BYTES) {
+            return json({ error: "payload too large" }, 413);
+          }
+          payload = JSON.parse(raw);
         } catch {
           return json({ error: "invalid json" }, 400);
         }

@@ -14,6 +14,16 @@ function oauthApi(): OAuthNamespace {
   return (supabase.auth as unknown as { oauth: OAuthNamespace }).oauth;
 }
 
+function safeOauthRedirectUrl(raw: unknown): string | null {
+  if (typeof raw !== "string" || !raw.trim()) return null;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "https:" || u.protocol === "http:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
   validateSearch: (s: Record<string, unknown>) => ({
@@ -30,7 +40,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     const authorizationId = new URLSearchParams(location.search).get("authorization_id")!;
     const { data, error } = await oauthApi().getAuthorizationDetails(authorizationId);
     if (error) throw error;
-    const immediate = data?.redirect_url ?? data?.redirect_to;
+    const immediate = safeOauthRedirectUrl(data?.redirect_url ?? data?.redirect_to);
     if (immediate && !data?.client) throw redirect({ href: immediate });
     return data;
   },
@@ -63,10 +73,10 @@ function Consent() {
       setError(err.message);
       return;
     }
-    const target = data?.redirect_url ?? data?.redirect_to;
+    const target = safeOauthRedirectUrl(data?.redirect_url ?? data?.redirect_to);
     if (!target) {
       setBusy(false);
-      setError("Server otorisasi tidak mengembalikan alamat pengalihan.");
+      setError("Server otorisasi tidak mengembalikan alamat pengalihan yang valid.");
       return;
     }
     window.location.href = target;

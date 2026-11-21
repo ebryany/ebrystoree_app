@@ -112,6 +112,7 @@ export const checkQrisPayment = createServerFn({ method: "POST" })
       .from("payments")
       .select("id, payment_number, status, expected_amount, qr_reference, external_transaction_id")
       .eq("id", data.paymentId)
+      .eq("user_id", (context as Ctx).userId)
       .maybeSingle();
 
     if (!payment) return { ok: false as const, error: "Pembayaran tidak ditemukan." };

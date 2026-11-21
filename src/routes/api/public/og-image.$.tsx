@@ -6,9 +6,18 @@ export const Route = createFileRoute("/api/public/og-image/$")({
     handlers: {
       GET: async ({ params }) => {
         const raw = (params as Record<string, string>)._splat ?? "";
-        const path = decodeURIComponent(raw);
+        let path: string;
+        try {
+          path = decodeURIComponent(raw);
+        } catch {
+          return new Response("Not found", { status: 404 });
+        }
 
-        if (!path || path.includes("..") || !/^[A-Za-z0-9/_-]+\.[A-Za-z0-9]{2,5}$/.test(path)) {
+        if (
+          !path ||
+          path.includes("..") ||
+          !/^[A-Za-z0-9/_-]+\.(jpg|jpeg|png|webp|avif)$/i.test(path)
+        ) {
           return new Response("Not found", { status: 404 });
         }
 

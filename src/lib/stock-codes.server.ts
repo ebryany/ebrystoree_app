@@ -36,6 +36,7 @@ export async function resolveCodeProduct(idOrSlug: string): Promise<{ id: string
     .from("digital_products")
     .select("id, name, delivery_mode")
     .eq(uuid ? "id" : "slug", idOrSlug)
+    .is("deleted_at", null)
     .maybeSingle();
   if (!data || data.delivery_mode !== "code") return null;
   return { id: data.id, name: data.name };
