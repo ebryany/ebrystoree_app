@@ -2,6 +2,13 @@
 
 ## 2026-11-21
 
+### Optimasi respons klik menu hamburger seluler dengan native `<dialog>` top-layer
+
+- **Drawer seluler native `<dialog>` (`src/components/mobile-nav-drawer.tsx`, `src/components/site-header.tsx`, `src/styles.css`)**: Mengganti Radix `<Sheet>` pada tombol hamburger seluler dengan native `<dialog>` (`showModal()`), transisi compositor-only (`transform` + `opacity` 180ms dengan `@starting-style`, `overlay`, `transition-behavior: allow-discrete` terpisah, serta fallback `data-closing` + `getAnimations()` untuk Firefox/Safari), dan scroll containment murni CSS (`overscroll-behavior: contain` pada `:modal` & `overflow: hidden; overscroll-behavior: contain` pada `::backdrop`) tanpa mutasi `body { overflow: hidden }` atau `backdrop-blur` layar penuh. Menambahkan fallback `@supports not (content-visibility: auto)` pada `.defer-render`.
+- **Percepatan `Sheet` umum (`src/components/ui/sheet.tsx`)**: Menghapus `backdrop-blur-[2px]` layar penuh pada `SheetOverlay` dan mempercepat durasi animasi (`200ms` buka / `150ms` tutup, `ease-out`).
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `$env:NITRO_PRESET='node-server'; npm run build` keluar `0`, dan `npm run test:unit` lulus **57/57 file, 686/686 test** (termasuk `src/lib/__tests__/mobile-nav-drawer.test.tsx`).
+- **Status deploy**: Dipublish ke GitHub `main`; deploy VPS mengikuti ketersediaan autentikasi SSH.
+
 ### Hardening cache Cloudflare/edge, revisi desain tombol Jelajahi kategori, dan pembersihan dead code
 
 - **Cloudflare edge & isolasi cache (`src/server.ts`)**: Menambahkan default `Cache-Control: private, no-store` untuk respons HTML SSR dan `Cache-Control: no-store` untuk respons dinamis non-HTML tanpa header `Cache-Control` eksplisit (menutup risiko *Web Cache Deception* pada rute dinamis berakhiran ekstensi statis sambil tetap menjaga cache publik pada media, sitemap, dan aset statis); mengetatkan CSP `connect-src` produksi agar tidak lagi mengizinkan `https://*.lovable.app`; serta menerapkan `applySecurityHeaders()` pada fallback error 500. Ditambahkan pengujian di `src/lib/__tests__/cloudflare-edge-hardening.test.ts`.

@@ -566,6 +566,105 @@
   contain-intrinsic-size: auto 480px;
 }
 
+@supports not (content-visibility: auto) {
+  .defer-render {
+    contain: layout style paint;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Mobile navigation drawer berbasis native <dialog> top-layer.
+ * - Tanpa mutasi overflow pada <body> (hindari reflow penuh & layout shift).
+ * - Animasi compositor-only (transform + opacity) tanpa backdrop-blur berat.
+ * - Mendukung @starting-style + overlay + transition-behavior: allow-discrete
+ *   serta fallback data-closing untuk Firefox/Safari.
+ * ------------------------------------------------------------------------- */
+dialog.ebry-mobile-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  padding: 0;
+  width: min(100dvw, 24rem);
+  max-width: none;
+  height: 100svh;
+  max-height: none;
+  border: 0;
+  border-left: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  box-shadow:
+    0 1px 2px oklch(0.22 0.03 205 / 8%),
+    0 16px 40px -16px oklch(0.22 0.03 205 / 26%);
+  overflow: hidden;
+  contain: layout style;
+  opacity: 0;
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 180ms;
+  transition-timing-function: var(--ease-ebry);
+  transition-behavior: allow-discrete;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.ebry-mobile-drawer {
+    transform: translateX(100%);
+  }
+}
+
+dialog.ebry-mobile-drawer:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.ebry-mobile-drawer::backdrop {
+  background-color: rgb(0 0 0 / 0);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  transition-property: background-color, display, overlay;
+  transition-duration: 180ms;
+  transition-timing-function: ease-out;
+  transition-behavior: allow-discrete;
+}
+
+dialog.ebry-mobile-drawer[open]:where(:not([data-closing])) {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.ebry-mobile-drawer[open]:where(:not([data-closing])) {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.ebry-mobile-drawer[open]:where(:not([data-closing])) {
+    transform: translateX(0);
+  }
+
+  @starting-style {
+    dialog.ebry-mobile-drawer[open]:where(:not([data-closing])) {
+      transform: translateX(100%);
+    }
+  }
+}
+
+dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
+  background-color: rgb(0 0 0 / 0.48);
+}
+
+@starting-style {
+  dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
+    background-color: rgb(0 0 0 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.ebry-mobile-drawer,
+  dialog.ebry-mobile-drawer::backdrop {
+    transition-duration: 0.08s;
+  }
+}
+
 /* Animasi line-fill satu kali untuk diagram alur hero. */
 @keyframes ebry-line-fill {
   from {

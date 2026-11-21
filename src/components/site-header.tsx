@@ -18,13 +18,13 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { CartButton } from "@/components/ebry/cart-button";
 import { NotificationBell } from "@/components/ebry/notification-bell";
+import { MobileNavDrawer } from "@/components/mobile-nav-drawer";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useSession } from "@/hooks/use-session";
 import { useSiteNav, useWebsiteSettings } from "@/hooks/use-website-settings";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,8 +49,11 @@ export function SiteHeader() {
   const publicPage = !/^\/(dashboard|admin|seller|operator|checkout|auth)(\/|$)/.test(pathname);
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [instantClose, setInstantClose] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState("");
+  const drawerId = useId();
+  const drawerTitleId = useId();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const homeLinkRef = useRef<HTMLAnchorElement>(null);
@@ -96,10 +99,22 @@ export function SiteHeader() {
     setSearchOpen(false);
   }
 
+  const handleDrawerOpenChange = useCallback((nextOpen: boolean) => {
+    if (nextOpen) setInstantClose(false);
+    setOpen(nextOpen);
+  }, []);
+
+  const restoreDrawerFocus = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const target = window.matchMedia(DESKTOP_NAV_QUERY).matches ? homeLinkRef : menuTriggerRef;
+    target.current?.focus({ preventScroll: true });
+  }, []);
+
   useEffect(() => {
     const desktop = window.matchMedia(DESKTOP_NAV_QUERY);
     function closeMobileOverlays() {
       if (!desktop.matches) return;
+      setInstantClose(true);
       setOpen(false);
       setSearchOpen(false);
     }
@@ -111,8 +126,7 @@ export function SiteHeader() {
 
   function restoreMobileOverlayFocus(event: Event) {
     event.preventDefault();
-    const target = window.matchMedia(DESKTOP_NAV_QUERY).matches ? homeLinkRef : menuTriggerRef;
-    target.current?.focus({ preventScroll: true });
+    restoreDrawerFocus();
   }
 
   // Fokuskan input saat panel pencarian terbuka. Ditunda satu frame supaya
@@ -301,7 +315,8 @@ export function SiteHeader() {
                 className="min-h-11 min-w-11 rounded-lg bg-surface"
                 aria-label="Buka menu"
                 aria-expanded={open}
-                onClick={() => setOpen(!open)}
+                aria-controls={drawerId}
+                onClick={() => handleDrawerOpenChange(!open)}
               >
                 <Menu className="size-5" aria-hidden="true" />
               </Button>
@@ -309,176 +324,182 @@ export function SiteHeader() {
           </div>
         </div>
       </div>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 [&>button]:hidden sm:max-w-md lg:hidden"
-          aria-describedby={undefined}
-          onCloseAutoFocus={restoreMobileOverlayFocus}
-        >
-          <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-            <SheetTitle className="min-w-0 truncate text-lg">{brandName}</SheetTitle>
+      <MobileNavDrawer
+        id={drawerId}
+        open={open}
+        instantClose={instantClose}
+        labelledBy={drawerTitleId}
+        onOpenChange={handleDrawerOpenChange}
+        onRestoreFocus={restoreDrawerFocus}
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <h2 id={drawerTitleId} className="min-w-0 truncate text-lg font-semibold text-foreground">
+            {brandName}
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="min-h-11 min-w-11"
+            aria-label="Tutup menu"
+            autoFocus
+            onClick={() => handleDrawerOpenChange(false)}
+          >
+            <X className="size-5" aria-hidden="true" />
+          </Button>
+        </div>
+        {/* Pencarian & chat mobile (dipindah dari navbar supaya baris atas ringkas). */}
+        <div className="flex gap-2 px-4 pt-4">
+          {publicPage ? (
             <Button
-              variant="ghost"
+              variant="outline"
+              className="min-h-11 flex-1 justify-start gap-2 text-muted-foreground"
+              onClick={() => {
+                setInstantClose(true);
+                setOpen(false);
+                setSearchOpen(true);
+              }}
+            >
+              <Search className="size-4 shrink-0" aria-hidden="true" />
+              Cari produk
+            </Button>
+          ) : null}
+          {user ? (
+            <Button
+              asChild
+              variant="outline"
               size="icon"
               className="min-h-11 min-w-11"
-              aria-label="Tutup menu"
-              onClick={() => setOpen(false)}
+              aria-label="Chat produk"
             >
-              <X className="size-5" aria-hidden="true" />
+              <Link to="/dashboard/chat" onClick={() => handleDrawerOpenChange(false)}>
+                <MessagesSquare className="size-5" aria-hidden="true" />
+              </Link>
             </Button>
-          </div>
-          {/* Pencarian & chat mobile (dipindah dari navbar supaya baris atas ringkas). */}
-          <div className="flex gap-2 px-4 pt-4">
-            {publicPage ? (
-              <Button
-                variant="outline"
-                className="min-h-11 flex-1 justify-start gap-2 text-muted-foreground"
-                onClick={() => {
-                  setOpen(false);
-                  setSearchOpen(true);
-                }}
-              >
-                <Search className="size-4 shrink-0" aria-hidden="true" />
-                Cari produk
-              </Button>
-            ) : null}
-            {user ? (
-              <Button
-                asChild
-                variant="outline"
-                size="icon"
-                className="min-h-11 min-w-11"
-                aria-label="Chat produk"
-              >
-                <Link to="/dashboard/chat" onClick={() => setOpen(false)}>
-                  <MessagesSquare className="size-5" aria-hidden="true" />
-                </Link>
-              </Button>
-            ) : null}
-          </div>
-          {user ? (
-            <Link
-              to="/dashboard"
-              onClick={() => setOpen(false)}
-              className="m-4 flex min-h-14 items-center gap-3 rounded-lg bg-surface-selected p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <UserRound className="size-5 shrink-0" aria-hidden="true" />
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold">{displayName}</span>
-                <span className="block truncate text-xs text-muted-foreground">{user.email}</span>
-              </span>
-            </Link>
-          ) : (
-            <p className="px-4 py-4 text-sm text-muted-foreground">
-              Masuk untuk memesan dan memantau pesanan.
-            </p>
-          )}
-          {user ? (
-            <nav
-              aria-label="Menu akun"
-              className="grid grid-cols-2 gap-2 border-b border-border px-4 pb-4"
-            >
-              <Button asChild variant="outline" className="min-h-11">
-                <Link
-                  to="/dashboard/pesanan"
-                  search={{ filter: "all" }}
-                  onClick={() => setOpen(false)}
-                >
-                  Pesanan
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="min-h-11">
-                <Link to="/dashboard/produk-saya" onClick={() => setOpen(false)}>
-                  Produk dibeli
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="min-h-11">
-                <Link to="/dashboard/notifikasi" onClick={() => setOpen(false)}>
-                  Notifikasi
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="min-h-11">
-                <Link to="/dashboard/pengaturan" onClick={() => setOpen(false)}>
-                  Pengaturan
-                </Link>
-              </Button>
-            </nav>
           ) : null}
-          <nav aria-label="Navigasi seluler" className="flex flex-col gap-1 p-3">
-            {navItems.map((item) => {
-              const meta = NAV_META[item.url];
-              const Icon = meta?.icon ?? ChevronRight;
-              return (
-                <Link
-                  key={`${item.url}-${item.label}`}
-                  to={item.url as string}
-                  target={item.open_in_new_tab ? "_blank" : undefined}
-                  rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
-                  onClick={() => setOpen(false)}
-                  className="flex min-h-14 items-center gap-3 rounded-lg px-3 py-3 hover:bg-surface-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  activeProps={{ className: "bg-surface-selected" }}
-                >
-                  <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold">{item.label}</span>
-                    {meta ? (
-                      <span className="block text-xs text-muted-foreground">
-                        {meta.description}
-                      </span>
-                    ) : null}
-                  </span>
-                </Link>
-              );
-            })}
+        </div>
+        {user ? (
+          <Link
+            to="/dashboard"
+            onClick={() => handleDrawerOpenChange(false)}
+            className="m-4 flex min-h-14 items-center gap-3 rounded-lg bg-surface-selected p-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <UserRound className="size-5 shrink-0" aria-hidden="true" />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-semibold">{displayName}</span>
+              <span className="block truncate text-xs text-muted-foreground">{user.email}</span>
+            </span>
+          </Link>
+        ) : (
+          <p className="px-4 py-4 text-sm text-muted-foreground">
+            Masuk untuk memesan dan memantau pesanan.
+          </p>
+        )}
+        {user ? (
+          <nav
+            aria-label="Menu akun"
+            className="grid grid-cols-2 gap-2 border-b border-border px-4 pb-4"
+          >
+            <Button asChild variant="outline" className="min-h-11">
+              <Link
+                to="/dashboard/pesanan"
+                search={{ filter: "all" }}
+                onClick={() => handleDrawerOpenChange(false)}
+              >
+                Pesanan
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="min-h-11">
+              <Link to="/dashboard/produk-saya" onClick={() => handleDrawerOpenChange(false)}>
+                Produk dibeli
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="min-h-11">
+              <Link to="/dashboard/notifikasi" onClick={() => handleDrawerOpenChange(false)}>
+                Notifikasi
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="min-h-11">
+              <Link to="/dashboard/pengaturan" onClick={() => handleDrawerOpenChange(false)}>
+                Pengaturan
+              </Link>
+            </Button>
           </nav>
-          <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
-            {user ? (
-              <>
-                {isAdmin ? (
-                  <Button asChild variant="outline" className="min-h-11 justify-start">
-                    <Link to="/admin" onClick={() => setOpen(false)}>
-                      <ShieldCheck className="size-4" aria-hidden="true" /> Dashboard admin
-                    </Link>
-                  </Button>
-                ) : null}
-                {isOperator ? (
-                  <Button asChild variant="outline" className="min-h-11 justify-start">
-                    <Link to="/operator" onClick={() => setOpen(false)}>
-                      <ClipboardList className="size-4" aria-hidden="true" /> Tugas saya
-                    </Link>
-                  </Button>
-                ) : null}
-                <Button asChild className="min-h-11 justify-start">
-                  <Link to="/dashboard" onClick={() => setOpen(false)}>
-                    <LayoutDashboard className="size-4" aria-hidden="true" /> Akun saya
+        ) : null}
+        <nav aria-label="Navigasi seluler" className="flex flex-col gap-1 p-3">
+          {navItems.map((item) => {
+            const meta = NAV_META[item.url];
+            const Icon = meta?.icon ?? ChevronRight;
+            return (
+              <Link
+                key={`${item.url}-${item.label}`}
+                to={item.url as string}
+                target={item.open_in_new_tab ? "_blank" : undefined}
+                rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+                onClick={() => handleDrawerOpenChange(false)}
+                className="flex min-h-14 items-center gap-3 rounded-lg px-3 py-3 hover:bg-surface-selected focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                activeProps={{ className: "bg-surface-selected" }}
+              >
+                <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold">{item.label}</span>
+                  {meta ? (
+                    <span className="block text-xs text-muted-foreground">{meta.description}</span>
+                  ) : null}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
+          {user ? (
+            <>
+              {isAdmin ? (
+                <Button asChild variant="outline" className="min-h-11 justify-start">
+                  <Link to="/admin" onClick={() => handleDrawerOpenChange(false)}>
+                    <ShieldCheck className="size-4" aria-hidden="true" /> Dashboard admin
                   </Link>
                 </Button>
-                <Button
-                  variant="outline"
-                  className="min-h-11 justify-start"
-                  onClick={handleSignOut}
+              ) : null}
+              {isOperator ? (
+                <Button asChild variant="outline" className="min-h-11 justify-start">
+                  <Link to="/operator" onClick={() => handleDrawerOpenChange(false)}>
+                    <ClipboardList className="size-4" aria-hidden="true" /> Tugas saya
+                  </Link>
+                </Button>
+              ) : null}
+              <Button asChild className="min-h-11 justify-start">
+                <Link to="/dashboard" onClick={() => handleDrawerOpenChange(false)}>
+                  <LayoutDashboard className="size-4" aria-hidden="true" /> Akun saya
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-h-11 justify-start"
+                onClick={handleSignOut}
+              >
+                <LogOut className="size-4" aria-hidden="true" /> Keluar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild className="min-h-11">
+                <Link
+                  to="/auth"
+                  search={{ mode: "daftar" }}
+                  onClick={() => handleDrawerOpenChange(false)}
                 >
-                  <LogOut className="size-4" aria-hidden="true" /> Keluar
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button asChild className="min-h-11">
-                  <Link to="/auth" search={{ mode: "daftar" }} onClick={() => setOpen(false)}>
-                    Daftar akun
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="min-h-11">
-                  <Link to="/auth" onClick={() => setOpen(false)}>
-                    Masuk
-                  </Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+                  Daftar akun
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="min-h-11">
+                <Link to="/auth" onClick={() => handleDrawerOpenChange(false)}>
+                  Masuk
+                </Link>
+              </Button>
+            </>
+          )}
+        </div>
+      </MobileNavDrawer>
 
       {/* Pencarian mobile: satu panel penuh agar input lega dan keyboard tidak
           mendorong konten navbar. Ditutup dengan X atau Escape. */}
