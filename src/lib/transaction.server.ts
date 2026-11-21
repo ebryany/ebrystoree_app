@@ -1,4 +1,8 @@
 /** Helper server-only untuk domain transaksi. Tidak boleh diimpor dari komponen. */
+import { getOrLoad } from "./server-cache.server";
+
+const TX_SETTINGS_TTL_MS = 30_000;
+const skipTxCache = () => Boolean(process.env.VITEST);
 
 const RPC_ERROR_MESSAGE: Record<string, string> = {
   UNAUTHENTICATED: "Sesi Anda berakhir. Silakan masuk kembali.",
@@ -80,28 +84,32 @@ export async function loadPaymentInstruction(supabase: any) {
 
 /** Detail rekening manual disimpan sebagai setting privat, dibaca dengan service role. */
 export async function loadManualAccount() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin
-    .from("system_settings")
-    .select("key, value")
-    .in("key", [
-      "manual_payment_method",
-      "manual_payment_number",
-      "manual_payment_holder",
-      "manual_payment_active",
-      "feature_manual_payment",
-      "proof_reupload_limit",
-    ]);
+  const fetchAccount = async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("system_settings")
+      .select("key, value")
+      .in("key", [
+        "manual_payment_method",
+        "manual_payment_number",
+        "manual_payment_holder",
+        "manual_payment_active",
+        "feature_manual_payment",
+        "proof_reupload_limit",
+      ]);
 
-  const map = new Map<string, unknown>((data ?? []).map((r: any) => [r.key, r.value]));
-  return {
-    method: (map.get("manual_payment_method") as string) ?? "DANA",
-    number: (map.get("manual_payment_number") as string) ?? "",
-    holder: (map.get("manual_payment_holder") as string) ?? "",
-    active:
-      map.get("manual_payment_active") !== false && map.get("feature_manual_payment") !== false,
-    reuploadLimit: Number(map.get("proof_reupload_limit") ?? 3),
+    const map = new Map<string, unknown>((data ?? []).map((r: any) => [r.key, r.value]));
+    return {
+      method: (map.get("manual_payment_method") as string) ?? "DANA",
+      number: (map.get("manual_payment_number") as string) ?? "",
+      holder: (map.get("manual_payment_holder") as string) ?? "",
+      active:
+        map.get("manual_payment_active") !== false && map.get("feature_manual_payment") !== false,
+      reuploadLimit: Number(map.get("proof_reupload_limit") ?? 3),
+    };
   };
+  if (skipTxCache()) return fetchAccount();
+  return getOrLoad("tx-settings", "manual-account", TX_SETTINGS_TTL_MS, fetchAccount);
 }
 
 /**
@@ -129,33 +137,37 @@ function resolveEnabled(map: Map<string, unknown>, canonical: string, aliases: s
 }
 
 export async function loadPaymentMethods(): Promise<PaymentMethods> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin
-    .from("system_settings")
-    .select("key, value")
-    .in("key", [
-      "qris_enabled",
-      "qris_payment_active",
-      "feature_qris",
-      "manual_payment_active",
-      "feature_manual_payment",
-      "shopeepay_enabled",
-    ]);
+  const fetchMethods = async (): Promise<PaymentMethods> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("system_settings")
+      .select("key, value")
+      .in("key", [
+        "qris_enabled",
+        "qris_payment_active",
+        "feature_qris",
+        "manual_payment_active",
+        "feature_manual_payment",
+        "shopeepay_enabled",
+      ]);
 
-  const map = new Map<string, unknown>((data ?? []).map((r: any) => [r.key, r.value]));
-  const { sumopodConfig } = await import("./sumopod.server");
-  const { shopeepayConfig } = await import("./shopeepay.server");
+    const map = new Map<string, unknown>((data ?? []).map((r: any) => [r.key, r.value]));
+    const { sumopodConfig } = await import("./sumopod.server");
+    const { shopeepayConfig } = await import("./shopeepay.server");
 
-  return {
-    // QRIS juga butuh kredensial provider; tanpa itu saklar tidak ada artinya.
-    qris:
-      Boolean(sumopodConfig()) &&
-      resolveEnabled(map, "qris_enabled", ["qris_payment_active", "feature_qris"]),
-    manual: resolveEnabled(map, "manual_payment_active", ["feature_manual_payment"]),
-    // ShopeePay resmi: wajib SHOPEEPAY_ENABLED=true + kredensial lengkap di server,
-    // dan dapat dimatikan admin lewat setting shopeepay_enabled=false.
-    shopeepay: Boolean(shopeepayConfig()) && map.get("shopeepay_enabled") !== false,
+    return {
+      // QRIS juga butuh kredensial provider; tanpa itu saklar tidak ada artinya.
+      qris:
+        Boolean(sumopodConfig()) &&
+        resolveEnabled(map, "qris_enabled", ["qris_payment_active", "feature_qris"]),
+      manual: resolveEnabled(map, "manual_payment_active", ["feature_manual_payment"]),
+      // ShopeePay resmi: wajib SHOPEEPAY_ENABLED=true + kredensial lengkap di server,
+      // dan dapat dimatikan admin lewat setting shopeepay_enabled=false.
+      shopeepay: Boolean(shopeepayConfig()) && map.get("shopeepay_enabled") !== false,
+    };
   };
+  if (skipTxCache()) return fetchMethods();
+  return getOrLoad("tx-settings", "payment-methods", TX_SETTINGS_TTL_MS, fetchMethods);
 }
 
 export async function signedUrl(

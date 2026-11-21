@@ -41,7 +41,11 @@ type SidebarGroup = {
  */
 export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
   const fetchStore = useServerFn(getMyStore);
-  const { data, isPending } = useQuery({ queryKey: ["my-store"], queryFn: () => fetchStore({}) });
+  const { data, isPending } = useQuery({
+    queryKey: ["my-store"],
+    queryFn: () => fetchStore({}),
+    staleTime: 5 * 60_000,
+  });
   const hasStore = Boolean(data?.store);
   const storeActive = hasStore && (data?.store as any)?.status === "active";
 

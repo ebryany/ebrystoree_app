@@ -1,16 +1,7 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import {
   BarChart3,
   ChevronRight,
@@ -30,6 +21,8 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react";
+
+const LazySellerTrendChart = lazy(() => import("@/components/seller/seller-trend-chart"));
 
 import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
 import { StatTile } from "@/components/ebry/cards";
@@ -57,71 +50,17 @@ export const Route = createFileRoute("/_authenticated/seller/")({
   component: SellerOverview,
 });
 
-function compactRupiah(value: number) {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)} jt`;
-  if (value >= 1_000) return `${Math.round(value / 1_000)} rb`;
-  return String(value);
-}
-
-function shortDate(value: string) {
-  const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? value
-    : d.toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
-}
-
-/** Grafik area 30 hari. Recharts hanya dirender setelah mount (aman untuk SSR). */
+/** Grafik area 30 hari. Chunk Recharts diunduh secara dinamis setelah mount (aman SSR, bebas blokir route). */
 function TrendChart({ data }: { data: Array<{ date: string; total: number }> }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="h-[240px] animate-pulse rounded-lg bg-muted/50" />;
+  const placeholder = <div className="h-[240px] animate-pulse rounded-lg bg-muted/50" />;
+  if (!mounted) return placeholder;
 
   return (
-    <div style={{ width: "100%", height: 240 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-          <XAxis
-            dataKey="date"
-            tickFormatter={shortDate}
-            minTickGap={16}
-            stroke="var(--muted-foreground)"
-            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            tickFormatter={compactRupiah}
-            width={54}
-            stroke="var(--muted-foreground)"
-            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <Tooltip
-            contentStyle={{
-              background: "var(--popover)",
-              border: "1px solid var(--border)",
-              borderRadius: "0.6rem",
-              color: "var(--popover-foreground)",
-              fontSize: 12,
-            }}
-            labelStyle={{ color: "var(--muted-foreground)", fontSize: 12 }}
-            labelFormatter={(v) => shortDate(String(v))}
-            formatter={(value: number) => [formatRupiah(Number(value)), "Pendapatan"]}
-          />
-          {/* Linear, bukan monotone: hari tanpa penjualan tetap 0, tidak "menggelembung". */}
-          <Area
-            type="linear"
-            dataKey="total"
-            stroke="var(--chart-1)"
-            strokeWidth={2}
-            fill="var(--chart-1)"
-            fillOpacity={0.12}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+    <Suspense fallback={placeholder}>
+      <LazySellerTrendChart data={data} />
+    </Suspense>
   );
 }
 
@@ -186,10 +125,13 @@ function SellerOverview() {
   const { data, isPending, error } = useQuery({
     queryKey: ["seller-summary"],
     queryFn: () => fetchSummary({}),
-    refetchOnWindowFocus: "always",
   });
   // Query key sama dengan halaman masing-masing supaya cache dipakai bersama.
-  const storeQ = useQuery({ queryKey: ["my-store"], queryFn: () => fetchStore({}) });
+  const storeQ = useQuery({
+    queryKey: ["my-store"],
+    queryFn: () => fetchStore({}),
+    staleTime: 5 * 60_000,
+  });
   const monitoringQ = useQuery({
     queryKey: ["seller-monitoring", "actions", 1],
     queryFn: () => fetchMonitoring({ data: { scope: "seller", filter: "actions", page: 1 } }),

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatRupiah, priceDetails } from "@/lib/format";
 import { listMyStoreProducts, getMyInventorySummary } from "@/lib/seller.functions";
-import { cn } from "@/lib/utils";
+import { cn, optimizedMediaUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/seller/produk/")({
   head: () => ({
@@ -80,6 +80,7 @@ function SellerProducts() {
   const fetchInventory = useServerFn(getMyInventorySummary);
   const [tab, setTab] = useState<TabKey>("all");
   const [q, setQ] = useState("");
+  const deferredQ = useDeferredValue(q);
 
   const { data, isPending, error } = useQuery({
     queryKey: ["my-store-products"],
@@ -102,10 +103,10 @@ function SellerProducts() {
     [items],
   ) as Record<TabKey, number>;
   const visible = useMemo(() => {
-    const term = q.trim().toLowerCase();
+    const term = deferredQ.trim().toLowerCase();
     const match = TABS.find((t) => t.key === tab)!.match;
     return items.filter((p) => match(p) && (!term || p.name.toLowerCase().includes(term)));
-  }, [items, tab, q]);
+  }, [items, tab, deferredQ]);
 
   const inv = (
     inventoryQ.data as { summary?: { low_stock: number; threshold: number } } | undefined
@@ -212,8 +213,8 @@ function SellerProducts() {
             />
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-              {visible.map((p) => (
-                <ProductCard key={p.id} p={p} />
+              {visible.map((p, index) => (
+                <ProductCard key={p.id} p={p} index={index} />
               ))}
             </ul>
           )}
@@ -223,7 +224,7 @@ function SellerProducts() {
   );
 }
 
-function ProductCard({ p }: { p: Product }) {
+function ProductCard({ p, index }: { p: Product; index: number }) {
   const modLabel = MOD_LABEL[p.moderation_status] ?? p.moderation_status;
   const { price, hasDiscount } = priceDetails(p.price, p.discount_price);
   const stock = stockLabel(p);
@@ -231,7 +232,7 @@ function ProductCard({ p }: { p: Product }) {
     p.status === "published" ? "Tayang" : p.status === "archived" ? "Diarsipkan" : "Draf";
 
   return (
-    <li className="flex">
+    <li className={cn("flex", index >= 4 && "cv-card")}>
       <Link
         to="/seller/produk/$id"
         params={{ id: p.id }}
@@ -240,9 +241,10 @@ function ProductCard({ p }: { p: Product }) {
         <span className="relative block aspect-[4/3] overflow-hidden bg-surface-selected">
           {p.thumbnail_url ? (
             <img
-              src={p.thumbnail_url}
+              src={optimizedMediaUrl(p.thumbnail_url, 480)}
               alt=""
               loading="lazy"
+              decoding="async"
               className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
             />
           ) : (

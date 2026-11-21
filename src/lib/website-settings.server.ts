@@ -1,3 +1,4 @@
+import { clearServerCache } from "./server-cache.server";
 import {
   FIELD_BY_KEY,
   PUBLIC_DEFAULTS,
@@ -29,6 +30,7 @@ let publicInflight: Promise<Awaited<ReturnType<typeof fetchPublicSettings>>> | n
 export function clearPublicSettingsCache() {
   publicCache = null;
   publicInflight = null;
+  clearServerCache("tx-settings");
 }
 
 /** Nilai publik (anon) — dipakai SSR header/footer/metadata/maintenance. */

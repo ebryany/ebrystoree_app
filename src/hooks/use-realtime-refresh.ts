@@ -68,6 +68,11 @@ export function useRealtimeRefresh({
     if (!enabled) return;
     // Nama channel unik per instance komponen agar dua layar tidak saling menimpa.
     const ch = supabase.channel(`${channel}:${instanceId}`);
+    // Jangan invalidate di subscribe awal saat halaman baru mount (data baru saja diambil).
+    // Hanya resync ketika channel benar-benar pulih dari putus/error/offline.
+    let needsResync = false;
+    let hiddenAt: number | null = null;
+    const MIN_HIDDEN_RESYNC_MS = 30_000;
 
     const flush = () => {
       timerRef.current = null;
@@ -95,22 +100,41 @@ export function useRealtimeRefresh({
     ch.subscribe((status) => {
       const mapped = mapRealtimeStatus(status);
       if (mapped) queryClient.setQueryData(realtimeStatusKey(channel), mapped);
-      if (status === "SUBSCRIBED") {
-        // Setelah (re)koneksi berhasil, samakan data yang mungkin tertinggal saat offline.
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        needsResync = true;
+      } else if (status === "SUBSCRIBED" && needsResync) {
+        // Setelah rekoneksi berhasil, samakan data yang mungkin tertinggal saat putus.
+        needsResync = false;
         schedule();
       }
     });
 
-    // Segarkan saat tab kembali aktif — event yang terlewat tidak dikirim ulang.
+    // Segarkan saat tab kembali aktif setelah tersembunyi cukup lama (≥30 dtk)
+    // atau saat jaringan kembali online — hindari refetch berlebih saat pindah tab singkat.
     const onVisible = () => {
-      if (document.visibilityState === "visible") schedule();
+      if (document.visibilityState === "visible") {
+        if (hiddenAt !== null && Date.now() - hiddenAt >= MIN_HIDDEN_RESYNC_MS) {
+          schedule();
+        }
+        hiddenAt = null;
+        return;
+      }
+      hiddenAt = Date.now();
     };
-    const onOnline = () => schedule();
+    const onOffline = () => {
+      needsResync = true;
+    };
+    const onOnline = () => {
+      needsResync = false;
+      schedule();
+    };
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("offline", onOffline);
     window.addEventListener("online", onOnline);
 
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("offline", onOffline);
       window.removeEventListener("online", onOnline);
       if (timerRef.current) clearTimeout(timerRef.current);
       supabase.removeChannel(ch);

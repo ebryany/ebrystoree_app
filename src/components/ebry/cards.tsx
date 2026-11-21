@@ -7,7 +7,7 @@ import { InlineToasts } from "@/components/ebry/inline-toasts";
 import { StatusPill } from "@/components/ebry/status";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, optimizedMediaUrl } from "@/lib/utils";
 export function formatIDR(value: number | null | undefined): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -349,7 +349,15 @@ export function OrderRow({
       >
         <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface-selected">
           {thumbnailUrl ? (
-            <img src={thumbnailUrl} alt="" className="size-full object-cover" loading="lazy" />
+            <img
+              src={optimizedMediaUrl(thumbnailUrl, 96)}
+              alt=""
+              width={48}
+              height={48}
+              decoding="async"
+              className="size-full object-cover"
+              loading="lazy"
+            />
           ) : (
             <Package className="size-5 text-muted-foreground" aria-hidden="true" />
           )}
@@ -594,6 +602,7 @@ export function BankListRow({
   to,
   params,
   search,
+  className,
 }: {
   icon: LucideIcon;
   title: string;
@@ -603,6 +612,7 @@ export function BankListRow({
   to?: string;
   params?: Record<string, unknown>;
   search?: Record<string, unknown>;
+  className?: string;
 }) {
   const inner = (
     <>
@@ -634,7 +644,7 @@ export function BankListRow({
     "flex min-h-[64px] items-center gap-3 py-3 transition-colors hover:bg-surface-selected/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   return (
-    <li className="border-b border-border last:border-b-0">
+    <li className={cn("border-b border-border last:border-b-0", className)}>
       {to ? (
         <Link to={to} params={params as never} search={search as never} className={cls}>
           {inner}

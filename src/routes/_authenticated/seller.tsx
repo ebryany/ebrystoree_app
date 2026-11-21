@@ -33,29 +33,7 @@ import { useSession } from "@/hooks/use-session";
 import { useSellerBadges } from "@/hooks/use-seller-badges";
 import { listMyNotifications } from "@/lib/orders.functions";
 import { applyAsSeller, getMyStore } from "@/lib/seller.functions";
-import { cn, isRenderableImageUrl } from "@/lib/utils";
-
-/**
- * Status toko sendiri seperti yang dilihat pembeli (dibaca dari server, disegarkan
- * tiap menit). Sebelum data pertama tiba, dashboard yang terbuka dianggap online.
- */
-function OwnPresence({
-  storeId,
-  kind,
-  className,
-}: {
-  storeId: string;
-  kind: "dot" | "label";
-  className?: string;
-}) {
-  const [openedAt] = useState(() => new Date().toISOString());
-  const presence = useStorePresence(storeId, { online: true, lastSeenAt: openedAt });
-  return kind === "dot" ? (
-    <OnlineDot presence={presence} className={className} />
-  ) : (
-    <PresenceLabel presence={presence} className={className} />
-  );
-}
+import { cn, isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/seller")({
   head: () => ({
@@ -80,11 +58,13 @@ const STORE_STATUS: Record<string, { label: string; tone: string }> = {
 
 function SellerLayout() {
   const { user } = useSession();
+  const [openedAt] = useState(() => new Date().toISOString());
   const fetchStore = useServerFn(getMyStore);
   const fetchNotifications = useServerFn(listMyNotifications);
   const { data, isPending, error } = useQuery({
     queryKey: ["my-store"],
     queryFn: () => fetchStore({}),
+    staleTime: 5 * 60_000,
   });
   const { data: notifData } = useQuery({
     queryKey: ["my-notifications"],
@@ -93,8 +73,14 @@ function SellerLayout() {
   });
   const unread = (((notifData as any)?.items ?? []) as any[]).filter((n) => !n.read_at).length;
 
-  const hasActiveStore = (data?.store as { status?: string } | null)?.status === "active";
+  const storeRecord = data?.store as { id?: string; status?: string } | null | undefined;
+  const hasActiveStore = storeRecord?.status === "active";
   const badges = useSellerBadges(hasActiveStore);
+  // Panggil satu kali di layout (bukan 4 komponen terpisah) agar listener & query tidak duplikat.
+  const ownPresence = useStorePresence(
+    hasActiveStore ? storeRecord?.id : null,
+    hasActiveStore ? { online: true, lastSeenAt: openedAt } : null,
+  );
 
   // Toko aktif: navigasi bawah khusus kerja seller. Akun pembeli lewat header.
   const bottomNav: BottomNavItem[] = hasActiveStore
@@ -171,7 +157,9 @@ function SellerLayout() {
   const meta = STORE_STATUS[store.status] ?? { label: store.status, tone: "neutral" };
   const isActive = store.status === "active";
 
-  const logo = isRenderableImageUrl(store.logo_url) ? (store.logo_url as string) : null;
+  const logo = isRenderableImageUrl(store.logo_url)
+    ? optimizedMediaUrl(store.logo_url as string, 96)
+    : null;
 
   const avatar = (size: "sm" | "md") => (
     <span
@@ -184,15 +172,17 @@ function SellerLayout() {
         <img
           src={logo}
           alt=""
+          width={size === "sm" ? 40 : 48}
+          height={size === "sm" ? 40 : 48}
+          decoding="async"
           className={cn("size-full object-cover", size === "sm" ? "rounded-xl" : "rounded-2xl")}
         />
       ) : (
         <Store className="size-5" aria-hidden="true" />
       )}
       {isActive ? (
-        <OwnPresence
-          storeId={store.id}
-          kind="dot"
+        <OnlineDot
+          presence={ownPresence}
           className="-bottom-0.5 -right-0.5 size-3 ring-2 ring-card sm:size-3"
         />
       ) : null}
@@ -218,7 +208,7 @@ function SellerLayout() {
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-bold text-foreground">{store.name}</p>
           {isActive ? (
-            <OwnPresence storeId={store.id} kind="label" className="flex text-xs" />
+            <PresenceLabel presence={ownPresence} className="flex text-xs" />
           ) : (
             <StatusPill value={meta.tone as any} kind="raw" label={meta.label} />
           )}
@@ -239,7 +229,7 @@ function SellerLayout() {
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-base font-bold text-foreground">{store.name}</h1>
               {isActive ? (
-                <OwnPresence storeId={store.id} kind="label" className="flex text-xs" />
+                <PresenceLabel presence={ownPresence} className="flex text-xs" />
               ) : (
                 <p className="truncate text-xs text-muted-foreground">/toko/{store.slug}</p>
               )}

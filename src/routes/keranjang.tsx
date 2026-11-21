@@ -17,6 +17,7 @@ import {
 } from "@/lib/cart-store";
 import { validateCartItems } from "@/lib/cart.functions";
 import { formatRupiah } from "@/lib/format";
+import { optimizedMediaUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/keranjang")({
   head: () => ({
@@ -65,7 +66,10 @@ function CartPage() {
   });
 
   const validated = useMemo(() => ((data?.items ?? []) as any[]), [data?.items]);
-  const byId = new Map(validated.map((v) => [cartLineKey(v.productId, v.variantId), v]));
+  const byId = useMemo(
+    () => new Map(validated.map((v) => [cartLineKey(v.productId, v.variantId), v])),
+    [validated],
+  );
 
   // Kelompokkan per toko: checkout tetap per item karena backend belum
   // mendukung multi-item dalam satu order.
@@ -157,8 +161,12 @@ function CartPage() {
                           <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-surface-selected">
                             {item.thumbnailUrl ? (
                               <img
-                                src={item.thumbnailUrl}
+                                src={optimizedMediaUrl(item.thumbnailUrl, 128)}
                                 alt=""
+                                width={56}
+                                height={56}
+                                loading="lazy"
+                                decoding="async"
                                 className="size-full object-cover"
                               />
                             ) : (

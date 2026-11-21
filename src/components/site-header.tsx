@@ -68,6 +68,7 @@ export function SiteHeader() {
     queryKey: ["my-roles"],
     queryFn: () => fetchRoles({}),
     enabled: Boolean(user),
+    staleTime: 5 * 60_000,
   });
   // Query key sama dengan halaman chat supaya cache & realtime dipakai bersama.
   const fetchChatUnread = useServerFn(listInquiryUnreadCounts);

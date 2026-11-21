@@ -71,7 +71,11 @@ function Notifikasi() {
     queryKey: ["my-notifications"],
     queryFn: () => fetchItems({}),
   });
-  const { data: rolesData } = useQuery({ queryKey: ["my-roles"], queryFn: () => fetchRoles({}) });
+  const { data: rolesData } = useQuery({
+    queryKey: ["my-roles"],
+    queryFn: () => fetchRoles({}),
+    staleTime: 5 * 60_000,
+  });
   const staff = isPayoutStaff((rolesData as { roles?: string[] } | undefined)?.roles);
 
   useRealtimeRefresh({
@@ -118,10 +122,22 @@ function Notifikasi() {
     await queryClient.invalidateQueries({ queryKey: ["customer-summary"] });
   }
   async function handleRead(id: string) {
+    const now = new Date().toISOString();
+    queryClient.setQueryData(["my-notifications"], (prev: any) =>
+      prev?.items
+        ? { ...prev, items: prev.items.map((n: Item) => (n.id === id ? { ...n, read_at: n.read_at ?? now } : n)) }
+        : prev,
+    );
     await markRead({ data: { id } });
     await refresh();
   }
   async function handleReadAll() {
+    const now = new Date().toISOString();
+    queryClient.setQueryData(["my-notifications"], (prev: any) =>
+      prev?.items
+        ? { ...prev, items: prev.items.map((n: Item) => ({ ...n, read_at: n.read_at ?? now })) }
+        : prev,
+    );
     await markAll({});
     await refresh();
   }
@@ -276,11 +292,12 @@ function Notifikasi() {
                   {label}
                 </h2>
                 <ul className="divide-y divide-border">
-                  {list.map((n) => (
+                  {list.map((n, index) => (
                     <NotificationRow
                       key={n.id}
                       item={n}
                       staff={staff}
+                      defer={index >= 6}
                       onRead={() => handleRead(n.id)}
                     />
                   ))}
@@ -297,10 +314,12 @@ function Notifikasi() {
 function NotificationRow({
   item: n,
   staff,
+  defer = false,
   onRead,
 }: {
   item: Item;
   staff: boolean;
+  defer?: boolean;
   onRead: () => void;
 }) {
   const tone = notificationTone(n.type);
@@ -354,7 +373,7 @@ function NotificationRow({
   );
 
   return (
-    <li className="relative">
+    <li className={cn("relative", defer && "cv-row")}>
       {href ? (
         // Membuka notifikasi sekaligus menandainya dibaca.
         <Link

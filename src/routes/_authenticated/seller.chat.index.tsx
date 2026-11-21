@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { MessageSquare, Search } from "lucide-react";
 
-import { CountUp } from "@/components/admin/report-widgets";
 import { ChatListItemContent } from "@/components/chat/chat-list-item";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { StatusPill } from "@/components/ebry/status";
@@ -39,14 +37,13 @@ type TabKey = (typeof TABS)[number]["key"];
 function SellerChatList() {
   const [tab, setTab] = useState<TabKey>("all");
   const [q, setQ] = useState("");
-  const reduced = useReducedMotion();
+  const deferredQ = useDeferredValue(q);
   const fetchList = useServerFn(listSellerInquiries);
   const fetchUnread = useServerFn(listInquiryUnreadCounts);
 
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["seller-inquiries", "all"],
     queryFn: () => fetchList({ data: { status: "all" } }),
-    refetchOnWindowFocus: "always",
   });
   const unreadQ = useQuery({ queryKey: ["inquiry-unread"], queryFn: () => fetchUnread({}) });
 
@@ -56,25 +53,36 @@ function SellerChatList() {
     keys: [["seller-inquiries", "all"], ["inquiry-unread"]],
   });
 
-  const allItems: any[] = data?.items ?? [];
-  const filtered = tab === "all" ? allItems : allItems.filter((i: any) => i.status === tab);
-  const term = q.trim().toLowerCase();
-  const visible = term
-    ? filtered.filter((i: any) =>
-        `${i.customer_name ?? ""} ${i.subject ?? ""}`.toLowerCase().includes(term),
-      )
-    : filtered;
+  const allItems = useMemo(() => (data?.items ?? []) as any[], [data?.items]);
+  const counts = useMemo(() => {
+    let open = 0;
+    let answered = 0;
+    let closed = 0;
+    for (const i of allItems) {
+      if (i.status === "open") open += 1;
+      else if (i.status === "answered") answered += 1;
+      else if (i.status === "closed") closed += 1;
+    }
+    return { all: allItems.length, open, answered, closed };
+  }, [allItems]);
 
-  const unreadById = new Map(
-    (unreadQ.data?.items ?? []).map((row) => [row.inquiry_id, Number(row.unread)]),
+  const visible = useMemo(() => {
+    const filtered = tab === "all" ? allItems : allItems.filter((i: any) => i.status === tab);
+    const term = deferredQ.trim().toLowerCase();
+    return term
+      ? filtered.filter((i: any) =>
+          `${i.customer_name ?? ""} ${i.subject ?? ""}`.toLowerCase().includes(term),
+        )
+      : filtered;
+  }, [allItems, tab, deferredQ]);
+
+  const unreadById = useMemo(
+    () =>
+      new Map(
+        (unreadQ.data?.items ?? []).map((row) => [row.inquiry_id, Number(row.unread)]),
+      ),
+    [unreadQ.data?.items],
   );
-
-  const counts = {
-    all: allItems.length,
-    open: allItems.filter((i: any) => i.status === "open").length,
-    answered: allItems.filter((i: any) => i.status === "answered").length,
-    closed: allItems.filter((i: any) => i.status === "closed").length,
-  };
 
   return (
     <div className="space-y-4">
@@ -128,7 +136,7 @@ function SellerChatList() {
                         : "bg-muted text-muted-foreground",
                     )}
                   >
-                    {data ? <CountUp value={counts[entry.key]} /> : "0"}
+                    {data ? counts[entry.key].toLocaleString("id-ID") : "0"}
                   </span>
                 </button>
               );
@@ -169,54 +177,45 @@ function SellerChatList() {
             }
           />
         ) : data ? (
-          <motion.ul layout={!reduced} className="divide-y divide-border" aria-label="Daftar chat">
-            <AnimatePresence initial={false} mode="popLayout">
-              {visible.map((item: any) => {
-                const unread = unreadById.get(item.id) ?? 0;
-                const name: string = item.customer_name || item.subject || "Pembeli";
-                return (
-                  <motion.li
-                    key={item.id}
-                    layout={!reduced}
-                    initial={reduced ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={reduced ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+          <ul className="divide-y divide-border" aria-label="Daftar chat">
+            {visible.map((item: any, index: number) => {
+              const unread = unreadById.get(item.id) ?? 0;
+              const name: string = item.customer_name || item.subject || "Pembeli";
+              return (
+                <li key={item.id} className={index >= 6 ? "cv-row" : undefined}>
+                  <Link
+                    to="/seller/chat/$id"
+                    params={{ id: item.id }}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                      unread > 0 && "bg-accent/[0.04]",
+                    )}
                   >
-                    <Link
-                      to="/seller/chat/$id"
-                      params={{ id: item.id }}
-                      className={cn(
-                        "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                        unread > 0 && "bg-accent/[0.04]",
-                      )}
+                    <span
+                      className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-selected text-sm font-bold uppercase text-accent"
+                      aria-hidden="true"
                     >
-                      <span
-                        className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-selected text-sm font-bold uppercase text-accent"
-                        aria-hidden="true"
-                      >
-                        {name.trim().charAt(0) || "?"}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <ChatListItemContent
-                          title={name}
-                          preview={item.last_message_body}
-                          lastMessageAt={item.last_message_at}
-                          unread={unread}
-                        />
-                      </div>
-                      <StatusPill
-                        value={item.status}
-                        kind="raw"
-                        label={INQUIRY_STATUS_LABEL[item.status]}
-                        className="hidden sm:inline-flex"
+                      {name.trim().charAt(0) || "?"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <ChatListItemContent
+                        title={name}
+                        preview={item.last_message_body}
+                        lastMessageAt={item.last_message_at}
+                        unread={unread}
                       />
-                    </Link>
-                  </motion.li>
-                );
-              })}
-            </AnimatePresence>
-          </motion.ul>
+                    </div>
+                    <StatusPill
+                      value={item.status}
+                      kind="raw"
+                      label={INQUIRY_STATUS_LABEL[item.status]}
+                      className="hidden sm:inline-flex"
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         ) : null}
       </section>
     </div>

@@ -1,7 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -91,21 +90,16 @@ export function ServiceOrderCard({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
-  const reduced = useReducedMotion();
   const next = serviceOrderNextAction(row);
   const deadline = serviceOrderPhaseDeadline(row, Date.now());
   const NextIcon = NEXT_ACTION_ICON[next.tone];
 
   return (
-    <motion.article
-      layout={!reduced}
-      initial={reduced ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={reduced ? undefined : { opacity: 0, y: -8 }}
-      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : index * 0.04 }}
+    <article
       className={cn(
         "min-w-0 overflow-hidden rounded-2xl border bg-card",
         next.tone === "danger" ? "border-destructive/40" : "border-border",
+        index >= 4 && "cv-card",
       )}
       aria-label={`Pesanan ${row.order_number}`}
     >
@@ -206,22 +200,14 @@ export function ServiceOrderCard({
         </button>
       </div>
 
-      <AnimatePresence initial={false}>
-        {isExpanded ? (
-          <motion.div
-            initial={reduced ? false : { height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={reduced ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-border"
-          >
-            <div className="bg-surface/40 p-4">
-              <SellerServiceOrderDetail orderId={row.order_id} />
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-    </motion.article>
+      {isExpanded ? (
+        <div className="overflow-hidden border-t border-border">
+          <div className="bg-surface/40 p-4">
+            <SellerServiceOrderDetail orderId={row.order_id} />
+          </div>
+        </div>
+      ) : null}
+    </article>
   );
 }
 

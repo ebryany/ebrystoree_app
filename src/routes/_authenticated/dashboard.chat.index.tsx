@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -52,19 +52,31 @@ function ChatListPage() {
 
   const [tab, setTab] = useState<Tab>("all");
   const [q, setQ] = useState("");
+  const deferredQ = useDeferredValue(q);
 
-  const unreadById = new Map(
-    (unreadQ.data?.items ?? []).map((row) => [row.inquiry_id, Number(row.unread)]),
+  const unreadById = useMemo(
+    () =>
+      new Map(
+        (unreadQ.data?.items ?? []).map((row) => [row.inquiry_id, Number(row.unread)]),
+      ),
+    [unreadQ.data?.items],
   );
-  const items: any[] = data?.items ?? [];
-  const unreadCount = items.filter((it) => (unreadById.get(it.id) ?? 0) > 0).length;
+  const items = useMemo(() => (data?.items ?? []) as any[], [data?.items]);
+  const unreadCount = useMemo(
+    () => items.filter((it) => (unreadById.get(it.id) ?? 0) > 0).length,
+    [items, unreadById],
+  );
 
-  const needle = q.trim().toLowerCase();
-  const visible = items.filter((it) => {
-    if (tab === "unread" && !(unreadById.get(it.id) ?? 0)) return false;
-    if (!needle) return true;
-    return `${it.subject ?? ""} ${it.last_message_body ?? ""}`.toLowerCase().includes(needle);
-  });
+  const needle = deferredQ.trim().toLowerCase();
+  const visible = useMemo(
+    () =>
+      items.filter((it) => {
+        if (tab === "unread" && !(unreadById.get(it.id) ?? 0)) return false;
+        if (!needle) return true;
+        return `${it.subject ?? ""} ${it.last_message_body ?? ""}`.toLowerCase().includes(needle);
+      }),
+    [items, tab, unreadById, needle],
+  );
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: "all", label: "Semua" },
@@ -163,10 +175,13 @@ function ChatListPage() {
 
         {/* Daftar polos dengan garis pemisah inset (mulai sejajar teks, bukan avatar). */}
         <ul className="-mx-4 sm:mx-0" aria-label="Daftar percakapan">
-          {visible.map((item) => (
+          {visible.map((item, index) => (
             <li
               key={item.id}
-              className="relative after:absolute after:bottom-0 after:left-[80px] after:right-0 after:h-px after:bg-border/70 last:after:hidden"
+              className={cn(
+                "relative after:absolute after:bottom-0 after:left-[80px] after:right-0 after:h-px after:bg-border/70 last:after:hidden",
+                index >= 6 && "cv-row",
+              )}
             >
               <Link
                 to="/dashboard/chat/$id"

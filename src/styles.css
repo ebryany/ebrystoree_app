@@ -566,8 +566,22 @@
   contain-intrinsic-size: auto 480px;
 }
 
+/* Item daftar panjang di bawah lipatan (dashboard User & Seller): lewati
+   layout & paint saat off-screen dengan ukuran cadangan agar scrollbar stabil. */
+@utility cv-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 72px;
+}
+
+@utility cv-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 260px;
+}
+
 @supports not (content-visibility: auto) {
-  .defer-render {
+  .defer-render,
+  .cv-row,
+  .cv-card {
     contain: layout style paint;
   }
 }

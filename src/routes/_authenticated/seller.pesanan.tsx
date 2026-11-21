@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ReceiptText } from "lucide-react";
 
 import { AdminLoading, AdminError } from "@/components/admin/admin-ui";
-import { CountUp } from "@/components/admin/report-widgets";
 import { EmptyState } from "@/components/ebry/states";
 import { cn } from "@/lib/utils";
 import { SellerOrderCard } from "@/components/seller/seller-order-card";
@@ -64,13 +62,12 @@ function SellerOrders() {
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("actions");
   const [page, setPage] = useState(1);
   const { user } = useSession();
-  const reduced = useReducedMotion();
   const fetchList = useServerFn(listOrderMonitoring);
 
   const query = useQuery({
     queryKey: ["seller-monitoring", tab, page],
     queryFn: () => fetchList({ data: { scope: "seller", filter: tab, page } }),
-    refetchOnWindowFocus: "always",
+    placeholderData: keepPreviousData,
   });
   // Pemicu notifikasi milik sendiri; seller tidak menerima event orders via RLS.
   useRealtimeRefresh({
@@ -145,7 +142,7 @@ function SellerOrders() {
                   urgent ? "text-destructive" : "text-foreground",
                 )}
               >
-                {typeof count === "number" ? <CountUp value={count} /> : "–"}
+                {typeof count === "number" ? count.toLocaleString("id-ID") : "–"}
               </span>
               <span
                 className={cn(
@@ -192,18 +189,19 @@ function SellerOrders() {
         />
       ) : data ? (
         <>
-          <motion.section layout={!reduced} aria-label="Daftar pesanan" className="space-y-3">
-            <AnimatePresence initial={false} mode="popLayout">
-              {items.map((row, index) => (
-                <SellerOrderCard
-                  key={row.order_id}
-                  row={row}
-                  observedAt={data.observed_at}
-                  index={index}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.section>
+          <section
+            aria-label="Daftar pesanan"
+            className={cn("space-y-3 transition-opacity", query.isPlaceholderData && "opacity-60")}
+          >
+            {items.map((row, index) => (
+              <SellerOrderCard
+                key={row.order_id}
+                row={row}
+                observedAt={data.observed_at}
+                index={index}
+              />
+            ))}
+          </section>
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
             <p className="text-xs tabular-nums text-muted-foreground">
               {data.total} pesanan · Halaman {page} dari {totalPages}

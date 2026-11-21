@@ -193,8 +193,8 @@ function SellerPerformance() {
           />
         ) : (
           <ul className="divide-y divide-border">
-            {visible.map((r) => (
-              <li key={r.id} className="flex gap-3 px-4 py-3.5">
+            {visible.map((r, index) => (
+              <li key={r.id} className={cn("flex gap-3 px-4 py-3.5", index >= 6 && "cv-row")}>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-warning/15 text-sm font-bold tabular-nums text-warning-foreground">
                   {Number(r.rating)}
                 </span>

@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -13,7 +13,6 @@ import {
   Wallet,
 } from "lucide-react";
 
-import { CountUp } from "@/components/admin/report-widgets";
 import { BankListRow, InlineEmpty } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
 import { WithdrawalPanel } from "@/components/ebry/withdrawal-panel";
@@ -55,12 +54,10 @@ function shortDateTime(value: string | null | undefined) {
 
 function SellerFinance() {
   const { user } = useSession();
-  const reduced = useReducedMotion();
   const fetchLedger = useServerFn(listSellerLedger);
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["seller-ledger"],
     queryFn: () => fetchLedger({}),
-    refetchOnWindowFocus: "always",
   });
   useRealtimeRefresh({
     channel: "seller-keuangan",
@@ -76,6 +73,15 @@ function SellerFinance() {
     keys: [["seller-ledger"], ["withdrawal-policy"], ["my-withdrawals"]],
     enabled: Boolean(user),
   });
+
+  const items: any[] = data?.items ?? [];
+  const totalIncome = useMemo(
+    () =>
+      items
+        .filter((e: any) => e.direction === "credit")
+        .reduce((sum: number, e: any) => sum + Number(e.amount), 0),
+    [items],
+  );
 
   if (isPending) {
     return (
@@ -106,11 +112,6 @@ function SellerFinance() {
   }
 
   const balance = data?.balance ?? 0;
-  const items: any[] = data?.items ?? [];
-
-  const totalIncome = items
-    .filter((e: any) => e.direction === "credit")
-    .reduce((sum: number, e: any) => sum + Number(e.amount), 0);
   const txCount = items.length;
 
   return (
@@ -134,10 +135,7 @@ function SellerFinance() {
 
       {/* Mobile & tablet: kartu saldo ringkas, gaya sama dengan kartu saldo pembeli.
           Warna literal karena kartu ini sengaja tetap gelap di tema terang maupun gelap. */}
-      <motion.section
-        initial={reduced ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      <section
         className="relative isolate overflow-hidden rounded-[22px] bg-[oklch(0.16_0.012_210)] text-white shadow-[0_16px_32px_-18px_oklch(0.16_0.012_210/80%)] lg:hidden"
         aria-label="Saldo toko"
       >
@@ -152,7 +150,7 @@ function SellerFinance() {
               Saldo tersedia
             </p>
             <p className="mt-1 truncate text-[28px] font-bold leading-tight tracking-tight tabular-nums">
-              <CountUp value={balance} format={formatRupiah} />
+              {formatRupiah(balance)}
             </p>
             <p className="mt-0.5 text-[11px] text-white/60">
               {balance > 0 ? "Bisa ditarik ke rekening." : "Saldo masuk setelah pesanan selesai."}
@@ -189,7 +187,7 @@ function SellerFinance() {
             ))}
           </dl>
         </div>
-      </motion.section>
+      </section>
       {/* Penjelasan singkat posisi dana (mobile), karena kartu di atas hanya memuat angka. */}
       <details className="group rounded-2xl border border-border bg-card px-4 text-xs text-muted-foreground lg:hidden">
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 font-medium text-foreground [&::-webkit-details-marker]:hidden">
@@ -217,10 +215,7 @@ function SellerFinance() {
       </details>
 
       {/* Desktop: saldo utama + posisi dana lain dalam satu baris. */}
-      <motion.section
-        initial={reduced ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      <section
         className="hidden gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr]"
         aria-label="Saldo toko"
       >
@@ -230,7 +225,7 @@ function SellerFinance() {
             Saldo tersedia
           </p>
           <p className="mt-1.5 text-3xl font-bold tabular-nums text-foreground">
-            <CountUp value={balance} format={formatRupiah} />
+            {formatRupiah(balance)}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">Bisa ditarik ke rekening.</p>
         </div>
@@ -265,7 +260,7 @@ function SellerFinance() {
             <p className="mt-1 text-xs text-muted-foreground">{k.hint}</p>
           </div>
         ))}
-      </motion.section>
+      </section>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
@@ -288,32 +283,22 @@ function SellerFinance() {
           {items.length === 0 ? (
             <InlineEmpty icon={Wallet} text="Belum ada mutasi saldo." />
           ) : (
-            <motion.ul layout={!reduced} className="px-4" aria-label="Daftar mutasi">
-              <AnimatePresence initial={false}>
-                {items.map((e: any, index: number) => {
-                  const credit = e.direction === "credit";
-                  return (
-                    <motion.div
-                      key={e.id}
-                      initial={reduced ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{
-                        duration: 0.15,
-                        delay: reduced ? 0 : index * 0.02,
-                      }}
-                    >
-                      <BankListRow
-                        icon={credit ? ArrowDownLeft : ArrowUpRight}
-                        title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.note ? ` — ${e.note}` : ""}`}
-                        subtitle={shortDateTime(e.created_at)}
-                        value={`${credit ? "+" : "−"}${formatRupiah(Number(e.amount))}`}
-                        valueTone={credit ? "positive" : "warning"}
-                      />
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </motion.ul>
+            <ul className="px-4" aria-label="Daftar mutasi">
+              {items.map((e: any, index: number) => {
+                const credit = e.direction === "credit";
+                return (
+                  <BankListRow
+                    key={e.id}
+                    className={index >= 6 ? "cv-row" : undefined}
+                    icon={credit ? ArrowDownLeft : ArrowUpRight}
+                    title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.note ? ` — ${e.note}` : ""}`}
+                    subtitle={shortDateTime(e.created_at)}
+                    value={`${credit ? "+" : "−"}${formatRupiah(Number(e.amount))}`}
+                    valueTone={credit ? "positive" : "warning"}
+                  />
+                );
+              })}
+            </ul>
           )}
         </section>
       </div>

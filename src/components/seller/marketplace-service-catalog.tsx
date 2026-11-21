@@ -1,35 +1,27 @@
-import { useState, type FormEvent } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown, FileText, Info, Plus, Video } from "lucide-react";
 
 import { ServiceDraftWizard } from "@/components/seller/service-draft-wizard";
 
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
-import { CountUp } from "@/components/admin/report-widgets";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { StatusPill } from "@/components/ebry/status";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { formatRupiah } from "@/lib/format";
 import {
-  marketplaceServiceDraftSchema,
   marketplaceServiceStatusLabels,
   serviceMediaUrl,
   type MarketplaceServiceDraft,
   type MarketplaceServiceListing,
-  type MarketplaceServiceMedia,
 } from "@/lib/marketplace-service";
 import {
   actOnMyMarketplaceService,
   listMyMarketplaceServices,
   saveMyMarketplaceService,
 } from "@/lib/marketplace-service.functions";
-import { cn } from "@/lib/utils";
+import { cn, optimizedMediaUrl } from "@/lib/utils";
 
 const TABS = [
   { key: "all", label: "Semua", filter: null, hint: "Semua jasa di toko Anda." },
@@ -77,16 +69,15 @@ export function MarketplaceServiceCatalog() {
   const [tab, setTab] = useState<TabKey>("all");
   const [editing, setEditing] = useState<MarketplaceServiceListing | null | undefined>();
   const [feedback, setFeedback] = useState("");
-  const reduced = useReducedMotion();
   const queryClient = useQueryClient();
   const fetchListings = useServerFn(listMyMarketplaceServices);
   const save = useServerFn(saveMyMarketplaceService);
   const act = useServerFn(actOnMyMarketplaceService);
   const queryKey = ["my-marketplace-services", page];
-  const { data, isPending, error, refetch } = useQuery({
+  const { data, isPending, isPlaceholderData, error, refetch } = useQuery({
     queryKey,
     queryFn: () => fetchListings({ data: { page } }),
-    refetchOnWindowFocus: "always",
+    placeholderData: keepPreviousData,
   });
   useRealtimeRefresh({
     channel: "my-marketplace-services",
@@ -118,9 +109,9 @@ export function MarketplaceServiceCatalog() {
     onError: () => setFeedback("Perubahan gagal disimpan. Draft tidak dihapus; coba lagi."),
   });
 
-  const allItems = data?.items ?? [];
-  const counts = countByTab(allItems);
-  const filtered = filterItems(allItems, tab);
+  const allItems = useMemo(() => data?.items ?? [], [data?.items]);
+  const counts = useMemo(() => countByTab(allItems), [allItems]);
+  const filtered = useMemo(() => filterItems(allItems, tab), [allItems, tab]);
   const pageSize = data?.pageSize ?? 20;
   const totalPages = data ? Math.max(1, Math.ceil(data.total / pageSize)) : 1;
 
@@ -202,7 +193,7 @@ export function MarketplaceServiceCatalog() {
             >
               {entry.label}
               <span className="text-xs tabular-nums text-muted-foreground">
-                {data ? <CountUp value={count} /> : "0"}
+                {data ? count.toLocaleString("id-ID") : "0"}
               </span>
             </button>
           );
@@ -216,26 +207,16 @@ export function MarketplaceServiceCatalog() {
       ) : null}
 
       {/* Form inline */}
-      <AnimatePresence initial={false}>
-        {editing !== undefined && data ? (
-          <motion.div
-            key="draft-form"
-            initial={reduced ? false : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <ServiceDraftWizard
-              key={editing?.id ?? "new"}
-              listing={editing}
-              categories={data.categories}
-              pending={mutation.isPending}
-              onCancel={() => setEditing(undefined)}
-              onSave={(draft) => mutation.mutate({ draft })}
-            />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {editing !== undefined && data ? (
+        <ServiceDraftWizard
+          key={editing?.id ?? "new"}
+          listing={editing}
+          categories={data.categories}
+          pending={mutation.isPending}
+          onCancel={() => setEditing(undefined)}
+          onSave={(draft) => mutation.mutate({ draft })}
+        />
+      ) : null}
 
       {/* Content area */}
       {isPending ? (
@@ -272,29 +253,28 @@ export function MarketplaceServiceCatalog() {
         />
       ) : data ? (
         <>
-          <motion.section
-            layout={!reduced}
+          <section
             aria-label="Daftar jasa"
-            className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            className={cn(
+              "grid items-start gap-3 transition-opacity sm:grid-cols-2 xl:grid-cols-3",
+              isPlaceholderData && "opacity-60",
+            )}
           >
-            <AnimatePresence initial={false} mode="popLayout">
-              {filtered.map((listing, index) => (
-                <ServiceCard
-                  key={listing.id}
-                  listing={listing}
-                  index={index}
-                  reduced={reduced ?? false}
-                  mutationPending={mutation.isPending}
-                  onEdit={() => {
-                    setFeedback("");
-                    setEditing(listing);
-                  }}
-                  onSubmit={() => mutation.mutate({ listing, action: "submit" })}
-                  onArchive={() => mutation.mutate({ listing, action: "archive" })}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.section>
+            {filtered.map((listing, index) => (
+              <ServiceCard
+                key={listing.id}
+                listing={listing}
+                index={index}
+                mutationPending={mutation.isPending}
+                onEdit={() => {
+                  setFeedback("");
+                  setEditing(listing);
+                }}
+                onSubmit={() => mutation.mutate({ listing, action: "submit" })}
+                onArchive={() => mutation.mutate({ listing, action: "archive" })}
+              />
+            ))}
+          </section>
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
             <p className="text-xs tabular-nums text-muted-foreground">
               {data.total} jasa · Halaman {page + 1} dari {totalPages}
@@ -333,7 +313,6 @@ export function MarketplaceServiceCatalog() {
 function ServiceCard({
   listing,
   index,
-  reduced,
   mutationPending,
   onEdit,
   onSubmit,
@@ -341,7 +320,6 @@ function ServiceCard({
 }: {
   listing: MarketplaceServiceListing;
   index: number;
-  reduced: boolean;
   mutationPending: boolean;
   onEdit: () => void;
   onSubmit: () => void;
@@ -350,20 +328,19 @@ function ServiceCard({
   const [open, setOpen] = useState(false);
 
   return (
-    <motion.article
-      layout={!reduced}
-      initial={reduced ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={reduced ? undefined : { opacity: 0, y: -8 }}
-      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : index * 0.04 }}
-      className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
+    <article
+      className={cn(
+        "flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
+        index >= 4 && "cv-card",
+      )}
     >
       {/* Kartu grid: media di atas, info, lalu aksi di bawah. */}
       <span className="relative grid aspect-[16/9] place-items-center overflow-hidden bg-surface-selected">
         {listing.media[0]?.kind === "image" ? (
           <img
-            src={serviceMediaUrl(listing.media[0].path)}
+            src={optimizedMediaUrl(serviceMediaUrl(listing.media[0].path), 480)}
             alt={listing.media[0].alt}
+            decoding="async"
             className="size-full object-cover"
             loading="lazy"
           />
@@ -452,21 +429,13 @@ function ServiceCard({
         />
         Lihat agreement draft
       </button>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            initial={reduced ? false : { height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={reduced ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <ServiceAgreement listing={listing} />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {open ? (
+        <div className="overflow-hidden">
+          <ServiceAgreement listing={listing} />
+        </div>
+      ) : null}
       </div>
-    </motion.article>
+    </article>
   );
 }
 

@@ -139,11 +139,12 @@ function SaldoSaya() {
               <InlineEmpty icon={Wallet} text="Belum ada mutasi saldo." />
             ) : (
               <ul className="px-4 pb-1">
-                {items.map((e: any) => {
+                {items.map((e: any, index: number) => {
                   const isCredit = e.direction === "credit";
                   return (
                     <BankListRow
                       key={e.id}
+                      className={index >= 6 ? "cv-row" : undefined}
                       icon={isCredit ? ArrowDownLeft : ArrowUpRight}
                       title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.reference ? ` · ${e.reference}` : ""}`}
                       subtitle={new Date(e.created_at).toLocaleString("id-ID", {

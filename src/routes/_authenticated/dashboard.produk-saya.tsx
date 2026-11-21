@@ -11,7 +11,7 @@ import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Button } from "@/components/ui/button";
 import { StockCodeAccess } from "@/components/ebry/stock-code-access";
 import { downloadEntitlement, listMyEntitlements } from "@/lib/orders.functions";
-import { cn } from "@/lib/utils";
+import { cn, optimizedMediaUrl } from "@/lib/utils";
 import { CalendarClock, Download, FileArchive, Loader2, Package, ShieldOff, TimerOff } from "lucide-react";
 
 function daysLeft(iso: string | null): number | null {
@@ -88,7 +88,7 @@ function ProdukSaya() {
         </div>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
-          {data.items.map((e: any) => {
+          {data.items.map((e: any, index: number) => {
             const remaining = Number(e.download_limit) - Number(e.download_count);
             const expired = e.valid_until ? new Date(e.valid_until) < new Date() : false;
             const revoked = Boolean(e.revoked_at);
@@ -102,7 +102,10 @@ function ProdukSaya() {
             return (
               <li
                 key={e.id}
-                className="flex flex-col rounded-2xl bg-card transition-shadow hover:elev-2"
+                className={cn(
+                  "flex flex-col rounded-2xl bg-card transition-shadow hover:elev-2",
+                  index >= 4 && "cv-card",
+                )}
               >
                 <div className="flex flex-1 flex-col gap-3 p-4">
                   {/* Thumbnail kecil + identitas: nama produk terbaca tanpa banner terpotong. */}
@@ -110,8 +113,10 @@ function ProdukSaya() {
                     <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-selected text-muted-foreground">
                       {product.thumbnail_url ? (
                         <img
-                          src={product.thumbnail_url}
+                          src={optimizedMediaUrl(product.thumbnail_url, 128)}
                           alt=""
+                          width={56}
+                          height={56}
                           loading="lazy"
                           decoding="async"
                           aria-hidden="true"

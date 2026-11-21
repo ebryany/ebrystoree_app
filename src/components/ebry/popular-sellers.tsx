@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 
 import { listPopularSellers, type PopularSeller } from "@/lib/reviews.functions";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import { optimizedMediaUrl } from "@/lib/utils";
 
 function Stars({ value }: { value: number }) {
   const full = Math.round(value);
@@ -50,9 +51,12 @@ function SellerItems({
             <span className="relative shrink-0">
               {s.logo_url ? (
                 <img
-                  src={s.logo_url}
+                  src={optimizedMediaUrl(s.logo_url, 96)}
                   alt=""
+                  width={40}
+                  height={40}
                   loading="lazy"
+                  decoding="async"
                   className="size-10 rounded-lg border border-border object-cover"
                 />
               ) : (

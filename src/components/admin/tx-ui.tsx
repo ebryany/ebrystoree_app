@@ -1,13 +1,21 @@
 import type { ReactNode } from "react";
 
 import { StatusPill } from "@/components/ebry/status";
-import { CHART_PALETTE } from "@/components/admin/report-charts";
 import { ORDER_STATUS_LABEL, PAYMENT_STATUS_LABEL } from "@/lib/transaction-labels";
+
+// Token warna lokal agar tx-ui tidak menarik seluruh bundle Recharts dari report-charts.
+const STORE_CHIP_PALETTE = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+] as const;
 
 function paletteIndexFor(name: string): number {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
-  return h % CHART_PALETTE.length;
+  return h % STORE_CHIP_PALETTE.length;
 }
 
 /** Chip toko untuk tabel transaksi. Tanpa nama = order produk platform. */
@@ -27,7 +35,7 @@ export function StoreChip({ name }: { name: string | null | undefined }) {
       <span
         aria-hidden="true"
         className="size-2 shrink-0 rounded-full"
-        style={{ backgroundColor: CHART_PALETTE[paletteIndexFor(name)] }}
+        style={{ backgroundColor: STORE_CHIP_PALETTE[paletteIndexFor(name)] }}
       />
       <span className="truncate">{name}</span>
     </span>

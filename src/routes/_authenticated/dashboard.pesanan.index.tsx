@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
@@ -126,9 +126,10 @@ function PesananSaya() {
   const { user } = useSession();
   const fetchOrders = useServerFn(listMyOrders);
 
-  const { data, isPending, error } = useQuery({
+  const { data, isPending, isPlaceholderData, error } = useQuery({
     queryKey: ["my-orders", filter, page],
     queryFn: () => fetchOrders({ data: { filter, page } }),
+    placeholderData: keepPreviousData,
   });
   useRealtimeRefresh({
     channel: "my-orders",
@@ -169,8 +170,13 @@ function PesananSaya() {
         <EmptyState filter={filter} />
       ) : (
         <>
-          <ul className="overflow-hidden rounded-2xl bg-card">
-            {data.items.map((o: any) => {
+          <ul
+            className={cn(
+              "overflow-hidden rounded-2xl bg-card transition-opacity",
+              isPlaceholderData && "opacity-60",
+            )}
+          >
+            {data.items.map((o: any, index: number) => {
               const action = customerAction(o.status, o.payments?.[0]?.status ?? null);
               const TypeIcon =
                 o.order_type === "service"
@@ -186,6 +192,7 @@ function PesananSaya() {
                   className={cn(
                     "relative border-b border-border last:border-b-0",
                     needsPayment && "bg-warning/[0.06]",
+                    index >= 6 && "cv-row",
                   )}
                 >
                   {needsPayment ? (

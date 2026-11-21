@@ -56,6 +56,7 @@ export function NotificationBell({ className }: { className?: string }) {
     queryKey: ["my-roles"],
     queryFn: () => fetchRoles({}),
     enabled: Boolean(user),
+    staleTime: 5 * 60_000,
   });
 
   const items: any[] = (data as any)?.items ?? [];

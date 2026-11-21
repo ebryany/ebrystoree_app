@@ -255,7 +255,17 @@ export const getMyOrder = createServerFn({ method: "GET" })
       };
     }
 
-    const [items, invoice, payments, histories, entitlements, refunds] = await Promise.all([
+    const [
+      items,
+      invoice,
+      payments,
+      histories,
+      entitlements,
+      refunds,
+      account,
+      instruction,
+      methods,
+    ] = await Promise.all([
       sb
         .from("order_items")
         .select("id, name_snapshot, unit_price, quantity, total, item_type")
@@ -285,13 +295,12 @@ export const getMyOrder = createServerFn({ method: "GET" })
         .from("refunds")
         .select("refund_number, amount, status, reason, created_at")
         .eq("order_id", order.id),
+      helpers.loadManualAccount(),
+      helpers.loadPaymentInstruction(sb),
+      // Satu sumber kebenaran: helper yang sama dipakai checkout dan admin,
+      // sehingga saklar metode pembayaran di pengaturan benar-benar berlaku.
+      helpers.loadPaymentMethods(),
     ]);
-
-    const account = await helpers.loadManualAccount();
-    const instruction = await helpers.loadPaymentInstruction(sb);
-    // Satu sumber kebenaran: helper yang sama dipakai checkout dan admin,
-    // sehingga saklar metode pembayaran di pengaturan benar-benar berlaku.
-    const methods = await helpers.loadPaymentMethods();
 
     return {
       order,

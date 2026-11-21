@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AlertTriangle, FileText } from "lucide-react";
 
-import { CountUp } from "@/components/admin/report-widgets";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { ServiceOrderCard } from "@/components/seller/service-order-card";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -38,12 +36,10 @@ const EMPTY_HINT: Record<ServiceOrderTabKey, string> = {
 function SellerServiceOrders() {
   const [tab, setTab] = useState<ServiceOrderTabKey>("needs_action");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const reduced = useReducedMotion();
   const fetchOrders = useServerFn(listMyServiceOrders);
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["my-service-orders"],
     queryFn: () => fetchOrders({}),
-    refetchOnWindowFocus: "always",
   });
   useRealtimeRefresh({
     channel: "my-service-orders",
@@ -55,10 +51,10 @@ function SellerServiceOrders() {
     keys: [["my-service-orders"], ["seller-service-order"]],
   });
 
-  const allItems = data?.items ?? [];
-  const counts = countServiceOrders(allItems);
-  const complaints = countServiceComplaints(allItems);
-  const filtered = filterServiceOrders(allItems, tab);
+  const allItems = useMemo(() => data?.items ?? [], [data?.items]);
+  const counts = useMemo(() => countServiceOrders(allItems), [allItems]);
+  const complaints = useMemo(() => countServiceComplaints(allItems), [allItems]);
+  const filtered = useMemo(() => filterServiceOrders(allItems, tab), [allItems, tab]);
 
   return (
     <div className="space-y-4">
@@ -124,7 +120,7 @@ function SellerServiceOrders() {
                   urgent ? "text-destructive" : "text-foreground",
                 )}
               >
-                {data ? <CountUp value={count} /> : "–"}
+                {data ? count.toLocaleString("id-ID") : "–"}
               </span>
               <span
                 className={cn(
@@ -157,19 +153,17 @@ function SellerServiceOrders() {
           description={EMPTY_HINT[tab]}
         />
       ) : data ? (
-        <motion.section layout={!reduced} aria-label="Daftar pesanan jasa" className="space-y-3">
-          <AnimatePresence initial={false} mode="popLayout">
-            {filtered.map((row, index) => (
-              <ServiceOrderCard
-                key={row.order_id}
-                row={row}
-                index={index}
-                isExpanded={expanded === row.order_id}
-                onToggle={() => setExpanded(expanded === row.order_id ? null : row.order_id)}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.section>
+        <section aria-label="Daftar pesanan jasa" className="space-y-3">
+          {filtered.map((row, index) => (
+            <ServiceOrderCard
+              key={row.order_id}
+              row={row}
+              index={index}
+              isExpanded={expanded === row.order_id}
+              onToggle={() => setExpanded(expanded === row.order_id ? null : row.order_id)}
+            />
+          ))}
+        </section>
       ) : null}
     </div>
   );

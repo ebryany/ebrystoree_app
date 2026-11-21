@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown } from "lucide-react";
 
 import { StatusPill } from "@/components/ebry/status";
@@ -41,7 +40,6 @@ export function SellerOrderCard({
   observedAt: string;
   index: number;
 }) {
-  const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const hours = row.waiting_since
     ? Math.max(0, Math.floor((Date.parse(observedAt) - Date.parse(row.waiting_since)) / 3600000))
@@ -52,13 +50,11 @@ export function SellerOrderCard({
   const reserved = funds ? funds.refund_reserved : 0;
 
   return (
-    <motion.article
-      layout={!reduced}
-      initial={reduced ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={reduced ? undefined : { opacity: 0, y: -8 }}
-      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : index * 0.04 }}
-      className="min-w-0 rounded-2xl border border-border bg-card"
+    <article
+      className={cn(
+        "min-w-0 rounded-2xl border border-border bg-card",
+        index >= 4 && "cv-card",
+      )}
       aria-label={`Pesanan ${row.order_number}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-3.5">
@@ -163,43 +159,34 @@ export function SellerOrderCard({
               aria-hidden="true"
             />
           </button>
-          <AnimatePresence initial={false}>
-            {open ? (
-              <motion.div
-                key="detail"
-                initial={reduced ? false : { height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={reduced ? undefined : { height: 0, opacity: 0 }}
-                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <dl className="grid gap-3 px-4 pb-4 sm:grid-cols-2">
-                  {[
-                    ["Nilai item toko", funds.item_total],
-                    ["Ditahan, menunggu penerimaan", funds.held_receipt],
-                    ["Pendapatan dilepas (historis)", funds.released_total],
-                    ["Cadangan refund aktif", funds.refund_reserved],
-                    ["Debit refund seller", funds.refunded_total],
-                  ].map(([label, amount]) => (
-                    <div key={String(label)}>
-                      <dt className="text-xs text-muted-foreground">{label}</dt>
-                      <dd className="text-sm tabular-nums">{formatRupiah(Number(amount))}</dd>
-                    </div>
-                  ))}
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Release pertama</dt>
-                    <dd className="text-sm">{fullDate(funds.released_at)}</dd>
+          {open ? (
+            <div className="overflow-hidden">
+              <dl className="grid gap-3 px-4 pb-4 sm:grid-cols-2">
+                {[
+                  ["Nilai item toko", funds.item_total],
+                  ["Ditahan, menunggu penerimaan", funds.held_receipt],
+                  ["Pendapatan dilepas (historis)", funds.released_total],
+                  ["Cadangan refund aktif", funds.refund_reserved],
+                  ["Debit refund seller", funds.refunded_total],
+                ].map(([label, amount]) => (
+                  <div key={String(label)}>
+                    <dt className="text-xs text-muted-foreground">{label}</dt>
+                    <dd className="text-sm tabular-nums">{formatRupiah(Number(amount))}</dd>
                   </div>
-                </dl>
-                <p className="px-4 pb-4 text-[11px] text-muted-foreground">
-                  Pendapatan historis bukan saldo toko saat ini. Penerimaan hanya dapat dikonfirmasi
-                  pembeli; umur tunggu bukan batas otomatis pelepasan dana.
-                </p>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+                ))}
+                <div>
+                  <dt className="text-xs text-muted-foreground">Release pertama</dt>
+                  <dd className="text-sm">{fullDate(funds.released_at)}</dd>
+                </div>
+              </dl>
+              <p className="px-4 pb-4 text-[11px] text-muted-foreground">
+                Pendapatan historis bukan saldo toko saat ini. Penerimaan hanya dapat dikonfirmasi
+                pembeli; umur tunggu bukan batas otomatis pelepasan dana.
+              </p>
+            </div>
+          ) : null}
         </div>
       ) : null}
-    </motion.article>
+    </article>
   );
 }

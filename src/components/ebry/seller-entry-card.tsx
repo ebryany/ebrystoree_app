@@ -17,6 +17,7 @@ export function SellerEntryCard() {
   const { data, isPending, error } = useQuery({
     queryKey: ["my-store"],
     queryFn: () => fetchStore({}),
+    staleTime: 5 * 60_000,
   });
 
   // Saat memuat atau gagal, status toko belum diketahui: jangan menebak.

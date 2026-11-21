@@ -9,6 +9,7 @@ import { MarketplaceProductCard } from "@/components/home/catalog-cards";
 import { FollowStoreButton } from "@/components/store/social-buttons";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import { listMyFollowsAndLikes } from "@/lib/social.functions";
+import { optimizedMediaUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/disukai")({
   head: () => ({
@@ -63,7 +64,15 @@ function DisukaiPage() {
                       <span className="relative shrink-0">
                         <span className="grid size-11 place-items-center overflow-hidden rounded-full bg-surface-selected font-bold text-accent">
                           {s.logo_url ? (
-                            <img src={s.logo_url} alt="" className="size-full object-cover" />
+                            <img
+                              src={optimizedMediaUrl(s.logo_url, 96)}
+                              alt=""
+                              width={44}
+                              height={44}
+                              loading="lazy"
+                              decoding="async"
+                              className="size-full object-cover"
+                            />
                           ) : (
                             <span aria-hidden="true">{s.name.charAt(0).toUpperCase()}</span>
                           )}

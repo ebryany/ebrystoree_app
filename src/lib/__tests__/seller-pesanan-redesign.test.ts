@@ -16,7 +16,7 @@ describe("seller order page redesign (static source contract)", () => {
     expect(page).toContain('countKey: "delivery_blocked"');
     expect(page).toContain('countKey: "awaiting_receipt"');
     expect(page).toContain('countKey: "refund_active"');
-    expect(page).toContain("CountUp");
+    expect(page).toContain('toLocaleString("id-ID")');
     expect(page).toContain('useState<(typeof TABS)[number]["key"]>("actions")');
   });
   it("keeps realtime trigger, pagination and accessible skeleton", () => {
@@ -26,10 +26,9 @@ describe("seller order page redesign (static source contract)", () => {
     expect(page).toContain('role="status"');
     expect(page).toContain('aria-label="Memuat pesanan"');
   });
-  it("animates cards and honors reduced motion", () => {
-    expect(card).toContain('from "motion/react"');
-    expect(card).toContain("useReducedMotion");
-    expect(card).toContain("AnimatePresence");
+  it("renders cards without layout thrashing and honors reduced motion", () => {
+    expect(card).not.toContain('from "motion/react"');
+    expect(card).toContain("motion-reduce:transition-none");
     expect(card).toContain("Kelola produk");
     expect(card).toContain("Rincian dana");
     expect(card).toContain("aria-label={`Pesanan ${row.order_number}`}");

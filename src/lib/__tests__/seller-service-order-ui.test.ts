@@ -190,7 +190,6 @@ describe("seller page redesign (static source contract)", () => {
   it("preserves accessibility and reduced motion", () => {
     expect(page).toContain('role="tablist"');
     expect(page).toContain("aria-selected={active}");
-    expect(page).toContain("useReducedMotion");
     expect(card).toContain("focus-visible:outline");
     expect(card).toContain("motion-reduce:animate-none");
   });
