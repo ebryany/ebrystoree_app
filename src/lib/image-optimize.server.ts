@@ -24,7 +24,7 @@ export function parseImageTransform(requestUrl: string | undefined): {
   try {
     const parsed = new URL(requestUrl, "https://local.invalid");
     const rawW = parsed.searchParams.get("w");
-    const rawFmt = parsed.searchParams.get("fmt")?.toLowerCase();
+    const rawFmt = (parsed.searchParams.get("f") ?? parsed.searchParams.get("fmt"))?.toLowerCase();
     const numericW = rawW ? Number.parseInt(rawW, 10) : NaN;
     const width = ALLOWED_SET.has(numericW) ? (numericW as AllowedImageWidth) : null;
     const webp = rawFmt === "webp" || width !== null;
@@ -38,10 +38,10 @@ export async function optimizeRasterImage(
   rawBuffer: ArrayBuffer,
   originalContentType: string,
   requestUrl: string | undefined,
-): Promise<{ body: BodyInit; contentType: string }> {
+): Promise<{ body: BodyInit; contentType: string; fallback: boolean }> {
   const { width, webp } = parseImageTransform(requestUrl);
   if (!width && !webp) {
-    return { body: rawBuffer, contentType: originalContentType };
+    return { body: rawBuffer, contentType: originalContentType, fallback: false };
   }
 
   try {
@@ -52,8 +52,9 @@ export async function optimizeRasterImage(
       pipeline = pipeline.resize({ width, withoutEnlargement: true });
     }
     const output = await pipeline.webp({ quality: 80, effort: 4 }).toBuffer();
-    return { body: new Uint8Array(output), contentType: "image/webp" };
-  } catch {
-    return { body: rawBuffer, contentType: originalContentType };
+    return { body: new Uint8Array(output), contentType: "image/webp", fallback: false };
+  } catch (err) {
+    console.error("[image-optimize] sharp gagal:", err instanceof Error ? err.message : err);
+    return { body: rawBuffer, contentType: originalContentType, fallback: true };
   }
 }

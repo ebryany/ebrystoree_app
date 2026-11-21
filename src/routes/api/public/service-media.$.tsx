@@ -52,12 +52,14 @@ export const Route = createFileRoute("/api/public/service-media/$")({
           ? await (
               await import("@/lib/image-optimize.server")
             ).optimizeRasterImage(rawBytes, contentType, request?.url)
-          : { body: rawBytes, contentType };
+          : { body: rawBytes, contentType, fallback: false };
 
         return new Response(result.body, {
           headers: {
             "Content-Type": result.contentType,
-            "Cache-Control": "public, max-age=31536000, immutable",
+            "Cache-Control": result.fallback
+              ? "public, max-age=60"
+              : "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff",
             "Content-Security-Policy": "default-src 'none'; sandbox",
           },

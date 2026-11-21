@@ -47,7 +47,9 @@ export const Route = createFileRoute("/api/public/catalog-image/$")({
         return new Response(optimized.body, {
           headers: {
             "Content-Type": optimized.contentType,
-            "Cache-Control": "public, max-age=31536000, immutable",
+            "Cache-Control": optimized.fallback
+              ? "public, max-age=60"
+              : "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff",
             "Content-Security-Policy": "default-src 'none'; sandbox",
           },

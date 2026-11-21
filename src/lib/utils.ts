@@ -93,5 +93,5 @@ export function optimizedMediaUrl(url: string, width: ImageWidthPreset): string 
   if (/\.(mp4|webm)(\?|$)/i.test(url)) return url;
   if (/[?&]w=\d+/.test(url)) return url;
   const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}w=${width}&fmt=webp`;
+  return `${url}${sep}w=${width}&f=webp`;
 }

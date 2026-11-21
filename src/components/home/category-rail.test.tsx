@@ -27,7 +27,7 @@ describe("CategoryRail icon image", () => {
   it("renders the uploaded PNG/JPEG inside a unified framed badge instead of the built-in icon", () => {
     state.items = [{ id: "1", name: "chatgpt", slug: "chatgpt", image_url: IMG }];
     const html = renderToStaticMarkup(<CategoryRail />);
-    expect(html).toContain(`src="${IMG}?w=96&amp;fmt=webp"`);
+    expect(html).toContain(`src="${IMG}?w=96&amp;f=webp"`);
     expect(html).toContain("object-contain");
     expect(html).toContain("rounded-[13px]");
     expect(html).toContain("ChatGPT");

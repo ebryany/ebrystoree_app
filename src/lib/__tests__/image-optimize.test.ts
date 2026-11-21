@@ -45,10 +45,10 @@ describe("Proxy image optimization (sharp WebP + whitelisted widths)", () => {
 
   it("rewrites only internal raster proxy URLs in optimizedMediaUrl", () => {
     expect(optimizedMediaUrl("/api/public/catalog-image/products/a.png", 480)).toBe(
-      "/api/public/catalog-image/products/a.png?w=480&fmt=webp",
+      "/api/public/catalog-image/products/a.png?w=480&f=webp",
     );
     expect(optimizedMediaUrl("/api/public/service-media/store/a.jpg", 480)).toBe(
-      "/api/public/service-media/store/a.jpg?w=480&fmt=webp",
+      "/api/public/service-media/store/a.jpg?w=480&f=webp",
     );
     expect(optimizedMediaUrl("/api/public/service-media/store/demo.mp4", 480)).toBe(
       "/api/public/service-media/store/demo.mp4",
