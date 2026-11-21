@@ -2,6 +2,14 @@
 
 ## 2026-11-21
 
+### Hardening cache Cloudflare/edge, revisi desain tombol Jelajahi kategori, dan pembersihan dead code
+
+- **Cloudflare edge & isolasi cache (`src/server.ts`)**: Menambahkan default `Cache-Control: private, no-store` untuk respons HTML SSR dan `Cache-Control: no-store` untuk respons dinamis non-HTML tanpa header `Cache-Control` eksplisit (menutup risiko *Web Cache Deception* pada rute dinamis berakhiran ekstensi statis sambil tetap menjaga cache publik pada media, sitemap, dan aset statis); mengetatkan CSP `connect-src` produksi agar tidak lagi mengizinkan `https://*.lovable.app`; serta menerapkan `applySecurityHeaders()` pada fallback error 500. Ditambahkan pengujian di `src/lib/__tests__/cloudflare-edge-hardening.test.ts`.
+- **Revisi desain tombol & ikon Jelajahi kategori**: Menyeragamkan bingkai squircle (`44×44px`, `rounded-[13px]`) untuk gambar unggahan maupun lencana ikon bawaan bertingkat memakai token tema di `src/lib/category-icons.ts`, `src/components/home/category-rail.tsx`, dan pratinjau admin `src/components/admin/category-manager-dialog.tsx`; merapikan kapitalisasi akronim/kata hubung (`formatCategoryLabel`), aksesibilitas (`role="list"`, `outline` focus-visible), dan pengujian di `src/components/home/category-rail.test.tsx`.
+- **Pembersihan dead code & penataan folder**: Menghapus 10 file komponen/hook yang sudah tidak dipakai di produksi maupun test (`src/components/ebry/timeline.tsx`, `src/components/home/flow-diagram.tsx`, `hero-shader-background.tsx`, `order-flow-section.tsx`, `reviews-section.tsx`, `showcase-gallery.tsx`, `src/hooks/use-scrolled.ts`, `src/components/ui/blur-vignette.tsx`, `glass-action-button.tsx`, `spotlight-link.tsx`), memindahkan `mobile-baseline.md` ke `docs/03-ux/mobile-baseline.md`, memperbarui `docs/README.md`, serta merapikan `.gitignore`.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `$env:NITRO_PRESET='node-server'; npm run build` keluar `0`, dan `npm run test:unit` lulus **56/56 file, 684/684 test**.
+- **Status deploy**: Dipublish ke GitHub `main` (belum di-deploy ke VPS produksi).
+
 ### Hardening keamanan aplikasi, proxy media, moderasi file seller, dan ekspor CSV
 
 - **Proxy media publik (`SEC-01`)**: Menambahkan `try/catch` untuk `decodeURIComponent` (`404` pada URI cacat), whitelist ekstensi raster (`jpg`/`jpeg`/`png`/`webp`/`avif`), pemetaan MIME eksplisit dari ekstensi, dan `Content-Security-Policy: default-src 'none'; sandbox` pada `src/routes/api/public/catalog-image.$.tsx`, `src/routes/api/public/service-media.$.tsx`, dan `src/routes/api/public/og-image.$.tsx`.

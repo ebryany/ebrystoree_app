@@ -64,6 +64,7 @@ const supabaseConnectSources = supabaseOrigin
 // membuat situs *.lovable.app, jadi framing hanya diizinkan dari origin sendiri.
 const isProduction = process.env.NODE_ENV === "production";
 const frameAncestors = isProduction ? "'self'" : "'self' https://*.lovable.app";
+const lovableConnectSource = isProduction ? "" : "https://*.lovable.app";
 
 const CSP = [
   "default-src 'self'",
@@ -71,7 +72,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
-  `connect-src 'self' ${supabaseConnectSources} https://*.lovable.app`.replace(/\s+/g, " ").trim(),
+  `connect-src 'self' ${supabaseConnectSources} ${lovableConnectSource}`.replace(/\s+/g, " ").trim(),
   "frame-src 'self' https://*.sumopod.com https://*.pymnt.app https://checkout.pymnt.app",
   `frame-ancestors ${frameAncestors}`,
   "base-uri 'self'",
@@ -89,6 +90,14 @@ function applySecurityHeaders(response: Response): Response {
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // HSTS diabaikan browser pada koneksi non-TLS, jadi aman dikirim juga di dev lokal.
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  // Mencegah Cloudflare default-extension caching (Web Cache Deception pada rute
+  // dinamis berakhiran .css/.js/.png) dan kebocoran cache lintas pengguna pada SSR,
+  // server functions, webhook, serta API yang tidak menetapkan Cache-Control eksplisit.
+  // Rute publik cacheable (catalog-image, service-media, og-image, sitemap.xml) sudah
+  // menetapkan Cache-Control sendiri sehingga tetap dipertahankan.
+  if (!headers.has("cache-control")) {
+    headers.set("Cache-Control", isHtml ? "private, no-store" : "no-store");
+  }
   if (isHtml) {
     headers.set("Content-Security-Policy", CSP);
     headers.set("X-Frame-Options", "SAMEORIGIN");
@@ -112,10 +121,12 @@ export default {
       return applySecurityHeaders(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return applySecurityHeaders(
+        new Response(renderErrorPage(), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+      );
     }
   },
 };

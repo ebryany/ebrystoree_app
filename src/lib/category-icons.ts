@@ -80,12 +80,36 @@ export type CategoryIconKey = keyof typeof CATEGORY_ICONS;
 
 /** Warna latar + ikon, semuanya dari token tema. Kunci disimpan di `categories.tone`. */
 export const CATEGORY_TONES = {
-  teal: { className: "bg-accent/12 text-accent", label: "Hijau toska" },
-  green: { className: "bg-success/15 text-success", label: "Hijau" },
-  blue: { className: "bg-info/15 text-info", label: "Biru" },
-  amber: { className: "bg-warning/20 text-warning-foreground", label: "Kuning" },
-  red: { className: "bg-chart-5/12 text-chart-5", label: "Merah" },
-  brand: { className: "bg-primary text-primary-foreground", label: "Gelap" },
+  teal: {
+    className:
+      "border border-accent/20 bg-gradient-to-br from-accent/18 via-accent/10 to-accent/5 text-accent shadow-[inset_0_1px_0_oklch(1_0_0/65%),0_1px_2px_oklch(0.22_0.03_205/5%)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/10%)]",
+    label: "Hijau toska",
+  },
+  green: {
+    className:
+      "border border-success/25 bg-gradient-to-br from-success/20 via-success/12 to-success/5 text-success shadow-[inset_0_1px_0_oklch(1_0_0/65%),0_1px_2px_oklch(0.22_0.03_205/5%)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/10%)]",
+    label: "Hijau",
+  },
+  blue: {
+    className:
+      "border border-info/25 bg-gradient-to-br from-info/20 via-info/12 to-info/5 text-info shadow-[inset_0_1px_0_oklch(1_0_0/65%),0_1px_2px_oklch(0.22_0.03_205/5%)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/10%)]",
+    label: "Biru",
+  },
+  amber: {
+    className:
+      "border border-warning/35 bg-gradient-to-br from-warning/28 via-warning/16 to-warning/8 text-warning-foreground shadow-[inset_0_1px_0_oklch(1_0_0/65%),0_1px_2px_oklch(0.22_0.03_205/5%)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/10%)]",
+    label: "Kuning",
+  },
+  red: {
+    className:
+      "border border-chart-5/22 bg-gradient-to-br from-chart-5/18 via-chart-5/10 to-chart-5/5 text-chart-5 shadow-[inset_0_1px_0_oklch(1_0_0/65%),0_1px_2px_oklch(0.22_0.03_205/5%)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/10%)]",
+    label: "Merah",
+  },
+  brand: {
+    className:
+      "border border-primary/25 bg-hero-gradient text-primary-foreground shadow-[inset_0_1px_0_oklch(1_0_0/20%),0_2px_6px_oklch(0.22_0.03_205/16%)]",
+    label: "Gelap",
+  },
 } as const;
 
 export type CategoryTone = keyof typeof CATEGORY_TONES;

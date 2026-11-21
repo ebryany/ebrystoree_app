@@ -70,21 +70,27 @@ function CategoryBadgeIcon({
   const style = resolveCategoryStyle(category);
   if (isRenderableImageUrl(category.image)) {
     return (
-      <img
-        src={category.image}
-        alt=""
-        className="size-10 shrink-0 rounded-lg border border-border bg-card object-contain p-1"
-      />
+      <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-[13px] border border-border/80 bg-gradient-to-b from-card to-surface p-1 shadow-[inset_0_1px_0_oklch(1_0_0/80%),0_1px_2px_oklch(0.22_0.03_205/6%)]">
+        <img
+          src={category.image}
+          alt=""
+          className="size-full rounded-[9px] object-contain"
+        />
+      </span>
     );
   }
   return (
     <span
       className={cn(
-        "grid size-10 shrink-0 place-items-center rounded-lg",
+        "relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-[13px]",
         CATEGORY_TONES[style.tone].className,
       )}
     >
-      <style.icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-2 -top-2 size-7 rounded-full bg-current opacity-[0.09]"
+      />
+      <style.icon className="relative size-5" strokeWidth={1.85} aria-hidden="true" />
     </span>
   );
 }
