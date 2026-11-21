@@ -7,7 +7,7 @@ import { shortRupiah } from "@/components/ebry/product-shelf";
 import { ServiceChatButton } from "@/components/home/service-chat-button";
 import { formatRupiah } from "@/lib/format";
 import { serviceMediaUrl, type PublicMarketplaceService } from "@/lib/marketplace-service";
-import { isRenderableImageUrl } from "@/lib/utils";
+import { isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 
 /**
  * Kartu jasa seukuran kartu produk (ProductTile): bingkai, rasio gambar, dan
@@ -26,8 +26,10 @@ export function ServiceTile({ item }: { item: PublicMarketplaceService }) {
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {cover ? (
           <img
-            src={serviceMediaUrl(cover.path)}
+            src={optimizedMediaUrl(serviceMediaUrl(cover.path), 480)}
             alt=""
+            width={480}
+            height={360}
             loading="lazy"
             decoding="async"
             className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
@@ -87,9 +89,12 @@ export function ServiceTile({ item }: { item: PublicMarketplaceService }) {
           <span className="relative shrink-0">
             {logo ? (
               <img
-                src={logo}
+                src={optimizedMediaUrl(logo, 96)}
                 alt=""
+                width={28}
+                height={28}
                 loading="lazy"
+                decoding="async"
                 className="size-7 rounded-full border border-border object-cover"
               />
             ) : (

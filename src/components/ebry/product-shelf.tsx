@@ -11,7 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Package, Star } from "lucide-react";
 
 import { formatRupiah, priceDetails } from "@/lib/format";
-import { cn, isRenderableImageUrl } from "@/lib/utils";
+import { cn, isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import type { StorePresence } from "@/lib/store-presence";
 
@@ -113,8 +113,10 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {thumb ? (
           <img
-            src={thumb}
+            src={optimizedMediaUrl(thumb, 480)}
             alt=""
+            width={480}
+            height={360}
             loading="lazy"
             decoding="async"
             className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
@@ -174,9 +176,12 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
                 <span className="relative shrink-0">
                   {logo ? (
                     <img
-                      src={logo}
+                      src={optimizedMediaUrl(logo, 96)}
                       alt=""
+                      width={28}
+                      height={28}
                       loading="lazy"
+                      decoding="async"
                       className="size-7 rounded-full border border-border object-cover"
                     />
                   ) : (

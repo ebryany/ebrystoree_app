@@ -45,7 +45,8 @@ describe("HomeHero (gaya toko modern)", () => {
     const html = renderHero();
     expect(html).toContain("Pembayaran diverifikasi");
     expect(html).toContain("Toko ditinjau sebelum tayang");
-    expect(html).toContain('src="/images/ebrystore-hero-mascot.webp?v=bf406217"');
+    expect(html).toContain("ebrystore-hero-mascot.webp");
+    expect(html).toContain('fetchPriority="high"');
     expect(html).toMatch(/<div class="hidden min-w-0 justify-center lg:flex"><img\b/);
     expect(html).not.toMatch(/min-h-screen|h-screen|100vh/);
   });

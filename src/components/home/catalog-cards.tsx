@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { SpotLightItem } from "@/components/ui/spotlight";
 import { addToCart } from "@/lib/cart-store";
 import { priceDetails } from "@/lib/format";
-import { cn, isRenderableImageUrl } from "@/lib/utils";
+import { cn, isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 
 const idr = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -108,7 +108,7 @@ export function MarketplaceProductCard({
       >
         {thumbnail ? (
           <img
-            src={thumbnail}
+            src={optimizedMediaUrl(thumbnail, 480)}
             alt=""
             width={320}
             height={213}
@@ -307,7 +307,7 @@ export function MarketplaceServiceCard({ item }: { item: ServiceCardItem }) {
       <div className="relative aspect-square overflow-hidden border-b border-border bg-surface-selected">
         {thumbnail ? (
           <img
-            src={thumbnail}
+            src={optimizedMediaUrl(thumbnail, 480)}
             alt=""
             width={320}
             height={320}
@@ -426,7 +426,7 @@ export function PlatformServiceCard({
       >
         {thumbnail ? (
           <img
-            src={thumbnail}
+            src={optimizedMediaUrl(thumbnail, 640)}
             alt=""
             width={640}
             height={400}
@@ -559,7 +559,7 @@ export function ProductCard({ item }: { item: ProductCardItem }) {
       <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
         {item.thumbnail_url ? (
           <img
-            src={item.thumbnail_url}
+            src={optimizedMediaUrl(item.thumbnail_url, 480)}
             alt={`${item.name} — produk digital Ebrystore`}
             loading="lazy"
             decoding="async"

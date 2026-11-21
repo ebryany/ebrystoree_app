@@ -5,7 +5,7 @@ import { ArrowUpRight, Star } from "lucide-react";
 
 import { SectionHeader } from "@/components/home/section-header";
 import { listPopularSellers } from "@/lib/reviews.functions";
-import { isRenderableImageUrl } from "@/lib/utils";
+import { isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 
 /** Penjual unggulan dalam grid statis; tersembunyi bila belum ada toko berulasan. */
@@ -39,9 +39,12 @@ export function FeaturedSellers() {
                 <span className="relative shrink-0">
                   {logo ? (
                     <img
-                      src={logo}
+                      src={optimizedMediaUrl(logo, 128)}
                       alt=""
+                      width={48}
+                      height={48}
                       loading="lazy"
+                      decoding="async"
                       className="size-12 rounded-xl border border-border object-cover"
                     />
                   ) : (

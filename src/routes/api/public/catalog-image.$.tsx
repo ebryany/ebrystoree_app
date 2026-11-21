@@ -11,7 +11,7 @@ const RASTER_MIME: Record<string, string> = {
 export const Route = createFileRoute("/api/public/catalog-image/$")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const raw = (params as Record<string, string>)._splat ?? "";
         let path: string;
         try {
@@ -37,9 +37,16 @@ export const Route = createFileRoute("/api/public/catalog-image/$")({
         const { data, error } = await supabaseAdmin.storage.from("catalog-images").download(path);
         if (error || !data) return new Response("Not found", { status: 404 });
 
-        return new Response(await data.arrayBuffer(), {
+        const { optimizeRasterImage } = await import("@/lib/image-optimize.server");
+        const optimized = await optimizeRasterImage(
+          await data.arrayBuffer(),
+          contentType,
+          request?.url,
+        );
+
+        return new Response(optimized.body, {
           headers: {
-            "Content-Type": contentType,
+            "Content-Type": optimized.contentType,
             "Cache-Control": "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff",
             "Content-Security-Policy": "default-src 'none'; sandbox",

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { BadgeCheck, Search, ShieldCheck, Store } from "lucide-react";
 
+import heroMascotUrl from "@/assets/ebrystore-hero-mascot.webp";
 import { WordAnimator } from "@/components/ui/word-animator";
 import { listCatalogCategories } from "@/lib/catalog.functions";
 
@@ -133,10 +134,10 @@ export function HomeHero() {
 
         <div className="hidden min-w-0 justify-center lg:flex">
           <img
-            src="/images/ebrystore-hero-mascot.webp?v=bf406217"
+            src={heroMascotUrl}
             alt="Maskot Ebrystore membawa laptop"
-            width={1254}
-            height={1254}
+            width={768}
+            height={768}
             fetchPriority="high"
             decoding="async"
             className="-my-6 h-auto w-full max-w-xl object-contain xl:-my-10 xl:max-w-2xl 2xl:max-w-3xl"

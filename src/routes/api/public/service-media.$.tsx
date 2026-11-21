@@ -18,7 +18,7 @@ const MEDIA_MIME: Record<string, string> = {
 export const Route = createFileRoute("/api/public/service-media/$")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const raw = (params as Record<string, string>)._splat ?? "";
         let relative: string;
         try {
@@ -46,9 +46,17 @@ export const Route = createFileRoute("/api/public/service-media/$")({
           .download(`service-media/${relative}`);
         if (error || !data) return new Response("Not found", { status: 404 });
 
-        return new Response(await data.arrayBuffer(), {
+        const rawBytes = await data.arrayBuffer();
+        const isRaster = contentType.startsWith("image/");
+        const result = isRaster
+          ? await (
+              await import("@/lib/image-optimize.server")
+            ).optimizeRasterImage(rawBytes, contentType, request?.url)
+          : { body: rawBytes, contentType };
+
+        return new Response(result.body, {
           headers: {
-            "Content-Type": contentType,
+            "Content-Type": result.contentType,
             "Cache-Control": "public, max-age=31536000, immutable",
             "X-Content-Type-Options": "nosniff",
             "Content-Security-Policy": "default-src 'none'; sandbox",

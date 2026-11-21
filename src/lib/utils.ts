@@ -76,3 +76,22 @@ export function isRenderableImageUrl(value: unknown): value is string {
     return false;
   }
 }
+
+export type ImageWidthPreset = 96 | 128 | 240 | 360 | 480 | 640 | 800 | 1200;
+
+/**
+ * Minta varian WebP terukur untuk URL proxy media internal (`/api/public/catalog-image/*`
+ * dan `/api/public/service-media/*`). URL eksternal atau video dikembalikan apa adanya.
+ */
+export function optimizedMediaUrl(url: string, width: ImageWidthPreset): string {
+  if (
+    !url.startsWith("/api/public/catalog-image/") &&
+    !url.startsWith("/api/public/service-media/")
+  ) {
+    return url;
+  }
+  if (/\.(mp4|webm)(\?|$)/i.test(url)) return url;
+  if (/[?&]w=\d+/.test(url)) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}w=${width}&fmt=webp`;
+}

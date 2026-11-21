@@ -125,7 +125,7 @@ vi.mock("@tanstack/react-start", () => ({
 import { Route } from "@/routes/index";
 import { Route as ProductRoute } from "@/routes/produk.$slug";
 import { saveMyProduct } from "@/lib/seller.functions";
-import { isRenderableImageUrl } from "@/lib/utils";
+import { isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 import { BannerBackground } from "./banner-background";
 import { HeroBannerBackground } from "./hero-banner-background";
 import {
@@ -208,7 +208,8 @@ describe("Product thumbnail validation", () => {
 
   it.each(valid)("keeps valid thumbnail %s", (url) => {
     expect(isRenderableImageUrl(url)).toBe(true);
-    expect(card({ thumbnail_url: url })).toContain(`src="${url}"`);
+    const cardSrc = optimizedMediaUrl(url, 480).replace(/&/g, "&amp;");
+    expect(card({ thumbnail_url: url })).toContain(`src="${cardSrc}"`);
     state.detailThumbnail = url;
     expect(detail()).toContain(`src="${url}"`);
     expect(() => validateSeller(url)).not.toThrow();

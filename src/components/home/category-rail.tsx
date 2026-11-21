@@ -8,7 +8,7 @@ import {
   resolveCategoryStyle,
   type CategoryTone as Tone,
 } from "@/lib/category-icons";
-import { cn, isRenderableImageUrl } from "@/lib/utils";
+import { cn, isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
 import { SectionHeader } from "@/components/home/section-header";
 
 const categoriesQuery = queryOptions({
@@ -171,7 +171,7 @@ export function CategoryRail() {
                   {isRenderableImageUrl(t.image) ? (
                     <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-[13px] border border-border/80 bg-gradient-to-b from-card to-surface p-1 shadow-[inset_0_1px_0_oklch(1_0_0/80%),0_1px_2px_oklch(0.22_0.03_205/6%)] transition-transform duration-200 group-hover:scale-[1.05] dark:shadow-[inset_0_1px_0_oklch(1_0_0/12%)] motion-reduce:transition-none motion-reduce:group-hover:scale-100">
                       <img
-                        src={t.image}
+                        src={optimizedMediaUrl(t.image, 96)}
                         alt=""
                         width={36}
                         height={36}

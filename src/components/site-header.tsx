@@ -30,7 +30,7 @@ import { useSiteNav, useWebsiteSettings } from "@/hooks/use-website-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRoles } from "@/lib/admin.functions";
 import { listInquiryUnreadCounts } from "@/lib/inquiries.functions";
-import { cn } from "@/lib/utils";
+import { cn, optimizedMediaUrl } from "@/lib/utils";
 
 // Match Tailwind's lg breakpoint, where the mobile controls are hidden.
 const DESKTOP_NAV_QUERY = "(min-width: 64rem)";
@@ -157,7 +157,14 @@ export function SiteHeader() {
               )}
             >
               {logoUrl ? (
-                <img src={logoUrl} alt="" className="size-9 shrink-0 object-contain" />
+                <img
+                  src={optimizedMediaUrl(logoUrl, 96)}
+                  alt=""
+                  width={36}
+                  height={36}
+                  decoding="async"
+                  className="size-9 shrink-0 object-contain"
+                />
               ) : (
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground">
                   <ShoppingBag className="size-5" aria-hidden="true" />
