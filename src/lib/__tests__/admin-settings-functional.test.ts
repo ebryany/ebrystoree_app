@@ -102,13 +102,10 @@ describe("Admin settings functional integrity", () => {
     expect(emailSrc).toContain('readStringSetting("site_timezone")');
   });
 
-  it("home banner, home feature sections, academic settings, and seller/refund SQL rules are wired", () => {
+  it("home feature sections, academic settings, and seller/refund SQL rules are wired", () => {
     const bannerBgSrc = readFileSync("src/components/home/hero-banner-background.tsx", "utf8");
     expect(bannerBgSrc).toContain("home_banner_position_x");
     expect(bannerBgSrc).toContain("home_banner_position_y");
-
-    const heroSrc = readFileSync("src/components/home/hero.tsx", "utf8");
-    expect(heroSrc).toContain("HeroBannerBackground");
 
     const homeSrc = readFileSync("src/routes/index.tsx", "utf8");
     expect(homeSrc).toContain("feature_home_tracking_preview !== false");

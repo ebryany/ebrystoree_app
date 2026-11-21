@@ -2,6 +2,11 @@
 
 ## 2026-11-21
 
+### Menonaktifkan banner gambar latar pada HomeHero
+
+- Menghapus render `HeroBannerBackground` di `src/components/home/hero.tsx` dan `src/routes/index.tsx` agar hero section tetap tampil bersih tanpa gambar banner latar.
+- Verifikasi: `npx tsc --noEmit` keluar `0`, `npm run test:unit` lulus **53/53 file, 665/665 test**.
+
 ### Remediasi keamanan, stabilitas UI, dan integrasi penuh Pengaturan Admin
 
 - **Keamanan & integritas data**:

@@ -149,7 +149,7 @@ function Beranda() {
 
   return (
     <PageShell>
-      <HomeHero bannerSettings={settings} />
+      <HomeHero />
       {/* Urutan mengikuti cara orang belanja: kategori, lanjut yang terakhir
           dilihat, katalog produk, lalu jasa, toko, ulasan, dan ajakan buka toko. */}
       <div className="w-full px-4 pb-16 pt-8 sm:px-6 sm:pt-10 lg:px-8">
