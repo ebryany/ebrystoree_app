@@ -17,24 +17,34 @@ function coerce(rows: Row[], base: Record<string, unknown>) {
   return out as Record<string, any>;
 }
 
-// Cache singkat di memori proses: setiap halaman SSR membaca pengaturan publik,
-// jadi tanpa cache setiap kunjungan menambah satu query ke database.
+// Cache singkat di memori proses + singleflight coalescing: setiap halaman SSR
+// membaca pengaturan publik, jadi saat TTL habis ratusan request serentak cukup
+// memicu satu query ke database (mencegah cache stampede).
 const PUBLIC_TTL_MS = 30_000;
 let publicCache: { at: number; value: Awaited<ReturnType<typeof fetchPublicSettings>> } | null =
   null;
+let publicInflight: Promise<Awaited<ReturnType<typeof fetchPublicSettings>>> | null = null;
 
 /** Dipanggil setelah admin menyimpan pengaturan agar perubahan langsung tampil. */
 export function clearPublicSettingsCache() {
   publicCache = null;
+  publicInflight = null;
 }
 
 /** Nilai publik (anon) — dipakai SSR header/footer/metadata/maintenance. */
 export async function readPublicSettings() {
   if (publicCache && Date.now() - publicCache.at < PUBLIC_TTL_MS) return publicCache.value;
-  const value = await fetchPublicSettings();
-  // Hasil fallback (gagal baca DB) tidak di-cache supaya segera pulih.
-  if (value.updatedAt !== null) publicCache = { at: Date.now(), value };
-  return value;
+  if (publicInflight) return publicInflight;
+  publicInflight = fetchPublicSettings()
+    .then((value) => {
+      // Hasil fallback (gagal baca DB) tidak di-cache supaya segera pulih.
+      if (value.updatedAt !== null) publicCache = { at: Date.now(), value };
+      return value;
+    })
+    .finally(() => {
+      publicInflight = null;
+    });
+  return publicInflight;
 }
 
 async function fetchPublicSettings() {

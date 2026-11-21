@@ -1,5 +1,16 @@
 # Catatan pembaruan EBRYSTORE
 
+## 2026-11-22
+
+### Optimasi performa SSR, perbaikan memory leak `QueryClient`, server cache singleflight, dan suite load testing Grafana k6
+
+- **Perbaikan SSR memory leak (`src/router.tsx`)**: Mengubah `gcTime` pada `QueryClient` dari `10 * 60_000` menjadi `isServer ? Infinity : 10 * 60_000` serta `retry: isServer ? 0 : 1` agar request SSR tidak menjadwalkan timer GC 10 menit yang menahan objek `QueryClient` di memori Node.js.
+- **Bounded TTL + singleflight server cache (`src/lib/server-cache.server.ts`, `src/lib/public-catalog.server.ts`, `src/lib/catalog.functions.ts`, `src/lib/marketplace-service-catalog.server.ts`, `src/lib/store-presence.ts`, `src/lib/website-settings.server.ts`)**: Menambahkan cache in-memory berbatas `maxEntries` dengan *in-flight request coalescing* (anti-stampede, error tidak pernah di-cache) untuk data baca publik (kategori 30s, daftar/cari/detail produk 15s, etalase & jasa publik 20s, presence toko 15s, serta coalescing pada `readPublicSettings`), memparalelkan query `readPresenceMap` dan `product_reviews` di `listProductShelves` serta `readStorePresence` di `src/lib/store-card.server.ts`.
+- **Singleton public Supabase client (`src/lib/supabase-public.server.ts`)**: Menggunakan ulang instance `SupabaseClient` publik berbasis `${url}::${key}` untuk menghindari alokasi klien baru di setiap query publik.
+- **Suite benchmark Grafana k6 & unit test (`tests/perf/*`, `src/lib/__tests__/server-cache.test.ts`, `.gitignore`)**: Menambahkan 6 skenario uji beban terisolasi (`smoke`, `load`, `stress`, `spike`, `soak`, `breakpoint`) beserta mock PostgREST dan runner terukur, serta unit test kontrak cache & SSR `gcTime`.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `npm run test:unit` lulus **59/59 file, 693/693 test**, `$env:NITRO_PRESET='node-server'; npm run build` keluar `0`. Benchmark k6 terisolasi (BEFORE vs AFTER pada 1 proses Node.js): `load_1000` menurunkan query DB **93,0%** (`25.153 → 1.769`), RSS puncak turun **54,0%** (`1.261 → 580 MB`), RPS naik **+70,0%** (`75,9 → 129,0`); `soak_200` pasca-stress pulih dari `100%` error (`1.562 MB`) menjadi **`0%` error** (`107,0 RPS`, `p50 65,6 ms`, RSS turun ke `286 MB`).
+- **Status deploy**: Siap dipublish ke GitHub `main` dan di-deploy ke VPS produksi bersama tuning Nginx & multi-worker Node.js.
+
 ## 2026-11-21
 
 ### Optimasi berat gambar beranda (`sharp` WebP + resize terukur) dan cache permanen maskot hero

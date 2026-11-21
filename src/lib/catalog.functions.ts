@@ -77,106 +77,117 @@ export type ShelfProduct = {
  * Satu query produk lalu dikelompokkan di server agar klien cukup 1 request.
  */
 export const listProductShelves = createServerFn({ method: "GET" }).handler(async () => {
-  const { createPublicClient } = await import("./supabase-public.server");
-  const supabase = createPublicClient();
+  const { getOrLoad } = await import("./server-cache.server");
+  return getOrLoad(
+    "catalog:shelves",
+    "default",
+    20_000,
+    async () => {
+      const { createPublicClient } = await import("./supabase-public.server");
+      const supabase = createPublicClient();
 
-  const [productsRes, categoriesRes] = await Promise.all([
-    supabase
-      .from("digital_products")
-      .select(
-        "id, name, slug, thumbnail_url, price, discount_price, sold_count, category_id, store_id, stores(name, slug, logo_url, is_platform)",
-      )
-      .eq("status", "published")
-      .eq("moderation_status", "approved")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false })
-      .limit(300),
-    supabase
-      .from("categories")
-      .select("id, name, slug")
-      .eq("kind", "product")
-      .eq("is_active", true)
-      .is("deleted_at", null)
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true }),
-  ]);
+      const [productsRes, categoriesRes] = await Promise.all([
+        supabase
+          .from("digital_products")
+          .select(
+            "id, name, slug, thumbnail_url, price, discount_price, sold_count, category_id, store_id, stores(name, slug, logo_url, is_platform)",
+          )
+          .eq("status", "published")
+          .eq("moderation_status", "approved")
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false })
+          .limit(300),
+        supabase
+          .from("categories")
+          .select("id, name, slug")
+          .eq("kind", "product")
+          .eq("is_active", true)
+          .is("deleted_at", null)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true }),
+      ]);
 
-  if (productsRes.error) {
-    console.error("[catalog] listProductShelves gagal:", productsRes.error.message);
-    return {
-      bestSellers: [] as ShelfProduct[],
-      latest: [] as ShelfProduct[],
-      shelves: [] as { slug: string; name: string; items: ShelfProduct[] }[],
-      error: "Produk sedang tidak dapat dimuat." as const,
-    };
-  }
+      if (productsRes.error) {
+        console.error("[catalog] listProductShelves gagal:", productsRes.error.message);
+        return {
+          bestSellers: [] as ShelfProduct[],
+          latest: [] as ShelfProduct[],
+          shelves: [] as { slug: string; name: string; items: ShelfProduct[] }[],
+          error: "Produk sedang tidak dapat dimuat." as const,
+        };
+      }
 
-  // Rating per toko: satu query ulasan, dirata-rata di server.
-  const storeIds = [
-    ...new Set((productsRes.data ?? []).map((r: any) => r.store_id as string).filter(Boolean)),
-  ];
-  const ratingByStore = new Map<string, number>();
-  const { readPresenceMap } = await import("./store-presence");
-  const presence = await readPresenceMap(supabase);
-  if (storeIds.length) {
-    const { data: reviews } = await supabase
-      .from("product_reviews")
-      .select("store_id, rating")
-      .eq("is_visible", true)
-      .eq("is_verified", true)
-      .in("store_id", storeIds)
-      .limit(3000);
-    const agg = new Map<string, { sum: number; n: number }>();
-    for (const r of reviews ?? []) {
-      const a = agg.get(r.store_id as string) ?? { sum: 0, n: 0 };
-      a.sum += Number(r.rating);
-      a.n += 1;
-      agg.set(r.store_id as string, a);
-    }
-    for (const [id, a] of agg) ratingByStore.set(id, a.sum / a.n);
-  }
+      // Rating per toko: satu query ulasan, dirata-rata di server.
+      const storeIds = [
+        ...new Set((productsRes.data ?? []).map((r: any) => r.store_id as string).filter(Boolean)),
+      ];
+      const ratingByStore = new Map<string, number>();
+      const { readPresenceMap } = await import("./store-presence");
+      const [presence, reviewsRes] = await Promise.all([
+        readPresenceMap(supabase),
+        storeIds.length
+          ? supabase
+              .from("product_reviews")
+              .select("store_id, rating")
+              .eq("is_visible", true)
+              .eq("is_verified", true)
+              .in("store_id", storeIds)
+              .limit(3000)
+          : Promise.resolve({ data: [] as { store_id: string; rating: number }[] }),
+      ]);
+      const agg = new Map<string, { sum: number; n: number }>();
+      for (const r of reviewsRes.data ?? []) {
+        const a = agg.get(r.store_id as string) ?? { sum: 0, n: 0 };
+        a.sum += Number(r.rating);
+        a.n += 1;
+        agg.set(r.store_id as string, a);
+      }
+      for (const [id, a] of agg) ratingByStore.set(id, a.sum / a.n);
 
-  const rows = (productsRes.data ?? []).map((r: any) => ({
-    category_id: r.category_id as string | null,
-    item: {
-      id: r.id,
-      name: r.name,
-      slug: r.slug,
-      thumbnail_url: r.thumbnail_url,
-      price: Number(r.price),
-      discount_price: r.discount_price == null ? null : Number(r.discount_price),
-      sold_count: Number(r.sold_count ?? 0),
-      // Produk tanpa toko = milik platform; tampil sebagai Ebrystore resmi.
-      store_name: r.stores?.name ?? (r.store_id ? null : "Ebrystore"),
-      store_slug: r.stores?.slug ?? null,
-      store_logo_url: r.stores?.logo_url ?? null,
-      is_official: !r.store_id || Boolean(r.stores?.is_platform),
-      store_rating: ratingByStore.get(r.store_id) ?? null,
-      store_presence: presence.get(r.store_id),
-    } satisfies ShelfProduct,
-  }));
+      const rows = (productsRes.data ?? []).map((r: any) => ({
+        category_id: r.category_id as string | null,
+        item: {
+          id: r.id,
+          name: r.name,
+          slug: r.slug,
+          thumbnail_url: r.thumbnail_url,
+          price: Number(r.price),
+          discount_price: r.discount_price == null ? null : Number(r.discount_price),
+          sold_count: Number(r.sold_count ?? 0),
+          // Produk tanpa toko = milik platform; tampil sebagai Ebrystore resmi.
+          store_name: r.stores?.name ?? (r.store_id ? null : "Ebrystore"),
+          store_slug: r.stores?.slug ?? null,
+          store_logo_url: r.stores?.logo_url ?? null,
+          is_official: !r.store_id || Boolean(r.stores?.is_platform),
+          store_rating: ratingByStore.get(r.store_id) ?? null,
+          store_presence: presence.get(r.store_id),
+        } satisfies ShelfProduct,
+      }));
 
-  const bestSellers = rows
-    .map((r) => r.item)
-    .filter((p) => p.sold_count > 0)
-    .sort((a, b) => b.sold_count - a.sold_count)
-    .slice(0, 12);
-
-  const shelves = (categoriesRes.data ?? [])
-    .map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      items: rows
-        .filter((r) => r.category_id === c.id)
+      const bestSellers = rows
         .map((r) => r.item)
-        .slice(0, 12),
-    }))
-    .filter((s) => s.items.length > 0);
+        .filter((p) => p.sold_count > 0)
+        .sort((a, b) => b.sold_count - a.sold_count)
+        .slice(0, 12);
 
-  // Query sudah diurutkan created_at desc, jadi 12 pertama = produk terbaru.
-  const latest = rows.map((r) => r.item).slice(0, 12);
+      const shelves = (categoriesRes.data ?? [])
+        .map((c) => ({
+          slug: c.slug,
+          name: c.name,
+          items: rows
+            .filter((r) => r.category_id === c.id)
+            .map((r) => r.item)
+            .slice(0, 12),
+        }))
+        .filter((s) => s.items.length > 0);
 
-  return { bestSellers, latest, shelves, error: null };
+      // Query sudah diurutkan created_at desc, jadi 12 pertama = produk terbaru.
+      const latest = rows.map((r) => r.item).slice(0, 12);
+
+      return { bestSellers, latest, shelves, error: null };
+    },
+    { maxEntries: 4, shouldCache: (v) => v.error === null },
+  );
 });
 
 export const listPublicMarketplaceServices = createServerFn({ method: "GET" })
@@ -197,50 +208,60 @@ export const getPublicMarketplaceService = createServerFn({ method: "GET" })
 export const listServices = createServerFn({ method: "GET" })
   .validator((data: unknown) => listInput.parse(data))
   .handler(async ({ data }) => {
-    const { createPublicClient } = await import("./supabase-public.server");
-    const supabase = createPublicClient();
-    const { page, pageSize, from, to } = pageRange(data);
-    const categoryId = await resolveCategoryId(supabase as never, data?.category);
-    if (data?.category && !categoryId) {
-      return { items: [], error: null, total: 0, page, nextPage: null };
-    }
+    const load = async () => {
+      const { createPublicClient } = await import("./supabase-public.server");
+      const supabase = createPublicClient();
+      const { page, pageSize, from, to } = pageRange(data);
+      const categoryId = await resolveCategoryId(supabase as never, data?.category);
+      if (data?.category && !categoryId) {
+        return { items: [], error: null, total: 0, page, nextPage: null };
+      }
 
-    let query = supabase
-      .from("services")
-      .select(
-        "id, name, slug, short_description, thumbnail_url, category:categories!services_category_id_fkey(slug, name), service_packages(id, name, price, estimated_days, free_revisions, is_active)",
-        { count: "exact" },
-      )
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      let query = supabase
+        .from("services")
+        .select(
+          "id, name, slug, short_description, thumbnail_url, category:categories!services_category_id_fkey(slug, name), service_packages(id, name, price, estimated_days, free_revisions, is_active)",
+          { count: "exact" },
+        )
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
-    const term = data?.q ? escapeLike(data.q) : "";
-    if (term) query = query.or(`name.ilike.%${term}%,short_description.ilike.%${term}%`);
-    if (categoryId)
-      query = query.or(`academic_category_id.eq.${categoryId},category_id.eq.${categoryId}`);
+      const term = data?.q ? escapeLike(data.q) : "";
+      if (term) query = query.or(`name.ilike.%${term}%,short_description.ilike.%${term}%`);
+      if (categoryId)
+        query = query.or(`academic_category_id.eq.${categoryId},category_id.eq.${categoryId}`);
 
-    const { data: rows, error, count } = await query;
-    if (error) {
-      console.error("[catalog] listServices gagal:", error.message);
+      const { data: rows, error, count } = await query;
+      if (error) {
+        console.error("[catalog] listServices gagal:", error.message);
+        return {
+          items: [],
+          error: "Katalog layanan sedang tidak dapat dimuat." as const,
+          total: 0,
+          page,
+          nextPage: null,
+        };
+      }
+      const items = rows ?? [];
+      const total = count ?? items.length;
       return {
-        items: [],
-        error: "Katalog layanan sedang tidak dapat dimuat." as const,
-        total: 0,
+        items,
+        error: null,
+        total,
         page,
-        nextPage: null,
+        nextPage: items.length === pageSize && (page + 1) * pageSize < total ? page + 1 : null,
       };
-    }
-    const items = rows ?? [];
-    const total = count ?? items.length;
-    return {
-      items,
-      error: null,
-      total,
-      page,
-      nextPage: items.length === pageSize && (page + 1) * pageSize < total ? page + 1 : null,
     };
+
+    if (data?.q) return load();
+    const { getOrLoad } = await import("./server-cache.server");
+    const key = `${data?.category ?? ""}|${data?.page ?? 0}|${data?.pageSize ?? 48}`;
+    return getOrLoad("catalog:platform-services", key, 20_000, load, {
+      maxEntries: 32,
+      shouldCache: (v) => v.error === null,
+    });
   });
 
 export const getStorefrontSummary = createServerFn({ method: "GET" }).handler(async () => {

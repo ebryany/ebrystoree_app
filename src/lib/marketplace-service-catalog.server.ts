@@ -28,53 +28,64 @@ export async function readPublicMarketplaceServices(
 ) {
   const page = filters.page ?? 0;
   const pageSize = filters.pageSize ?? 12;
-  try {
-    // Anon has no table access; eligibility and projection must stay in this server-only query.
-    let query = client
-      .from("marketplace_services")
-      .select(
-        "id, name, price, agreement, media, store:stores!inner(id, name, slug, logo_url), category:categories!inner(name, slug)",
-        { count: "exact" },
-      )
-      .eq("status", "approved")
-      .eq("store.status", "active")
-      .eq("category.kind", "service")
-      .eq("category.is_active", true)
-      .is("category.deleted_at", null)
-      .order("created_at", { ascending: false })
-      .order("id")
-      .range(page * pageSize, (page + 1) * pageSize - 1);
-    const term = filters.q?.replace(/[\\%_]/g, " ").trim();
-    if (term) query = query.ilike("name", `%${term}%`);
-    if (filters.category) query = query.eq("category.slug", filters.category);
-    const { readPresenceMap } = await import("./store-presence");
-    const [{ data, error, count }, presence] = await Promise.all([query, readPresenceMap(client)]);
-    if (error) throw error;
-    const items: PublicMarketplaceService[] = (data ?? []).map((row) => {
-      const item = publicServiceSchema.parse(row);
-      return { ...item, store: { ...item.store, presence: presence.get(item.store.id) } };
-    });
-    const total = count ?? items.length;
-    return {
-      items,
-      total,
-      page,
-      nextPage: (page + 1) * pageSize < total ? page + 1 : null,
-      error: null,
-    };
-  } catch (error) {
-    console.error(
-      "[catalog] jasa seller gagal:",
-      error instanceof Error ? error.message : "Query failed",
-    );
-    return {
-      items: [] as PublicMarketplaceService[],
-      total: 0,
-      page,
-      nextPage: null,
-      error: "Katalog jasa seller sedang tidak dapat dimuat.",
-    };
-  }
+  const load = async () => {
+    try {
+      // Anon has no table access; eligibility and projection must stay in this server-only query.
+      let query = client
+        .from("marketplace_services")
+        .select(
+          "id, name, price, agreement, media, store:stores!inner(id, name, slug, logo_url), category:categories!inner(name, slug)",
+          { count: "exact" },
+        )
+        .eq("status", "approved")
+        .eq("store.status", "active")
+        .eq("category.kind", "service")
+        .eq("category.is_active", true)
+        .is("category.deleted_at", null)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+      const term = filters.q?.replace(/[\\%_]/g, " ").trim();
+      if (term) query = query.ilike("name", `%${term}%`);
+      if (filters.category) query = query.eq("category.slug", filters.category);
+      const { readPresenceMap } = await import("./store-presence");
+      const [{ data, error, count }, presence] = await Promise.all([query, readPresenceMap(client)]);
+      if (error) throw error;
+      const items: PublicMarketplaceService[] = (data ?? []).map((row) => {
+        const item = publicServiceSchema.parse(row);
+        return { ...item, store: { ...item.store, presence: presence.get(item.store.id) } };
+      });
+      const total = count ?? items.length;
+      return {
+        items,
+        total,
+        page,
+        nextPage: (page + 1) * pageSize < total ? page + 1 : null,
+        error: null,
+      };
+    } catch (error) {
+      console.error(
+        "[catalog] jasa seller gagal:",
+        error instanceof Error ? error.message : "Query failed",
+      );
+      return {
+        items: [] as PublicMarketplaceService[],
+        total: 0,
+        page,
+        nextPage: null,
+        error: "Katalog jasa seller sedang tidak dapat dimuat.",
+      };
+    }
+  };
+
+  const isDefaultClient = client === (supabaseAdmin as unknown as SupabaseClient);
+  if (!isDefaultClient || filters.q || process.env.VITEST) return load();
+  const { getOrLoad } = await import("./server-cache.server");
+  const key = `${filters.category ?? ""}|${page}|${pageSize}`;
+  return getOrLoad("catalog:marketplace-services", key, 20_000, load, {
+    maxEntries: 32,
+    shouldCache: (v) => v.error === null,
+  });
 }
 
 /**

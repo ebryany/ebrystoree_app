@@ -39,7 +39,8 @@ export async function loadStoreCard(
   const ownerFilter = store.is_platform
     ? `store_id.is.null,store_id.eq.${store.id}`
     : `store_id.eq.${store.id}`;
-  const [{ data: storeProducts }, servicesRes] = await Promise.all([
+  const { readStorePresence } = await import("./store-presence");
+  const [{ data: storeProducts }, servicesRes, presence] = await Promise.all([
     supabase
       .from("digital_products")
       .select("id, sold_count")
@@ -58,6 +59,7 @@ export async function loadStoreCard(
           .select("id", { count: "exact", head: true })
           .eq("store_id", store.id)
           .eq("status", "published"),
+    readStorePresence(supabase, store.id),
   ]);
   const ids = ((storeProducts ?? []) as { id: string }[]).map((r) => r.id);
   let rating: number | null = null;
@@ -74,9 +76,6 @@ export async function loadStoreCard(
     if (reviews)
       rating = (rv as { rating: number }[]).reduce((n, r) => n + Number(r.rating), 0) / reviews;
   }
-
-  const { readStorePresence } = await import("./store-presence");
-  const presence = await readStorePresence(supabase, store.id);
 
   return {
     seller: { ...store, presence },

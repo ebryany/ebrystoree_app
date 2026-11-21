@@ -60,28 +60,55 @@ export type PresenceMap = {
   platform: StorePresence;
 };
 
-/** Status semua toko sekaligus (tabel kecil: satu baris per toko). */
+const PRESENCE_CACHE_TTL_MS = 15_000;
+let presenceCache: { at: number; value: PresenceMap } | null = null;
+let presenceInflight: Promise<PresenceMap> | null = null;
+
+/** Status semua toko sekaligus (tabel kecil: satu baris per toko), dengan cache 15 detik + singleflight. */
 export async function readPresenceMap(supabase: any): Promise<PresenceMap> {
-  const map = new Map<string, StorePresence>();
-  let platform = OFFLINE_UNKNOWN;
-  try {
-    const { data } = await supabase
-      .from("store_presence")
-      .select("store_id, last_seen_at, online, stores(is_platform)")
-      .limit(2000);
-    const now = Date.now();
-    for (const row of (data ?? []) as PresenceRow[]) {
-      const p = toPresence(row, now);
-      map.set(row.store_id, p);
-      if (row.stores?.is_platform) platform = p;
+  if (typeof window === "undefined" && !process.env.VITEST) {
+    if (presenceCache && Date.now() - presenceCache.at < PRESENCE_CACHE_TTL_MS) {
+      return presenceCache.value;
     }
-  } catch {
-    // Status online bersifat pelengkap; gagal baca = semua dianggap offline.
+    if (presenceInflight) return presenceInflight;
   }
-  return {
-    get: (id) => (id ? (map.get(id) ?? OFFLINE_UNKNOWN) : platform),
-    platform,
+
+  const load = async (): Promise<PresenceMap> => {
+    const map = new Map<string, StorePresence>();
+    let platform = OFFLINE_UNKNOWN;
+    let ok = false;
+    try {
+      const { data, error } = await supabase
+        .from("store_presence")
+        .select("store_id, last_seen_at, online, stores(is_platform)")
+        .limit(2000);
+      if (!error) ok = true;
+      const now = Date.now();
+      for (const row of (data ?? []) as PresenceRow[]) {
+        const p = toPresence(row, now);
+        map.set(row.store_id, p);
+        if (row.stores?.is_platform) platform = p;
+      }
+    } catch {
+      // Status online bersifat pelengkap; gagal baca = semua dianggap offline.
+    }
+    const result: PresenceMap = {
+      get: (id) => (id ? (map.get(id) ?? OFFLINE_UNKNOWN) : platform),
+      platform,
+    };
+    if (ok && typeof window === "undefined" && !process.env.VITEST) {
+      presenceCache = { at: Date.now(), value: result };
+    }
+    return result;
   };
+
+  if (typeof window === "undefined" && !process.env.VITEST) {
+    presenceInflight = load().finally(() => {
+      presenceInflight = null;
+    });
+    return presenceInflight;
+  }
+  return load();
 }
 
 export async function readStorePresence(supabase: any, storeId: string): Promise<StorePresence> {

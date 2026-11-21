@@ -40,6 +40,7 @@ dist-ssr
 *.sw?
 tests/e2e/.auth/
 tests/e2e/.artifacts/
+tests/perf/.results/
 playwright-report/
 
 # AI tooling / local working files (bukan bagian aplikasi)
