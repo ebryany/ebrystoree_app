@@ -2,6 +2,13 @@
 
 ## 2026-11-21
 
+### Dokumentasi System Design, endpoint `/api/health`, dan sinkronisasi migrasi SQL produksi
+
+- Menambahkan paket dokumentasi arsitektur di `docs/system-design/` (Deliverables 01–13).
+- Menambahkan endpoint health check non-sensitif `GET /api/health` (`src/routes/api/health.ts` dan `src/lib/health.server.ts`) beserta pengujian kontrak `src/lib/__tests__/health-and-sql-contract.test.ts`.
+- Menerapkan dan memverifikasi 3 migrasi SQL terbaru (`20261121132000`, `20261121150000`, `20261121160000`) ke database Supabase produksi (`wcxaheqnnsbhifpgiedk`).
+- Verifikasi: `npx tsc --noEmit` keluar `0`, `npm run test:unit` lulus **54/54 file, 671/671 test**.
+
 ### Menonaktifkan banner gambar latar pada HomeHero
 
 - Menghapus render `HeroBannerBackground` di `src/components/home/hero.tsx` dan `src/routes/index.tsx` agar hero section tetap tampil bersih tanpa gambar banner latar.

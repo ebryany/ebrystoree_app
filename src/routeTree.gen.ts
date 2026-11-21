@@ -26,6 +26,7 @@ import { Route as AuthenticatedAkunRouteImport } from './routes/_authenticated/a
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOperatorRouteImport } from './routes/_authenticated/operator'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -210,6 +211,11 @@ const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
   id: '/seller',
   path: '/seller',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ArtikelIndexRoute = ArtikelIndexRouteImport.update({
   id: '/artikel/',
@@ -790,6 +796,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/operator': typeof AuthenticatedOperatorRouteWithChildren
   '/seller': typeof AuthenticatedSellerRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jasa/$id': typeof JasaIdRoute
@@ -901,6 +908,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/akun': typeof AuthenticatedAkunRoute
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jasa/$id': typeof JasaIdRoute
@@ -1018,6 +1026,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/operator': typeof AuthenticatedOperatorRouteWithChildren
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/jasa/$id': typeof JasaIdRoute
@@ -1136,6 +1145,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/operator'
     | '/seller'
+    | '/api/health'
     | '/artikel/$slug'
     | '/auth/callback'
     | '/jasa/$id'
@@ -1247,6 +1257,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/akun'
+    | '/api/health'
     | '/artikel/$slug'
     | '/auth/callback'
     | '/jasa/$id'
@@ -1363,6 +1374,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/operator'
     | '/_authenticated/seller'
+    | '/api/health'
     | '/artikel/$slug'
     | '/auth/callback'
     | '/jasa/$id'
@@ -1476,6 +1488,7 @@ export interface RootRouteChildren {
   SeeDashboardRouteRoute: typeof SeeDashboardRouteRouteWithChildren
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ArtikelSlugRoute: typeof ArtikelSlugRoute
   JasaIdRoute: typeof JasaIdRoute
   LayananSlugRoute: typeof LayananSlugRoute
@@ -1622,6 +1635,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/seller'
       preLoaderRoute: typeof AuthenticatedSellerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/artikel/': {
       id: '/artikel/'
@@ -2573,6 +2593,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ArtikelSlugRoute: ArtikelSlugRoute,
   JasaIdRoute: JasaIdRoute,
   LayananSlugRoute: LayananSlugRoute,
