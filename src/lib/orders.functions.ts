@@ -22,42 +22,8 @@ export type ProductVariant = {
 export const getProductDetail = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({ slug: z.string().trim().min(1).max(120) }).parse(data))
   .handler(async ({ data }) => {
-    const { createPublicClient } = await import("./supabase-public.server");
-    const supabase = createPublicClient();
-    const { data: row, error } = await supabase
-      .from("digital_products")
-      .select(
-        "id, name, slug, short_description, description, thumbnail_url, price, discount_price, usage_notes, version, download_limit, validity_days, sold_count, delivery_mode, code_kind, available_stock, store_id, stores(name, slug, is_platform), categories(name, slug), product_variants(id, name, price, discount_price, sort_order)",
-      )
-      .eq("slug", data.slug)
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[katalog] detail produk gagal:", error.message);
-      return { product: null, error: "Produk tidak dapat dimuat." as const };
-    }
-    if (!row) return { product: null, error: null };
-
-    // RLS publik hanya mengembalikan variasi aktif; urutkan dan buang variasi
-    // pada mode kirim yang tidak mendukungnya.
-    const { product_variants: rawVariants, ...rest } = row as typeof row & {
-      product_variants?: ProductVariant[] | null;
-    };
-    const variants =
-      (rest.delivery_mode ?? "shared") === "shared"
-        ? [...(rawVariants ?? [])].sort((a, b) => a.sort_order - b.sort_order)
-        : [];
-
-    // Produk tanpa store_id adalah produk platform: tampilkan sebagai toko resmi.
-    const { loadStoreCard } = await import("./store-card.server");
-    const { seller, sellerStats } = await loadStoreCard(supabase, rest.store_id ?? null);
-
-    return {
-      product: { ...rest, variants, seller, sellerStats },
-      error: null,
-    };
+    const { readCatalogProduct } = await import("./public-catalog.server");
+    return readCatalogProduct(data);
   });
 
 /** Penegakan feature flag di server: checkout ditutup saat flag dimatikan. */
@@ -456,6 +422,8 @@ export const requestMyRefund = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
+    const blocked = await ensureFeature(["feature_refund"]);
+    if (blocked) return blocked;
     const helpers = await tx();
     const { error } = await (context as Ctx).supabase.rpc("request_refund", {
       _order_id: data.orderId,

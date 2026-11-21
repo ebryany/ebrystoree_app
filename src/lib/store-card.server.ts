@@ -67,6 +67,7 @@ export async function loadStoreCard(
       .from("product_reviews")
       .select("rating")
       .eq("is_visible", true)
+      .eq("is_verified", true)
       .in("product_id", ids)
       .limit(3000);
     reviews = rv?.length ?? 0;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -73,8 +73,8 @@ export function InquiryThread({
   const prepareUpload = useServerFn(prepareChatUpload);
   const fetchUrls = useServerFn(getChatAttachmentUrls);
 
-  const queryKey = ["inquiry", id];
-  const messagesKey = ["inquiry-messages", id];
+  const queryKey = useMemo(() => ["inquiry", id], [id]);
+  const messagesKey = useMemo(() => ["inquiry-messages", id], [id]);
 
   const { data, isPending, error, refetch } = useQuery({
     queryKey,
@@ -134,7 +134,7 @@ export function InquiryThread({
     void markRead({ data: { inquiryId: id } }).then(() =>
       queryClient.invalidateQueries({ queryKey }),
     );
-  }, [user, data, messages.length, id, markRead, queryClient]);
+  }, [user, data, messages.length, id, markRead, queryClient, queryKey]);
 
   async function sendBody(text: string, existingTempId?: string) {
     const tempId = existingTempId ?? crypto.randomUUID();

@@ -57,10 +57,12 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent({ error }: { error: unknown }) {
   console.error(error);
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportLovableError(error instanceof Error ? error : new Error(String(error)), {
+      boundary: "tanstack_root_error_component",
+    });
   }, [error]);
 
   return <RouteError />;
@@ -73,9 +75,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData, match, matches }) => {
     const failureHead = routeFailureHead([...matches, match]);
     const s: Record<string, any> = (loaderData as any)?.values ?? {};
-    const title = String(
+    const baseTitle = String(
       s.seo_default_title ?? "Ebrystore — Produk Digital & Pendampingan Akademik",
     );
+    const titleTemplate = typeof s.seo_title_template === "string" ? s.seo_title_template.trim() : "";
+    const title = titleTemplate.includes("{title}")
+      ? titleTemplate.replace("{title}", baseTitle)
+      : baseTitle;
     const description = String(
       s.seo_default_description ??
         "Beli produk digital yang langsung terkirim dan pesan bantuan tugas kuliah dengan progres terpantau.",
@@ -88,11 +94,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         s.seo_og_image || s.site_og_image_url || s.site_square_logo_url || s.site_logo_url || "",
       ),
     );
+    const googleVerification = String(
+      s.seo_google_verification || "5V5oY0ERtp1nkZTxzinF-GwbMZwJAj3fSTiYPUwaCIg",
+    );
     const verification = [
-      { name: "google-site-verification", content: "5V5oY0ERtp1nkZTxzinF-GwbMZwJAj3fSTiYPUwaCIg" },
-      s.seo_google_verification
-        ? { name: "google-site-verification", content: String(s.seo_google_verification) }
-        : null,
+      { name: "google-site-verification", content: googleVerification },
       s.seo_bing_verification
         ? { name: "msvalidate.01", content: String(s.seo_bing_verification) }
         : null,
@@ -172,8 +178,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const settings = Route.useLoaderData();
+  const s = ((settings as any)?.values ?? {}) as Record<string, any>;
+  const lang = s.site_language === "en" ? "en" : "id";
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <HeadContent />
       </head>
@@ -212,18 +221,34 @@ function RootComponent() {
     );
   }, [pathname]);
 
+  const settingsValues = ((settings as any)?.values ?? {}) as Record<string, any>;
+  const customAccent =
+    typeof settingsValues.site_accent_color === "string" &&
+    /^#[0-9a-fA-F]{6}$/.test(settingsValues.site_accent_color) &&
+    settingsValues.site_accent_color.toLowerCase() !== "#0f8f86"
+      ? settingsValues.site_accent_color
+      : undefined;
+
   return (
     <QueryClientProvider client={queryClient}>
-      <NavProgress />
-      <MaintenanceGate settings={(settings as any)?.values ?? {}}>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </MaintenanceGate>
-      {/* richColors sengaja dilepas: permukaan frosted netral + ikon semantik
-          diatur terpusat di components/ui/sonner.tsx untuk semua toast. */}
-      {/* Disembunyikan saat header dashboard terlihat: notifikasi tampil
-          menempel di bawah header (components/ebry/inline-toasts.tsx). */}
-      {inlineToasts ? null : <Toaster position="top-center" />}
+      <div
+        style={
+          customAccent
+            ? ({ "--accent": customAccent, "--ring": customAccent } as React.CSSProperties)
+            : undefined
+        }
+      >
+        <NavProgress />
+        <MaintenanceGate settings={settingsValues}>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </MaintenanceGate>
+        {/* richColors sengaja dilepas: permukaan frosted netral + ikon semantik
+            diatur terpusat di components/ui/sonner.tsx untuk semua toast. */}
+        {/* Disembunyikan saat header dashboard terlihat: notifikasi tampil
+            menempel di bawah header (components/ebry/inline-toasts.tsx). */}
+        {inlineToasts ? null : <Toaster position="top-center" />}
+      </div>
     </QueryClientProvider>
   );
 }

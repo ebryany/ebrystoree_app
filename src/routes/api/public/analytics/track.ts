@@ -18,21 +18,57 @@ import { clientIpFrom } from "@/lib/client-ip.server";
  *   boleh membocorkan informasi ke penyerang atau mengganggu pengalaman halaman.
  */
 
-const eventSchema = z.object({
-  event: z.enum([
-    "page_view",
-    "product_view",
-    "service_view",
-    "article_view",
-    "checkout_start",
-    "payment_success",
-  ]),
+const MAX_ANALYTICS_BYTES = 4 * 1024;
+
+// payment_success sengaja TIDAK diizinkan dari browser; konversi hanya dicatat server-side.
+export const analyticsEventSchema = z.object({
+  event: z.enum(["page_view", "product_view", "service_view", "article_view", "checkout_start"]),
   path: z.string().min(1).max(300),
   referrer: z.string().max(500).optional().nullable(),
   utmSource: z.string().max(120).optional().nullable(),
   utmMedium: z.string().max(120).optional().nullable(),
   utmCampaign: z.string().max(120).optional().nullable(),
 });
+
+/** Baca body request dengan batas byte tegas (menghentikan stream sebelum melebihi batas). */
+export async function readBoundedJson(request: Request, maxBytes = MAX_ANALYTICS_BYTES): Promise<unknown> {
+  const declared = Number(request.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declared) && declared > maxBytes) return null;
+
+  if (!request.body) return null;
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel().catch(() => {});
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const combined = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    combined.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    return JSON.parse(new TextDecoder().decode(combined));
+  } catch {
+    return null;
+  }
+}
 
 /** Pola user-agent yang jelas bot/crawler. */
 const BOT_PATTERN =
@@ -82,17 +118,10 @@ export const Route = createFileRoute("/api/public/analytics/track")({
         // Selalu 204: tidak ada informasi yang berguna bagi pemanggil tak sah.
         const ok = new Response(null, { status: 204 });
 
-        const declared = Number(request.headers.get("content-length") ?? "0");
-        if (Number.isFinite(declared) && declared > 4 * 1024) return ok;
+        const payload = await readBoundedJson(request, MAX_ANALYTICS_BYTES);
+        if (!payload) return ok;
 
-        let payload: unknown;
-        try {
-          payload = await request.json();
-        } catch {
-          return ok;
-        }
-
-        const parsed = eventSchema.safeParse(payload);
+        const parsed = analyticsEventSchema.safeParse(payload);
         if (!parsed.success) return ok;
 
         const userAgent = request.headers.get("user-agent") ?? "";

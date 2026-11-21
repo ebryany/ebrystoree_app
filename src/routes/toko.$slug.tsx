@@ -39,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { priceDetails } from "@/lib/format";
 import { getPublicStore } from "@/lib/seller.functions";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/toko/$slug")({
@@ -187,6 +188,11 @@ function toTile(item: any): ProductTileItem {
 
 function Storefront() {
   const router = useRouter();
+  const websiteSettings = useWebsiteSettings();
+  const perPage = Math.min(
+    100,
+    Math.max(1, Number(websiteSettings.marketplace_store_products_per_page) || 48),
+  );
   const { store, products, services, rating, soldCount, hasMoreProducts, isOwner } =
     Route.useLoaderData() as any;
   const presence = useStorePresence(store?.id, store?.presence);
@@ -224,8 +230,8 @@ function Storefront() {
     else if (sort === "price_desc") sorted.sort((a, b) => priceOf(b) - priceOf(a));
     else if (sort === "popular")
       sorted.sort((a, b) => Number(b.sold_count ?? 0) - Number(a.sold_count ?? 0));
-    return sorted;
-  }, [products, term, sort]);
+    return sorted.slice(0, perPage);
+  }, [products, term, sort, perPage]);
 
   // Rak terlaris hanya dari produk yang benar-benar pernah terjual.
   const bestSellers = useMemo(

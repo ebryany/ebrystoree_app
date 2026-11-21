@@ -77,6 +77,7 @@ export const listPopularSellers = createServerFn({ method: "GET" }).handler(asyn
     .from("product_reviews")
     .select("store_id, rating")
     .eq("is_visible", true)
+    .eq("is_verified", true)
     .not("store_id", "is", null)
     .limit(2000);
   if (error) {
@@ -140,8 +141,9 @@ export const listProductReviews = createServerFn({ method: "GET" })
     }
 
     const items = rows ?? [];
-    const total = items.length;
-    const average = total ? items.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
+    const verified = items.filter((r) => Boolean(r.is_verified));
+    const total = verified.length;
+    const average = total ? verified.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
     return { items, average, total, error: null };
   });
 
@@ -202,7 +204,7 @@ export const submitGuestReview = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: product } = await supabaseAdmin
       .from("digital_products")
-      .select("id")
+      .select("id, store_id")
       .eq("id", data.productId)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -211,11 +213,13 @@ export const submitGuestReview = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin.from("product_reviews").insert({
       product_id: data.productId,
+      store_id: (product as { store_id?: string | null }).store_id ?? null,
       user_id: null,
       rating: data.rating,
       body: data.body || null,
       reviewer_name: data.name,
       is_verified: false,
+      is_visible: false,
     });
     if (error) {
       console.error("[reviews] submitGuestReview gagal:", error.message);
@@ -265,8 +269,9 @@ export const listServiceReviews = createServerFn({ method: "GET" })
       created_at: string;
       is_verified: boolean;
     }>;
-    const total = items.length;
-    const average = total ? items.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
+    const verified = items.filter((r) => Boolean(r.is_verified));
+    const total = verified.length;
+    const average = total ? verified.reduce((sum, r) => sum + Number(r.rating), 0) / total : 0;
     return { items, average, total, error: null };
   });
 
@@ -373,6 +378,7 @@ export const submitGuestServiceReview = createServerFn({ method: "POST" })
       body: data.body || null,
       reviewer_name: data.name,
       is_verified: false,
+      is_visible: false,
     });
     if (error) {
       console.error("[reviews] submitGuestServiceReview gagal:", error.message);

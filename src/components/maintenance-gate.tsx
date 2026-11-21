@@ -40,8 +40,13 @@ export function MaintenanceGate({ settings, children }: { settings: Record<strin
   ];
   if (excluded.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return <>{children}</>;
 
+  const allowAdmin = settings.maintenance_allow_admin !== false;
   const allowOperator = settings.maintenance_allow_operator !== false;
-  const isStaff = (roles ?? []).some((r) => (allowOperator ? STAFF_ROLES : STAFF_ROLES.slice(1)).includes(r));
+  const allowedStaffRoles = [
+    ...(allowOperator ? ["operator"] : []),
+    ...(allowAdmin ? ["support", "finance", "admin", "super_admin"] : []),
+  ];
+  const isStaff = (roles ?? []).some((r) => allowedStaffRoles.includes(r));
   if (loading || (user && roles === null)) return <>{children}</>;
   if (isStaff) return <>{children}</>;
 

@@ -151,17 +151,17 @@ describe("work state hints", () => {
 
 describe("seller page redesign (static source contract)", () => {
   it("renders the work summary, complaints banner, and tab set from the shared lib", () => {
-    expect(page).toContain("Ringkasan pesanan jasa");
-    expect(page).toContain("Menunggu pembeli");
-    expect(page).toContain("Revisi diminta");
+    expect(page).toContain("Pesanan jasa");
+    expect(SERVICE_ORDER_TABS.map((t) => t.label)).toContain("Menunggu pembeli");
+    expect(SERVICE_ORDER_TABS.map((t) => t.label)).toContain("Revisi");
     expect(page).toContain("complaints > 0");
-    expect(page).toContain("SERVICE_ORDER_TABS");
+    expect(page).toContain("SERVICE_ORDER_TABS.map");
     expect(page).toContain('"marketplace_service_events"');
   });
 
   it("keeps the card hierarchy: header, next action, metadata, detail", () => {
     expect(card).toContain("serviceOrderNextAction(row)");
-    expect(card).toContain("serviceOrderDeadline(row.due_at, Date.now())");
+    expect(card).toContain("serviceOrderPhaseDeadline(row, Date.now())");
     expect(card).toContain("serviceOrderWorkStateHint[row.work_state]");
     expect(card).toContain("aria-label={`Pesanan ${row.order_number}`}");
     expect(card).toContain("aria-expanded={isExpanded}");
@@ -179,11 +179,12 @@ describe("seller page redesign (static source contract)", () => {
     expect(agreementIndex).toBeLessThan(historyIndex);
   });
 
-  it("keeps delivery kinds as a segmented control with one primary button", () => {
+  it("keeps delivery kinds as a segmented control with one primary button per form", () => {
     expect(card).toContain("DELIVERY_KINDS");
     expect(card).toContain('className="sr-only"');
     expect(card).toContain("Kirim hasil");
-    expect(card.match(/type="submit"/g)?.length).toBe(1);
+    const deliverySection = card.slice(card.indexOf("function DeliveryForm"));
+    expect(deliverySection.match(/type="submit"/g)?.length).toBe(1);
   });
 
   it("preserves accessibility and reduced motion", () => {

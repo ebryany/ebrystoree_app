@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const anonPriv = readFileSync(
   "supabase/migrations/20261003210000_anon_least_privilege.sql",
@@ -85,16 +85,34 @@ describe("security overview functions (static SQL contract)", () => {
   });
 });
 
-describe("perimeter headers (static contract)", () => {
-  it("sets the full header set on HTML responses", () => {
-    expect(server).toContain('headers.set("Content-Security-Policy", CSP)');
-    expect(server).toContain('headers.set("X-Frame-Options", "SAMEORIGIN")');
-    expect(server).toContain('headers.set("X-Content-Type-Options", "nosniff")');
-    expect(server).toContain('headers.set("Referrer-Policy", "strict-origin-when-cross-origin")');
-    expect(server).toContain('headers.set("Strict-Transport-Security"');
-    expect(server).toContain('"Permissions-Policy"');
-    expect(server).toContain("frame-ancestors 'self'");
-    expect(server).toContain("object-src 'none'");
+describe("perimeter headers (runtime response contract)", () => {
+  it("sets the full header set on HTML responses in production", async () => {
+    vi.resetModules();
+    vi.stubEnv("NODE_ENV", "production");
+    vi.doMock("@tanstack/react-start/server-entry", () => ({
+      default: {
+        fetch: async () =>
+          new Response("<!doctype html><html><body>ok</body></html>", {
+            status: 200,
+            headers: { "content-type": "text/html; charset=utf-8" },
+          }),
+      },
+    }));
+    try {
+      const { default: handler } = await import("@/server");
+      const res = await handler.fetch(new Request("https://app.ebrystore.my.id/"), {}, {});
+      const csp = res.headers.get("Content-Security-Policy") ?? "";
+      expect(csp).toContain("frame-ancestors 'self'");
+      expect(csp).toContain("object-src 'none'");
+      expect(res.headers.get("X-Frame-Options")).toBe("SAMEORIGIN");
+      expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+      expect(res.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
+      expect(res.headers.get("Strict-Transport-Security")).toContain("max-age=31536000");
+      expect(res.headers.get("Permissions-Policy")).toBeTruthy();
+    } finally {
+      vi.unstubAllEnvs();
+      vi.doUnmock("@tanstack/react-start/server-entry");
+    }
   });
 
   it("bounds the webhook body before reading it", () => {

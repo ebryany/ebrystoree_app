@@ -96,7 +96,7 @@ function SellerProducts() {
     keys: [["my-store-products"], ["my-inventory-summary"]],
   });
 
-  const items = (data?.items ?? []) as Product[];
+  const items = useMemo(() => (data?.items ?? []) as Product[], [data?.items]);
   const counts = useMemo(
     () => Object.fromEntries(TABS.map((t) => [t.key, items.filter(t.match).length])),
     [items],

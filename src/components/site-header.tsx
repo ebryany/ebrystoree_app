@@ -43,7 +43,7 @@ const NAV_META: Record<string, { description: string; icon: typeof Package }> = 
 };
 
 export function SiteHeader() {
-  const { user, loading } = useSession();
+  const { user } = useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const publicPage = !/^\/(dashboard|admin|seller|operator|checkout|auth)(\/|$)/.test(pathname);
@@ -207,12 +207,7 @@ export function SiteHeader() {
             ) : null}
             <div className="ml-auto hidden items-center gap-1 border-l border-border pl-3 lg:flex">
               <CartButton />
-              {loading ? (
-                <div
-                  className="h-11 w-28 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
-                  aria-label="Memuat akun"
-                />
-              ) : user ? (
+              {user ? (
                 <>
                   <Button
                     asChild
@@ -362,12 +357,7 @@ export function SiteHeader() {
               </Button>
             ) : null}
           </div>
-          {loading ? (
-            <div
-              className="m-4 h-14 animate-pulse rounded-lg bg-muted motion-reduce:animate-none"
-              aria-label="Memuat akun"
-            />
-          ) : user ? (
+          {user ? (
             <Link
               to="/dashboard"
               onClick={() => setOpen(false)}
@@ -443,12 +433,7 @@ export function SiteHeader() {
             })}
           </nav>
           <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
-            {loading ? (
-              <div
-                className="h-11 animate-pulse rounded-md bg-muted motion-reduce:animate-none"
-                aria-label="Memuat akun"
-              />
-            ) : user ? (
+            {user ? (
               <>
                 {isAdmin ? (
                   <Button asChild variant="outline" className="min-h-11 justify-start">

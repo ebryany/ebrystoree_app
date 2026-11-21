@@ -122,6 +122,7 @@ export async function readPublicMarketplaceService(
         .select("rating")
         .eq("store_id", sid)
         .eq("is_visible", true)
+        .eq("is_verified", true)
         .limit(3000);
       if (ratingError) return null;
       const n = rows?.length ?? 0;

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ebrystore</string>
+    <string name="title_activity_main">Ebrystore</string>
+    <string name="package_name">id.my.ebrystore.app</string>
+    <string name="custom_url_scheme">id.my.ebrystore.app</string>
+</resources>

@@ -24,14 +24,14 @@ describe("store page shell and structure (static contract)", () => {
   });
 
   it("shows verifiable trust signals with honest empty states", () => {
-    expect(page).toContain("StarRating");
+    expect(page).toContain("<Star ");
     expect(page).toContain("Belum ada ulasan");
-    expect(page).toContain("Belum ada penjualan");
-    expect(page).toContain("bergabung ${joined}");
+    expect(page).toContain("Toko ini belum menjual apa pun");
+    expect(page).toContain("Toko ini bergabung ${joined}");
   });
 
   it("never fabricates a rating when there are no reviews", () => {
-    expect(page).toContain("rating.total > 0");
+    expect(page).toContain("ratingTotal > 0");
     expect(page).not.toMatch(/toFixed\(1\).*0\.0.*ulasan/);
   });
 
@@ -47,7 +47,7 @@ describe("store page shell and structure (static contract)", () => {
     expect(serviceIndex).toBeGreaterThan(-1);
     expect(productIndex).toBeGreaterThan(-1);
     expect(serviceIndex).toBeLessThan(productIndex);
-    expect(page).toContain("SellerServiceCard");
+    expect(page).toContain("ServiceTile");
     expect(page).toContain('to="/layanan"');
   });
 

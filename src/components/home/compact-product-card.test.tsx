@@ -53,12 +53,9 @@ describe("Homepage compact product rail", () => {
     }
   });
 
-  it("puts horizontal scrolling and snap on the mobile scroll container, not its list", () => {
-    const source = readFileSync("src/routes/index.tsx", "utf8");
-    const rail = source.slice(source.indexOf('aria-label="Daftar produk digital"'));
-    expect(rail).toMatch(/className="[^"]*snap-x[^"]*overflow-x-auto[^"]*sm:hidden/);
-    expect(rail).toContain('<ul className="flex w-max gap-2.5">');
-    expect(rail).toContain("<CompactProductCard item={item} />");
-    expect(rail).toContain("sm:block");
+  it("keeps horizontal scrolling on the product tabs list without nesting overflow on grid", () => {
+    const tabsSource = readFileSync("src/components/home/product-tabs.tsx", "utf8");
+    expect(tabsSource).toMatch(/role="tablist"[\s\S]*overflow-x-auto/);
+    expect(tabsSource).toContain("<ProductTile item={item}");
   });
 });

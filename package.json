@@ -15,8 +15,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test": "vitest run && playwright test",
     "test:unit:watch": "vitest",
-    "verify": "npm run lint && npm run test:unit && npm run build",
-    "ci": "npm run lint && npm run test:unit"
+    "verify": "npm run typecheck && npm run lint && npm run test:unit && npm run build",
+    "ci": "npm run typecheck && npm run lint && npm run test:unit",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
@@ -119,6 +120,11 @@
     "brace-expansion@5": "5.0.12",
     "launch-editor": "^2.14.2",
     "ip-address": "^10.7.4",
+    "hono": "^4.13.19",
+    "@hono/node-server": "^2.1.11",
+    "@lovable.dev/mcp-js": {
+      "@modelcontextprotocol/sdk": "^1.32.2"
+    },
     "@hookform/resolvers": {
       "ajv": "^8.20.0",
       "ajv-formats": "^3.0.1"

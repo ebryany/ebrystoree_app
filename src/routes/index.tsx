@@ -7,6 +7,7 @@ import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
 import { HomeHero } from "@/components/home/hero";
 import { SellerJoinSection } from "@/components/home/home-hero";
+import { FaqSection, TrackingPreviewSection } from "@/components/home/sections";
 import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { ServiceTile } from "@/components/home/service-tile";
 import { PlatformServiceCard, type PlatformServiceItem } from "@/components/home/catalog-cards";
@@ -23,6 +24,7 @@ import {
   listCatalogCategories,
 } from "@/lib/catalog.functions";
 import { CategoryRail } from "@/components/home/category-rail";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { SITE_ORIGIN } from "@/lib/seo-url";
 
 const shelvesQuery = queryOptions({
@@ -128,6 +130,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Beranda() {
+  const settings = useWebsiteSettings();
+  const showProducts = settings.storefront_show_products !== false;
+  const showServices = settings.storefront_show_services !== false;
   // Bukti toko untuk section CTA seller: diambil dari katalog jasa yang memang
   // sudah dimuat homepage (tanpa query baru). De-duplikasi per slug, maks 6.
   const sellerServices = useSuspenseQuery(sellerServicesQuery);
@@ -144,7 +149,7 @@ function Beranda() {
 
   return (
     <PageShell>
-      <HomeHero />
+      <HomeHero bannerSettings={settings} />
       {/* Urutan mengikuti cara orang belanja: kategori, lanjut yang terakhir
           dilihat, katalog produk, lalu jasa, toko, ulasan, dan ajakan buka toko. */}
       <div className="w-full px-4 pb-16 pt-8 sm:px-6 sm:pt-10 lg:px-8">
@@ -158,39 +163,47 @@ function Beranda() {
             <CategoryRail />
           </SectionSuspense>
           <RecentlyViewedShelf />
-          <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
-            <ProductShelves />
-          </SectionSuspense>
+          {showProducts ? (
+            <SectionSuspense fallback={<CardsSkeleton count={6} />} queryKey={shelvesQuery.queryKey}>
+              <ProductShelves />
+            </SectionSuspense>
+          ) : null}
         </div>
       </div>
 
       {/* Jasa di pita sendiri: alur jasa (brief, pengerjaan, serah terima)
           berbeda dari produk instan, jadi dipisah secara visual. */}
-      <div className="w-full border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-12 2xl:max-w-[88rem]">
-          <section aria-labelledby="jasa-heading">
-            <SectionHeader
-              id="jasa-heading"
-              title="Jasa seller"
-              desc="Dikerjakan seller sesuai kesepakatan. Dana ditahan sampai hasil Anda terima."
-              action={<SeeAllLink to="/layanan" />}
-            />
-            <SectionSuspense
-              fallback={<CardsSkeleton count={3} />}
-              queryKey={sellerServicesQuery.queryKey}
-            >
-              <SellerServicesSection />
-            </SectionSuspense>
-          </section>
-          {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
-          <PlatformServicesSection />
+      {showServices ? (
+        <div className="w-full border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-12 2xl:max-w-[88rem]">
+            <section aria-labelledby="jasa-heading">
+              <SectionHeader
+                id="jasa-heading"
+                title="Jasa seller"
+                desc="Dikerjakan seller sesuai kesepakatan. Dana ditahan sampai hasil Anda terima."
+                action={<SeeAllLink to="/layanan" />}
+              />
+              <SectionSuspense
+                fallback={<CardsSkeleton count={3} />}
+                queryKey={sellerServicesQuery.queryKey}
+              >
+                <SellerServicesSection />
+              </SectionSuspense>
+            </section>
+            {/* Layanan platform disembunyikan saat belum ada paket aktif. */}
+            <PlatformServicesSection />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="w-full px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:px-8">
         <div className="defer-render mx-auto w-full max-w-7xl space-y-10 sm:space-y-14 2xl:max-w-[88rem]">
           <FeaturedSellers />
           <ReviewMarqueeSection />
+          {settings.feature_home_tracking_preview !== false ? (
+            <TrackingPreviewSection />
+          ) : null}
+          {settings.feature_home_faq !== false ? <FaqSection /> : null}
           <SellerJoinSection stores={proofStores} />
         </div>
       </div>
@@ -198,11 +211,35 @@ function Beranda() {
   );
 }
 
+function sortAndFeatureItems<T extends { id: string; slug?: string; price?: number; sold_count?: number }>(
+  items: T[],
+  featuredKeys: unknown,
+  defaultSort: unknown,
+): T[] {
+  const featured = new Set(
+    Array.isArray(featuredKeys) ? featuredKeys.map((v) => String(v).trim()).filter(Boolean) : [],
+  );
+  const sorted = [...items];
+  if (defaultSort === "price_asc") {
+    sorted.sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
+  } else if (defaultSort === "price_desc") {
+    sorted.sort((a, b) => Number(b.price ?? 0) - Number(a.price ?? 0));
+  } else if (defaultSort === "popular") {
+    sorted.sort((a, b) => Number(b.sold_count ?? 0) - Number(a.sold_count ?? 0));
+  }
+  if (!featured.size) return sorted;
+  return [
+    ...sorted.filter((item) => featured.has(item.id) || (item.slug ? featured.has(item.slug) : false)),
+    ...sorted.filter((item) => !featured.has(item.id) && !(item.slug ? featured.has(item.slug) : false)),
+  ];
+}
+
 /**
  * Rak produk beranda: Terlaris, Terbaru, lalu satu rak per kategori.
  * Rak kosong tidak dirender, jadi beranda tetap rapi saat katalog masih sedikit.
  */
 function ProductShelves() {
+  const websiteSettings = useWebsiteSettings();
   const query = useSuspenseQuery(shelvesQuery);
   const data = query.data;
   if (data.error) {
@@ -216,10 +253,15 @@ function ProductShelves() {
       />
     );
   }
+  const latestItems = sortAndFeatureItems(
+    data.latest,
+    websiteSettings.storefront_featured_products,
+    websiteSettings.storefront_default_sort,
+  );
   // Satu section bertab menggantikan rak bertumpuk. Tab kategori hanya untuk
   // kategori yang cukup isi; sisanya tetap muncul di tab "Terbaru".
   const tabs: ProductTab[] = [
-    { key: "latest", label: "Terbaru", items: data.latest },
+    { key: "latest", label: "Terbaru", items: latestItems },
     ...(data.bestSellers.length
       ? [{ key: "best", label: "Terlaris", items: data.bestSellers, ranked: true }]
       : []),
@@ -233,19 +275,26 @@ function ProductShelves() {
 const MIN_CATEGORY_TAB = 2;
 
 function SellerServicesSection() {
+  const websiteSettings = useWebsiteSettings();
   const query = useSuspenseQuery(sellerServicesQuery);
   if (query.data.error)
     return <SectionError message={query.data.error} onRetry={() => query.refetch()} />;
-  if (!query.data.items.length)
+  if (!query.data.items.length) {
     return (
       <SectionEmpty
         title="Belum ada jasa seller tersedia."
         description="Jasa yang disetujui dari toko dan kategori aktif akan tampil di sini."
       />
     );
+  }
+  const serviceItems = sortAndFeatureItems(
+    query.data.items,
+    websiteSettings.storefront_featured_services,
+    websiteSettings.storefront_default_sort,
+  );
   return (
     <ul className={PRODUCT_GRID}>
-      {query.data.items.map((item) => (
+      {serviceItems.map((item) => (
         <li key={item.id} className="min-w-0">
           <ServiceTile item={item} />
         </li>

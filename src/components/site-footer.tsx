@@ -41,6 +41,11 @@ export function SiteFooter() {
           >
             {String(settings.store_name ?? "Ebrystore")}
           </Link>
+          {settings.site_tagline ? (
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              {String(settings.site_tagline)}
+            </p>
+          ) : null}
           {settings.site_description ? (
             <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">
               {String(settings.site_description)}
@@ -59,10 +64,30 @@ export function SiteFooter() {
               WhatsApp {String(settings.site_whatsapp)}
             </p>
           ) : null}
+          {settings.site_phone ? (
+            <p className="mt-1 break-words text-sm text-muted-foreground">
+              Telepon {String(settings.site_phone)}
+            </p>
+          ) : null}
+          {settings.site_address ? (
+            <p className="mt-1 break-words text-xs text-muted-foreground">
+              {String(settings.site_address)}
+            </p>
+          ) : null}
           {settings.site_operating_hours ? (
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
               {String(settings.site_operating_hours)}
             </p>
+          ) : null}
+          {settings.site_help_url ? (
+            <a
+              href={String(settings.site_help_url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex min-h-11 items-center rounded-md text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Pusat bantuan
+            </a>
           ) : null}
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -71,12 +71,12 @@ function AdminTransactionSettings() {
 
   const { data, isPending, error } = useQuery({ queryKey: ["admin-settings"], queryFn: () => fetchSettings({}) });
 
-  const items: any[] = (data as any)?.items ?? [];
+  const items = useMemo<any[]>(() => ((data as any)?.items ?? []) as any[], [data]);
 
   useEffect(() => {
     if (!items.length) return;
     setDraft(Object.fromEntries(items.map((s) => [s.key, JSON.stringify(s.value)])));
-  }, [data]);
+  }, [items]);
 
   const mutation = useMutation({
     mutationFn: (payload: { key: string; value: string }) => save({ data: payload }),
@@ -85,6 +85,8 @@ function AdminTransactionSettings() {
       if (!res.ok) return toast.error(res.error);
       toast.success("Pengaturan disimpan.");
       void qc.invalidateQueries({ queryKey: ["admin-settings"] });
+      void qc.invalidateQueries({ queryKey: ["website-settings"] });
+      void qc.invalidateQueries({ queryKey: ["public-website-settings"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Gagal menyimpan pengaturan."),
   });

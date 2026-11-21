@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { BadgeCheck, Search, ShieldCheck, Store } from "lucide-react";
 
+import { HeroBannerBackground } from "@/components/home/hero-banner-background";
 import { WordAnimator } from "@/components/ui/word-animator";
 import { listCatalogCategories } from "@/lib/catalog.functions";
 
@@ -25,7 +26,7 @@ const TRUST = [
  * pintasan kategori, lalu tiga jaminan yang memang berjalan di sistem.
  * Tepi kiri memakai padding yang sama dengan navbar dan section di bawahnya.
  */
-export function HomeHero() {
+export function HomeHero({ bannerSettings }: { bannerSettings?: Record<string, unknown> } = {}) {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const categories = useQuery(productCategoriesQuery);
@@ -45,6 +46,7 @@ export function HomeHero() {
       aria-labelledby="hero-heading"
       className="relative isolate overflow-hidden border-b border-border bg-background px-3 sm:px-6 lg:px-8"
     >
+      {bannerSettings ? <HeroBannerBackground settings={bannerSettings} /> : null}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_70%_40%,var(--surface-selected),transparent_70%)]"
@@ -137,6 +139,7 @@ export function HomeHero() {
             alt="Maskot Ebrystore membawa laptop"
             width={1254}
             height={1254}
+            fetchPriority="high"
             decoding="async"
             className="-my-6 h-auto w-full max-w-xl object-contain xl:-my-10 xl:max-w-2xl 2xl:max-w-3xl"
           />

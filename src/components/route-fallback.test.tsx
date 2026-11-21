@@ -12,7 +12,6 @@ import {
   isNotFound,
   Outlet,
   RouterProvider,
-  type AnyRoute,
 } from "@tanstack/react-router";
 import { RouteError, routeFailureHead } from "./route-fallback";
 import { renderErrorPage } from "@/lib/error-page";
@@ -48,7 +47,7 @@ vi.mock("@/lib/supabase-public.server", () => ({
   createPublicClient: () => ({
     from: () => {
       const query: Record<string, unknown> = {};
-      for (const method of ["select", "eq", "is", "neq", "order", "limit", "maybeSingle"]) {
+      for (const method of ["select", "eq", "is", "neq", "or", "order", "limit", "maybeSingle"]) {
         query[method] = () => query;
       }
       query.then = (resolve: (value: unknown) => unknown) =>
@@ -137,22 +136,26 @@ async function routerAt(path: string, routeCase?: (typeof cases)[number]) {
     notFoundComponent: routeCase?.route.options.notFoundComponent,
   });
   const router = createRouter({
-    routeTree: root.addChildren([detail as AnyRoute]),
+    routeTree: root.addChildren([detail as never]),
     context: { queryClient: client() },
     history: createMemoryHistory({ initialEntries: [path] }),
     defaultErrorComponent: () => <RouteError />,
     // Router >= 1.171 no longer exposes state.statusCode: the SSR status lives
     // on the server-only load result. Force the server path so tests assert the
     // status the HTTP response will actually use.
-    isServer: true,
-  } as never);
+    ...({ isServer: true } as Record<string, unknown>),
+  });
   await router.load();
   return router;
 }
 
 /** SSR HTTP status produced by the router's server load path. */
-function ssrStatus(router: ReturnType<typeof createRouter>): number | undefined {
-  return (router as unknown as { _serverResult?: { status?: number } })._serverResult?.status;
+function ssrStatus(router: { _serverResult?: unknown }): number | undefined {
+  const res = router._serverResult;
+  if (res && typeof res === "object" && "status" in res && typeof res.status === "number") {
+    return res.status;
+  }
+  return undefined;
 }
 
 describe("klasifikasi detail publik", () => {
@@ -283,7 +286,9 @@ describe("router dan fallback", () => {
   });
   it("default fallback registered; checkout server contracts untouched", () => {
     expect(source("src/router.tsx")).toContain("defaultErrorComponent: () => <RouteError />");
-    expect(source("src/lib/orders.functions.ts")).toContain('error: "Produk tidak dapat dimuat."');
+    expect(source("src/lib/public-catalog.server.ts")).toContain(
+      'error: "Produk tidak dapat dimuat."',
+    );
     expect(source("src/lib/catalog.functions.ts")).toContain(
       'error: "Detail layanan sedang tidak dapat dimuat."',
     );

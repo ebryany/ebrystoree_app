@@ -624,16 +624,39 @@ export const updateSetting = createServerFn({ method: "POST" })
         parsed = data.value;
       }
 
+      const { FIELD_BY_KEY, validateField } = await import("./website-settings");
+      const field = FIELD_BY_KEY.get(data.key);
+      if (field) {
+        if (field.readOnly) {
+          return { ok: false, error: "Pengaturan ini hanya dapat dibaca." };
+        }
+        const validated = validateField(field, parsed);
+        if (!validated.ok) return { ok: false, error: validated.error };
+        parsed = validated.value;
+      }
+
       const { data: before } = await sb
         .from("system_settings")
         .select("value")
         .eq("key", data.key)
         .maybeSingle();
-      const { error } = await sb
+      const { data: updated, error } = await sb
         .from("system_settings")
         .update({ value: parsed })
-        .eq("key", data.key);
-      if (error) return { ok: false, error: "Pengaturan gagal disimpan." };
+        .eq("key", data.key)
+        .select("key")
+        .maybeSingle();
+      if (error || !updated) {
+        return {
+          ok: false,
+          error: error
+            ? "Pengaturan gagal disimpan."
+            : "Pengaturan tidak ditemukan atau tidak dapat diperbarui.",
+        };
+      }
+
+      const { clearPublicSettingsCache } = await import("./website-settings.server");
+      clearPublicSettingsCache();
 
       await helpers.writeAudit(context as Ctx, {
         action: "setting.update",

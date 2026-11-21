@@ -66,7 +66,7 @@ function SellerPerformance() {
   // Key sama dengan ringkasan toko, jadi biasanya sudah ada di cache.
   const summaryQ = useQuery({ queryKey: ["seller-summary"], queryFn: () => fetchSummary({}) });
 
-  const items = ((data?.items ?? []) as Review[]);
+  const items = useMemo(() => (data?.items ?? []) as Review[], [data?.items]);
   // Distribusi dihitung dari ulasan yang dimuat (maks. 100 terbaru).
   const dist = useMemo(() => {
     const d = [0, 0, 0, 0, 0];

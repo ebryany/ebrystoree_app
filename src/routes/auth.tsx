@@ -96,6 +96,8 @@ function HalamanAuth() {
   const navigate = useNavigate();
   const { next, mode: initialMode } = Route.useSearch();
   const { user, loading } = useSession();
+  const websiteSettings = useWebsiteSettings();
+  const registrationEnabled = websiteSettings.feature_registration !== false;
   const [mode, setMode] = useState<Mode>(initialMode ?? "masuk");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -187,6 +189,10 @@ function HalamanAuth() {
         toast.success("Berhasil masuk.");
         goNext();
       } else {
+        if (!registrationEnabled) {
+          toast.error("Pendaftaran akun baru sedang dinonaktifkan sementara oleh admin.");
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
@@ -370,8 +376,21 @@ function HalamanAuth() {
                 </>
               ) : null}
 
+              {mode === "daftar" && !registrationEnabled ? (
+                <div
+                  role="alert"
+                  className="mt-6 rounded-xl border border-border bg-muted/50 p-4 text-center text-sm text-muted-foreground"
+                >
+                  Pendaftaran akun baru sedang dinonaktifkan sementara oleh admin.
+                </div>
+              ) : null}
+
               <form
-                className={cn("space-y-4", mode === "lupa" && "mt-6")}
+                className={cn(
+                  "space-y-4",
+                  mode === "lupa" && "mt-6",
+                  mode === "daftar" && !registrationEnabled && "hidden",
+                )}
                 onSubmit={handleSubmit}
                 noValidate
               >
@@ -684,7 +703,7 @@ function GlowPanel({ mode }: { mode: Mode }) {
     staleTime: 5 * 60_000,
   });
 
-  const reviews = data?.items ?? [];
+  const reviews = useMemo(() => data?.items ?? [], [data?.items]);
   const hasProof = (data?.total ?? 0) >= MIN_REVIEWS_FOR_PROOF;
   const quote = useMemo(
     () => reviews.find((r) => r.rating >= 4 && (r.body ?? "").trim().length >= 20) ?? null,

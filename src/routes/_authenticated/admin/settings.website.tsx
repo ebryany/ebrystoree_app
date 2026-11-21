@@ -177,7 +177,7 @@ function WebsiteSettingsPage() {
     queryFn: () => load({}),
   });
 
-  const serverValues: Record<string, any> = (data as any)?.values ?? {};
+  const serverValues = useMemo<Record<string, any>>(() => (data as any)?.values ?? {}, [data]);
 
   // Setelah simpan/refetch: key yang tidak sedang diedit mengikuti server; draf yang
   // belum disimpan di bagian lain dipertahankan.
@@ -194,7 +194,7 @@ function WebsiteSettingsPage() {
       }
       return next;
     });
-  }, [data]);
+  }, [data, serverValues]);
 
   const section = useMemo(() => SETTING_SECTIONS.find((s) => s.id === activeId)!, [activeId]);
   const canEdit = useCan(section.permission);
@@ -333,6 +333,20 @@ function WebsiteSettingsPage() {
         });
         setResultOpen(true);
         return;
+      }
+      setDraft((prev) => {
+        const next = { ...prev };
+        for (const f of section.fields) {
+          if (!f.readOnly) next[f.key] = f.default;
+        }
+        return next;
+      });
+      if (previousServer.current) {
+        const synced = { ...previousServer.current };
+        for (const f of section.fields) {
+          if (!f.readOnly) synced[f.key] = f.default;
+        }
+        previousServer.current = synced;
       }
       setActionResult({
         status: "success",

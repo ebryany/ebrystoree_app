@@ -62,6 +62,40 @@ export async function isFeatureEnabled(key: string) {
   return value === undefined ? Boolean(field?.default) : Boolean(value);
 }
 
+/** Baca satu nilai pengaturan (publik lewat cache, internal lewat database) dengan fallback default registry. */
+export async function readServerSetting(key: string): Promise<unknown> {
+  const field = FIELD_BY_KEY.get(key);
+  if (field?.isPublic) {
+    const { values } = await readPublicSettings();
+    return values[key] !== undefined ? values[key] : field.default;
+  }
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("system_settings")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+    return data?.value !== undefined ? data.value : field?.default;
+  } catch {
+    return field?.default;
+  }
+}
+
+export async function readNumberSetting(key: string): Promise<number> {
+  const raw = await readServerSetting(key);
+  const num = Number(raw);
+  const fallback = Number(FIELD_BY_KEY.get(key)?.default ?? 0);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+export async function readStringSetting(key: string): Promise<string> {
+  const raw = await readServerSetting(key);
+  if (typeof raw === "string") return raw.trim();
+  const fallback = FIELD_BY_KEY.get(key)?.default;
+  return typeof fallback === "string" ? fallback.trim() : "";
+}
+
 export async function readAllSettings(supabase: { from: (t: "system_settings") => any }) {
   const { data, error } = await supabase.from("system_settings").select("key, value, updated_at");
   if (error) throw error;

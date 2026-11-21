@@ -211,7 +211,8 @@ describe("buyer receipt UI wiring (static, not GUI integration)", () => {
   it("keeps code access separate from file quota and renders secrets as text", () => {
     const ui = readFileSync("src/components/ebry/stock-code-access.tsx", "utf8");
     expect(ui).toContain("stockCodeUrl(visibleCode)");
-    expect(ui).toContain("{visibleCode}</pre>");
+    expect(ui).toContain("<CopyField label=\"Kode/link produk Anda\" value={visibleCode} />");
+    expect(ui).toContain("{shown ? value :");
     expect(ui).toContain('rel="noopener noreferrer"');
     expect(ui).not.toContain("dangerouslySetInnerHTML");
     const library = readFileSync("src/routes/_authenticated/dashboard.produk-saya.tsx", "utf8");

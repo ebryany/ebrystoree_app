@@ -588,15 +588,17 @@ function AcademicCheckout({ service }: { service: any }) {
   const reviewForced = !!service?.requires_quality_review;
 
   /* Estimasi harga selalu dari server. */
+  const addonKey = addonIds.join(",");
   useEffect(() => {
     if (!service || !selectedPackage) return;
     let active = true;
     setQuoteState("loading");
+    const parsedAddons = addonKey ? addonKey.split(",") : [];
     void fetchQuote({
       data: {
         serviceId: service.id,
         packageId: selectedPackage.id,
-        addonIds,
+        addonIds: parsedAddons,
         deadline: deadlineIso,
         reviewerRequested: reviewerRequested || reviewForced,
       },
@@ -610,7 +612,15 @@ function AcademicCheckout({ service }: { service: any }) {
     return () => {
       active = false;
     };
-  }, [service?.id, selectedPackage?.id, addonIds.join(","), deadlineIso, reviewerRequested]);
+  }, [
+    service,
+    selectedPackage,
+    addonKey,
+    deadlineIso,
+    reviewerRequested,
+    reviewForced,
+    fetchQuote,
+  ]);
 
   const s = service;
   const selectedAddons = addons.filter((a) => addonIds.includes(a.id));

@@ -572,6 +572,11 @@ export const prepareServiceDeliveryUpload = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
+    const { readNumberSetting } = await import("./website-settings.server");
+    const maxDeliveryMb = Math.max(1, await readNumberSetting("marketplace_delivery_max_mb"));
+    if (data.sizeBytes > maxDeliveryMb * 1024 * 1024) {
+      return { ok: false as const, error: `Ukuran berkas maksimal ${maxDeliveryMb} MB.` };
+    }
     const limited = await enforceRateLimit(ctx.userId, "order.create");
     if (limited) return { ok: false as const, error: limited.error };
     const { data: store } = await ctx.supabase

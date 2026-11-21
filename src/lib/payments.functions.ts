@@ -59,6 +59,8 @@ export const startQrisPayment = createServerFn({ method: "POST" })
 
     const qr = await sumopod.fetchQrPayload(created.paymentLinkUrl);
 
+    const { readNumberSetting } = await import("./website-settings.server");
+    const expiryMinutes = Math.max(5, await readNumberSetting("qris_expiry_minutes"));
     const total = created.amount || amount;
     const qris: StoredQris = {
       providerPaymentId: created.paymentId,
@@ -67,7 +69,9 @@ export const startQrisPayment = createServerFn({ method: "POST" })
       fee: created.fee,
       total,
       expiredAt:
-        qr?.expiresAt ?? created.expiresAt ?? new Date(Date.now() + 60 * 60_000).toISOString(),
+        qr?.expiresAt ??
+        created.expiresAt ??
+        new Date(Date.now() + expiryMinutes * 60_000).toISOString(),
       ...(qr?.qrString ? { qrString: qr.qrString } : {}),
     };
 

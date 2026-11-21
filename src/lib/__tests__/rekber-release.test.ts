@@ -48,7 +48,7 @@ describe("rekber release source regression", () => {
     expect(sql).toContain("'released_trend'");
     const ui = readFileSync("src/routes/_authenticated/seller.keuangan.tsx", "utf8");
     expect(ui.indexOf("if (isPending) return")).toBeLessThan(ui.indexOf("const balance ="));
-    expect(ui).toContain("Ditahan, menunggu penerimaan");
-    expect(ui).toContain("Cadangan refund aktif");
+    expect(ui).toContain("Menunggu pembeli konfirmasi penerimaan.");
+    expect(ui).toContain("Dibekukan selama refund diproses.");
   });
 });

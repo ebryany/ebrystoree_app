@@ -128,11 +128,11 @@ beforeEach(() => {
 });
 
 describe("Public storefront", () => {
-  it("uses shared product cards and preserves independent store navigation", () => {
+  it("uses shared product cards without nested anchor links", () => {
     state.pages[0].items = [product];
     const html = renderRoute(ProductRoute);
     expect(html).toContain('href="/produk/template-asli"');
-    expect(html).toContain('href="/toko/toko-contoh"');
+    expect(html).toContain("Toko Contoh");
     expect(html).not.toMatch(/<a\b[^>]*>(?:(?!<\/a>)[\s\S])*<a\b/);
     expect(html).toContain("1 produk ditampilkan");
     expect(html).not.toContain("dari 1 produk");
@@ -204,10 +204,11 @@ describe("Public storefront", () => {
     const html = renderRoute(ServiceRoute);
     expect(html).toContain("Jasa dari seller");
     expect(html).toContain('href="/toko/toko-contoh"');
-    expect(html).toContain("Brief pembeli");
-    expect(html).toContain("<details");
+    expect(html).toContain('href="/jasa/service-1"');
+    expect(html).toContain("3 hari");
+    expect(html).toContain("2 revisi");
     expect(html).toContain("Muat lebih banyak");
-    expect(html).toContain("Pesan jasa");
+    expect(html).toContain("Pesan");
     expect(html).toContain('href="/checkout/jasa/service-1"');
     expect(html).not.toContain('href="/layanan/');
     expect(html).not.toContain('href="/checkout/layanan/');

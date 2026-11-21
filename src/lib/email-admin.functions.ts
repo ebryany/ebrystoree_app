@@ -108,6 +108,10 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     // Tujuan: isian admin, atau email akun admin yang sedang masuk.
     let recipient = data.recipient?.trim() ?? "";
     if (!recipient) {
+      const { readStringSetting } = await import("./website-settings.server");
+      recipient = await readStringSetting("notify_test_recipient");
+    }
+    if (!recipient) {
       const { data: profile } = await ctx.supabase
         .from("profiles")
         .select("email")
@@ -125,6 +129,14 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     // Isi email dibangun dari kerangka asli, dengan data contoh yang jelas
     // ditandai sebagai uji supaya tidak ada yang mengira transaksi nyata.
     const { renderEmail, renderEmailText } = await import("./email-layout");
+    const { formatConfiguredDateTime } = await import("./format");
+    const { readStringSetting } = await import("./website-settings.server");
+    const [siteLocale, siteTimezone, siteDateFormat, siteTimeFormat] = await Promise.all([
+      readStringSetting("site_language"),
+      readStringSetting("site_timezone"),
+      readStringSetting("site_date_format"),
+      readStringSetting("site_time_format"),
+    ]);
     const layoutInput = {
       heading: "Ini email uji dari Ebrystore",
       intro:
@@ -134,7 +146,15 @@ export const sendTestEmail = createServerFn({ method: "POST" })
       details: [
         { label: "Jenis", value: "Email uji, bukan transaksi" },
         { label: "Pengirim", value: emailConfig()?.from ?? "-" },
-        { label: "Waktu", value: new Date().toLocaleString("id-ID") },
+        {
+          label: "Waktu",
+          value: formatConfiguredDateTime(new Date(), {
+            locale: siteLocale,
+            timeZone: siteTimezone,
+            dateFormat: siteDateFormat,
+            timeFormat: siteTimeFormat,
+          }),
+        },
       ],
       action: {
         label: "Buka dashboard",

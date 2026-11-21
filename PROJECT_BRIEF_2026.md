@@ -203,7 +203,7 @@ Ini bagian yang paling penting untuk brainstorming. Daftar ini sudah diverifikas
 
 2. **Keputusan komisi & biaya admin belum ada.** Ledger dan payout bergantung pada angka ini. Tanpa keputusan, fitur finansial marketplace tidak bisa diselesaikan.
 
-3. **Payout ke seller belum ada.** Saldo seller tercatat di ledger, tetapi pencairan ke rekening bank belum diimplementasikan. MVP berencana manual, tetapi alurnya belum dibangun.
+3. **Payout ke seller (withdrawals) sudah diimplementasikan di kode.** Fitur penarikan saldo seller beserta invariant ledger, biaya penarikan, dan alur persetujuan admin sudah tersedia di kode dan unit test; verifikasi operasional penuh di production tetap mengikuti kebijakan rilis.
 
 ### Parsial
 - **Refund parsial**: RPC `request_refund`/`review_refund`/`process_refund` ada, tetapi UI dan alokasi per-item perlu diverifikasi ulang apakah sudah mendukung nominal sebagian.
@@ -292,14 +292,14 @@ Ini bagian yang paling penting untuk brainstorming. Daftar ini sudah diverifikas
 
 | Aspek | Status |
 |---|---|
-| Hosting | Lovable Cloud (managed) |
-| Database | Supabase production |
-| Scheduler | 3 cron job aktif |
+| Hosting | VPS Node.js (migrasi dari Lovable Cloud sesuai konfigurasi rilis di `AGENTS.md`) |
+| Database | Supabase (PostgreSQL + RLS + migrasi lokal di `supabase/migrations/`) |
+| Scheduler | Cron job terautentikasi (`/api/public/jobs/*`) |
 | Email | SMTP + dispatcher + retry |
 | Backup | Ada, **belum diuji restore** |
-| Monitoring | Terbatas (Lovable error reporting) |
+| Monitoring | Terbatas (error reporting & audit log) |
 | Staging | **Tidak ada** |
-| CI/CD | GitHub sync → Lovable auto-deploy |
+| CI/CD | GitHub Actions CI (`typecheck`, `lint`, `test:unit`) + deploy manual sesuai `AGENTS.md` |
 
 ---
 

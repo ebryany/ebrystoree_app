@@ -17,7 +17,7 @@ export function ReviewsSection() {
   const [filter, setFilter] = useState<number | null>(null);
 
   const data = query.data;
-  const items = data?.items ?? [];
+  const items = useMemo(() => data?.items ?? [], [data?.items]);
 
   const distribution = useMemo(() => {
     const base: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };

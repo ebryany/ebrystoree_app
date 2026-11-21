@@ -80,7 +80,10 @@ function Notifikasi() {
     keys: [["my-notifications"], ["customer-summary"]],
   });
 
-  const items = ((data as { items?: Item[] } | undefined)?.items ?? []) as Item[];
+  const items = useMemo(
+    () => ((data as { items?: Item[] } | undefined)?.items ?? []) as Item[],
+    [data],
+  );
   const unread = items.filter((n) => !n.read_at).length;
 
   // Hitung total & belum dibaca per kategori sekali, dipakai sidebar dan chip.

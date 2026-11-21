@@ -59,6 +59,11 @@ export function HeroBannerBackground({ settings }: { settings: Record<string, un
 
   if (!slides.length) return null;
 
+  const rawX = Number(settings.home_banner_position_x ?? 50);
+  const rawY = Number(settings.home_banner_position_y ?? 50);
+  const posX = Number.isFinite(rawX) ? Math.min(100, Math.max(0, rawX)) : 50;
+  const posY = Number.isFinite(rawY) ? Math.min(100, Math.max(0, rawY)) : 50;
+
   return (
     <div id="hero-banner-host" aria-hidden="true" className="absolute inset-0 overflow-hidden">
       {slides.map((slide, i) => (
@@ -71,8 +76,11 @@ export function HeroBannerBackground({ settings }: { settings: Record<string, un
             height={400}
             loading={i === 0 ? "eager" : "lazy"}
             decoding="async"
-            className="absolute inset-0 size-full object-cover transition-opacity duration-1000 ease-out motion-reduce:transition-none"
-            style={{ opacity: i === (reduced ? 0 : index) ? 1 : 0 }}
+            className="absolute inset-0 size-full object-cover opacity-20 transition-opacity duration-1000 ease-out motion-reduce:transition-none"
+            style={{
+              opacity: i === (reduced ? 0 : index) ? 0.2 : 0,
+              objectPosition: `${posX}% ${posY}%`,
+            }}
           />
         </picture>
       ))}

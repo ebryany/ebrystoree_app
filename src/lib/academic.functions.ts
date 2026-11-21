@@ -75,13 +75,20 @@ export const createAcademicOrder = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { isFeatureEnabled } = await import("./website-settings.server");
+    const { isFeatureEnabled, readServerSetting } = await import("./website-settings.server");
     for (const flag of ["feature_checkout", "feature_academic_services"]) {
       if (!(await isFeatureEnabled(flag)))
         return {
           ok: false as const,
           error: "Fitur ini sedang dinonaktifkan sementara oleh admin.",
         };
+    }
+    const requireIntegrity = (await readServerSetting("academic_integrity_confirmation")) !== false;
+    if (requireIntegrity && !data.integrityAccepted) {
+      return {
+        ok: false as const,
+        error: "Konfirmasi integritas akademik wajib disetujui sebelum memesan.",
+      };
     }
     const helpers = await tx();
     const { data: result, error } = await (context as Ctx).supabase.rpc("create_academic_order", {
@@ -221,10 +228,25 @@ export const registerAcademicAttachment = createServerFn({ method: "POST" })
     if (listError || !object) {
       return { ok: false as const, error: "Berkas belum terunggah sepenuhnya. Unggah ulang." };
     }
+    const { readNumberSetting, readServerSetting } = await import("./website-settings.server");
+    const maxMb = Math.min(100, Math.max(1, (await readNumberSetting("academic_max_upload_mb")) || 20));
+    const allowedFormatsRaw = await readServerSetting("academic_allowed_formats");
+    const allowedFormats = Array.isArray(allowedFormatsRaw)
+      ? allowedFormatsRaw.map((ext) => String(ext).trim().toLowerCase().replace(/^\./, "")).filter(Boolean)
+      : [];
+    if (allowedFormats.length) {
+      const ext = data.originalName.split(".").pop()?.trim().toLowerCase() ?? "";
+      if (!ext || !allowedFormats.includes(ext)) {
+        return {
+          ok: false as const,
+          error: `Format berkas tidak diizinkan. Gunakan: ${allowedFormats.join(", ")}.`,
+        };
+      }
+    }
     const actualSize = Number((object.metadata as { size?: number } | null)?.size ?? 0);
     const actualMime = String((object.metadata as { mimetype?: string } | null)?.mimetype ?? "");
-    if (actualSize < 1 || actualSize > 20 * 1024 * 1024) {
-      return { ok: false as const, error: "Ukuran berkas tidak sesuai batas." };
+    if (actualSize < 1 || actualSize > maxMb * 1024 * 1024) {
+      return { ok: false as const, error: `Ukuran berkas tidak sesuai batas (maks ${maxMb} MB).` };
     }
     if (data.fileSize !== actualSize) {
       return {
