@@ -6,6 +6,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const hoisted = vi.hoisted(() => ({
   assertPermission: vi.fn(),
+  loadAccess: vi.fn().mockResolvedValue({
+    roles: ["super_admin"],
+    permissions: [],
+    isSuperAdmin: true,
+    isAdmin: true,
+  }),
   toastCustom: vi.fn(),
   toastError: vi.fn(),
   canSellersView: true,
@@ -32,6 +38,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock("@/lib/authz.server", () => ({
   assertPermission: hoisted.assertPermission,
+  loadAccess: hoisted.loadAccess,
 }));
 
 vi.mock("@/integrations/supabase/auth-middleware", () => ({
@@ -122,6 +129,8 @@ import {
 } from "@/hooks/use-admin-seller-notifications";
 import { SellerNotificationCenter } from "@/components/admin/seller-notification-center";
 import { notificationHref, notificationTone } from "@/components/ebry/notification-meta";
+import { getAdminSidebarBadges } from "@/lib/admin.functions";
+import { adminNav } from "@/lib/admin-nav";
 
 const STORE_ID = "11111111-1111-4111-8111-111111111111";
 const ADMIN_A = "aaaa1111-1111-4111-8111-111111111111";
@@ -754,5 +763,102 @@ describe("Test 9 — UI Integration & /admin/seller Regression Contracts", () =>
       ),
     );
     expect(deniedHtml).toBe("");
+  });
+
+  it("wires admin sidebar badges, realtime socket JWT sync, removes audit_logs from admin-dashboard, and includes backfill migration", async () => {
+    // 1. Seluruh 13 menu antrean sidebar admin memiliki badgeKey
+    const badgedItems = adminNav
+      .flatMap((g) => g.items)
+      .filter((item) => Boolean(item.badgeKey))
+      .map((item) => item.badgeKey);
+    expect(badgedItems).toEqual(
+      expect.arrayContaining([
+        "sellers",
+        "productModeration",
+        "serviceModeration",
+        "orders",
+        "chats",
+        "payments",
+        "topups",
+        "refunds",
+        "payouts",
+        "tasks",
+        "fulfillment",
+        "po",
+        "security",
+      ]),
+    );
+
+    // 2. Dashboard overview tidak lagi menyertakan audit_logs (tidak ada di publication realtime)
+    const adminIndexSrc = readFileSync("src/routes/_authenticated/admin/index.tsx", "utf8");
+    expect(adminIndexSrc).not.toContain('"audit_logs"');
+
+    // 3. Sinkronisasi JWT realtime aktif di use-session & use-realtime-refresh + sidebar pakai useAdminBadges
+    const sessionSrc = readFileSync("src/hooks/use-session.ts", "utf8");
+    expect(sessionSrc).toContain(".realtime?.setAuth");
+    const routeSrc = readFileSync("src/routes/_authenticated/admin/route.tsx", "utf8");
+    expect(routeSrc).toContain("useAdminBadges");
+    expect(routeSrc).toContain("badgeKey");
+
+    // 4. Migrasi backfill idempoten ada
+    const backfillSql = readFileSync(
+      "supabase/migrations/20261122150000_backfill_pending_seller_admin_notifications.sql",
+      "utf8",
+    );
+    expect(backfillSql).toContain("notify_seller_admins");
+    expect(backfillSql).toContain("admin_seller.registered");
+
+    // 5. getAdminSidebarBadges menggabungkan pending stores + extra unread notifications tanpa hitung ganda
+    const mockQuery = (table: string) => {
+      const state: { filters: Array<[string, unknown]>; countMode: boolean } = {
+        filters: [],
+        countMode: false,
+      };
+      const q: Record<string, any> = {
+        select: (_c: string, opts?: { count?: string }) => {
+          if (opts?.count === "exact") state.countMode = true;
+          return q;
+        },
+        eq: (c: string, v: unknown) => {
+          state.filters.push([c, v]);
+          return q;
+        },
+        in: () => q,
+        is: () => q,
+        like: () => q,
+        then: (resolve: (val: unknown) => unknown) => {
+          if (table === "stores") {
+            return Promise.resolve({
+              data: [{ id: "store-pending-1" }, { id: "store-pending-2" }],
+              count: 2,
+              error: null,
+            }).then(resolve);
+          }
+          if (table === "notifications") {
+            return Promise.resolve({
+              data: [
+                { id: "n1", related_id: "store-pending-1" }, // duplikat pending -> jangan hitung ganda
+                { id: "n2", related_id: "store-other-3" }, // unread extra (mis. profil diubah) -> +1
+              ],
+              count: 2,
+              error: null,
+            }).then(resolve);
+          }
+          if (table === "payments") return Promise.resolve({ data: [], count: 6, error: null }).then(resolve);
+          if (table === "admin_tasks") return Promise.resolve({ data: [], count: 11, error: null }).then(resolve);
+          return Promise.resolve({ data: [], count: 0, error: null }).then(resolve);
+        },
+      };
+      return q;
+    };
+
+    const sb = { from: mockQuery };
+    const badgeRes = await (getAdminSidebarBadges as any)({
+      context: { supabase: sb, userId: ADMIN_A },
+    });
+    expect(badgeRes.forbidden).toBe(false);
+    expect(badgeRes.badges.sellers).toBe(3); // 2 pending stores + 1 non-pending unread notification
+    expect(badgeRes.badges.payments).toBe(6);
+    expect(badgeRes.badges.tasks).toBe(11);
   });
 });

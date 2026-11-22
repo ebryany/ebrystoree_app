@@ -164,7 +164,11 @@ function AdminSellerQueue() {
 
   const refresh = async () => {
     setOpenId(null);
-    await qc.invalidateQueries({ queryKey: ["admin-stores"] });
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["admin-stores"] }),
+      qc.invalidateQueries({ queryKey: ["admin-sidebar-badges"] }),
+      qc.invalidateQueries({ queryKey: ["admin-overview"] }),
+    ]);
   };
 
   return (

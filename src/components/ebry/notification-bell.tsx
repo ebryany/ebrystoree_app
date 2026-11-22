@@ -76,7 +76,13 @@ export function NotificationBell({ className }: { className?: string }) {
     channel: "notification-bell",
     tables: ["notifications"],
     filter: user ? `recipient_id=eq.${user.id}` : undefined,
-    keys: [["my-notifications"], ["customer-summary"]],
+    keys: [
+      ["my-notifications"],
+      ["customer-summary"],
+      ["admin-sidebar-badges"],
+      ["admin-overview"],
+      ["admin-stores"],
+    ],
     enabled: Boolean(user),
     onEvent: (payload) => {
       if (payload.eventType === "INSERT" && payload.new?.title) {
@@ -198,7 +204,17 @@ export function NotificationBell({ className }: { className?: string }) {
               {items.slice(0, 8).map((n) => {
                 const tone = notificationTone(n.type);
                 const Icon = tone.icon;
-                const isPayout = n.related_type === "payout" && n.related_id;
+                const actionHref = notificationHref(n, staffRoles);
+                const actionLabel =
+                  n.related_type === "store" && staffRoles
+                    ? "Tinjau seller"
+                    : n.related_type === "payout" && staffRoles
+                      ? "Lihat permintaan"
+                      : n.related_type === "payout"
+                        ? "Lihat keuangan"
+                        : n.related_type === "payment"
+                          ? "Tinjau pembayaran"
+                          : "Lihat detail";
                 return (
                   <li
                     key={n.id}
@@ -252,22 +268,17 @@ export function NotificationBell({ className }: { className?: string }) {
                               Tandai dibaca
                             </button>
                           )}
-                          {isPayout && isPayoutStaff((rolesData as any)?.roles) ? (
+                          {actionHref ? (
                             <Link
-                              to="/admin/payouts/$id"
-                              params={{ id: n.related_id }}
-                              onClick={() => setOpen(false)}
+                              to={actionHref.to as never}
+                              params={actionHref.params as never}
+                              onClick={() => {
+                                if (!n.read_at) void handleRead(n.id);
+                                setOpen(false);
+                              }}
                               className="text-[11px] font-medium text-accent hover:underline"
                             >
-                              Lihat permintaan
-                            </Link>
-                          ) : isPayout ? (
-                            <Link
-                              to="/seller/keuangan"
-                              onClick={() => setOpen(false)}
-                              className="text-[11px] font-medium text-accent hover:underline"
-                            >
-                              Lihat keuangan
+                              {actionLabel}
                             </Link>
                           ) : null}
                         </div>

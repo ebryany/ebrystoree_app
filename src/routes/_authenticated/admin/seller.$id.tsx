@@ -296,8 +296,12 @@ function AdminSellerDetail() {
   });
 
   const invalidateAll = async () => {
-    await qc.invalidateQueries({ queryKey: ["admin-store", id] });
-    await qc.invalidateQueries({ queryKey: ["admin-stores"] });
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["admin-store", id] }),
+      qc.invalidateQueries({ queryKey: ["admin-stores"] }),
+      qc.invalidateQueries({ queryKey: ["admin-sidebar-badges"] }),
+      qc.invalidateQueries({ queryKey: ["admin-overview"] }),
+    ]);
   };
 
   if (!canView) return <ForbiddenState permission="sellers.view" />;

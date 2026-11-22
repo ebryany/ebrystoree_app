@@ -182,6 +182,8 @@ export function createAdminSellerRealtimeController({
       }
 
       void queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-sidebar-badges"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
       scheduleStoreSync(normalized.storeId);
       return;
     }
@@ -263,13 +265,18 @@ export function createAdminSellerRealtimeController({
   );
   ch.subscribe(handleSubscribeStatus);
 
-  const { data: authSub } = client.auth.onAuthStateChange((event) => {
+  const { data: authSub } = client.auth.onAuthStateChange((event, session) => {
     if (!active) return;
     if (event === "SIGNED_OUT") {
       onStatusChange("error");
       return;
     }
     if (event === "TOKEN_REFRESHED" || event === "SIGNED_IN") {
+      try {
+        void (client as any).realtime?.setAuth?.(session?.access_token ?? null);
+      } catch {
+        /* abaikan pada mock */
+      }
       resyncAll();
     }
   });
@@ -491,6 +498,7 @@ export function useAdminSellerNotifications({
           throw new Error((res as any)?.error ?? "Gagal memperbarui status notifikasi.");
         }
         void qc.invalidateQueries({ queryKey: ["my-notifications"] });
+        void qc.invalidateQueries({ queryKey: ["admin-sidebar-badges"] });
         return true;
       } catch {
         for (const [key, prev] of snapshots) {
@@ -550,6 +558,7 @@ export function useAdminSellerNotifications({
         throw new Error((res as any)?.error ?? "Gagal menandai semua notifikasi.");
       }
       void qc.invalidateQueries({ queryKey: ["my-notifications"] });
+      void qc.invalidateQueries({ queryKey: ["admin-sidebar-badges"] });
       void qc.invalidateQueries({ queryKey: ["admin-seller-notifications", resolvedUserId] });
       return true;
     } catch {

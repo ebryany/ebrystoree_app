@@ -97,6 +97,19 @@ export function useRealtimeRefresh({
       );
     }
 
+    // Pastikan token sesi aktif diteruskan ke socket Realtime sebelum join (sb_publishable_).
+    try {
+      void (supabase as any)?.auth
+        ?.getSession?.()
+        ?.then?.((res: { data?: { session?: { access_token?: string } | null } }) => {
+          const token = res?.data?.session?.access_token;
+          if (token) void (supabase as any)?.realtime?.setAuth?.(token);
+        })
+        ?.catch?.(() => {});
+    } catch {
+      /* abaikan pada mock */
+    }
+
     ch.subscribe((status) => {
       const mapped = mapRealtimeStatus(status);
       if (mapped) queryClient.setQueryData(realtimeStatusKey(channel), mapped);
@@ -128,6 +141,19 @@ export function useRealtimeRefresh({
       needsResync = false;
       schedule();
     };
+    const authSub =
+      typeof (supabase as any)?.auth?.onAuthStateChange === "function"
+        ? supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+              try {
+                void (supabase as any).realtime?.setAuth?.(session?.access_token ?? null);
+              } catch {
+                /* abaikan pada mock */
+              }
+              schedule();
+            }
+          })
+        : null;
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("offline", onOffline);
     window.addEventListener("online", onOnline);
@@ -136,6 +162,7 @@ export function useRealtimeRefresh({
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("offline", onOffline);
       window.removeEventListener("online", onOnline);
+      authSub?.data?.subscription?.unsubscribe?.();
       if (timerRef.current) clearTimeout(timerRef.current);
       supabase.removeChannel(ch);
     };

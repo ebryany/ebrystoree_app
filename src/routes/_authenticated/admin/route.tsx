@@ -35,7 +35,8 @@ import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
 import { NotificationBell } from "@/components/ebry/notification-bell";
 import { SecurityErrorView } from "@/components/security-error-page";
 import { adminNav, ROLE_LABELS } from "@/lib/admin-nav";
-import { getMyAccess } from "@/lib/admin.functions";
+import { getMyAccess, type AdminBadges } from "@/lib/admin.functions";
+import { useAdminBadges } from "@/hooks/use-admin-badges";
 import { reportUnauthorizedRouteAccess } from "@/lib/security.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -57,10 +58,12 @@ const navigationOrder = [
 function NavList({
   permissions,
   isSuperAdmin,
+  badges,
   onNavigate,
 }: {
   permissions: string[];
   isSuperAdmin: boolean;
+  badges?: AdminBadges;
   onNavigate?: () => void;
 }) {
   const [search, setSearch] = useState("");
@@ -144,6 +147,7 @@ function NavList({
               <ul className="mt-2 space-y-1">
                 {group.items.map((item) => {
                   const isActive = item.to === activeItem?.to;
+                  const badgeCount = item.badgeKey && badges ? badges[item.badgeKey] : 0;
                   return (
                     <li key={item.to}>
                       <Link
@@ -160,7 +164,15 @@ function NavList({
                         )}
                       >
                         <item.icon className="size-4 shrink-0" aria-hidden="true" />
-                        <span className="min-w-0 break-words">{item.label}</span>
+                        <span className="min-w-0 flex-1 break-words">{item.label}</span>
+                        {badgeCount > 0 ? (
+                          <>
+                            <span className="ml-auto inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-5 tabular-nums text-destructive-foreground">
+                              {badgeCount > 99 ? "99+" : badgeCount}
+                            </span>
+                            <span className="sr-only">, {badgeCount} perlu tindakan</span>
+                          </>
+                        ) : null}
                       </Link>
                     </li>
                   );
@@ -191,6 +203,8 @@ function AdminLayout() {
 
   const canEnter =
     !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
+  const badges = useAdminBadges(canEnter);
+  const totalBadgeCount = Object.values(badges).reduce((sum, count) => sum + count, 0);
 
   useEffect(() => {
     if (isPending || error || !data || canEnter) return;
@@ -200,7 +214,7 @@ function AdminLayout() {
       .then((res) => {
         if (res?.requestId) setDeniedRefId(res.requestId);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [isPending, error, data, canEnter, pathname, reportDenied]);
 
   async function handleSignOut() {
@@ -266,10 +280,19 @@ function AdminLayout() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="min-h-11 min-w-11 shrink-0 lg:hidden"
-                    aria-label="Buka menu admin"
+                    className="relative min-h-11 min-w-11 shrink-0 lg:hidden"
+                    aria-label={
+                      totalBadgeCount > 0
+                        ? `Buka menu admin, ${totalBadgeCount} antrean menunggu tindakan`
+                        : "Buka menu admin"
+                    }
                   >
                     <Menu className="size-5" aria-hidden="true" />
+                    {totalBadgeCount > 0 ? (
+                      <span className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 tabular-nums text-destructive-foreground">
+                        {totalBadgeCount > 99 ? "99+" : totalBadgeCount}
+                      </span>
+                    ) : null}
                   </Button>
                 </SheetTrigger>
                 <SheetContent
@@ -288,6 +311,7 @@ function AdminLayout() {
                     <NavList
                       permissions={data.permissions}
                       isSuperAdmin={data.isSuperAdmin}
+                      badges={badges}
                       onNavigate={() => setOpen(false)}
                     />
                   </div>
@@ -309,10 +333,15 @@ function AdminLayout() {
             <div className="flex shrink-0 items-center gap-1 sm:gap-2">
               <NotificationBell />
               {canViewOrders ? (
-                <Button asChild variant="ghost" className="hidden min-h-11 sm:inline-flex">
+                <Button asChild variant="ghost" className="hidden min-h-11 gap-1.5 sm:inline-flex">
                   <Link to="/admin/chat">
                     <MessagesSquare className="size-4" aria-hidden="true" />
-                    Chat Produk
+                    <span>Chat Produk</span>
+                    {badges.chats > 0 ? (
+                      <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-5 tabular-nums text-destructive-foreground">
+                        {badges.chats > 99 ? "99+" : badges.chats}
+                      </span>
+                    ) : null}
                   </Link>
                 </Button>
               ) : null}
@@ -366,7 +395,11 @@ function AdminLayout() {
           aria-label="Menu admin desktop"
           className="fixed bottom-0 left-0 top-16 hidden w-64 border-r border-border bg-card lg:block"
         >
-          <NavList permissions={data.permissions} isSuperAdmin={data.isSuperAdmin} />
+          <NavList
+            permissions={data.permissions}
+            isSuperAdmin={data.isSuperAdmin}
+            badges={badges}
+          />
         </aside>
         <div className="min-w-0 lg:pl-64">
           <main

@@ -35,8 +35,8 @@ Dokumentasi arsitektur, keamanan, integrasi backend/realtime, dan hasil pengujia
 
 ## 2. Database Migration & Rollback
 
-- **Lokasi file**: `supabase/migrations/20261122140000_admin_seller_notification_center.sql`
-- **Status penerapan ke produksi**: **Telah diterapkan & diverifikasi pada project Supabase produksi (`wcxaheqnnsbhifpgiedk`)** dengan verifikasi katalog DB (`cols_count=4`, `idx_count=3`, `fn_count=4`, `trg_count=3`, `pub_count=2`) serta smoke test trigger ber-rollback (`exp=3`, `after_insert=3`, `after_dup=3`, `leftover_stores=0`, `leftover_notifs=0`).
+- **Lokasi file**: `supabase/migrations/20261122140000_admin_seller_notification_center.sql` & `supabase/migrations/20261122150000_backfill_pending_seller_admin_notifications.sql`
+- **Status penerapan ke produksi**: **Telah diterapkan & diverifikasi pada project Supabase produksi (`wcxaheqnnsbhifpgiedk`)** dengan verifikasi katalog DB (`cols_count=4`, `idx_count=3`, `fn_count=4`, `trg_count=3`, `pub_count=2`), smoke test trigger ber-rollback (`exp=3`, `after_insert=3`, `after_dup=3`, `leftover_stores=0`, `leftover_notifs=0`), serta backfill idempoten antrean lama (`total_admin_seller_notifs=6`, `unread_admin_seller_notifs=6` di 3 akun admin untuk 2 toko pending).
 - **Perubahan skema (`public.notifications`)**:
   - Kolom aditif nullable/defaulted: `dedupe_key text`, `event_ref text`, `action_url text`, `metadata jsonb NOT NULL DEFAULT '{}'::jsonb`.
   - Unique partial index: `uq_notifications_recipient_dedupe ON public.notifications (recipient_id, dedupe_key) WHERE dedupe_key IS NOT NULL` untuk jaminan idempotensi pada database.

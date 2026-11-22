@@ -174,6 +174,223 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     }),
   );
 
+export type AdminBadges = {
+  sellers: number;
+  productModeration: number;
+  serviceModeration: number;
+  orders: number;
+  chats: number;
+  payments: number;
+  topups: number;
+  refunds: number;
+  payouts: number;
+  tasks: number;
+  fulfillment: number;
+  po: number;
+  security: number;
+};
+
+const EMPTY_ADMIN_BADGES: AdminBadges = {
+  sellers: 0,
+  productModeration: 0,
+  serviceModeration: 0,
+  orders: 0,
+  chats: 0,
+  payments: 0,
+  topups: 0,
+  refunds: 0,
+  payouts: 0,
+  tasks: 0,
+  fulfillment: 0,
+  po: 0,
+  security: 0,
+};
+
+async function safeCount(
+  allowed: boolean,
+  run: () => Promise<{ count: number | null; error: unknown }>,
+): Promise<number> {
+  if (!allowed) return 0;
+  try {
+    const res = await run();
+    if (res.error) return 0;
+    return Math.max(0, Number(res.count ?? 0));
+  } catch {
+    return 0;
+  }
+}
+
+/** Ringkasan angka notifikasi & antrean kerja untuk badge sidebar admin (permission-scoped). */
+export const getAdminSidebarBadges = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    guard(context as Ctx, "admin.dashboard.view", async (helpers) => {
+      const ctx = context as Ctx;
+      const sb = ctx.supabase;
+      const access = await helpers.loadAccess(ctx);
+      const can = (permission: string) =>
+        access.isSuperAdmin || access.permissions.includes(permission);
+
+      const sellersPromise = can("sellers.view")
+        ? Promise.all([
+            sb
+              .from("stores")
+              .select("id")
+              .eq("is_platform", false)
+              .eq("status", "pending"),
+            sb
+              .from("notifications")
+              .select("id, related_id")
+              .eq("recipient_id", ctx.userId)
+              .like("type", "admin_seller.%")
+              .is("read_at", null),
+          ])
+            .then(([pendingRes, notifRes]) => {
+              const pendingIds = new Set<string>(
+                !pendingRes.error && Array.isArray(pendingRes.data)
+                  ? pendingRes.data.map((r: any) => String(r.id))
+                  : [],
+              );
+              const extraUnread =
+                !notifRes.error && Array.isArray(notifRes.data)
+                  ? notifRes.data.filter(
+                      (n: any) => !n.related_id || !pendingIds.has(String(n.related_id)),
+                    ).length
+                  : 0;
+              return pendingIds.size + extraUnread;
+            })
+            .catch(() => 0)
+        : Promise.resolve(0);
+
+      const [
+        sellers,
+        productModeration,
+        serviceReview,
+        serviceComplaints,
+        orders,
+        chats,
+        payments,
+        topups,
+        refunds,
+        payouts,
+        tasks,
+        fulfillment,
+        poSubmitted,
+        poPaymentsWaiting,
+        security,
+      ] = await Promise.all([
+        sellersPromise,
+        safeCount(can("products.view"), () =>
+          sb
+            .from("digital_products")
+            .select("id", { count: "exact", head: true })
+            .eq("moderation_status", "pending")
+            .is("deleted_at", null),
+        ),
+        safeCount(can("services.view"), () =>
+          sb
+            .from("marketplace_services")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "in_review"),
+        ),
+        safeCount(can("orders.view"), () =>
+          sb
+            .from("marketplace_service_orders")
+            .select("order_id", { count: "exact", head: true })
+            .eq("complaint_open", true)
+            .is("accepted_delivery_id", null),
+        ),
+        safeCount(can("orders.view"), () =>
+          sb
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .in("status", ["payment_under_review", "refund_requested", "refund_processing", "disputed"]),
+        ),
+        safeCount(can("orders.view"), () =>
+          sb
+            .from("product_inquiries")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "open"),
+        ),
+        safeCount(can("payments.view"), () =>
+          sb
+            .from("payments")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "waiting_verification"),
+        ),
+        safeCount(can("payments.view"), () =>
+          sb
+            .from("credit_topups")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "waiting_verification"),
+        ),
+        safeCount(can("refunds.view"), () =>
+          sb
+            .from("refunds")
+            .select("id", { count: "exact", head: true })
+            .in("status", ["requested", "under_review", "information_requested"]),
+        ),
+        safeCount(can("payouts.view"), () =>
+          sb
+            .from("withdrawals")
+            .select("id", { count: "exact", head: true })
+            .in("status", ["pending", "processing"]),
+        ),
+        safeCount(can("tasks.view"), () =>
+          sb
+            .from("admin_tasks")
+            .select("id", { count: "exact", head: true })
+            .in("status", ["open", "in_progress", "blocked"]),
+        ),
+        safeCount(can("orders.fulfill"), () =>
+          sb
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("order_type", "service")
+            .in("status", ["paid", "in_progress", "revision_requested"]),
+        ),
+        safeCount(can("orders.view"), () =>
+          sb
+            .from("custom_orders")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "submitted"),
+        ),
+        safeCount(can("orders.view"), () =>
+          sb
+            .from("po_payments")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "waiting_verification"),
+        ),
+        safeCount(can("security.alerts.read") || can("settings.view"), () =>
+          sb
+            .from("security_alerts")
+            .select("id", { count: "exact", head: true })
+            .in("status", ["OPEN", "INVESTIGATING"]),
+        ),
+      ]);
+
+      return {
+        forbidden: false as const,
+        badges: {
+          ...EMPTY_ADMIN_BADGES,
+          sellers,
+          productModeration,
+          serviceModeration: serviceReview + serviceComplaints,
+          orders,
+          chats,
+          payments,
+          topups,
+          refunds,
+          payouts,
+          tasks,
+          fulfillment,
+          po: poSubmitted + poPaymentsWaiting,
+          security,
+        } satisfies AdminBadges,
+      };
+    }),
+  );
+
 /* ------------------------------------------------------------------ */
 /* Kategori                                                             */
 /* ------------------------------------------------------------------ */

@@ -20,6 +20,12 @@ let initPromise: Promise<Session | null> | null = null;
 const listeners = new Set<() => void>();
 
 function emit(nextSession: Session | null) {
+  // Sinkronkan JWT pengguna ke socket Realtime (diperlukan untuk sb_publishable_ key).
+  try {
+    void (supabase as any).realtime?.setAuth?.(nextSession?.access_token ?? null);
+  } catch {
+    /* abaikan pada mock/SSR */
+  }
   if (!snapshot.loading && snapshot.session === nextSession) return;
   snapshot = {
     session: nextSession,

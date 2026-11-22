@@ -132,6 +132,11 @@ export function notificationHref(n: NotificationLike, staff: boolean): Notificat
       return staff && id ? { to: "/admin/payouts/$id", params: { id } } : { to: "/seller/keuangan" };
     case "payment":
       return staff && id ? { to: "/admin/payments/$id", params: { id } } : null;
+    case "refund":
+      return staff && id ? { to: "/admin/refunds/$id", params: { id } } : null;
+    case "custom_order":
+    case "po_payment":
+      return staff && id ? { to: "/admin/po/$id", params: { id } } : null;
     case "credit_ledger":
       return { to: "/dashboard/saldo" };
     case "store":

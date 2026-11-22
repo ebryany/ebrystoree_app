@@ -24,6 +24,10 @@ import {
   Wrench,
 } from "lucide-react";
 
+import type { AdminBadges } from "@/lib/admin.functions";
+
+export type AdminBadgeKey = keyof AdminBadges;
+
 export type AdminNavItem = {
   to?: string;
   label: string;
@@ -32,6 +36,8 @@ export type AdminNavItem = {
   exact?: boolean;
   /** false = modul belum tersedia, ditampilkan sebagai roadmap item nonaktif */
   available: boolean;
+  /** Kunci badge notifikasi/antrean real-time pada sidebar admin */
+  badgeKey?: AdminBadgeKey;
 };
 
 export type AdminNavGroup = { label: string; items: AdminNavItem[] };
@@ -85,6 +91,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Store,
         permission: "sellers.view",
         available: true,
+        badgeKey: "sellers",
       },
       {
         to: "/admin/seller/produk",
@@ -92,6 +99,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: PackageSearch,
         permission: "products.view",
         available: true,
+        badgeKey: "productModeration",
       },
       {
         to: "/admin/seller/jasa",
@@ -99,6 +107,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Wrench,
         permission: "services.view",
         available: true,
+        badgeKey: "serviceModeration",
       },
       {
         to: "/admin/seller/laporan",
@@ -139,6 +148,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: ShieldCheck,
         permission: "settings.view",
         available: true,
+        badgeKey: "security",
       },
     ],
   },
@@ -151,6 +161,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Receipt,
         permission: "orders.view",
         available: true,
+        badgeKey: "orders",
       },
       {
         to: "/admin/chat",
@@ -158,6 +169,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: MessagesSquare,
         permission: "orders.view",
         available: true,
+        badgeKey: "chats",
       },
       {
         to: "/admin/payments",
@@ -165,6 +177,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: CreditCard,
         permission: "payments.view",
         available: true,
+        badgeKey: "payments",
       },
       {
         to: "/admin/topups",
@@ -172,6 +185,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: CreditCard,
         permission: "payments.view",
         available: true,
+        badgeKey: "topups",
       },
       {
         to: "/admin/refunds",
@@ -179,6 +193,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Undo2,
         permission: "refunds.view",
         available: true,
+        badgeKey: "refunds",
       },
       {
         to: "/admin/payouts",
@@ -186,6 +201,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Banknote,
         permission: "payouts.view",
         available: true,
+        badgeKey: "payouts",
       },
       {
         to: "/admin/tasks",
@@ -193,6 +209,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: ClipboardList,
         permission: "tasks.view",
         available: true,
+        badgeKey: "tasks",
       },
       {
         to: "/admin/reports",
@@ -220,6 +237,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: Hammer,
         permission: "orders.fulfill",
         available: true,
+        badgeKey: "fulfillment",
       },
       {
         to: "/admin/po",
@@ -227,6 +245,7 @@ export const adminNav: AdminNavGroup[] = [
         icon: MessageSquarePlus,
         permission: "orders.view",
         available: true,
+        badgeKey: "po",
       },
     ],
   },

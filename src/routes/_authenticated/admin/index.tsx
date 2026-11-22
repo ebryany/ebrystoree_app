@@ -132,7 +132,18 @@ function AdminOverview() {
 
   useRealtimeRefresh({
     channel: "admin-dashboard",
-    tables: ["orders", "payments", "refunds", "stores", "digital_products", "audit_logs"],
+    tables: [
+      "orders",
+      "payments",
+      "credit_topups",
+      "refunds",
+      "withdrawals",
+      "stores",
+      "digital_products",
+      "marketplace_services",
+      "marketplace_service_orders",
+      "admin_tasks",
+    ],
     keys: [["admin-overview"], ["admin-dashboard-report"], ["admin-dashboard-orders"]],
   });
 
