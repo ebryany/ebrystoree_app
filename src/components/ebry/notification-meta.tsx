@@ -59,6 +59,15 @@ const MAP: Array<{ match: RegExp; tone: NotificationTone }> = [
 const PREFIX_TONE: Array<[RegExp, NotificationTone]> = [
   [/^(credit|payout)/, { icon: Wallet, label: "Saldo", wrap: "bg-success/12 text-success" }],
   [/^product_inquiry/, { icon: MessageSquare, label: "Chat", wrap: "bg-primary/10 text-primary" }],
+  [
+    /^admin_seller\.(status_rejected|status_suspended|compliance_flagged)/,
+    { icon: TriangleAlert, label: "Seller", wrap: "bg-destructive/10 text-destructive" },
+  ],
+  [
+    /^admin_seller\.(status_approved|status_reactivated|auto_approved)/,
+    { icon: BadgeCheck, label: "Seller", wrap: "bg-accent/15 text-accent" },
+  ],
+  [/^admin_seller\./, { icon: Store, label: "Seller", wrap: "bg-primary/10 text-primary" }],
   [/^seller\./, { icon: Store, label: "Toko", wrap: "bg-accent/15 text-accent" }],
   [/^store\.new_product/, { icon: Store, label: "Toko diikuti", wrap: "bg-primary/10 text-primary" }],
   [/^service\./, { icon: PackageCheck, label: "Pesanan jasa", wrap: "bg-accent/15 text-accent" }],
@@ -88,7 +97,7 @@ export function notificationCategory(type?: string | null): NotificationCategory
   if (/^payment/.test(t)) return "pembayaran";
   if (/^(payout|credit|refund)/.test(t)) return "saldo";
   if (/^product_inquiry/.test(t)) return "chat";
-  if (/^(seller|store)\./.test(t)) return "toko";
+  if (/^(admin_seller|seller|store)\./.test(t)) return "toko";
   return "lainnya";
 }
 
@@ -126,6 +135,9 @@ export function notificationHref(n: NotificationLike, staff: boolean): Notificat
     case "credit_ledger":
       return { to: "/dashboard/saldo" };
     case "store":
+      if (type.startsWith("admin_seller.") || (staff && id)) {
+        return id ? { to: "/admin/seller/$id", params: { id } } : { to: "/admin/seller" };
+      }
       return { to: "/seller" };
     case "product":
       return id ? { to: "/p/$id", params: { id } } : null;

@@ -1593,9 +1593,13 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_url: string | null
           created_at: string
+          dedupe_key: string | null
+          event_ref: string | null
           id: string
           message: string
+          metadata: Json
           read_at: string | null
           recipient_id: string
           related_id: string | null
@@ -1604,9 +1608,13 @@ export type Database = {
           type: string
         }
         Insert: {
+          action_url?: string | null
           created_at?: string
+          dedupe_key?: string | null
+          event_ref?: string | null
           id?: string
           message: string
+          metadata?: Json
           read_at?: string | null
           recipient_id: string
           related_id?: string | null
@@ -1615,9 +1623,13 @@ export type Database = {
           type: string
         }
         Update: {
+          action_url?: string | null
           created_at?: string
+          dedupe_key?: string | null
+          event_ref?: string | null
           id?: string
           message?: string
+          metadata?: Json
           read_at?: string | null
           recipient_id?: string
           related_id?: string | null

@@ -27,6 +27,7 @@ import {
   useCan,
 } from "@/components/admin/admin-ui";
 import { DetailCard, Field, StatusBadge, formatDateTime } from "@/components/admin/tx-ui";
+import { SellerNotificationCenter } from "@/components/admin/seller-notification-center";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -335,6 +336,7 @@ function AdminSellerDetail() {
         description={`/toko/${store.slug} · diajukan ${formatDateTime(store.created_at)}`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            <SellerNotificationCenter />
             {store.status === "active" ? (
               <Button asChild variant="outline" size="sm" className="min-h-11">
                 <Link to="/toko/$slug" params={{ slug: store.slug }} target="_blank">

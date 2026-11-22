@@ -39,6 +39,14 @@ function sellerError(message: string) {
 
 /* ---------------- Antrean & daftar seller ---------------- */
 
+export type AdminStoreCounts = {
+  all: number;
+  pending: number;
+  active: number;
+  suspended: number;
+  rejected: number;
+};
+
 /** Daftar toko untuk admin. `status='pending'` = antrean pengajuan. */
 export const listStoresForAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -53,12 +61,33 @@ export const listStoresForAdmin = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "sellers.view", async () => {
       const sb = (context as Ctx).supabase;
-      const { data: rows, error } = await sb.rpc("admin_list_stores", {
-        _status: data.status,
-        _search: data.search || null,
-      });
-      if (error) return { items: [], error: "Daftar seller tidak dapat dimuat." };
-      return { items: rows ?? [], error: null };
+      const [listRes, statusRes] = await Promise.all([
+        sb.rpc("admin_list_stores", {
+          _status: data.status,
+          _search: data.search || null,
+        }),
+        sb.from("stores").select("status"),
+      ]);
+      const counts: AdminStoreCounts = {
+        all: 0,
+        pending: 0,
+        active: 0,
+        suspended: 0,
+        rejected: 0,
+      };
+      if (!statusRes.error && Array.isArray(statusRes.data)) {
+        for (const row of statusRes.data as Array<{ status?: string | null }>) {
+          counts.all += 1;
+          if (row.status === "pending") counts.pending += 1;
+          else if (row.status === "active") counts.active += 1;
+          else if (row.status === "suspended") counts.suspended += 1;
+          else if (row.status === "rejected") counts.rejected += 1;
+        }
+      }
+      if (listRes.error) {
+        return { items: [], counts, error: "Daftar seller tidak dapat dimuat." };
+      }
+      return { items: listRes.data ?? [], counts, error: null };
     }),
   );
 

@@ -16,19 +16,27 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/lib/orders.functions";
-import { isPayoutStaff, notificationTone, relativeTime } from "@/components/ebry/notification-meta";
+import {
+  isPayoutStaff,
+  notificationHref,
+  notificationTone,
+  relativeTime,
+  type NotificationHref,
+} from "@/components/ebry/notification-meta";
+import { claimNotificationToast, formatUnreadBadge } from "@/lib/admin-seller-notifications";
 import { pushNotificationToast } from "@/components/ebry/notification-toast";
 import { cn } from "@/lib/utils";
 
-const seenNotifications = new Set<string>();
-
-/** true bila id ini belum pernah diproses di tab ini. */
-function claimNotification(id: unknown): boolean {
-  if (typeof id !== "string") return true;
-  if (seenNotifications.has(id)) return false;
-  seenNotifications.add(id);
-  if (seenNotifications.size > 200) seenNotifications.clear();
-  return true;
+function resolveToastHref(target: NotificationHref | null): string {
+  if (!target) return "/dashboard/notifikasi";
+  if (target.params) {
+    let path = target.to;
+    for (const [k, v] of Object.entries(target.params)) {
+      path = path.replace(`$${k}`, encodeURIComponent(v));
+    }
+    return path;
+  }
+  return target.to;
 }
 
 /** Bubble notifikasi realtime dengan badge jumlah belum dibaca + suara lonceng. */
@@ -61,6 +69,8 @@ export function NotificationBell({ className }: { className?: string }) {
 
   const items: any[] = (data as any)?.items ?? [];
   const unread = items.filter((n) => !n.read_at).length;
+  const unreadBadge = formatUnreadBadge(unread);
+  const staffRoles = isPayoutStaff((rolesData as any)?.roles);
 
   useRealtimeRefresh({
     channel: "notification-bell",
@@ -74,14 +84,15 @@ export function NotificationBell({ className }: { className?: string }) {
         window.setTimeout(() => setPulse(false), 1600);
         // Lonceng dipasang lebih dari sekali (header desktop + mobile); hanya
         // instance pertama yang menerima id ini boleh berbunyi dan menampilkan kartu.
-        if (!claimNotification(payload.new.id)) return;
+        if (!claimNotificationToast(payload.new.id)) return;
         playRef.current();
+        const resolved = resolveToastHref(notificationHref(payload.new, staffRoles));
         pushNotificationToast({
           id: payload.new.id,
           title: payload.new.title,
           message: payload.new.message,
           type: payload.new.type,
-          href: "/dashboard/notifikasi",
+          href: resolved,
         });
       }
     },
@@ -110,17 +121,20 @@ export function NotificationBell({ className }: { className?: string }) {
           className={cn("relative min-h-11 min-w-11", className)}
         >
           <Bell
-            className={cn("size-5 transition-transform", pulse && "animate-bounce")}
+            className={cn(
+              "size-5 transition-transform motion-reduce:animate-none",
+              pulse && "animate-bounce",
+            )}
             aria-hidden="true"
           />
-          {unread > 0 ? (
+          {unreadBadge ? (
             <>
               <span
                 aria-hidden="true"
-                className="absolute right-1.5 top-1.5 size-4 animate-ping rounded-full bg-destructive/40"
+                className="absolute right-1.5 top-1.5 size-4 animate-ping rounded-full bg-destructive/40 motion-reduce:hidden"
               />
               <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground shadow-sm">
-                {unread > 9 ? "9+" : unread}
+                {unreadBadge}
               </span>
             </>
           ) : null}
