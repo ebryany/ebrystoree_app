@@ -4,12 +4,17 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type Ctx = { supabase: any; userId: string };
 
-async function assertStaff(ctx: Ctx): Promise<boolean> {
-  const { data: roles } = await ctx.supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", ctx.userId);
-  return (roles ?? []).some((r: any) => ["admin", "super_admin", "support"].includes(r.role));
+async function canSeo(
+  ctx: Ctx,
+  permission: "admin.dashboard.view" | "settings.seo.update",
+): Promise<boolean> {
+  const { assertPermission } = await import("./authz.server");
+  try {
+    await assertPermission(ctx, permission, { endpoint: `serverFn:seo-audit:${permission}` });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -58,9 +63,13 @@ export const runSeoAuditNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertStaff(ctx))) {
-      return { ok: false as const, error: "Hanya staf yang dapat menjalankan audit SEO." };
+    if (!(await canSeo(ctx, "settings.seo.update"))) {
+      return { ok: false as const, error: "Anda tidak punya izin menjalankan audit SEO." };
     }
+
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    const limited = await enforceRateLimit(ctx.userId, "seo.audit");
+    if (limited) return { ok: false as const, error: limited.error };
 
     const baseUrl = process.env["SITE_URL"] ?? "https://app.ebrystore.my.id";
     const paths = await collectPaths();
@@ -80,7 +89,7 @@ export const getSeoAudit = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertStaff(ctx))) return { forbidden: true as const };
+    if (!(await canSeo(ctx, "admin.dashboard.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: summary }, { data: rows }] = await Promise.all([

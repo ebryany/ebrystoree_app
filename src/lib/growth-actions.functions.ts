@@ -12,22 +12,17 @@ type Ctx = { supabase: any; userId: string };
  * dipakai. Pesan error dikembalikan dalam bahasa manusia, bukan kode database.
  */
 
-async function assertGrowthAccess(ctx: Ctx): Promise<boolean> {
-  const { data: roles } = await ctx.supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", ctx.userId);
-  return (roles ?? []).some((r: any) =>
-    ["admin", "super_admin", "support", "finance"].includes(r.role),
-  );
-}
-
-async function assertArticleWrite(ctx: Ctx): Promise<boolean> {
-  const { data: roles } = await ctx.supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", ctx.userId);
-  return (roles ?? []).some((r: any) => ["admin", "super_admin"].includes(r.role));
+async function hasPerm(
+  ctx: Ctx,
+  permission: "settings.seo.update" | "articles.update",
+): Promise<boolean> {
+  const { assertPermission } = await import("./authz.server");
+  try {
+    await assertPermission(ctx, permission, { endpoint: `serverFn:growth-actions:${permission}` });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Hapus kampanye. Riwayat kunjungan tetap utuh; yang hilang hanya definisinya. */
@@ -36,7 +31,7 @@ export const deleteCampaign = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertGrowthAccess(ctx))) {
+    if (!(await hasPerm(ctx, "settings.seo.update"))) {
       return { ok: false as const, error: "Anda tidak punya izin menghapus kampanye." };
     }
 
@@ -72,7 +67,7 @@ export const setCampaignStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertGrowthAccess(ctx))) {
+    if (!(await hasPerm(ctx, "settings.seo.update"))) {
       return { ok: false as const, error: "Anda tidak punya izin mengubah kampanye." };
     }
 
@@ -116,7 +111,7 @@ export const ignoreSeoIssue = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertGrowthAccess(ctx))) {
+    if (!(await hasPerm(ctx, "settings.seo.update"))) {
       return { ok: false as const, error: "Anda tidak punya izin mengubah temuan audit." };
     }
 
@@ -159,8 +154,8 @@ export const moveArticleStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertArticleWrite(ctx))) {
-      return { ok: false as const, error: "Hanya admin yang dapat memindahkan status artikel." };
+    if (!(await hasPerm(ctx, "articles.update"))) {
+      return { ok: false as const, error: "Anda tidak punya izin memindahkan status artikel." };
     }
 
     const { data: result, error } = await ctx.supabase.rpc("set_article_status", {
@@ -192,8 +187,8 @@ export const saveArticleChecklist = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertArticleWrite(ctx))) {
-      return { ok: false as const, error: "Hanya admin yang dapat mengubah checklist." };
+    if (!(await hasPerm(ctx, "articles.update"))) {
+      return { ok: false as const, error: "Anda tidak punya izin mengubah checklist artikel." };
     }
 
     const { error } = await ctx.supabase.rpc("save_article_checklist", {

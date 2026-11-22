@@ -91,7 +91,7 @@ export function ServiceOptionsDialog({
   };
 
   const handle = (res: any, onOk: () => void) => {
-    if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+    if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
     if (!res?.ok) return toast.error(res?.message ?? "Gagal menyimpan.");
     toast.success(res.message);
     onOk();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,7 +11,6 @@ import {
   Megaphone,
   Menu,
   Search,
-  ShieldAlert,
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -26,7 +25,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { getMyAccess } from "@/lib/admin.functions";
+import { reportUnauthorizedRouteAccess } from "@/lib/security.functions";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -104,9 +105,12 @@ function GrowthLayout() {
   const queryClient = useQueryClient();
   const { session, loading: sessionLoading } = useSession();
   const fetchAccess = useServerFn(getMyAccess);
-  const pathname = useRouterState({ select: (s) => s.location.pathname.replace(/\/$/, "") });
+  const reportDenied = useServerFn(reportUnauthorizedRouteAccess);
+  const pathname = useRouterState({ select: (s) => s.location.pathname.replace(/\/$/, "") || "/see" });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [deniedRefId, setDeniedRefId] = useState<string | null>(null);
+  const reportedRef = useRef<string | null>(null);
 
   const access = useQuery({
     queryKey: ["my-access"],
@@ -119,6 +123,21 @@ function GrowthLayout() {
   useEffect(() => {
     if (!sessionLoading && !session) navigate({ to: "/see/masuk", replace: true });
   }, [sessionLoading, session, navigate]);
+
+  const data = access.data;
+  const canEnter =
+    !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
+
+  useEffect(() => {
+    if (sessionLoading || !session || access.isPending || access.error || !data || canEnter) return;
+    if (reportedRef.current === pathname) return;
+    reportedRef.current = pathname;
+    void reportDenied({ data: { area: "see", route: pathname } })
+      .then((res) => {
+        if (res?.requestId) setDeniedRefId(res.requestId);
+      })
+      .catch(() => {});
+  }, [sessionLoading, session, access.isPending, access.error, data, canEnter, pathname, reportDenied]);
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -144,12 +163,23 @@ function GrowthLayout() {
     );
   }
 
-  const data = access.data;
-  const canEnter =
-    !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
-
   if (access.error || !data || !canEnter) {
-    return <ForbiddenScreen failed={!!access.error} onRetry={() => void access.refetch()} />;
+    return (
+      <SecurityErrorView
+        variant="card"
+        status={access.error ? 500 : 403}
+        title={access.error ? "Gagal memeriksa akses" : "Akses ke dashboard pertumbuhan dibatasi"}
+        description={
+          access.error
+            ? "Izin akses belum dapat dimuat. Coba lagi atau kembali ke website."
+            : "Dashboard Pertumbuhan hanya tersedia bagi anggota tim yang memiliki hak akses."
+        }
+        requestId={deniedRefId}
+        onRetry={access.error ? () => void access.refetch() : null}
+        backTo="/"
+        backLabel="Kembali ke website"
+      />
+    );
   }
 
   const active =
@@ -301,40 +331,5 @@ function GrowthLayout() {
         </div>
       </div>
     </AccessProvider>
-  );
-}
-
-/**
- * Layar penolakan khusus dashboard Pertumbuhan.
- *
- * Tombol kembalinya menuju website, bukan halaman masuk: pengguna yang sudah
- * masuk tapi tidak berizin akan terlempar balik ke sini bila diarahkan ke
- * `/see/masuk` (halaman itu meneruskan sesi aktif ke `/see`).
- */
-function ForbiddenScreen({ failed, onRetry }: { failed: boolean; onRetry: () => void }) {
-  return (
-    <div className="mx-auto w-full max-w-md px-4 py-16 text-center">
-      <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
-        <ShieldAlert className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
-        <h1 className="mt-4 break-words text-xl font-bold">
-          {failed ? "Gagal memeriksa akses" : "Akses ditolak"}
-        </h1>
-        <p className="mt-2 break-words text-sm text-muted-foreground">
-          {failed
-            ? "Izin akses belum dapat dimuat. Coba lagi atau kembali ke website."
-            : "Akun Anda tidak memiliki izin untuk membuka dashboard Pertumbuhan."}
-        </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {failed ? (
-            <Button className="min-h-11" onClick={onRetry}>
-              Coba lagi
-            </Button>
-          ) : null}
-          <Button asChild variant="outline" className="min-h-11">
-            <Link to="/">Kembali ke website</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
   );
 }

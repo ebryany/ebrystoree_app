@@ -1,0 +1,45 @@
+# API Security Changelog
+
+Ringkasan seluruh file baru dan file yang dimodifikasi pada pembaruan Advanced API Security Hardening & Security Monitoring Center:
+
+- **Database Migration:**
+  - `supabase/migrations/20261122100000_security_monitoring_center.sql`
+- **Backend Security Infrastructure:**
+  - `src/lib/security-event.server.ts`
+  - `src/lib/authz.server.ts`
+  - `src/lib/rate-limit.server.ts`
+  - `src/lib/security.functions.ts`
+  - `src/server.ts`
+  - `src/lib/error-page.ts`
+- **Endpoint & MCP Hardening:**
+  - `src/lib/email-admin.functions.ts`
+  - `src/lib/growth.functions.ts`
+  - `src/lib/growth-actions.functions.ts`
+  - `src/lib/campaigns.functions.ts`
+  - `src/lib/seo-audit.functions.ts`
+  - `src/lib/inquiries.functions.ts`
+  - `src/lib/po.functions.ts`
+  - `src/lib/catalog-api.server.ts`
+  - `src/lib/mcp/tools/manage-user-role.ts`
+  - `src/routes/api/public/payments/webhook.shopeepay.ts`
+  - `src/routes/api/public/payments/webhook.sumopod.ts`
+  - `src/routes/api/public/jobs/email-dispatch.ts`
+  - `src/routes/api/public/jobs/shopeepay-reconcile.ts`
+  - `src/routes/api/public/jobs/telegram-dispatch.ts`
+  - `src/routes/api/public/integrations/jiofarm/demand.ts`
+  - `src/routes/api/public/integrations/jiofarm/links.ts`
+- **Frontend Security UX & Admin Security Monitoring Center:**
+  - `src/components/security-error-page.tsx`
+  - `src/components/admin/admin-ui.tsx`
+  - `src/components/admin/category-manager-dialog.tsx`
+  - `src/components/admin/product-files-dialog.tsx`
+  - `src/components/admin/service-options-dialog.tsx`
+  - `src/routes/__root.tsx`
+  - `src/routes/_authenticated/admin/route.tsx`
+  - `src/routes/_authenticated/admin/izin.tsx`
+  - `src/routes/_authenticated/admin/settings.security.tsx`
+  - `src/routes/see/_dashboard/route.tsx`
+  - `src/lib/admin-nav.ts`
+- **Pengujian & Dokumentasi:**
+  - `src/lib/__tests__/api-security-monitoring.test.ts`
+  - `docs/security/*.md` (17 dokumen)

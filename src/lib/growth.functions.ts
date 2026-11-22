@@ -17,16 +17,19 @@ type Ctx = { supabase: any; userId: string };
  *   `articles.view` supaya orang marketing tidak otomatis melihat draf.
  */
 
-/** Cek akses dashboard. Menerima context apa pun yang punya `supabase`. */
-async function assertAccess(context: unknown): Promise<boolean> {
+/** Cek akses dashboard berdasarkan matriks izin (`assertPermission`). */
+async function canGrowth(
+  context: unknown,
+  permission: "admin.dashboard.view" | "articles.view" = "admin.dashboard.view",
+): Promise<boolean> {
   const ctx = context as Ctx;
-  const { data: roles } = await ctx.supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", ctx.userId);
-  return (roles ?? []).some((r: any) =>
-    ["admin", "super_admin", "support", "finance"].includes(r.role),
-  );
+  const { assertPermission } = await import("./authz.server");
+  try {
+    await assertPermission(ctx, permission, { endpoint: `serverFn:growth:${permission}` });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const rangeSchema = z.object({ days: z.number().int().min(1).max(365).default(30) });
@@ -39,7 +42,7 @@ export const getAnalyticsRange = createServerFn({ method: "GET" })
   .validator((data: unknown) => rangeSchema.parse(data ?? {}))
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const };
+    if (!(await canGrowth(ctx, "admin.dashboard.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sejak = new Date();
@@ -67,7 +70,7 @@ export const getGrowthSummary = createServerFn({ method: "GET" })
   .validator((data: unknown) => rangeSchema.parse(data ?? {}))
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const };
+    if (!(await canGrowth(ctx, "admin.dashboard.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sejak = new Date();
@@ -145,7 +148,7 @@ export const getContentSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const };
+    if (!(await canGrowth(ctx, "articles.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.rpc("content_summary");
@@ -164,7 +167,7 @@ export const listArticlesForBoard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const };
+    if (!(await canGrowth(ctx, "articles.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
@@ -203,7 +206,9 @@ export const listCampaigns = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const, items: [], error: null };
+    if (!(await canGrowth(ctx, "admin.dashboard.view"))) {
+      return { forbidden: true as const, items: [], error: null };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.rpc("list_campaigns");
@@ -223,7 +228,7 @@ export const getAttribution = createServerFn({ method: "GET" })
   .validator((data: unknown) => rangeSchema.parse(data ?? {}))
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertAccess(ctx))) return { forbidden: true as const };
+    if (!(await canGrowth(ctx, "admin.dashboard.view"))) return { forbidden: true as const };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: result, error } = await supabaseAdmin.rpc("campaign_attribution", {

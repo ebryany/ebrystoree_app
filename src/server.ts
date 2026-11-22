@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { generateRequestId } from "./lib/security-event.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -20,7 +21,11 @@ async function getServerEntry(): Promise<ServerEntry> {
 
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
-async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
+async function normalizeCatastrophicSsrResponse(
+  response: Response,
+  request: Request,
+  requestId: string,
+): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return response;
@@ -29,7 +34,29 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   if (!isH3SwallowedErrorBody(body)) return response;
 
   console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
-  return new Response(renderErrorPage(), {
+  const prefersJson =
+    request.url.includes("/api/") ||
+    request.url.includes("/mcp") ||
+    request.url.includes("/_serverFn") ||
+    (request.headers.get("accept")?.includes("application/json") &&
+      !request.headers.get("accept")?.includes("text/html"));
+
+  if (prefersJson) {
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Permintaan tidak dapat diproses saat ini.",
+          requestId,
+          status: 500,
+        },
+      }),
+      { status: 500, headers: { "content-type": "application/json; charset=utf-8" } },
+    );
+  }
+
+  return new Response(renderErrorPage({ status: 500, requestId }), {
     status: 500,
     headers: { "content-type": "text/html; charset=utf-8" },
   });
@@ -81,10 +108,14 @@ const CSP = [
   "upgrade-insecure-requests",
 ].join("; ");
 
-function applySecurityHeaders(response: Response): Response {
+function applySecurityHeaders(response: Response, requestId: string): Response {
   const contentType = response.headers.get("content-type") ?? "";
   const isHtml = contentType.includes("text/html");
   const headers = new Headers(response.headers);
+  // Request Reference ID unik untuk korelasi audit & security monitoring.
+  if (!headers.has("X-Request-Id")) {
+    headers.set("X-Request-Id", requestId);
+  }
   // Berlaku untuk semua respons (HTML, JSON server function, API, gambar).
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -115,17 +146,41 @@ function applySecurityHeaders(response: Response): Response {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const requestId = request.headers.get("x-request-id")?.trim() || generateRequestId();
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return applySecurityHeaders(await normalizeCatastrophicSsrResponse(response));
+      const normalized = await normalizeCatastrophicSsrResponse(response, request, requestId);
+      return applySecurityHeaders(normalized, requestId);
     } catch (error) {
-      console.error(error);
+      console.error(`[server] requestId=${requestId}`, error);
+      const isApi =
+        request.url.includes("/api/") ||
+        request.url.includes("/mcp") ||
+        request.url.includes("/_serverFn");
+      if (isApi) {
+        return applySecurityHeaders(
+          new Response(
+            JSON.stringify({
+              ok: false,
+              error: {
+                code: "INTERNAL_ERROR",
+                message: "Permintaan tidak dapat diproses saat ini.",
+                requestId,
+                status: 500,
+              },
+            }),
+            { status: 500, headers: { "content-type": "application/json; charset=utf-8" } },
+          ),
+          requestId,
+        );
+      }
       return applySecurityHeaders(
-        new Response(renderErrorPage(), {
+        new Response(renderErrorPage({ status: 500, requestId }), {
           status: 500,
           headers: { "content-type": "text/html; charset=utf-8" },
         }),
+        requestId,
       );
     }
   },

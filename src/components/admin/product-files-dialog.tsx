@@ -97,7 +97,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
     try {
       const res: any = await ingestMutation.mutateAsync(codes);
       if (res?.forbidden) {
-        toast.error(`Izin ${res.permission} dibutuhkan.`);
+        toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
         return false;
       }
       if (!res.ok) {
@@ -116,7 +116,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   const deleteCodeMutation = useMutation({
     mutationFn: (id: string) => removeCode({ data: { id } }),
     onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
       invalidate();
@@ -126,7 +126,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   const modeMutation = useMutation({
     mutationFn: (mode: DeliveryChoice) => setMode({ data: { productId: productId!, mode } }),
     onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
       invalidate();
@@ -136,7 +136,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   const toggleMutation = useMutation({
     mutationFn: (payload: { fileId: string; isActive: boolean }) => toggle({ data: payload }),
     onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
       invalidate();
@@ -146,7 +146,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
   const deleteMutation = useMutation({
     mutationFn: (fileId: string) => remove({ data: { fileId } }),
     onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
       invalidate();
@@ -166,7 +166,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
           data: { productId, filename: file.name, sizeBytes: file.size },
         });
         if (prep?.forbidden) {
-          toast.error(`Izin ${prep.permission} dibutuhkan.`);
+          toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
           break;
         }
         if (!prep.ok) {
@@ -192,7 +192,7 @@ export function ProductFilesDialog({ product, onOpenChange }: Props) {
           },
         });
         if (res?.forbidden) {
-          toast.error(`Izin ${res.permission} dibutuhkan.`);
+          toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
           break;
         }
         if (!res.ok) {

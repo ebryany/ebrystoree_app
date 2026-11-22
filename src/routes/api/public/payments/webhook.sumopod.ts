@@ -36,6 +36,19 @@ export const Route = createFileRoute("/api/public/payments/webhook/sumopod")({
           return new Response("payload too large", { status: 413 });
         }
         if (!(await sumopod.verifyWebhook(raw, request.headers))) {
+          const { recordSecurityEvent } = await import("@/lib/security-event.server");
+          await recordSecurityEvent({
+            eventType: "invalid_webhook_signature",
+            severity: "HIGH",
+            category: "security_violation",
+            endpoint: "/api/public/payments/webhook/sumopod",
+            httpMethod: "POST",
+            statusCode: 401,
+            reasonCode: "SUMOPOD_INVALID_SIGNATURE",
+            sourceSystem: "webhook",
+            ipAddress: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip"),
+            userAgent: request.headers.get("user-agent"),
+          });
           return new Response("invalid signature", { status: 401 });
         }
 

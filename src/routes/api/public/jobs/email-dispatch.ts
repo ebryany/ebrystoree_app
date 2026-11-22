@@ -35,7 +35,22 @@ export const Route = createFileRoute("/api/public/jobs/email-dispatch")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        if (!authorize(request)) return json({ error: "unauthorized" }, 401);
+        if (!authorize(request)) {
+          const { recordSecurityEvent } = await import("@/lib/security-event.server");
+          await recordSecurityEvent({
+            eventType: "invalid_internal_job_token",
+            severity: "HIGH",
+            category: "security_violation",
+            endpoint: "/api/public/jobs/email-dispatch",
+            httpMethod: "POST",
+            statusCode: 401,
+            reasonCode: "INVALID_JOBS_TOKEN",
+            sourceSystem: "internal_job",
+            ipAddress: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip"),
+            userAgent: request.headers.get("user-agent"),
+          });
+          return json({ error: "unauthorized" }, 401);
+        }
 
         const { dispatchEmails, retryFailedEmails } = await import("@/lib/email-dispatch.server");
         const sent = await dispatchEmails();

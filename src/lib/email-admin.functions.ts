@@ -5,6 +5,18 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type Ctx = { supabase: any; userId: string };
 
+const authz = () => import("./authz.server");
+
+async function canEmail(ctx: Ctx, permission: "settings.view" | "settings.manage"): Promise<boolean> {
+  const { assertPermission } = await authz();
+  try {
+    await assertPermission(ctx, permission, { endpoint: `serverFn:email-admin:${permission}` });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Status konfigurasi email untuk ditampilkan di pengaturan admin.
  *
@@ -15,14 +27,8 @@ type Ctx = { supabase: any; userId: string };
 export const getEmailStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: roles } = await (context as Ctx).supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", (context as Ctx).userId);
-    const isStaff = (roles ?? []).some((r: any) =>
-      ["admin", "super_admin", "support"].includes(r.role),
-    );
-    if (!isStaff) return { forbidden: true as const };
+    const ctx = context as Ctx;
+    if (!(await canEmail(ctx, "settings.view"))) return { forbidden: true as const };
 
     // Konfigurasi efektif (database dulu, lalu env) supaya form admin menampilkan
     // nilai yang benar-benar dipakai. Password TIDAK pernah ikut dikembalikan.
@@ -87,15 +93,13 @@ export const sendTestEmail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
 
-    const { data: roles } = await ctx.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", ctx.userId);
-    const isStaff = (roles ?? []).some((r: any) =>
-      ["admin", "super_admin", "support"].includes(r.role),
-    );
-    if (!isStaff)
-      return { ok: false as const, error: "Hanya staff yang dapat mengirim email uji." };
+    if (!(await canEmail(ctx, "settings.manage"))) {
+      return { ok: false as const, error: "Anda tidak memiliki izin mengelola pengiriman email uji." };
+    }
+
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    const limited = await enforceRateLimit(ctx.userId, "email.test");
+    if (limited) return { ok: false as const, error: limited.error };
 
     const { emailReady, emailConfig } = await import("./email.server");
     if (!emailReady()) {
@@ -191,14 +195,6 @@ export const sendTestEmail = createServerFn({ method: "POST" })
 
 /* --------------------------- Konfigurasi SMTP dari admin --------------------------- */
 
-async function assertStaff(ctx: Ctx): Promise<boolean> {
-  const { data: roles } = await ctx.supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", ctx.userId);
-  return (roles ?? []).some((r: any) => ["admin", "super_admin"].includes(r.role));
-}
-
 /**
  * Simpan konfigurasi SMTP dari UI admin.
  *
@@ -223,8 +219,8 @@ export const saveSmtpConfig = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
-    if (!(await assertStaff(ctx))) {
-      return { ok: false as const, error: "Hanya admin yang dapat mengubah konfigurasi SMTP." };
+    if (!(await canEmail(ctx, "settings.manage"))) {
+      return { ok: false as const, error: "Anda tidak memiliki izin mengubah konfigurasi SMTP." };
     }
 
     const { encryptSecret, encryptionReady } = await import("./crypto.server");
@@ -305,8 +301,8 @@ export const clearSmtpConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as Ctx;
-    if (!(await assertStaff(ctx))) {
-      return { ok: false as const, error: "Hanya admin yang dapat menghapus konfigurasi SMTP." };
+    if (!(await canEmail(ctx, "settings.manage"))) {
+      return { ok: false as const, error: "Anda tidak memiliki izin menghapus konfigurasi SMTP." };
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

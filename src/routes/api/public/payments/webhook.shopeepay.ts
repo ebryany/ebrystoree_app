@@ -44,12 +44,38 @@ export const Route = createFileRoute("/api/public/payments/webhook/shopeepay")({
           console.warn(
             `[shopeepay] signature webhook tidak valid ip=${request.headers.get("cf-connecting-ip") ?? "-"}`,
           );
+          const { recordSecurityEvent } = await import("@/lib/security-event.server");
+          await recordSecurityEvent({
+            eventType: "invalid_webhook_signature",
+            severity: "HIGH",
+            category: "security_violation",
+            endpoint: "/api/public/payments/webhook/shopeepay",
+            httpMethod: "POST",
+            statusCode: 401,
+            reasonCode: "SHOPEEPAY_INVALID_SIGNATURE",
+            sourceSystem: "webhook",
+            ipAddress: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip"),
+            userAgent: request.headers.get("user-agent"),
+          });
           return json(
             { responseCode: "4015600", responseMessage: "Unauthorized. Invalid signature" },
             401,
           );
         }
         if (!sp.timestampFresh(timestamp)) {
+          const { recordSecurityEvent } = await import("@/lib/security-event.server");
+          await recordSecurityEvent({
+            eventType: "invalid_webhook_signature",
+            severity: "MEDIUM",
+            category: "suspicious_activity",
+            endpoint: "/api/public/payments/webhook/shopeepay",
+            httpMethod: "POST",
+            statusCode: 401,
+            reasonCode: "SHOPEEPAY_STALE_TIMESTAMP",
+            sourceSystem: "webhook",
+            ipAddress: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip"),
+            userAgent: request.headers.get("user-agent"),
+          });
           return json(
             { responseCode: "4015600", responseMessage: "Unauthorized. Stale timestamp" },
             401,

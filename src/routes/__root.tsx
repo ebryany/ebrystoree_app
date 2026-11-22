@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   useRouter,
   useRouterState,
@@ -19,6 +18,7 @@ import { getPublicWebsiteSettings } from "@/lib/website-settings.functions";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { NavProgress } from "@/components/ebry/nav-progress";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { ogImageUrl, SITE_ORIGIN } from "@/lib/seo-url";
 import { useStorePresenceHeartbeat } from "@/hooks/use-store-presence-heartbeat";
 
@@ -33,28 +33,7 @@ const supabaseOrigin = (() => {
 })();
 
 function NotFoundComponent() {
-  return (
-    <main
-      lang="id"
-      className="flex min-h-screen items-center justify-center bg-background px-4 py-12"
-    >
-      <div className="w-full max-w-md text-center">
-        <p className="text-7xl font-bold text-foreground">404</p>
-        <h1 className="mt-4 text-xl font-semibold text-foreground">Halaman tidak ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Tautan mungkin keliru atau halaman sudah tidak tersedia.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-          >
-            Kembali ke beranda
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
+  return <SecurityErrorView status={404} />;
 }
 
 function ErrorComponent({ error }: { error: unknown }) {

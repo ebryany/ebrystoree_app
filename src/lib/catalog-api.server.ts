@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { clientIpFrom } from "./client-ip.server";
+import { enforceRateLimit } from "./rate-limit.server";
 import {
   readCatalogCategories,
   readCatalogProduct,
@@ -21,6 +23,13 @@ const readers = {
   product: readCatalogProduct,
 };
 
+async function checkCatalogRateLimit(request: Request): Promise<boolean> {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return true;
+  const ip = clientIpFrom((name) => request.headers.get(name)) ?? "unknown";
+  const limited = await enforceRateLimit(`ip:${ip}`, "catalog.public");
+  return limited === null;
+}
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -33,8 +42,15 @@ function json(data: unknown, status = 200) {
 }
 
 /** HTTP boundary only: business queries remain shared with the website. */
-export async function handleCatalogRequest(request: Request, source = readers): Promise<Response> {
+export async function handleCatalogRequest(
+  request: Request,
+  source = readers,
+  rateLimitCheck: (req: Request) => Promise<boolean> = checkCatalogRateLimit,
+): Promise<Response> {
   if (request.method !== "GET") return json({ error: { code: "METHOD_NOT_ALLOWED" } }, 405);
+  if (!(await rateLimitCheck(request))) {
+    return json({ error: { code: "RATE_LIMITED" } }, 429);
+  }
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/$/, "");
   try {

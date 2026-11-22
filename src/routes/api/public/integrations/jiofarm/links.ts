@@ -20,7 +20,22 @@ export const Route = createFileRoute("/api/public/integrations/jiofarm/links")({
     handlers: {
       POST: async ({ request }) => {
         const { authorizeIngest, adminClient, resolveCodeProduct } = await import("@/lib/stock-codes.server");
-        if (!authorizeIngest(request)) return json({ error: "unauthorized" }, 401);
+        if (!authorizeIngest(request)) {
+          const { recordSecurityEvent } = await import("@/lib/security-event.server");
+          await recordSecurityEvent({
+            eventType: "invalid_internal_job_token",
+            severity: "HIGH",
+            category: "security_violation",
+            endpoint: "/api/public/integrations/jiofarm/links",
+            httpMethod: "POST",
+            statusCode: 401,
+            reasonCode: "INVALID_INGEST_TOKEN",
+            sourceSystem: "internal_job",
+            ipAddress: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip"),
+            userAgent: request.headers.get("user-agent"),
+          });
+          return json({ error: "unauthorized" }, 401);
+        }
 
         const declared = Number(request.headers.get("content-length") ?? "0");
         if (Number.isFinite(declared) && declared > MAX_INGEST_BYTES) {

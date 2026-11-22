@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,7 +9,6 @@ import {
   Menu,
   MessagesSquare,
   Search,
-  ShieldAlert,
   User,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -34,8 +33,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
 import { NotificationBell } from "@/components/ebry/notification-bell";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { adminNav, ROLE_LABELS } from "@/lib/admin-nav";
 import { getMyAccess } from "@/lib/admin.functions";
+import { reportUnauthorizedRouteAccess } from "@/lib/security.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -175,10 +176,14 @@ function NavList({
 
 function AdminLayout() {
   const fetchAccess = useServerFn(getMyAccess);
+  const reportDenied = useServerFn(reportUnauthorizedRouteAccess);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [deniedRefId, setDeniedRefId] = useState<string | null>(null);
+  const reportedRef = useRef<string | null>(null);
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["my-access"],
     queryFn: () => fetchAccess({}),
@@ -186,6 +191,17 @@ function AdminLayout() {
 
   const canEnter =
     !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
+
+  useEffect(() => {
+    if (isPending || error || !data || canEnter) return;
+    if (reportedRef.current === pathname) return;
+    reportedRef.current = pathname;
+    void reportDenied({ data: { area: "admin", route: pathname } })
+      .then((res) => {
+        if (res?.requestId) setDeniedRefId(res.requestId);
+      })
+      .catch(() => {});
+  }, [isPending, error, data, canEnter, pathname, reportDenied]);
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -213,34 +229,20 @@ function AdminLayout() {
 
   if (error || !canEnter) {
     return (
-      <div className="mx-auto w-full max-w-md px-4 py-16 text-center">
-        <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
-          <ShieldAlert className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
-          <h1 className="mt-4 break-words text-xl font-bold">
-            {error ? "Gagal memeriksa akses" : "Akses ditolak"}
-          </h1>
-          <p className="mt-2 break-words text-sm text-muted-foreground">
-            {error ? (
-              "Izin akses belum dapat dimuat. Coba lagi atau kembali ke akun Anda."
-            ) : (
-              <>
-                Akun Anda tidak memiliki izin <code>admin.dashboard.view</code> untuk membuka
-                dashboard admin.
-              </>
-            )}
-          </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {error ? (
-              <Button className="min-h-11" onClick={() => void refetch()}>
-                Coba lagi
-              </Button>
-            ) : null}
-            <Button asChild variant="outline" className="min-h-11">
-              <Link to="/dashboard">Kembali ke akun saya</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <SecurityErrorView
+        variant="card"
+        status={error ? 500 : 403}
+        title={error ? "Gagal memeriksa akses" : "Akses ke area admin dibatasi"}
+        description={
+          error
+            ? "Izin akses belum dapat dimuat. Silakan coba beberapa saat lagi atau kembali ke akun Anda."
+            : "Halaman administrasi hanya tersedia bagi akun dengan hak akses yang sesuai."
+        }
+        requestId={deniedRefId}
+        onRetry={error ? () => void refetch() : null}
+        backTo="/dashboard"
+        backLabel="Kembali ke akun saya"
+      />
     );
   }
 

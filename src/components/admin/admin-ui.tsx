@@ -63,15 +63,26 @@ export function AdminPageHeader({
   );
 }
 
-export function ForbiddenState({ permission }: { permission?: string }) {
+export function ForbiddenState({
+  permission: _permission,
+  requestId,
+}: {
+  permission?: string;
+  requestId?: string | null;
+}) {
   return (
     <div className="mx-auto mt-10 max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-sm">
       <ShieldAlert className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
-      <h2 className="mt-4 text-lg font-bold">Akses ditolak</h2>
+      <h2 className="mt-4 text-lg font-bold">Akses dibatasi</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Akun Anda tidak memiliki izin{permission ? ` "${permission}"` : ""} untuk membuka bagian
-        ini.
+        Akun Anda tidak memiliki hak akses untuk membuka bagian ini. Hubungi administrator bila Anda
+        memerlukan akses tambahan.
       </p>
+      {requestId ? (
+        <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+          Referensi: {requestId}
+        </p>
+      ) : null}
       <Button asChild variant="outline" size="sm" className="mt-5">
         <Link to="/admin">Kembali ke dashboard</Link>
       </Button>

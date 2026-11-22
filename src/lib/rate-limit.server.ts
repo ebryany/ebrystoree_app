@@ -28,6 +28,10 @@ const DEFAULT_POLICIES = {
   "seller.payout": { limit: 5, windowSeconds: 300 },
   "admin.seller.decision": { limit: 60, windowSeconds: 300 },
   "admin.payout.decision": { limit: 60, windowSeconds: 300 },
+  "catalog.public": { limit: 120, windowSeconds: 60 },
+  "email.test": { limit: 5, windowSeconds: 300 },
+  "seo.audit": { limit: 3, windowSeconds: 300 },
+  "security.route_report": { limit: 20, windowSeconds: 60 },
 } as const;
 
 export type RateLimitBucket = keyof typeof DEFAULT_POLICIES;
@@ -90,6 +94,26 @@ export async function enforceRateLimit(
     }
     const allowed = Boolean((data as { allowed?: boolean } | null)?.allowed);
     if (allowed) return null;
+
+    try {
+      const { recordSecurityEvent } = await import("./security-event.server");
+      await recordSecurityEvent({
+        eventType: "rate_limit_exceeded",
+        severity: failClosed ? "HIGH" : "MEDIUM",
+        category: "suspicious_activity",
+        actorUserId: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(subject)
+          ? subject
+          : null,
+        endpoint: `rateLimit:${bucket}`,
+        actionName: bucket,
+        statusCode: 429,
+        reasonCode: "RATE_LIMIT_EXCEEDED",
+        sourceSystem: "server_fn",
+        metadata: { bucket, limit: policy.limit, windowSeconds: policy.windowSeconds },
+      });
+    } catch {
+      /* fail-safe */
+    }
 
     const minutes = Math.ceil(policy.windowSeconds / 60);
     return {

@@ -133,6 +133,13 @@ export const adminNav: AdminNavGroup[] = [
         permission: "audit_logs.view",
         available: true,
       },
+      {
+        to: "/admin/settings/security",
+        label: "Pusat Keamanan",
+        icon: ShieldCheck,
+        permission: "settings.view",
+        available: true,
+      },
     ],
   },
   {
@@ -198,13 +205,6 @@ export const adminNav: AdminNavGroup[] = [
         to: "/admin/settings/transactions",
         label: "Pengaturan Transaksi",
         icon: Settings,
-        permission: "settings.view",
-        available: true,
-      },
-      {
-        to: "/admin/settings/security",
-        label: "Keamanan",
-        icon: ShieldCheck,
         permission: "settings.view",
         available: true,
       },

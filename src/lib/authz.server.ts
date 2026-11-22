@@ -6,6 +6,7 @@
 import { getRequestHeader } from "@tanstack/react-start/server";
 
 import { clientIpFrom } from "./client-ip.server";
+import { recordSecurityEvent } from "./security-event.server";
 
 export type AuthzContext = { supabase: any; userId: string };
 
@@ -81,7 +82,11 @@ export async function writeAudit(
  * Memastikan pemanggil punya permission tertentu.
  * super_admin memperoleh bypass terkontrol dan bypass tersebut dicatat di audit log.
  */
-export async function assertPermission(context: AuthzContext, permission: string): Promise<Access> {
+export async function assertPermission(
+  context: AuthzContext,
+  permission: string,
+  meta?: { endpoint?: string; routeTemplate?: string },
+): Promise<Access> {
   const access = await loadAccess(context);
   if (access.permissions.includes(permission)) return access;
 
@@ -95,15 +100,31 @@ export async function assertPermission(context: AuthzContext, permission: string
     return access;
   }
 
-  // Penolakan dicatat supaya percobaan akses admin oleh akun biasa/curian terlihat.
+  // Penolakan dicatat ke audit_logs + security_events supaya percobaan akses admin terlihat di Security Monitoring Center.
   console.warn(
     `[authz] ditolak user=${context.userId} permission=${permission} ip=${clientIp() ?? "-"}`,
   );
-  await writeAudit(context, {
-    action: "permission.denied",
-    entityType: "permission",
-    after: { permission },
-  });
+  await Promise.all([
+    writeAudit(context, {
+      action: "permission.denied",
+      entityType: "permission",
+      after: { permission },
+    }),
+    recordSecurityEvent({
+      eventType: "forbidden_permission_access",
+      severity: /manage|approve|verify|dangerous|process|delete/.test(permission) ? "HIGH" : "MEDIUM",
+      category: "access_denial",
+      actorUserId: context.userId,
+      actorRole: access.roles.join(",") || "authenticated",
+      endpoint: meta?.endpoint ?? `serverFn:${permission}`,
+      routeTemplate: meta?.routeTemplate ?? null,
+      actionName: permission,
+      statusCode: 403,
+      reasonCode: "PERMISSION_DENIED",
+      sourceSystem: "server_fn",
+      metadata: { requiredPermission: permission },
+    }),
+  ]);
   throw new ForbiddenError(permission);
 }
 

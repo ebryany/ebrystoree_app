@@ -133,7 +133,7 @@ export function CategoryManagerDialog({
         },
       }),
     onSuccess: (res: any) => {
-      if (res?.forbidden) return toast.error(`Izin ${res.permission} dibutuhkan.`);
+      if (res?.forbidden) return toast.error("Anda tidak memiliki izin untuk melakukan tindakan ini.");
       if (!res.ok) return toast.error(res.message);
       toast.success(res.message);
       setDraft(EMPTY);

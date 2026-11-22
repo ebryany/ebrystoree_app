@@ -86,7 +86,14 @@ export const listAllPoRequests = createServerFn({ method: "GET" })
     z.object({ status: z.string().max(30).optional() }).parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context as Ctx;
+    const ctx = context as Ctx;
+    const { assertPermission } = await import("./authz.server");
+    try {
+      await assertPermission(ctx, "orders.view", { endpoint: "serverFn:po:listAllPoRequests" });
+    } catch {
+      return { items: [], error: "Akses ditolak." as const, forbidden: true as const };
+    }
+    const { supabase } = ctx;
     let query = supabase
       .from("custom_orders")
       .select(REQUEST_FIELDS)

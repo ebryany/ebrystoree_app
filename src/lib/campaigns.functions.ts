@@ -28,13 +28,13 @@ export const createCampaign = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ctx = context as Ctx;
 
-    const { data: roles } = await ctx.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", ctx.userId);
-    const allowed = (roles ?? []).some((r: any) => ["admin", "super_admin"].includes(r.role));
-    if (!allowed) {
-      return { ok: false as const, error: "Hanya admin yang dapat membuat kampanye." };
+    const { assertPermission } = await import("./authz.server");
+    try {
+      await assertPermission(ctx, "settings.seo.update", {
+        endpoint: "serverFn:campaigns:createCampaign",
+      });
+    } catch {
+      return { ok: false as const, error: "Anda tidak punya izin membuat kampanye." };
     }
 
     // RPC memeriksa auth.uid() di database, jadi dipanggil lewat client milik

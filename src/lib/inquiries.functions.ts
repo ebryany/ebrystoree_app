@@ -237,7 +237,14 @@ export const listAllInquiries = createServerFn({ method: "GET" })
     z.object({ status: z.string().max(20).optional() }).parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context as Ctx;
+    const ctx = context as Ctx;
+    const { assertPermission } = await import("./authz.server");
+    try {
+      await assertPermission(ctx, "orders.view", { endpoint: "serverFn:inquiries:listAllInquiries" });
+    } catch {
+      return { items: [], error: "Akses ditolak.", forbidden: true as const };
+    }
+    const { supabase } = ctx;
     let query = supabase
       .from("product_inquiries")
       .select(FIELDS)
@@ -572,7 +579,60 @@ export const setInquiryStatus = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context as Ctx;
+    const ctx = context as Ctx;
+    const { supabase, userId } = ctx;
+    const { data: inquiry } = await supabase
+      .from("product_inquiries")
+      .select("id, user_id, store_id")
+      .eq("id", data.inquiryId)
+      .maybeSingle();
+
+    if (!inquiry) {
+      const { recordSecurityEvent } = await import("./security-event.server");
+      await recordSecurityEvent({
+        eventType: "ownership_violation_attempt",
+        severity: "MEDIUM",
+        category: "access_denial",
+        actorUserId: userId,
+        endpoint: "serverFn:inquiries:setInquiryStatus",
+        actionName: "setInquiryStatus",
+        targetResourceType: "product_inquiries",
+        targetResourceId: data.inquiryId,
+        statusCode: 403,
+        reasonCode: "INQUIRY_ACCESS_DENIED",
+        sourceSystem: "server_fn",
+      });
+      return { ok: false as const, error: "Percakapan tidak ditemukan atau akses ditolak." };
+    }
+
+    const isOwner = inquiry.user_id === userId;
+    const myStoreId = isOwner ? null : ((await supabase.rpc("my_store_id")).data as string | null);
+    const isSeller = Boolean(!isOwner && inquiry.store_id && myStoreId && inquiry.store_id === myStoreId);
+    let isAuthorized = isOwner || isSeller;
+    if (!isAuthorized) {
+      const { loadAccess } = await import("./authz.server");
+      const access = await loadAccess(ctx);
+      isAuthorized = access.isSuperAdmin || access.permissions.includes("orders.view");
+    }
+
+    if (!isAuthorized) {
+      const { recordSecurityEvent } = await import("./security-event.server");
+      await recordSecurityEvent({
+        eventType: "ownership_violation_attempt",
+        severity: "HIGH",
+        category: "security_violation",
+        actorUserId: userId,
+        endpoint: "serverFn:inquiries:setInquiryStatus",
+        actionName: "setInquiryStatus",
+        targetResourceType: "product_inquiries",
+        targetResourceId: data.inquiryId,
+        statusCode: 403,
+        reasonCode: "INQUIRY_OWNERSHIP_VIOLATION",
+        sourceSystem: "server_fn",
+      });
+      return { ok: false as const, error: "Akses ditolak." };
+    }
+
     const { error } = await supabase
       .from("product_inquiries")
       .update({ status: data.status })
