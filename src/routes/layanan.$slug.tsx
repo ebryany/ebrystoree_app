@@ -27,6 +27,7 @@ import { StoreChatButton } from "@/components/store/social-buttons";
 import { getServiceDetail } from "@/lib/catalog.functions";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { ogImageUrl } from "@/lib/seo-url";
 import { summarizeServicePackages } from "@/lib/admin-service-list";
 import { daysLabel, revisionLabel } from "@/lib/service-checkout";
@@ -86,17 +87,13 @@ export const Route = createFileRoute("/layanan/$slug")({
 
 function LayananTidakDitemukan() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main lang="id" className="mx-auto w-full max-w-3xl flex-1 px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Layanan tidak ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Layanan mungkin sudah tidak tayang.</p>
-        <Button asChild className="mt-6 min-h-11">
-          <Link to="/layanan">Kembali ke daftar layanan</Link>
-        </Button>
-      </main>
-      <SiteFooter />
-    </div>
+    <SecurityErrorView
+      status={404}
+      title="Layanan tidak ditemukan."
+      description="Layanan yang Anda cari mungkin sudah tidak tersedia atau tautannya keliru."
+      backTo="/layanan"
+      backLabel="Kembali ke daftar layanan"
+    />
   );
 }
 

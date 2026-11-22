@@ -27,6 +27,7 @@ import { StickyActionBar } from "@/components/ebry/cards";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import { ServiceChatButton } from "@/components/home/service-chat-button";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import {
   OPEN_REVIEW_EVENT,
   ServiceReviewPanel,
@@ -111,19 +112,13 @@ export const Route = createFileRoute("/jasa/$id")({
 
 function JasaTidakDitemukan() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main lang="id" className="mx-auto w-full max-w-3xl flex-1 px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Jasa tidak ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Jasa mungkin sudah diarsipkan atau tokonya tidak aktif.
-        </p>
-        <Button asChild className="mt-6 min-h-11">
-          <Link to="/layanan">Lihat jasa lain</Link>
-        </Button>
-      </main>
-      <SiteFooter />
-    </div>
+    <SecurityErrorView
+      status={404}
+      title="Jasa tidak ditemukan."
+      description="Jasa yang Anda cari mungkin sudah diarsipkan atau tokonya sedang tidak aktif."
+      backTo="/layanan"
+      backLabel="Lihat jasa lain"
+    />
   );
 }
 

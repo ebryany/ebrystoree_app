@@ -11,6 +11,7 @@ import { ArticleContent } from "@/components/ebry/article-content";
 import { ShareBar } from "@/components/ebry/share-bar";
 import { HeroSkeleton } from "@/components/catalog-states";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { getArticleBySlug } from "@/lib/articles.functions";
 
 const articleQuery = (slug: string) =>
@@ -64,22 +65,13 @@ export const Route = createFileRoute("/artikel/$slug")({
     />
   ),
   notFoundComponent: () => (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main lang="id" className="mx-auto w-full max-w-3xl flex-1 space-y-4 px-4 py-16 text-center">
-        <h1 className="text-2xl font-semibold">Artikel tidak ditemukan</h1>
-        <p className="text-muted-foreground">
-          Artikel mungkin sudah diarsipkan atau tautannya keliru.
-        </p>
-        <Button
-          asChild
-          className="min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-        >
-          <Link to="/artikel">Lihat semua artikel</Link>
-        </Button>
-      </main>
-      <SiteFooter />
-    </div>
+    <SecurityErrorView
+      status={404}
+      title="Artikel tidak ditemukan."
+      description="Artikel mungkin sudah diarsipkan atau tautannya keliru."
+      backTo="/artikel"
+      backLabel="Lihat semua artikel"
+    />
   ),
   component: ArtikelDetail,
 });

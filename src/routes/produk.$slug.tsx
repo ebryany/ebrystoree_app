@@ -37,6 +37,7 @@ import { effectivePrice, formatRupiah } from "@/lib/format";
 import { cn, isRenderableImageUrl } from "@/lib/utils";
 import { recordProductView } from "@/lib/recently-viewed";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { ogImageUrl } from "@/lib/seo-url";
 import { SellerCard, SELLER_ACTION, joinedLabel, ratingLabel } from "@/components/ebry/seller-card";
 import type { StorePresence } from "@/lib/store-presence";
@@ -117,22 +118,13 @@ export const Route = createFileRoute("/produk/$slug")({
 
 function ProdukTidakDitemukan() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main lang="id" className="mx-auto w-full max-w-3xl flex-1 px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Produk tidak ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Produk mungkin sudah tidak diterbitkan.
-        </p>
-        <Button
-          asChild
-          className="mt-6 min-h-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-        >
-          <Link to="/produk">Kembali ke katalog</Link>
-        </Button>
-      </main>
-      <SiteFooter />
-    </div>
+    <SecurityErrorView
+      status={404}
+      title="Produk tidak ditemukan."
+      description="Produk yang Anda cari mungkin sudah tidak diterbitkan atau tautannya keliru."
+      backTo="/produk"
+      backLabel="Kembali ke katalog"
+    />
   );
 }
 

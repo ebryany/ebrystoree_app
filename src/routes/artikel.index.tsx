@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState, ErrorState, HeroSkeleton, ProductGridSkeleton } from "@/components/catalog-states";
 import { listArticles } from "@/lib/articles.functions";
 import { RouteError } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 
 const articlesQuery = queryOptions({
   queryKey: ["articles", "public"],
@@ -42,11 +43,13 @@ export const Route = createFileRoute("/artikel/")({
   ),
   errorComponent: () => <RouteError message="Daftar artikel belum dapat dimuat. Muat ulang halaman untuk mencoba lagi." />,
   notFoundComponent: () => (
-    <main lang="id" className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 py-12 text-center">
-      <h1 className="text-xl font-semibold">Halaman tidak ditemukan</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Tautan mungkin keliru atau halaman sudah tidak tersedia.</p>
-      <Link to="/artikel" className="mt-6 inline-flex min-h-11 items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground">Lihat semua artikel</Link>
-    </main>
+    <SecurityErrorView
+      status={404}
+      title="Halaman tidak ditemukan."
+      description="Tautan yang Anda buka mungkin keliru atau halaman sudah tidak tersedia."
+      backTo="/artikel"
+      backLabel="Lihat semua artikel"
+    />
   ),
   component: ArtikelIndex,
 });

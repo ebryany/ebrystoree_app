@@ -25,6 +25,7 @@ import {
 import { EmptyState } from "@/components/ebry/states";
 import { PageShell } from "@/components/page-shell";
 import { RouteError, routeFailureHead } from "@/components/route-fallback";
+import { SecurityErrorView } from "@/components/security-error-page";
 import { ogImageUrl } from "@/lib/seo-url";
 import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
 import { useStorePresence } from "@/hooks/use-store-presence";
@@ -104,18 +105,13 @@ export const Route = createFileRoute("/toko/$slug")({
     <RouteError message="Toko belum dapat dimuat. Muat ulang halaman untuk mencoba lagi." />
   ),
   notFoundComponent: () => (
-    <PageShell>
-      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-12 text-center">
-        <Store className="size-10 text-muted-foreground" aria-hidden="true" />
-        <h1 className="mt-4 text-xl font-bold">Toko tidak ditemukan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Toko ini belum aktif atau tidak tersedia.
-        </p>
-        <Button asChild className="mt-5 min-h-11">
-          <Link to="/">Kembali ke beranda</Link>
-        </Button>
-      </div>
-    </PageShell>
+    <SecurityErrorView
+      status={404}
+      title="Toko tidak ditemukan."
+      description="Toko ini belum aktif atau halaman toko tidak tersedia."
+      backTo="/"
+      backLabel="Kembali ke beranda"
+    />
   ),
   component: Storefront,
 });

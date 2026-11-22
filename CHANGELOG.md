@@ -2,6 +2,13 @@
 
 ## 2026-11-22
 
+### Pembaruan Desain Halaman Error 404 (Ilustrasi Referensi, Navbar, Footer & Bahasa Indonesia)
+
+- **Ilustrasi & layout dua kolom 404 dengan Navbar & Footer (`src/components/security-error-page.tsx`, `src/lib/error-page.ts`)**: Memperbarui `SecurityErrorView` (khusus `status === 404`) dan fallback HTML statis `renderErrorPage({ status: 404 })` menjadi tata letak dua kolom tanpa kartu tepi yang menampilkan ilustrasi SVG kotak susu hitam-putih (`MissingMilkCartonIllustration`, `aria-hidden="true"`, kontras aman di mode terang dan gelap), angka besar `404`, salinan Bahasa Indonesia (`Halaman tidak ditemukan.`, `Halaman yang Anda cari tidak tersedia atau tautan yang Anda masukkan keliru.`, serta tautan `Kembali ke beranda ›`), sekaligus menyematkan skip link, `<SiteHeader />`, dan `<SiteFooter />` pada tampilan halaman penuh (`variant="page"`).
+- **Penyeragaman halaman 404 rute publik (`src/routes/produk.$slug.tsx`, `src/routes/layanan.$slug.tsx`, `src/routes/jasa.$id.tsx`, `src/routes/artikel.$slug.tsx`, `src/routes/artikel.index.tsx`, `src/routes/toko.$slug.tsx`)**: Memperluas `backTo` pada `SecurityErrorViewProps` dan menyelaraskan `notFoundComponent` pada seluruh rute detail produk, layanan, jasa, artikel, dan toko agar tampil konsisten dengan navbar, footer, ilustrasi 404, serta tautan kembali berbahasa Indonesia.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `npx vitest run` lulus **61/61 file (714/714 test)** (termasuk 35 test `route-fallback.test.tsx` dan 13 test `api-security-monitoring.test.ts`), dan `$env:NITRO_PRESET='node-server'; npm run build` keluar `0`.
+- **Status deploy**: Siap dipublish ke GitHub `main` dan di-deploy ke VPS produksi `43.156.83.235` (`ebrystore-20261122-04`).
+
 ### Advanced API Security Hardening, Access Governance & Security Monitoring Center
 
 - **Hardening RBAC & Privilege Escalation di Database + MCP (`supabase/migrations/20261122100000_security_monitoring_center.sql`, `src/lib/mcp/tools/manage-user-role.ts`)**: Memperkuat trigger `protect_role_changes()` agar non-`super_admin` (termasuk `admin`) tidak dapat menambahkan atau mencabut peran `super_admin` melalui Data API/MCP; mengganti policy tulis `permissions` dan `role_permissions` dari `is_admin()` ke `is_super_admin()` / `has_permission('permissions.manage')` beserta trigger `protect_role_permissions_changes()`; mendaftarkan 6 permission granular grup `Keamanan` (`security.events.read`, `security.events.view_details`, `security.alerts.read`, `security.alerts.manage`, `security.events.resolve`, `security.settings.manage`); serta menambahkan validasi + pencatatan `privilege_escalation_attempt` di tool MCP `manage_user_role`.
