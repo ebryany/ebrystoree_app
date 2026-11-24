@@ -34,7 +34,8 @@ import {
 import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
 import { NotificationBell } from "@/components/ebry/notification-bell";
 import { SecurityErrorView } from "@/components/security-error-page";
-import { adminNav, ROLE_LABELS } from "@/lib/admin-nav";
+import { adminNav, ROLE_LABELS, type AdminBadgeKey } from "@/lib/admin-nav";
+import { sumAdminBadges } from "@/lib/admin-badges";
 import { adminPortalSignOut } from "@/lib/admin-auth.functions";
 import { getMyAccess, type AdminBadges } from "@/lib/admin.functions";
 import { useAdminBadges } from "@/hooks/use-admin-badges";
@@ -61,11 +62,13 @@ function NavList({
   isSuperAdmin,
   badges,
   onNavigate,
+  onSelectBadge,
 }: {
   permissions: string[];
   isSuperAdmin: boolean;
   badges?: AdminBadges;
   onNavigate?: () => void;
+  onSelectBadge?: (badgeKey: AdminBadgeKey) => void;
 }) {
   const [search, setSearch] = useState("");
   const navigationId = useId();
@@ -156,7 +159,10 @@ function NavList({
                         activeOptions={{ exact: true }}
                         activeProps={{}}
                         aria-current={isActive ? "page" : undefined}
-                        onClick={onNavigate}
+                        onClick={() => {
+                          if (item.badgeKey) onSelectBadge?.(item.badgeKey);
+                          onNavigate?.();
+                        }}
                         className={cn(
                           "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                           isActive
@@ -207,8 +213,8 @@ function AdminLayout() {
     !!data &&
     Boolean(data.adminPortalVerified) &&
     (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
-  const badges = useAdminBadges(canEnter);
-  const totalBadgeCount = Object.values(badges).reduce((sum, count) => sum + count, 0);
+  const { badges, markBadgeSeen } = useAdminBadges(canEnter, pathname);
+  const totalBadgeCount = sumAdminBadges(badges);
 
   useEffect(() => {
     if (isPending || error || !data || canEnter) return;
@@ -318,6 +324,7 @@ function AdminLayout() {
                       isSuperAdmin={data.isSuperAdmin}
                       badges={badges}
                       onNavigate={() => setOpen(false)}
+                      onSelectBadge={markBadgeSeen}
                     />
                   </div>
                 </SheetContent>
@@ -339,7 +346,7 @@ function AdminLayout() {
               <NotificationBell />
               {canViewOrders ? (
                 <Button asChild variant="ghost" className="hidden min-h-11 gap-1.5 sm:inline-flex">
-                  <Link to="/admin/chat">
+                  <Link to="/admin/chat" onClick={() => markBadgeSeen("chats")}>
                     <MessagesSquare className="size-4" aria-hidden="true" />
                     <span>Chat Produk</span>
                     {badges.chats > 0 ? (
@@ -404,6 +411,7 @@ function AdminLayout() {
             permissions={data.permissions}
             isSuperAdmin={data.isSuperAdmin}
             badges={badges}
+            onSelectBadge={markBadgeSeen}
           />
         </aside>
         <div className="min-w-0 lg:pl-64">

@@ -227,7 +227,49 @@ async function safeCount(
   }
 }
 
-/** Ringkasan angka notifikasi & antrean kerja untuk badge sidebar admin (permission-scoped). */
+const ADMIN_BADGE_KEY_LIST = [
+  "sellers",
+  "productModeration",
+  "serviceModeration",
+  "orders",
+  "chats",
+  "payments",
+  "topups",
+  "refunds",
+  "payouts",
+  "tasks",
+  "fulfillment",
+  "po",
+  "security",
+] as const;
+
+type AdminBadgeKeyName = (typeof ADMIN_BADGE_KEY_LIST)[number];
+
+/** Catat bahwa admin saat ini sudah membuka halaman menu tertentu sehingga badge merahnya hilang hingga ada item baru. */
+export const markAdminBadgeSeen = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({ badgeKey: z.enum(ADMIN_BADGE_KEY_LIST) }).parse(data),
+  )
+  .handler(async ({ context, data }) =>
+    guard(context as Ctx, "admin.dashboard.view", async () => {
+      const ctx = context as Ctx;
+      const { data: res, error } = await ctx.supabase.rpc("mark_admin_badge_seen", {
+        _badge_key: data.badgeKey,
+      });
+      if (error) {
+        console.error("[admin-badges] mark_admin_badge_seen gagal:", error.message);
+        return { forbidden: false as const, ok: false as const, seenAt: null as string | null };
+      }
+      return {
+        forbidden: false as const,
+        ok: true as const,
+        seenAt: ((res as { seen_at?: string } | null)?.seen_at ?? null) as string | null,
+      };
+    }),
+  );
+
+/** Ringkasan angka notifikasi & antrean baru untuk badge sidebar admin (permission-scoped & seen-aware). */
 export const getAdminSidebarBadges = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) =>
@@ -238,19 +280,48 @@ export const getAdminSidebarBadges = createServerFn({ method: "GET" })
       const can = (permission: string) =>
         access.isSuperAdmin || access.permissions.includes(permission);
 
+      // Baca timestamp terakhir dilihat per menu untuk akun admin ini (fail-safe bila migrasi belum diterapkan).
+      const seenMap = new Map<AdminBadgeKeyName, string>();
+      try {
+        const { data: reads, error: readsErr } = await sb
+          .from("admin_badge_reads")
+          .select("badge_key, seen_at")
+          .eq("user_id", ctx.userId);
+        if (!readsErr && Array.isArray(reads)) {
+          for (const row of reads as Array<{ badge_key: string; seen_at: string }>) {
+            if (row.badge_key && row.seen_at) {
+              seenMap.set(row.badge_key as AdminBadgeKeyName, String(row.seen_at));
+            }
+          }
+        }
+      } catch {
+        /* fallback tanpa filter seen_at bila tabel belum ada */
+      }
+
+      const seenAt = (key: AdminBadgeKeyName) => seenMap.get(key) ?? null;
+
+      const sellersSeen = seenAt("sellers");
       const sellersPromise = can("sellers.view")
         ? Promise.all([
-            sb
-              .from("stores")
-              .select("id")
-              .eq("is_platform", false)
-              .eq("status", "pending"),
-            sb
-              .from("notifications")
-              .select("id, related_id")
-              .eq("recipient_id", ctx.userId)
-              .like("type", "admin_seller.%")
-              .is("read_at", null),
+            (() => {
+              let q = sb
+                .from("stores")
+                .select("id")
+                .eq("is_platform", false)
+                .eq("status", "pending");
+              if (sellersSeen) q = q.gt("updated_at", sellersSeen);
+              return q;
+            })(),
+            (() => {
+              let q = sb
+                .from("notifications")
+                .select("id, related_id")
+                .eq("recipient_id", ctx.userId)
+                .like("type", "admin_seller.%")
+                .is("read_at", null);
+              if (sellersSeen) q = q.gt("created_at", sellersSeen);
+              return q;
+            })(),
           ])
             .then(([pendingRes, notifRes]) => {
               const pendingIds = new Set<string>(
@@ -268,6 +339,19 @@ export const getAdminSidebarBadges = createServerFn({ method: "GET" })
             })
             .catch(() => 0)
         : Promise.resolve(0);
+
+      const productSeen = seenAt("productModeration");
+      const serviceSeen = seenAt("serviceModeration");
+      const ordersSeen = seenAt("orders");
+      const chatsSeen = seenAt("chats");
+      const paymentsSeen = seenAt("payments");
+      const topupsSeen = seenAt("topups");
+      const refundsSeen = seenAt("refunds");
+      const payoutsSeen = seenAt("payouts");
+      const tasksSeen = seenAt("tasks");
+      const fulfillmentSeen = seenAt("fulfillment");
+      const poSeen = seenAt("po");
+      const securitySeen = seenAt("security");
 
       const [
         sellers,
@@ -287,93 +371,123 @@ export const getAdminSidebarBadges = createServerFn({ method: "GET" })
         security,
       ] = await Promise.all([
         sellersPromise,
-        safeCount(can("products.view"), () =>
-          sb
+        safeCount(can("products.view"), () => {
+          let q = sb
             .from("digital_products")
             .select("id", { count: "exact", head: true })
             .eq("moderation_status", "pending")
-            .is("deleted_at", null),
-        ),
-        safeCount(can("services.view"), () =>
-          sb
+            .is("deleted_at", null);
+          if (productSeen) q = q.gt("updated_at", productSeen);
+          return q;
+        }),
+        safeCount(can("services.view"), () => {
+          let q = sb
             .from("marketplace_services")
             .select("id", { count: "exact", head: true })
-            .eq("status", "in_review"),
-        ),
-        safeCount(can("orders.view"), () =>
-          sb
+            .eq("status", "in_review");
+          if (serviceSeen) q = q.gt("updated_at", serviceSeen);
+          return q;
+        }),
+        safeCount(can("orders.view"), () => {
+          let q = sb
             .from("marketplace_service_orders")
             .select("order_id", { count: "exact", head: true })
             .eq("complaint_open", true)
-            .is("accepted_delivery_id", null),
-        ),
-        safeCount(can("orders.view"), () =>
-          sb
+            .is("accepted_delivery_id", null);
+          if (serviceSeen) q = q.gt("updated_at", serviceSeen);
+          return q;
+        }),
+        safeCount(can("orders.view"), () => {
+          let q = sb
             .from("orders")
             .select("id", { count: "exact", head: true })
-            .in("status", ["payment_under_review", "refund_requested", "refund_processing", "disputed"]),
-        ),
-        safeCount(can("orders.view"), () =>
-          sb
+            .in("status", ["payment_under_review", "refund_requested", "refund_processing", "disputed"]);
+          if (ordersSeen) q = q.gt("updated_at", ordersSeen);
+          return q;
+        }),
+        safeCount(can("orders.view"), () => {
+          let q = sb
             .from("product_inquiries")
             .select("id", { count: "exact", head: true })
-            .eq("status", "open"),
-        ),
-        safeCount(can("payments.view"), () =>
-          sb
+            .eq("status", "open");
+          if (chatsSeen) q = q.or(`last_message_at.gt.${chatsSeen},updated_at.gt.${chatsSeen}`);
+          return q;
+        }),
+        safeCount(can("payments.view"), () => {
+          let q = sb
             .from("payments")
             .select("id", { count: "exact", head: true })
-            .eq("status", "waiting_verification"),
-        ),
-        safeCount(can("payments.view"), () =>
-          sb
+            .eq("status", "waiting_verification");
+          if (paymentsSeen) q = q.gt("updated_at", paymentsSeen);
+          return q;
+        }),
+        safeCount(can("payments.view"), () => {
+          let q = sb
             .from("credit_topups")
             .select("id", { count: "exact", head: true })
-            .eq("status", "waiting_verification"),
-        ),
-        safeCount(can("refunds.view"), () =>
-          sb
+            .eq("provider", "manual")
+            .eq("status", "waiting_payment")
+            .not("proof_submitted_at", "is", null);
+          if (topupsSeen) q = q.gt("proof_submitted_at", topupsSeen);
+          return q;
+        }),
+        safeCount(can("refunds.view"), () => {
+          let q = sb
             .from("refunds")
             .select("id", { count: "exact", head: true })
-            .in("status", ["requested", "under_review", "information_requested"]),
-        ),
-        safeCount(can("payouts.view"), () =>
-          sb
+            .in("status", ["requested", "under_review", "information_requested"]);
+          if (refundsSeen) q = q.gt("updated_at", refundsSeen);
+          return q;
+        }),
+        safeCount(can("payouts.view"), () => {
+          let q = sb
             .from("withdrawals")
             .select("id", { count: "exact", head: true })
-            .in("status", ["pending", "processing"]),
-        ),
-        safeCount(can("tasks.view"), () =>
-          sb
+            .in("status", ["requested", "approved", "needs_reconciliation"]);
+          if (payoutsSeen) q = q.gt("updated_at", payoutsSeen);
+          return q;
+        }),
+        safeCount(can("tasks.view"), () => {
+          let q = sb
             .from("admin_tasks")
             .select("id", { count: "exact", head: true })
-            .in("status", ["open", "in_progress", "blocked"]),
-        ),
-        safeCount(can("orders.fulfill"), () =>
-          sb
+            .in("status", ["open", "in_progress", "blocked"]);
+          if (tasksSeen) q = q.gt("updated_at", tasksSeen);
+          return q;
+        }),
+        safeCount(can("orders.fulfill"), () => {
+          let q = sb
             .from("orders")
             .select("id", { count: "exact", head: true })
             .eq("order_type", "service")
-            .in("status", ["paid", "in_progress", "revision_requested"]),
-        ),
-        safeCount(can("orders.view"), () =>
-          sb
+            .in("status", ["paid", "in_progress", "revision_requested"]);
+          if (fulfillmentSeen) q = q.gt("updated_at", fulfillmentSeen);
+          return q;
+        }),
+        safeCount(can("orders.view"), () => {
+          let q = sb
             .from("custom_orders")
             .select("id", { count: "exact", head: true })
-            .eq("status", "submitted"),
-        ),
-        safeCount(can("orders.view"), () =>
-          sb
+            .eq("status", "submitted");
+          if (poSeen) q = q.gt("updated_at", poSeen);
+          return q;
+        }),
+        safeCount(can("orders.view"), () => {
+          let q = sb
             .from("po_payments")
             .select("id", { count: "exact", head: true })
-            .eq("status", "waiting_verification"),
-        ),
-        safeCount(can("security.alerts.read") || can("settings.view"), () =>
-          sb
+            .eq("status", "waiting_verification");
+          if (poSeen) q = q.gt("updated_at", poSeen);
+          return q;
+        }),
+        safeCount(can("security.alerts.read") || can("settings.view"), () => {
+          let q = sb
             .from("security_alerts")
             .select("id", { count: "exact", head: true })
-            .in("status", ["OPEN", "INVESTIGATING"]),
-        ),
+            .in("status", ["OPEN", "INVESTIGATING"]);
+          if (securitySeen) q = q.gt("last_triggered_at", securitySeen);
+          return q;
+        }),
       ]);
 
       return {

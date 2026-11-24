@@ -108,13 +108,23 @@ export function NotificationBell({ className }: { className?: string }) {
 
   async function handleRead(id: string) {
     await markRead({ data: { id } });
-    await queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["my-notifications"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-sidebar-badges"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-seller-notifications"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-seller-notifications-unread"] }),
+    ]);
   }
 
   async function handleReadAll() {
     await markAll({});
-    await queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
-    await queryClient.invalidateQueries({ queryKey: ["customer-summary"] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["my-notifications"] }),
+      queryClient.invalidateQueries({ queryKey: ["customer-summary"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-sidebar-badges"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-seller-notifications"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-seller-notifications-unread"] }),
+    ]);
   }
 
   return (
