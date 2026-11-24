@@ -1,6 +1,15 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+  writeMcpAudit,
+} from "../supabase";
 
 export default defineTool({
   name: "archive_digital_product",
@@ -23,14 +32,31 @@ export default defineTool({
           ? { status: "archived", deleted_at: now, updated_at: now }
           : { status: "draft", deleted_at: null, updated_at: now };
     const supabase = supabaseForUser(ctx);
+    const permDenied = await requireMcpPermission(
+      supabase,
+      ctx,
+      mode === "soft_delete" ? "products.delete" : "products.update",
+    );
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.mutation");
+    if (limited) return limited;
+
     const { data, error } = await supabase
       .from("digital_products")
       .update(patch)
       .eq("id", id)
       .select("id, name, slug, status, deleted_at")
       .maybeSingle();
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("archive_digital_product", error);
     if (!data) return errorResult("Produk tidak ditemukan atau akun tidak punya izin mengubahnya.");
+
+    await writeMcpAudit(supabase, {
+      action: `product.${mode}`,
+      entityType: "digital_product",
+      entityId: id,
+      after: { mode, status: data.status, deleted_at: data.deleted_at, source: "mcp" },
+    });
+
     return jsonResult({ product: data, mode });
   },
 });

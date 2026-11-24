@@ -3,7 +3,15 @@ import { isIP } from "node:net";
 
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+} from "../supabase";
 
 const BUCKET = "product-files";
 const MAX_BYTES = 100 * 1024 * 1024;
@@ -106,8 +114,9 @@ export default defineTool({
     content_base64: z
       .string()
       .min(4)
+      .max(140_000_000)
       .optional()
-      .describe("Isi berkas dalam base64 (boleh data URL)."),
+      .describe("Isi berkas dalam base64 (boleh data URL, maksimal 100 MB)."),
     source_url: z
       .string()
       .url()
@@ -139,12 +148,17 @@ export default defineTool({
     }
 
     const supabase = supabaseForUser(ctx);
+    const permDenied = await requireMcpPermission(supabase, ctx, "products.update");
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.upload");
+    if (limited) return limited;
+
     const { data: product, error: productError } = await supabase
       .from("digital_products")
       .select("id, name, delivery_mode")
       .eq("id", input.product_id)
       .maybeSingle();
-    if (productError) return errorResult(productError.message);
+    if (productError) return safeMcpError("upload_product_file", productError);
     if (!product) return errorResult("Produk tidak ditemukan atau akun tidak punya akses.");
     const unique = (product.delivery_mode ?? "shared") === "unique";
 
@@ -175,7 +189,9 @@ export default defineTool({
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(path, bytes, { contentType, upsert: false });
-    if (uploadError) return errorResult(`Unggahan gagal: ${uploadError.message}`);
+    if (uploadError) {
+      return safeMcpError("upload_product_file:storage", uploadError, "Unggahan berkas gagal.");
+    }
 
     if (input.make_active && !unique) {
       await supabase
@@ -199,8 +215,10 @@ export default defineTool({
       .maybeSingle();
     if (error || !inserted) {
       await supabase.storage.from(BUCKET).remove([path]);
-      return errorResult(
-        error?.message ?? "Berkas gagal dicatat; akun mungkin tidak punya izin kelola produk.",
+      return safeMcpError(
+        "upload_product_file:insert",
+        error,
+        "Berkas gagal dicatat; akun mungkin tidak punya izin kelola produk.",
       );
     }
 

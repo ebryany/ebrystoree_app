@@ -1,6 +1,15 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+  writeMcpAudit,
+} from "../supabase";
 
 export default defineTool({
   name: "update_digital_product",
@@ -30,6 +39,11 @@ export default defineTool({
       return errorResult("Harga diskon harus lebih kecil dari harga normal.");
     }
     const supabase = supabaseForUser(ctx);
+    const permDenied = await requireMcpPermission(supabase, ctx, "products.update");
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.mutation");
+    if (limited) return limited;
+
     const { data, error } = await supabase
       .from("digital_products")
       .update({ ...patch, updated_at: new Date().toISOString() })
@@ -37,8 +51,16 @@ export default defineTool({
       .is("deleted_at", null)
       .select("id, name, slug, status, price, discount_price, download_limit, validity_days")
       .maybeSingle();
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("update_digital_product", error);
     if (!data) return errorResult("Produk tidak ditemukan atau akun tidak punya izin mengubahnya.");
+
+    await writeMcpAudit(supabase, {
+      action: "product.update",
+      entityType: "digital_product",
+      entityId: id,
+      after: { ...patch, source: "mcp" },
+    });
+
     return jsonResult({ updated: data });
   },
 });

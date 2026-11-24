@@ -136,6 +136,7 @@ export const getManualTopupStatus = createServerFn({ method: "POST" })
       .from("credit_topups")
       .select("status, paid_at, proof_submitted_at, review_note")
       .eq("id", data.topupId)
+      .eq("user_id", context.userId)
       .maybeSingle();
     if (!row) return { ok: false as const, error: "Isi saldo tidak ditemukan." };
     return {
@@ -159,13 +160,21 @@ export const prepareTopupProofUpload = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
+    const limited = await enforceRateLimit(context.userId, "payment.proof");
+    if (limited) return { ok: false as const, error: limited.error };
+
     const { data: topup } = await (context as Ctx).supabase
       .from("credit_topups")
-      .select("id, status, provider")
+      .select("id, status, provider, expires_at, proof_submitted_at")
       .eq("id", data.topupId)
+      .eq("user_id", context.userId)
       .maybeSingle();
     if (!topup || topup.provider !== "manual" || topup.status !== "waiting_payment")
       return { ok: false as const, error: "Isi saldo tidak menerima bukti transfer." };
+    if (topup.expires_at && new Date(topup.expires_at).getTime() <= Date.now())
+      return { ok: false as const, error: "Batas waktu isi saldo sudah lewat." };
+    if (topup.proof_submitted_at)
+      return { ok: false as const, error: "Bukti transfer sudah dikirim dan sedang menunggu verifikasi." };
 
     const path = `${context.userId}/topup-${topup.id}/${crypto.randomUUID()}.${PROOF_EXT[data.mimeType]}`;
     const sb = await admin();
@@ -190,31 +199,22 @@ export const submitTopupProof = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const limited = await enforceRateLimit(context.userId, "payment.proof");
     if (limited) return { ok: false as const, error: limited.error };
-    // Path wajib milik top up ini; mencegah menempelkan berkas pengguna lain.
-    if (!data.filePath.startsWith(`${context.userId}/topup-${data.topupId}/`))
+    // Path wajib milik top up ini dan bebas traversal; mencegah menempelkan berkas pengguna lain.
+    if (
+      !data.filePath.startsWith(`${context.userId}/topup-${data.topupId}/`) ||
+      data.filePath.includes("..") ||
+      data.filePath.includes("\\")
+    ) {
       return { ok: false as const, error: "Berkas bukti tidak valid." };
+    }
 
-    const sb = await admin();
-    const folder = data.filePath.slice(0, data.filePath.lastIndexOf("/"));
-    const name = data.filePath.slice(data.filePath.lastIndexOf("/") + 1);
-    const { data: files } = await sb.storage.from("payment-proofs").list(folder, { search: name });
-    if (!files?.some((f: any) => f.name === name))
-      return { ok: false as const, error: "Berkas bukti belum terunggah." };
-
-    const { data: updated, error } = await sb
-      .from("credit_topups")
-      .update({
-        proof_path: data.filePath,
-        proof_sender_name: data.senderName,
-        proof_submitted_at: new Date().toISOString(),
-      })
-      .eq("id", data.topupId)
-      .eq("user_id", context.userId)
-      .eq("provider", "manual")
-      .eq("status", "waiting_payment")
-      .select("id")
-      .maybeSingle();
-    if (error || !updated) return { ok: false as const, error: "Bukti gagal dikirim. Coba lagi." };
+    const { rpcErrorMessage } = await import("./transaction.server");
+    const { error } = await (context as Ctx).supabase.rpc("submit_manual_topup_proof", {
+      _topup_id: data.topupId,
+      _file_path: data.filePath,
+      _sender_name: data.senderName,
+    });
+    if (error) return { ok: false as const, error: rpcErrorMessage(error.message) };
     return { ok: true as const };
   });
 
@@ -243,19 +243,42 @@ export const listManualTopups = createServerFn({ method: "GET" })
         .eq("provider", "manual")
         .order("created_at", { ascending: false })
         .limit(50);
-      const items = await Promise.all(
-        (data ?? []).map(async (t: any) => {
-          let proofUrl: string | null = null;
-          if (t.proof_path) {
-            const { data: s } = await sb.storage
-              .from("payment-proofs")
-              .createSignedUrl(t.proof_path, 300);
-            proofUrl = s?.signedUrl ?? null;
-          }
-          return { ...t, proof_url: proofUrl };
-        }),
-      );
+      // Jangan membuat 50 signed URL setiap polling; tanda tangani on-demand saat admin klik "Lihat bukti".
+      const items = (data ?? []).map((t: any) => {
+        const { proof_path, ...rest } = t;
+        return {
+          ...rest,
+          has_proof: Boolean(proof_path),
+          proof_url: null as string | null,
+        };
+      });
       return { items, error: null };
+    }),
+  );
+
+export const getManualTopupProofUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ topupId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) =>
+    guard(context as Ctx, "payments.view", async () => {
+      const sb = await admin();
+      const { data: topup, error } = await sb
+        .from("credit_topups")
+        .select("id, proof_path, provider")
+        .eq("id", data.topupId)
+        .eq("provider", "manual")
+        .maybeSingle();
+      if (error || !topup?.proof_path) {
+        return { ok: false as const, error: "Bukti transfer tidak tersedia." };
+      }
+      const { data: signed, error: signErr } = await sb.storage
+        .from("payment-proofs")
+        .createSignedUrl(topup.proof_path, 300);
+      if (signErr || !signed?.signedUrl) {
+        console.error("[topup-manual] gagal membuat signed URL:", signErr?.message);
+        return { ok: false as const, error: "Tautan bukti gagal dibuat. Coba lagi." };
+      }
+      return { ok: true as const, url: signed.signedUrl };
     }),
   );
 
@@ -275,61 +298,16 @@ export const reviewManualTopup = createServerFn({ method: "POST" })
       context as Ctx,
       data.decision === "approve" ? "payments.verify" : "payments.reject",
       async () => {
-        const sb = await admin();
-        const { data: topup } = await sb
-          .from("credit_topups")
-          .select("id, user_id, amount, status, provider, proof_submitted_at")
-          .eq("id", data.topupId)
-          .maybeSingle();
-        if (!topup || topup.provider !== "manual" || topup.status !== "waiting_payment")
-          return { ok: false as const, error: "Isi saldo tidak dalam status menunggu." };
+        const limited = await enforceRateLimit(context.userId, "admin.payment.decision");
+        if (limited) return { ok: false as const, error: limited.error };
 
-        const review = {
-          reviewed_by: context.userId,
-          reviewed_at: new Date().toISOString(),
-          review_note: data.reason ?? null,
-        };
-
-        if (data.decision === "reject") {
-          const { error } = await sb
-            .from("credit_topups")
-            .update({ ...review, status: "cancelled" })
-            .eq("id", topup.id)
-            .eq("status", "waiting_payment");
-          if (error) return { ok: false as const, error: "Gagal menolak isi saldo." };
-          await sb.from("notifications").insert({
-            recipient_id: topup.user_id,
-            type: "payment.rejected",
-            title: "Isi saldo ditolak",
-            message: data.reason
-              ? `Bukti transfer ditolak: ${data.reason}`
-              : "Bukti transfer tidak dapat diverifikasi.",
-            related_type: "credit_topups",
-            related_id: topup.id,
-          });
-          return { ok: true as const };
-        }
-
-        if (!topup.proof_submitted_at)
-          return { ok: false as const, error: "Pengguna belum mengirim bukti transfer." };
-
-        await sb.from("credit_topups").update(review).eq("id", topup.id);
-        // Settle + kredit ledger + audit log dalam satu RPC idempoten.
-        const { error } = await sb.rpc("settle_credit_topup", {
-          _topup_id: topup.id,
-          _provider: "manual",
-          _provider_ref: `manual:${context.userId}`,
-          _paid_amount: Number(topup.amount),
+        const { rpcErrorMessage } = await import("./transaction.server");
+        const { error } = await (context as Ctx).supabase.rpc("review_manual_topup", {
+          _topup_id: data.topupId,
+          _decision: data.decision,
+          _reason: data.reason ?? null,
         });
-        if (error) {
-          console.error("[topup-manual] settle gagal:", error.message);
-          const msg = error.message ?? "";
-          if (msg.includes("AMOUNT_MISMATCH"))
-            return { ok: false as const, error: "Nominal tidak cocok dengan permintaan isi saldo." };
-          if (msg.includes("INVALID_STATE"))
-            return { ok: false as const, error: "Isi saldo sudah diproses sebelumnya." };
-          return { ok: false as const, error: `Gagal mengkredit saldo: ${msg || "kesalahan database"}` };
-        }
+        if (error) return { ok: false as const, error: rpcErrorMessage(error.message) };
         return { ok: true as const };
       },
     ),

@@ -1,6 +1,13 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  safeMcpError,
+  supabaseForUser,
+} from "../supabase";
 
 export default defineTool({
   name: "review_refund",
@@ -17,11 +24,14 @@ export default defineTool({
   handler: async ({ refund_id, action, reason, reference }, ctx) => {
     const denied = authGuard(ctx);
     if (denied) return denied;
+    const limited = await enforceMcpRateLimit(ctx, "admin.payment.decision");
+    if (limited) return limited;
+
     const supabase = supabaseForUser(ctx);
     if (action === "process") {
       if (!reference) return errorResult("Nomor referensi transfer wajib diisi.");
       const { data, error } = await supabase.rpc("process_refund", { _refund_id: refund_id, _reference: reference });
-      if (error) return errorResult(error.message);
+      if (error) return safeMcpError("review_refund", error);
       return jsonResult({ result: data });
     }
     if (action === "reject" && !reason) return errorResult("Alasan wajib diisi saat menolak refund.");
@@ -30,7 +40,7 @@ export default defineTool({
       _decision: action,
       _reason: reason ?? null,
     });
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("review_refund", error);
     return jsonResult({ result: data });
   },
 });

@@ -1,7 +1,15 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { FIELD_BY_KEY, SETTING_SECTIONS, redact, validateField } from "@/lib/website-settings";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+} from "../supabase";
 
 export default defineTool({
   name: "update_website_settings",
@@ -45,6 +53,11 @@ export default defineTool({
     }
 
     const supabase = supabaseForUser(ctx);
+    const permDenied = await requireMcpPermission(supabase, ctx, "settings.manage");
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.mutation");
+    if (limited) return limited;
+
     const { data: existing } = await supabase
       .from("system_settings")
       .select("key, value")
@@ -64,7 +77,7 @@ export default defineTool({
       changed.map((n) => ({ key: n.key, value: n.value, is_public: n.isPublic })),
       { onConflict: "key" },
     );
-    if (error) return errorResult(`Gagal menyimpan: ${error.message}`);
+    if (error) return safeMcpError("update_website_settings", error, "Gagal menyimpan pengaturan.");
     (await import("@/lib/website-settings.server")).clearPublicSettingsCache();
 
     for (const item of changed) {

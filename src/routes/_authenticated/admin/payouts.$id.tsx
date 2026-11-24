@@ -193,8 +193,9 @@ function AdminPayoutDetail() {
           <Field label="Nama pemilik">{w.bank_account_holder}</Field>
         </dl>
         <p className="mt-3 text-xs text-muted-foreground">
-          Perubahan rekening setelah pengajuan tidak mengubah tujuan transfer ini. Verifikasi
-          kecocokan nama pemilik sebelum mentransfer.
+          {w.bank_account_redacted
+            ? "Nomor rekening penuh disamarkan; izin payouts.process diperlukan untuk melihat nomor rekening lengkap."
+            : "Perubahan rekening setelah pengajuan tidak mengubah tujuan transfer ini. Verifikasi kecocokan nama pemilik sebelum mentransfer."}
         </p>
       </DetailCard>
 

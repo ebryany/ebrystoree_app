@@ -433,6 +433,8 @@ export const requestMyRefund = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const blocked = await ensureFeature(["feature_refund"]);
     if (blocked) return blocked;
+    const limited = await enforceRateLimit(context.userId, "refund.request");
+    if (limited) return { ok: false as const, error: limited.error };
     const helpers = await tx();
     const { error } = await (context as Ctx).supabase.rpc("request_refund", {
       _order_id: data.orderId,

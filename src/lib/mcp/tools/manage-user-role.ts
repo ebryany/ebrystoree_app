@@ -1,6 +1,15 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+  writeMcpAudit,
+} from "../supabase";
 
 export default defineTool({
   name: "manage_user_role",
@@ -18,6 +27,8 @@ export default defineTool({
     if (denied) return denied;
     const actorId = ctx.getUserId();
     const supabase = supabaseForUser(ctx);
+    const limited = await enforceMcpRateLimit(ctx, "mcp.mutation");
+    if (limited) return limited;
 
     if (user_id === actorId && action === "grant") {
       try {
@@ -68,17 +79,32 @@ export default defineTool({
       }
     }
 
+    const permDenied = await requireMcpPermission(supabase, ctx, "roles.manage");
+    if (permDenied) return permDenied;
+
     if (action === "grant") {
       const { data, error } = await supabase
         .from("user_roles")
         .upsert({ user_id, role, granted_by: actorId }, { onConflict: "user_id,role" })
         .select("user_id, role")
         .maybeSingle();
-      if (error) return errorResult(error.message);
+      if (error) return safeMcpError("manage_user_role", error);
+      await writeMcpAudit(supabase, {
+        action: "role.grant",
+        entityType: "user_roles",
+        entityId: user_id,
+        after: { user_id, role, source: "mcp" },
+      });
       return jsonResult({ granted: data });
     }
     const { error } = await supabase.from("user_roles").delete().eq("user_id", user_id).eq("role", role);
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("manage_user_role", error);
+    await writeMcpAudit(supabase, {
+      action: "role.revoke",
+      entityType: "user_roles",
+      entityId: user_id,
+      after: { user_id, role, source: "mcp" },
+    });
     return jsonResult({ revoked: { user_id, role } });
   },
 });

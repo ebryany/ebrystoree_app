@@ -1,6 +1,13 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  supabaseForUser,
+} from "../supabase";
 
 export default defineTool({
   name: "hermes_notify_telegram",
@@ -19,15 +26,17 @@ export default defineTool({
     const denied = authGuard(ctx);
     if (denied) return denied;
     const supabase = supabaseForUser(ctx);
-    const { data: me } = await supabase.auth.getUser();
-    const userId = me?.user?.id;
-    if (!userId) return errorResult("Tidak dapat membaca identitas pengguna.");
-    const { data: allowed } = await supabase.rpc("has_permission", { _user_id: userId, _permission: "orders.fulfill" });
-    if (!allowed) return errorResult("Tidak punya izin orders.fulfill.");
+    const permDenied = await requireMcpPermission(supabase, ctx, "orders.fulfill");
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.notify");
+    if (limited) return limited;
 
     const telegram = await import("@/lib/telegram.server");
     const sent = await telegram.sendTelegramMessage(message);
-    if (!sent.ok) return errorResult(sent.error ?? "Gagal mengirim pesan Telegram.");
+    if (!sent.ok) {
+      console.error("[mcp:hermes_notify_telegram] gagal:", sent.error);
+      return errorResult("Gagal mengirim pesan Telegram.");
+    }
 
     let dispatched: { sent: number; skipped: number } | null = null;
     if (dispatch_pending_orders) dispatched = await telegram.dispatchServiceOrderAlerts();

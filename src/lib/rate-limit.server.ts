@@ -28,6 +28,10 @@ const DEFAULT_POLICIES = {
   "seller.payout": { limit: 5, windowSeconds: 300 },
   "admin.seller.decision": { limit: 60, windowSeconds: 300 },
   "admin.payout.decision": { limit: 60, windowSeconds: 300 },
+  "admin.payment.decision": { limit: 60, windowSeconds: 300 },
+  "mcp.upload": { limit: 15, windowSeconds: 300 },
+  "mcp.mutation": { limit: 60, windowSeconds: 60 },
+  "mcp.notify": { limit: 10, windowSeconds: 300 },
   "catalog.public": { limit: 120, windowSeconds: 60 },
   "email.test": { limit: 5, windowSeconds: 300 },
   "seo.audit": { limit: 3, windowSeconds: 300 },
@@ -50,6 +54,8 @@ const FAIL_CLOSED_BUCKETS = new Set<RateLimitBucket>([
   "po.create",
   "seller.payout",
   "admin.payout.decision",
+  "admin.payment.decision",
+  "mcp.upload",
 ]);
 
 export type RateLimitResult = {

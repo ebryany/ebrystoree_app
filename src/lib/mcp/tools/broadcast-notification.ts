@@ -1,6 +1,13 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  safeMcpError,
+  supabaseForUser,
+} from "../supabase";
 
 export default defineTool({
   name: "broadcast_notification",
@@ -22,6 +29,9 @@ export default defineTool({
     const target = audience ?? "all";
     if (target === "role" && !role) return errorResult("role wajib diisi bila audience = role.");
     if (target === "users" && !user_ids?.length) return errorResult("user_ids wajib diisi bila audience = users.");
+    const limited = await enforceMcpRateLimit(ctx, "mcp.notify");
+    if (limited) return limited;
+
     const supabase = supabaseForUser(ctx);
     const { data, error } = await supabase.rpc("admin_broadcast_notification", {
       _title: title,
@@ -32,7 +42,7 @@ export default defineTool({
       _type: type ?? null,
       _link: link ?? null,
     });
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("broadcast_notification", error);
     return jsonResult({ result: data });
   },
 });

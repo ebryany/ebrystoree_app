@@ -7,6 +7,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Access } from "./authz.server";
+import { enforceRateLimit } from "./rate-limit.server";
 
 const authz = () => import("./authz.server");
 
@@ -15,15 +17,16 @@ type Ctx = { supabase: any; userId: string };
 async function guard<T>(
   context: Ctx,
   permission: string,
-  run: () => Promise<T>,
+  run: (access: Access) => Promise<T>,
 ): Promise<T | { forbidden: true; permission: string }> {
   const helpers = await authz();
+  let access: Access;
   try {
-    await helpers.assertPermission(context, permission);
+    access = await helpers.assertPermission(context, permission);
   } catch {
     return { forbidden: true as const, permission };
   }
-  return run();
+  return run(access);
 }
 
 function rpcError(message: string) {
@@ -38,7 +41,9 @@ function rpcError(message: string) {
     REFERENCE_REQUIRED: "Referensi transfer wajib diisi (minimal 3 karakter).",
     SELF_APPROVAL_FORBIDDEN: "Pemilik toko tidak boleh memproses payout toko sendiri.",
   };
-  return map[clean] ?? (clean.length > 3 ? clean : "Aksi gagal diproses. Coba lagi.");
+  if (map[clean]) return map[clean];
+  console.error("[admin-payout] rpc error:", message);
+  return "Aksi gagal diproses. Coba lagi.";
 }
 
 const PAYOUT_STATUSES = [
@@ -107,8 +112,10 @@ export const getPayoutDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) =>
-    guard(context as Ctx, "payouts.view", async () => {
+    guard(context as Ctx, "payouts.view", async (access) => {
       const sb = (context as Ctx).supabase;
+      const canViewFullBank =
+        access.isSuperAdmin || access.permissions.includes("payouts.process");
       const { data: w, error } = await sb
         .from("withdrawals")
         .select("*, stores(name, slug, owner_id)")
@@ -144,13 +151,16 @@ export const getPayoutDetail = createServerFn({ method: "GET" })
         .eq("withdrawal_id", data.id)
         .order("created_at", { ascending: true });
 
+      const maskedAccount = maskAccount(w.bank_account_number);
       return {
         detail: {
           ...w,
           gross_amount: Number(w.gross_amount),
           fee_amount: Number(w.fee_amount),
           net_amount: Number(w.net_amount),
-          bank_account_masked: maskAccount(w.bank_account_number),
+          bank_account_number: canViewFullBank ? w.bank_account_number : maskedAccount,
+          bank_account_masked: maskedAccount,
+          bank_account_redacted: !canViewFullBank,
           store_owner_id: w.stores?.owner_id ?? null,
           requested_by_profile: profileMap.get(w.requested_by) ?? null,
           events: events ?? [],
@@ -174,6 +184,8 @@ export const decidePayout = createServerFn({ method: "POST" })
   .validator((data: unknown) => decisionPayload.parse(data))
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "payouts.approve", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payout.decision");
+      if (limited) return { ok: false as const, error: limited.error };
       const sb = (context as Ctx).supabase;
       const { error } = await sb.rpc("review_withdrawal", {
         _withdrawal_id: data.withdrawal_id,
@@ -199,6 +211,8 @@ export const recordPayoutTransfer = createServerFn({ method: "POST" })
   .validator((data: unknown) => transferPayload.parse(data))
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "payouts.process", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payout.decision");
+      if (limited) return { ok: false as const, error: limited.error };
       const sb = (context as Ctx).supabase;
       const { error } = await sb.rpc("record_withdrawal_transfer", {
         _withdrawal_id: data.withdrawal_id,
@@ -223,6 +237,8 @@ export const completePayout = createServerFn({ method: "POST" })
   .validator((data: unknown) => completionPayload.parse(data))
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "payouts.process", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payout.decision");
+      if (limited) return { ok: false as const, error: limited.error };
       const sb = (context as Ctx).supabase;
       const { error } = await sb.rpc("complete_withdrawal", {
         _withdrawal_id: data.withdrawal_id,
@@ -243,6 +259,8 @@ export const markPayoutReconciliation = createServerFn({ method: "POST" })
   .validator((data: unknown) => reconciliationPayload.parse(data))
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "payouts.process", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payout.decision");
+      if (limited) return { ok: false as const, error: limited.error };
       const sb = (context as Ctx).supabase;
       const { error } = await sb.rpc("mark_withdrawal_reconciliation", {
         _withdrawal_id: data.withdrawal_id,
@@ -267,6 +285,8 @@ export const resolvePayoutReconciliation = createServerFn({ method: "POST" })
   .validator((data: unknown) => resolvePayload.parse(data))
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "payouts.approve", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payout.decision");
+      if (limited) return { ok: false as const, error: limited.error };
       const sb = (context as Ctx).supabase;
       const { error } = await sb.rpc("resolve_withdrawal_reconciliation", {
         _withdrawal_id: data.withdrawal_id,

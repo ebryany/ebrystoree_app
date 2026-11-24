@@ -1,6 +1,15 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { authGuard, errorResult, jsonResult, supabaseForUser } from "../supabase";
+import {
+  authGuard,
+  enforceMcpRateLimit,
+  errorResult,
+  jsonResult,
+  requireMcpPermission,
+  safeMcpError,
+  supabaseForUser,
+  writeMcpAudit,
+} from "../supabase";
 
 function slugify(value: string) {
   return value
@@ -45,6 +54,11 @@ export default defineTool({
     if (!slug) return errorResult("Slug tidak valid, isi nama produk yang mengandung huruf/angka.");
 
     const supabase = supabaseForUser(ctx);
+    const permDenied = await requireMcpPermission(supabase, ctx, "products.create");
+    if (permDenied) return permDenied;
+    const limited = await enforceMcpRateLimit(ctx, "mcp.mutation");
+    if (limited) return limited;
+
     const { data: existing } = await supabase
       .from("digital_products")
       .select("id")
@@ -74,8 +88,16 @@ export default defineTool({
       .insert(row)
       .select("id, name, slug, status, price, discount_price, delivery_mode, download_limit, validity_days")
       .maybeSingle();
-    if (error) return errorResult(error.message);
+    if (error) return safeMcpError("create_digital_product", error);
     if (!data) return errorResult("Produk gagal dibuat atau akun tidak punya izin menambah produk.");
+
+    await writeMcpAudit(supabase, {
+      action: "product.create",
+      entityType: "digital_product",
+      entityId: data.id,
+      after: { name: data.name, slug: data.slug, price: data.price, status: data.status, source: "mcp" },
+    });
+
     return jsonResult({
       created: data,
       note: "Produk masih tanpa file. Unggah file produk lewat dashboard admin agar bisa dikirim otomatis.",

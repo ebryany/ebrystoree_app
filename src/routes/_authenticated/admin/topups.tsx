@@ -21,7 +21,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { formatRupiah } from "@/lib/format";
-import { listManualTopups, reviewManualTopup } from "@/lib/topup-manual.functions";
+import {
+  getManualTopupProofUrl,
+  listManualTopups,
+  reviewManualTopup,
+} from "@/lib/topup-manual.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/topups")({
@@ -44,11 +48,33 @@ function AdminTopups() {
   const canReject = useCan("payments.reject");
   const qc = useQueryClient();
   const fetchList = useServerFn(listManualTopups);
+  const fetchProofUrl = useServerFn(getManualTopupProofUrl);
   const review = useServerFn(reviewManualTopup);
   const [filter, setFilter] = useState<Filter>("review");
   const [search, setSearch] = useState("");
   const [rejecting, setRejecting] = useState<string | null>(null);
   const [reasons, setReasons] = useState<Record<string, string>>({});
+  const [openingProofId, setOpeningProofId] = useState<string | null>(null);
+
+  const openProof = async (topupId: string) => {
+    setOpeningProofId(topupId);
+    try {
+      const res: any = await fetchProofUrl({ data: { topupId } });
+      if (res?.forbidden) {
+        toast.error(`Butuh izin ${res.permission}.`);
+        return;
+      }
+      if (!res?.ok || !res.url) {
+        toast.error(res?.error ?? "Gagal membuka bukti transfer.");
+        return;
+      }
+      window.open(res.url, "_blank", "noopener,noreferrer");
+    } catch {
+      toast.error("Gagal membuka bukti transfer.");
+    } finally {
+      setOpeningProofId(null);
+    }
+  };
 
   const { data, isPending, isFetching, error, refetch } = useQuery({
     queryKey: ["admin-manual-topups"],
@@ -247,15 +273,20 @@ function AdminTopups() {
                   </p>
                 ) : null}
 
-                {t.proof_url || kind === "review" ? (
+                {t.has_proof || t.proof_url || kind === "review" ? (
                   <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3 sm:flex-row sm:items-center">
-                    {t.proof_url ? (
-                      <Button asChild variant="outline" size="sm" className="min-h-11">
-                        <a href={t.proof_url} target="_blank" rel="noreferrer">
-                          <FileText className="size-4" aria-hidden="true" />
-                          Lihat bukti
-                          <ExternalLink className="size-3.5 opacity-60" aria-hidden="true" />
-                        </a>
+                    {t.has_proof || t.proof_url ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="min-h-11"
+                        disabled={openingProofId === t.id}
+                        onClick={() => void openProof(t.id)}
+                      >
+                        <FileText className="size-4" aria-hidden="true" />
+                        {openingProofId === t.id ? "Membuka…" : "Lihat bukti"}
+                        <ExternalLink className="size-3.5 opacity-60" aria-hidden="true" />
                       </Button>
                     ) : null}
 

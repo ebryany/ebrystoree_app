@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { enforceRateLimit } from "./rate-limit.server";
 
 const authz = () => import("./authz.server");
 const tx = () => import("./transaction.server");
@@ -332,6 +333,8 @@ export const verifyPayment = createServerFn({ method: "POST" })
       context as Ctx,
       data.decision === "approve" ? "payments.verify" : "payments.reject",
       async () => {
+        const limited = await enforceRateLimit(context.userId, "admin.payment.decision");
+        if (limited) return { ok: false, error: limited.error };
         const helpers = await tx();
         const dbDecision =
           data.decision === "approve"
@@ -403,6 +406,8 @@ export const decideRefund = createServerFn({ method: "POST" })
       context as Ctx,
       data.decision === "reject" ? "refunds.reject" : "refunds.approve",
       async () => {
+        const limited = await enforceRateLimit(context.userId, "admin.payment.decision");
+        if (limited) return { ok: false, error: limited.error };
         const helpers = await tx();
         const { error } = await (context as Ctx).supabase.rpc("review_refund", {
           _refund_id: data.refundId,
@@ -424,6 +429,8 @@ export const processRefund = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) =>
     guard(context as Ctx, "refunds.process", async () => {
+      const limited = await enforceRateLimit(context.userId, "admin.payment.decision");
+      if (limited) return { ok: false, error: limited.error };
       const helpers = await tx();
       const { error } = await (context as Ctx).supabase.rpc("process_refund", {
         _refund_id: data.refundId,

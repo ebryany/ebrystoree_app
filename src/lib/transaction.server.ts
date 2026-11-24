@@ -7,6 +7,8 @@ const skipTxCache = () => Boolean(process.env.VITEST);
 const RPC_ERROR_MESSAGE: Record<string, string> = {
   UNAUTHENTICATED: "Sesi Anda berakhir. Silakan masuk kembali.",
   FORBIDDEN: "Anda tidak memiliki izin untuk tindakan ini.",
+  SELF_APPROVAL_FORBIDDEN: "Anda tidak dapat memproses atau menyetujui transaksi milik sendiri.",
+  FEATURE_DISABLED: "Fitur ini sedang dinonaktifkan sementara oleh admin.",
   NOT_FOUND: "Data tidak ditemukan atau bukan milik Anda.",
   INVALID_STATE: "Status saat ini tidak mengizinkan tindakan tersebut.",
   INVALID_DECISION: "Keputusan verifikasi tidak dikenal.",
@@ -27,9 +29,12 @@ const RPC_ERROR_MESSAGE: Record<string, string> = {
   MANUAL_ONLY: "Pembayaran ini memakai gateway, bukan transfer manual.",
   INVALID_PROOF: "Bukti tidak valid. Unggah JPG, PNG, WEBP, atau PDF maksimal 5 MiB.",
   PROOF_REQUIRED: "Bukti pembayaran yang diajukan belum tersedia.",
+  PROOF_ALREADY_SUBMITTED: "Bukti transfer sudah dikirim dan sedang menunggu verifikasi.",
   AMOUNT_MISMATCH: "Nominal bukti berbeda dari tagihan. Minta unggah ulang sebelum menyetujui.",
   REASON_REQUIRED: "Alasan wajib diisi.",
   REFUND_WINDOW_CLOSED: "Masa pengajuan refund sudah lewat.",
+  INVALID_REFUND_AMOUNT: "Nominal refund tidak valid.",
+  SERVICE_POST_ACCEPTANCE_REFUND_UNAVAILABLE: "Pesanan jasa yang sudah diterima tidak dapat diajukan refund.",
   NO_PAID_PAYMENT: "Belum ada pembayaran lunas pada pesanan ini.",
   DELIVERY_NOT_READY: "Seluruh produk belum tersedia. Konfirmasikan setelah produk dapat diakses.",
   REFUND_ACTIVE: "Pengajuan refund sedang diproses. Penerimaan belum dapat dikonfirmasi.",
@@ -57,9 +62,13 @@ const RPC_ERROR_MESSAGE: Record<string, string> = {
   create_general_service_order: "Checkout jasa ini belum aktif. Hubungi admin.",
 };
 
+const RPC_ERROR_ENTRIES = Object.entries(RPC_ERROR_MESSAGE).sort(
+  (a, b) => b[0].length - a[0].length,
+);
+
 export function rpcErrorMessage(message: string | undefined | null): string {
   if (!message) return "Terjadi kesalahan. Coba lagi.";
-  for (const [code, text] of Object.entries(RPC_ERROR_MESSAGE)) {
+  for (const [code, text] of RPC_ERROR_ENTRIES) {
     if (message.includes(code)) return text;
   }
   console.error("[transaksi] kesalahan tidak terduga:", message);

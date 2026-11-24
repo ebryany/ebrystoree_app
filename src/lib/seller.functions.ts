@@ -32,7 +32,9 @@ function rpcError(message: string) {
     REFERENCE_REQUIRED: "Referensi transfer wajib diisi (minimal 3 karakter).",
     SELF_APPROVAL_FORBIDDEN: "Pemilik toko tidak boleh memproses payout toko sendiri.",
   };
-  return map[clean] ?? (clean.length > 3 ? clean : "Aksi gagal diproses. Coba lagi.");
+  if (map[clean]) return map[clean];
+  console.error("[seller] rpc error:", message);
+  return "Aksi gagal diproses. Coba lagi.";
 }
 
 /* ---------------- Toko seller ---------------- */
