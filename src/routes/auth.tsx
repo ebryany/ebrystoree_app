@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
@@ -28,12 +28,13 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
+import { userPortalSignIn } from "@/lib/admin-auth.functions";
 import { listRecentReviews } from "@/lib/reviews.functions";
-import { cn, safeInternalPath } from "@/lib/utils";
+import { cn, safeUserNextPath } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { next?: string; mode?: "masuk" | "daftar" } => {
-    const next = safeInternalPath(s["next"]);
+    const next = safeUserNextPath(s["next"]);
     const mode = s["mode"] === "daftar" ? "daftar" : undefined;
     return {
       ...(next ? { next } : {}),
@@ -94,6 +95,8 @@ function passwordStrength(value: string) {
 
 function HalamanAuth() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const signInUserPortal = useServerFn(userPortalSignIn);
   const { next, mode: initialMode } = Route.useSearch();
   const { user, loading } = useSession();
   const websiteSettings = useWebsiteSettings();
@@ -133,11 +136,11 @@ function HalamanAuth() {
   };
 
   useEffect(() => {
-    if (!loading && user && !awaitingEmail) {
+    if (!loading && user && !awaitingEmail && !busy) {
       if (next) window.location.href = next;
       else navigate({ to: "/dashboard", replace: true });
     }
-  }, [loading, user, navigate, next, awaitingEmail]);
+  }, [loading, user, navigate, next, awaitingEmail, busy]);
 
   function switchMode(value: Mode) {
     setMode(value);
@@ -180,11 +183,29 @@ function HalamanAuth() {
         if (error) throw error;
         setResetSent(true);
       } else if (mode === "masuk") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
+        // Autentikasi user lewat server: memblokir akun admin/staf agar tidak bisa
+        // masuk lewat halaman login user dan membersihkan cookie portal admin.
+        const res = await signInUserPortal({
+          data: {
+            email: email.trim(),
+            password,
+          },
         });
-        if (error) throw error;
+        if (!res.ok) {
+          if (res.code === "INVALID_CREDENTIALS" || res.code === "ADMIN_BLOCKED") {
+            setErrors({ password: res.error });
+          } else {
+            toast.error(res.error);
+          }
+          return;
+        }
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: res.accessToken,
+          refresh_token: res.refreshToken,
+        });
+        if (sessionError) throw sessionError;
+        await queryClient.cancelQueries();
+        queryClient.clear();
         rememberMethod("email");
         toast.success("Berhasil masuk.");
         goNext();

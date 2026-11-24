@@ -5,6 +5,7 @@
  */
 import { getRequestHeader } from "@tanstack/react-start/server";
 
+import { readAdminPortalState } from "./admin-portal.server";
 import { clientIpFrom } from "./client-ip.server";
 import { recordSecurityEvent } from "./security-event.server";
 
@@ -88,6 +89,39 @@ export async function assertPermission(
   meta?: { endpoint?: string; routeTemplate?: string },
 ): Promise<Access> {
   const access = await loadAccess(context);
+  const endpoint = meta?.endpoint ?? `serverFn:${permission}`;
+  const isSeeEndpoint = /^serverFn:(growth|growth-actions|seo-audit|campaigns|see):/.test(endpoint);
+  const portalState = readAdminPortalState(context.userId);
+  const portalAllowed = isSeeEndpoint ? portalState.seeVerified : portalState.adminVerified;
+
+  if (!portalAllowed) {
+    console.warn(
+      `[authz] portal gate ditolak user=${context.userId} permission=${permission} endpoint=${endpoint} ip=${clientIp() ?? "-"}`,
+    );
+    await Promise.all([
+      writeAudit(context, {
+        action: "permission.portal_gate_denied",
+        entityType: "permission",
+        after: { permission, endpoint, portal: portalState.portal },
+      }),
+      recordSecurityEvent({
+        eventType: "admin_portal_bypass_attempt",
+        severity: "HIGH",
+        category: "security_violation",
+        actorUserId: context.userId,
+        actorRole: access.roles.join(",") || "authenticated",
+        endpoint,
+        routeTemplate: meta?.routeTemplate ?? null,
+        actionName: permission,
+        statusCode: 403,
+        reasonCode: "ADMIN_PORTAL_GATE_REQUIRED",
+        sourceSystem: "server_fn",
+        metadata: { requiredPermission: permission, portal: portalState.portal ?? "none" },
+      }),
+    ]);
+    throw new ForbiddenError(permission);
+  }
+
   if (access.permissions.includes(permission)) return access;
 
   if (access.isSuperAdmin) {

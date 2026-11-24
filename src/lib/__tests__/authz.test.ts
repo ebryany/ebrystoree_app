@@ -1,8 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@tanstack/react-start/server", () => ({ getRequestHeader: () => "203.0.113.5" }));
+const headerState = vi.hoisted(() => ({
+  ip: "203.0.113.5",
+  cookie: "",
+  userAgent: "VitestBrowser/1.0",
+}));
 
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequestHeader: (name: string) => {
+    const lower = name.toLowerCase();
+    if (lower === "cookie") return headerState.cookie;
+    if (lower === "user-agent") return headerState.userAgent;
+    return headerState.ip;
+  },
+}));
+
+import { ADMIN_PORTAL_COOKIE_NAME, createAdminPortalCookieValue } from "../admin-portal.server";
 import { ForbiddenError, assertPermission, loadAccess, slugify, writeAudit } from "../authz.server";
+
+function setValidPortalCookie(userId: string, portal: "admin" | "see" = "admin") {
+  const { value } = createAdminPortalCookieValue(userId, portal, headerState.userAgent);
+  headerState.cookie = `${ADMIN_PORTAL_COOKIE_NAME}=${value}`;
+}
+
+beforeEach(() => {
+  setValidPortalCookie("user-1", "admin");
+});
 
 function makeContext(roles: string[], permissions: string[]) {
   const rpcCalls: any[] = [];
@@ -64,6 +87,31 @@ describe("assertPermission", () => {
     expect(audit).toBeTruthy();
     expect(audit.args._action).toBe("permission.super_admin_bypass");
     expect(audit.args._after).toEqual({ permission: "settings.manage" });
+  });
+
+  it("menolak admin/super_admin bila cookie portal admin tidak ada (misal sesi dari /auth)", async () => {
+    headerState.cookie = "";
+    const { ctx } = makeContext(["super_admin"], ["admin.dashboard.view", "settings.manage"]);
+    await expect(assertPermission(ctx, "settings.manage")).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("menolak cookie portal /see saat mencoba mengakses server function admin, tetapi mengizinkan endpoint growth", async () => {
+    setValidPortalCookie("user-1", "see");
+    const { ctx } = makeContext(["admin"], ["settings.manage", "articles.view"]);
+    await expect(assertPermission(ctx, "settings.manage")).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(
+      assertPermission(ctx, "articles.view", { endpoint: "serverFn:growth:articles.view" }),
+    ).resolves.toBeTruthy();
+  });
+
+  it("menolak cookie portal admin yang dimodifikasi atau milik user berbeda", async () => {
+    setValidPortalCookie("other-user", "admin");
+    const { ctx } = makeContext(["super_admin"], ["settings.manage"]);
+    await expect(assertPermission(ctx, "settings.manage")).rejects.toBeInstanceOf(ForbiddenError);
+
+    setValidPortalCookie("user-1", "admin");
+    headerState.cookie = `${headerState.cookie}tampered`;
+    await expect(assertPermission(ctx, "settings.manage")).rejects.toBeInstanceOf(ForbiddenError);
   });
 });
 

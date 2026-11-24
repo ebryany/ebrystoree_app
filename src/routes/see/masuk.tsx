@@ -1,10 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Lock, Mail, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
+import { growthPortalSignIn } from "@/lib/admin-auth.functions";
+import { getMyAccess } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,16 +39,30 @@ export const Route = createFileRoute("/see/masuk")({
 
 function HalamanMasukSee() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const signInGrowth = useServerFn(growthPortalSignIn);
+  const fetchAccess = useServerFn(getMyAccess);
   const { user, loading } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  // Sudah masuk: langsung ke dashboard, tidak perlu mengetik ulang.
+  // Sudah masuk melalui portal pertumbuhan/admin: langsung ke /see.
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/see", replace: true });
-  }, [loading, user, navigate]);
+    if (loading || !user || busy) return;
+    let alive = true;
+    void fetchAccess({})
+      .then((access) => {
+        if (alive && access?.seePortalVerified) {
+          void navigate({ to: "/see", replace: true });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [loading, user, busy, fetchAccess, navigate]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,11 +73,23 @@ function HalamanMasukSee() {
     setBusy(true);
     setError("");
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const res = await signInGrowth({
+        data: {
+          email: email.trim(),
+          password,
+        },
       });
-      if (signInError) throw signInError;
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      const { error: sessionErr } = await supabase.auth.setSession({
+        access_token: res.accessToken,
+        refresh_token: res.refreshToken,
+      });
+      if (sessionErr) throw sessionErr;
+      await queryClient.cancelQueries();
+      queryClient.clear();
       toast.success("Berhasil masuk.");
       navigate({ to: "/see", replace: true });
     } catch (err) {

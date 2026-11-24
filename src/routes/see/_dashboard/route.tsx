@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
 import { SecurityErrorView } from "@/components/security-error-page";
+import { adminPortalSignOut } from "@/lib/admin-auth.functions";
 import { getMyAccess } from "@/lib/admin.functions";
 import { reportUnauthorizedRouteAccess } from "@/lib/security.functions";
 import { useSession } from "@/hooks/use-session";
@@ -105,6 +106,7 @@ function GrowthLayout() {
   const queryClient = useQueryClient();
   const { session, loading: sessionLoading } = useSession();
   const fetchAccess = useServerFn(getMyAccess);
+  const signOutPortal = useServerFn(adminPortalSignOut);
   const reportDenied = useServerFn(reportUnauthorizedRouteAccess);
   const pathname = useRouterState({ select: (s) => s.location.pathname.replace(/\/$/, "") || "/see" });
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -126,7 +128,9 @@ function GrowthLayout() {
 
   const data = access.data;
   const canEnter =
-    !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
+    !!data &&
+    Boolean(data.seePortalVerified) &&
+    (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
 
   useEffect(() => {
     if (sessionLoading || !session || access.isPending || access.error || !data || canEnter) return;
@@ -145,6 +149,7 @@ function GrowthLayout() {
     try {
       await queryClient.cancelQueries();
       queryClient.clear();
+      await signOutPortal({}).catch(() => {});
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       await navigate({ to: "/see/masuk", replace: true });

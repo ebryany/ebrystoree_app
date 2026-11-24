@@ -29,6 +29,9 @@ const DEFAULT_POLICIES = {
   "admin.seller.decision": { limit: 60, windowSeconds: 300 },
   "admin.payout.decision": { limit: 60, windowSeconds: 300 },
   "admin.payment.decision": { limit: 60, windowSeconds: 300 },
+  "admin.login.ip": { limit: 10, windowSeconds: 900 },
+  "admin.login.account": { limit: 5, windowSeconds: 900 },
+  "user.login": { limit: 20, windowSeconds: 900 },
   "mcp.upload": { limit: 15, windowSeconds: 300 },
   "mcp.mutation": { limit: 60, windowSeconds: 60 },
   "mcp.notify": { limit: 10, windowSeconds: 300 },
@@ -55,6 +58,8 @@ const FAIL_CLOSED_BUCKETS = new Set<RateLimitBucket>([
   "seller.payout",
   "admin.payout.decision",
   "admin.payment.decision",
+  "admin.login.ip",
+  "admin.login.account",
   "mcp.upload",
 ]);
 

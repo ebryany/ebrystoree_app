@@ -51,6 +51,35 @@ export function safeInternalPath(value: unknown): string | null {
   }
 }
 
+/**
+ * Sama seperti `safeInternalPath`, tetapi menolak tujuan rute portal admin/internal
+ * agar halaman login user (`/auth` & `/auth/callback`) tidak pernah mengarahkan ke `/admin`.
+ */
+export function safeUserNextPath(value: unknown): string | null {
+  const safe = safeInternalPath(value);
+  if (!safe) return null;
+  const rawPathname = safe.split(/[?#]/)[0] ?? "";
+  let decodedPathname = rawPathname;
+  try {
+    decodedPathname = decodeURIComponent(rawPathname);
+  } catch {
+    return null;
+  }
+  for (const candidate of [rawPathname.toLowerCase(), decodedPathname.toLowerCase()]) {
+    if (
+      candidate === "/admin" ||
+      candidate.startsWith("/admin/") ||
+      candidate === "/as/feb/auth/admin" ||
+      candidate.startsWith("/as/feb/auth/admin/") ||
+      candidate === "/see" ||
+      candidate.startsWith("/see/")
+    ) {
+      return null;
+    }
+  }
+  return safe;
+}
+
 export function isRenderableImageUrl(value: unknown): value is string {
   if (typeof value !== "string" || /[\s\p{Cc}\\]/u.test(value)) return false;
   try {

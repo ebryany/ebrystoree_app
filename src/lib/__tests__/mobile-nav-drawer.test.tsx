@@ -27,6 +27,7 @@ vi.mock("@tanstack/react-start", () => ({
   useServerFn: () => vi.fn(),
 }));
 vi.mock("@/lib/admin.functions", () => ({ getMyRoles: vi.fn() }));
+vi.mock("@/lib/admin-auth.functions", () => ({ adminPortalSignOut: vi.fn() }));
 vi.mock("@/lib/inquiries.functions", () => ({ listInquiryUnreadCounts: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { auth: { signOut: vi.fn() } } }));
 vi.mock("@/hooks/use-session", () => ({ useSession: () => ({ user: null, loading: false }) }));

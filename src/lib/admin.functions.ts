@@ -36,13 +36,20 @@ export const getMyAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const helpers = await authz();
+    const { readAdminPortalState } = await import("./admin-portal.server");
     try {
       await context.supabase.rpc("sync_my_profile_email");
     } catch {
       /* fallback sync tidak boleh memblokir */
     }
     const access = await helpers.loadAccess(context as Ctx);
-    return access;
+    const portal = readAdminPortalState((context as Ctx).userId);
+    return {
+      ...access,
+      adminPortalVerified: portal.adminVerified,
+      seePortalVerified: portal.seeVerified,
+      adminPortalExpiresAt: portal.expiresAt,
+    };
   });
 
 /** @deprecated dipertahankan untuk kompatibilitas komponen lama */

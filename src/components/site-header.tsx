@@ -13,7 +13,6 @@ import {
   MessagesSquare,
   Package,
   Search,
-  ShieldCheck,
   ShoppingBag,
   UserRound,
   X,
@@ -28,6 +27,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useSession } from "@/hooks/use-session";
 import { useSiteNav, useWebsiteSettings } from "@/hooks/use-website-settings";
 import { supabase } from "@/integrations/supabase/client";
+import { adminPortalSignOut } from "@/lib/admin-auth.functions";
 import { getMyRoles } from "@/lib/admin.functions";
 import { listInquiryUnreadCounts } from "@/lib/inquiries.functions";
 import { cn, optimizedMediaUrl } from "@/lib/utils";
@@ -64,6 +64,7 @@ export function SiteHeader() {
   const brandName = String(settings.store_name ?? "Ebrystore");
   const logoUrl = String(settings.site_logo_url ?? "");
   const fetchRoles = useServerFn(getMyRoles);
+  const signOutPortal = useServerFn(adminPortalSignOut);
   const { data: access } = useQuery({
     queryKey: ["my-roles"],
     queryFn: () => fetchRoles({}),
@@ -78,7 +79,6 @@ export function SiteHeader() {
     enabled: Boolean(user),
   });
   const chatUnread = (chatUnreadData?.items ?? []).reduce((sum, r) => sum + Number(r.unread), 0);
-  const isAdmin = Boolean(access?.isAdmin);
   const isOperator = Boolean(access?.roles?.includes("operator"));
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
@@ -90,6 +90,7 @@ export function SiteHeader() {
     setOpen(false);
     await queryClient.cancelQueries();
     queryClient.clear();
+    await signOutPortal({}).catch(() => {});
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
   }
@@ -243,11 +244,6 @@ export function SiteHeader() {
                     </Link>
                   </Button>
                   <NotificationBell />
-                  {isAdmin ? (
-                    <Button asChild variant="ghost" className="min-h-11">
-                      <Link to="/admin">Admin</Link>
-                    </Button>
-                  ) : null}
                   {isOperator ? (
                     <Button asChild variant="ghost" className="min-h-11">
                       <Link to="/operator">Tugas saya</Link>
@@ -461,13 +457,6 @@ export function SiteHeader() {
         <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
           {user ? (
             <>
-              {isAdmin ? (
-                <Button asChild variant="outline" className="min-h-11 justify-start">
-                  <Link to="/admin" onClick={() => handleDrawerOpenChange(false)}>
-                    <ShieldCheck className="size-4" aria-hidden="true" /> Dashboard admin
-                  </Link>
-                </Button>
-              ) : null}
               {isOperator ? (
                 <Button asChild variant="outline" className="min-h-11 justify-start">
                   <Link to="/operator" onClick={() => handleDrawerOpenChange(false)}>

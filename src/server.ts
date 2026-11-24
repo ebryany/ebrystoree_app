@@ -108,9 +108,26 @@ const CSP = [
   "upgrade-insecure-requests",
 ].join("; ");
 
-function applySecurityHeaders(response: Response, requestId: string): Response {
+function isPrivatePortalPath(url: string): boolean {
+  try {
+    const pathname = new URL(url).pathname.toLowerCase();
+    return (
+      pathname === "/admin" ||
+      pathname.startsWith("/admin/") ||
+      pathname === "/as/feb/auth/admin" ||
+      pathname.startsWith("/as/feb/auth/admin/") ||
+      pathname === "/see" ||
+      pathname.startsWith("/see/")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function applySecurityHeaders(response: Response, requestId: string, requestUrl = ""): Response {
   const contentType = response.headers.get("content-type") ?? "";
   const isHtml = contentType.includes("text/html");
+  const isPrivatePortal = isPrivatePortalPath(requestUrl);
   const headers = new Headers(response.headers);
   // Request Reference ID unik untuk korelasi audit & security monitoring.
   if (!headers.has("X-Request-Id")) {
@@ -121,6 +138,10 @@ function applySecurityHeaders(response: Response, requestId: string): Response {
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // HSTS diabaikan browser pada koneksi non-TLS, jadi aman dikirim juga di dev lokal.
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  if (isPrivatePortal) {
+    headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    headers.set("Cache-Control", "private, no-store, no-cache, must-revalidate");
+  }
   // Mencegah Cloudflare default-extension caching (Web Cache Deception pada rute
   // dinamis berakhiran .css/.js/.png) dan kebocoran cache lintas pengguna pada SSR,
   // server functions, webhook, serta API yang tidak menetapkan Cache-Control eksplisit.
@@ -151,7 +172,7 @@ export default {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       const normalized = await normalizeCatastrophicSsrResponse(response, request, requestId);
-      return applySecurityHeaders(normalized, requestId);
+      return applySecurityHeaders(normalized, requestId, request.url);
     } catch (error) {
       console.error(`[server] requestId=${requestId}`, error);
       const isApi =
@@ -173,6 +194,7 @@ export default {
             { status: 500, headers: { "content-type": "application/json; charset=utf-8" } },
           ),
           requestId,
+          request.url,
         );
       }
       return applySecurityHeaders(
@@ -181,6 +203,7 @@ export default {
           headers: { "content-type": "text/html; charset=utf-8" },
         }),
         requestId,
+        request.url,
       );
     }
   },

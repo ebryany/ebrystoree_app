@@ -35,6 +35,7 @@ import { AccessProvider, AdminLoading } from "@/components/admin/admin-ui";
 import { NotificationBell } from "@/components/ebry/notification-bell";
 import { SecurityErrorView } from "@/components/security-error-page";
 import { adminNav, ROLE_LABELS } from "@/lib/admin-nav";
+import { adminPortalSignOut } from "@/lib/admin-auth.functions";
 import { getMyAccess, type AdminBadges } from "@/lib/admin.functions";
 import { useAdminBadges } from "@/hooks/use-admin-badges";
 import { reportUnauthorizedRouteAccess } from "@/lib/security.functions";
@@ -188,6 +189,7 @@ function NavList({
 
 function AdminLayout() {
   const fetchAccess = useServerFn(getMyAccess);
+  const signOutPortal = useServerFn(adminPortalSignOut);
   const reportDenied = useServerFn(reportUnauthorizedRouteAccess);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -202,7 +204,9 @@ function AdminLayout() {
   });
 
   const canEnter =
-    !!data && (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
+    !!data &&
+    Boolean(data.adminPortalVerified) &&
+    (data.isSuperAdmin || data.permissions.includes("admin.dashboard.view"));
   const badges = useAdminBadges(canEnter);
   const totalBadgeCount = Object.values(badges).reduce((sum, count) => sum + count, 0);
 
@@ -223,9 +227,10 @@ function AdminLayout() {
     try {
       await queryClient.cancelQueries();
       queryClient.clear();
+      await signOutPortal({}).catch(() => {});
       const { error: signOutError } = await supabase.auth.signOut();
       if (signOutError) throw signOutError;
-      await navigate({ to: "/auth", replace: true });
+      await navigate({ to: "/as/feb/auth/admin", replace: true });
     } catch {
       toast.error("Gagal keluar dari akun. Silakan coba lagi.");
     } finally {

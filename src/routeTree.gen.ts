@@ -121,6 +121,7 @@ import { Route as ApiPublicJobsTelegramDispatchRouteImport } from './routes/api/
 import { Route as ApiPublicOgImageSplatRouteImport } from './routes/api/public/og-image.$'
 import { Route as ApiPublicServiceMediaSplatRouteImport } from './routes/api/public/service-media.$'
 import { Route as ApiV1CatalogSplatRouteImport } from './routes/api/v1/catalog/$'
+import { Route as AsFebAuthAdminRouteImport } from './routes/as.feb.auth.admin'
 import { Route as ApiPublicIntegrationsJiofarmDemandRouteImport } from './routes/api/public/integrations/jiofarm/demand'
 import { Route as ApiPublicIntegrationsJiofarmLinksRouteImport } from './routes/api/public/integrations/jiofarm/links'
 import { Route as ApiPublicPaymentsWebhookShopeepayRouteImport } from './routes/api/public/payments/webhook.shopeepay'
@@ -753,6 +754,11 @@ const ApiV1CatalogSplatRoute = ApiV1CatalogSplatRouteImport.update({
   path: '/api/v1/catalog/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AsFebAuthAdminRoute = AsFebAuthAdminRouteImport.update({
+  id: '/as/feb/auth/admin',
+  path: '/as/feb/auth/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIntegrationsJiofarmDemandRoute =
   ApiPublicIntegrationsJiofarmDemandRouteImport.update({
     id: '/api/public/integrations/jiofarm/demand',
@@ -876,6 +882,7 @@ export interface FileRoutesByFullPath {
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
+  '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/admin/payments/': typeof AuthenticatedAdminPaymentsIndexRoute
@@ -987,6 +994,7 @@ export interface FileRoutesByTo {
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
+  '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/admin/chat': typeof AuthenticatedAdminChatIndexRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsIndexRoute
@@ -1106,6 +1114,7 @@ export interface FileRoutesById {
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
+  '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/_authenticated/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
   '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/_authenticated/admin/payments/': typeof AuthenticatedAdminPaymentsIndexRoute
@@ -1225,6 +1234,7 @@ export interface FileRouteTypes {
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/api/v1/catalog/$'
+    | '/as/feb/auth/admin'
     | '/admin/chat/'
     | '/admin/orders/'
     | '/admin/payments/'
@@ -1336,6 +1346,7 @@ export interface FileRouteTypes {
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/api/v1/catalog/$'
+    | '/as/feb/auth/admin'
     | '/admin/chat'
     | '/admin/orders'
     | '/admin/payments'
@@ -1454,6 +1465,7 @@ export interface FileRouteTypes {
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
     | '/api/v1/catalog/$'
+    | '/as/feb/auth/admin'
     | '/_authenticated/admin/chat/'
     | '/_authenticated/admin/orders/'
     | '/_authenticated/admin/payments/'
@@ -1509,6 +1521,7 @@ export interface RootRouteChildren {
   ApiPublicOgImageSplatRoute: typeof ApiPublicOgImageSplatRoute
   ApiPublicServiceMediaSplatRoute: typeof ApiPublicServiceMediaSplatRoute
   ApiV1CatalogSplatRoute: typeof ApiV1CatalogSplatRoute
+  AsFebAuthAdminRoute: typeof AsFebAuthAdminRoute
   ApiPublicIntegrationsJiofarmDemandRoute: typeof ApiPublicIntegrationsJiofarmDemandRoute
   ApiPublicIntegrationsJiofarmLinksRoute: typeof ApiPublicIntegrationsJiofarmLinksRoute
   ApiPublicPaymentsWebhookShopeepayRoute: typeof ApiPublicPaymentsWebhookShopeepayRoute
@@ -2301,6 +2314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1CatalogSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/as/feb/auth/admin': {
+      id: '/as/feb/auth/admin'
+      path: '/as/feb/auth/admin'
+      fullPath: '/as/feb/auth/admin'
+      preLoaderRoute: typeof AsFebAuthAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/integrations/jiofarm/demand': {
       id: '/api/public/integrations/jiofarm/demand'
       path: '/api/public/integrations/jiofarm/demand'
@@ -2614,6 +2634,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicOgImageSplatRoute: ApiPublicOgImageSplatRoute,
   ApiPublicServiceMediaSplatRoute: ApiPublicServiceMediaSplatRoute,
   ApiV1CatalogSplatRoute: ApiV1CatalogSplatRoute,
+  AsFebAuthAdminRoute: AsFebAuthAdminRoute,
   ApiPublicIntegrationsJiofarmDemandRoute:
     ApiPublicIntegrationsJiofarmDemandRoute,
   ApiPublicIntegrationsJiofarmLinksRoute:

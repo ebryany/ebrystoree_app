@@ -1,10 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { safeInternalPath } from "@/lib/utils";
+import { verifyUserPortalSession } from "@/lib/admin-auth.functions";
+import { safeUserNextPath } from "@/lib/utils";
 
 /**
  * Callback OAuth (Google) untuk Supabase Auth.
@@ -27,8 +29,8 @@ export const Route = createFileRoute("/auth/callback")({
   validateSearch: (
     s: Record<string, unknown>,
   ): { code?: string; next?: string; error?: string } => {
-    // Hanya path internal. "//evil.com", "/\evil.com" dan "https://evil.com" ditolak.
-    const safeNext = safeInternalPath(s["next"]);
+    // Hanya path internal non-admin. "//evil.com", "/admin", dan "https://evil.com" ditolak.
+    const safeNext = safeUserNextPath(s["next"]);
     return {
       ...(typeof s["code"] === "string" ? { code: s["code"] } : {}),
       ...(safeNext ? { next: safeNext } : {}),
@@ -44,6 +46,7 @@ export const Route = createFileRoute("/auth/callback")({
 function AuthCallback() {
   const { code, next, error: oauthError } = Route.useSearch();
   const navigate = useNavigate();
+  const verifyUserPortal = useServerFn(verifyUserPortalSession);
   const [failed, setFailed] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,6 +71,23 @@ function AuthCallback() {
         return;
       }
 
+      // Pastikan akun admin/staf tidak dapat masuk melalui OAuth portal pengguna
+      // dan bersihkan cookie portal admin apa pun yang tersisa.
+      try {
+        const check = await verifyUserPortal({});
+        if (cancelled) return;
+        if (!check?.allowed) {
+          await supabase.auth.signOut();
+          setFailed(check?.error ?? "Akun ini tidak dapat masuk melalui halaman login pengguna.");
+          return;
+        }
+      } catch {
+        if (cancelled) return;
+        await supabase.auth.signOut();
+        setFailed("Gagal memverifikasi jenis akun. Coba masuk lagi.");
+        return;
+      }
+
       // Session sudah tersimpan oleh SDK. Arahkan ke tujuan semula, atau
       // dashboard sebagai default.
       navigate({ to: next || "/dashboard", replace: true });
@@ -77,7 +97,7 @@ function AuthCallback() {
     return () => {
       cancelled = true;
     };
-  }, [code, next, oauthError, navigate]);
+  }, [code, next, oauthError, navigate, verifyUserPortal]);
 
   return (
     <PageShell>
