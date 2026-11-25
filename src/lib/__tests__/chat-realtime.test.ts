@@ -10,6 +10,15 @@ import {
   renderFormattedChatText,
 } from "@/components/chat/chat-format";
 import { chatDayLabel, shortChatTime } from "@/components/chat/chat-time";
+import {
+  buildGoogleMapsEmbedUrl,
+  buildGoogleMapsUrl,
+  buildOsmEmbedUrl,
+  latLngToWorldPixels,
+  LocationBubbleCard,
+  parseCoordinateOrMapsInput,
+  worldPixelsToLatLng,
+} from "@/components/chat/location-map";
 import { formatAudioClock } from "@/components/chat/voice-note";
 import { normalizeChatMime } from "@/lib/inquiries.functions";
 
@@ -162,6 +171,63 @@ describe("chat WhatsApp + VN full upgrade SQL & security header contract", () =>
   it("permits same-origin microphone & scoped media-src for Voice Notes without opening camera", () => {
     expect(serverSrc).toContain("camera=(), microphone=(self)");
     expect(serverSrc).toContain("media-src 'self' blob:");
+    expect(serverSrc).toContain("https://www.openstreetmap.org");
+    expect(serverSrc).toContain("https://maps.google.com");
+  });
+});
+
+describe("WhatsApp location map projection, URL parsing, and bubble card render", () => {
+  it("projects coordinates accurately through Web Mercator round-trip", () => {
+    const jakarta = { lat: -6.175392, lng: 106.827153 };
+    const px = latLngToWorldPixels(jakarta.lat, jakarta.lng, 16);
+    const back = worldPixelsToLatLng(px.x, px.y, 16);
+    expect(Math.abs(back.lat - jakarta.lat)).toBeLessThan(0.00001);
+    expect(Math.abs(back.lng - jakarta.lng)).toBeLessThan(0.00001);
+  });
+
+  it("parses raw coordinates and Google Maps links cleanly", () => {
+    expect(parseCoordinateOrMapsInput("-6.2088, 106.8456")).toEqual({
+      lat: -6.2088,
+      lng: 106.8456,
+    });
+    expect(
+      parseCoordinateOrMapsInput(
+        "https://www.google.com/maps/place/Monas/@-6.175392,106.827153,17z",
+      ),
+    ).toEqual({ lat: -6.175392, lng: 106.827153 });
+    expect(
+      parseCoordinateOrMapsInput("https://maps.google.com/?q=-5.147665%2C119.432732"),
+    ).toEqual({ lat: -5.147665, lng: 119.432732 });
+    expect(parseCoordinateOrMapsInput("Monas Jakarta")).toBeNull();
+    expect(parseCoordinateOrMapsInput("999, 999")).toBeNull();
+  });
+
+  it("builds valid Google Maps and OSM embed URLs and renders LocationBubbleCard safely", () => {
+    expect(buildGoogleMapsUrl(-6.175392, 106.827153)).toContain("-6.175392,106.827153");
+    expect(buildGoogleMapsEmbedUrl(-6.175392, 106.827153)).toContain("output=embed");
+    expect(buildOsmEmbedUrl(-6.175392, 106.827153)).toContain("marker=-6.175392%2C106.827153");
+
+    const html = renderToStaticMarkup(
+      createElement(LocationBubbleCard, {
+        lat: -6.175392,
+        lng: 106.827153,
+        label: "Monumen Nasional",
+        address: "Gambir, Jakarta Pusat",
+        mine: true,
+        onOpenFullMap: () => {},
+      }),
+    );
+    expect(html).toContain("Monumen Nasional");
+    expect(html).toContain("Gambir, Jakarta Pusat");
+    expect(html).toContain("basemaps.cartocdn.com/rastertiles/voyager/16/");
+    expect(html).toContain('referrerPolicy="no-referrer"');
+    expect(html).toContain("Peta interaktif");
+    expect(html).toContain("Google Maps");
+    expect(windowSrc).toContain("LocationBubbleCard");
+    expect(windowSrc).toContain("LocationPickerDialog");
+    expect(windowSrc).toContain("LocationMapModal");
+    expect(windowSrc).toContain("touch-pan-y");
+    expect(windowSrc).toContain("chat-scroll");
   });
 });
 

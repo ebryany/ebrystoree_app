@@ -4,14 +4,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronLeft,
+  Lock,
   Mail,
+  MapPin,
   MessagesSquare,
   Mic,
   MoreVertical,
   Pin,
   PinOff,
   Search,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -143,86 +144,105 @@ function ChatListPage() {
 
   return (
     <>
-      {/* Desktop (lg+): tata letak 2 kolom permanen ala WhatsApp Web */}
+      {/* Desktop (lg+): tata letak 2 kolom 100% ala WhatsApp Web */}
       <div className="hidden lg:block">
         <ChatSplit mode="customer" activeId={null}>
-          <div className="chat-wallpaper flex h-full flex-col items-center justify-center p-8 text-center">
-            <span className="grid size-16 place-items-center rounded-2xl border border-border bg-card text-primary shadow-[var(--elev-1)]">
-              <MessagesSquare className="size-8" aria-hidden="true" />
+          <div className="chat-wallpaper relative flex h-full flex-col items-center justify-center p-8 text-center">
+            <span className="grid size-20 place-items-center rounded-full bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)] shadow-sm">
+              <MessagesSquare className="size-9" aria-hidden="true" />
             </span>
-            <h1 className="mt-4 font-display text-xl font-bold text-foreground">
+            <h1 className="mt-5 font-display text-2xl font-bold tracking-tight text-[var(--wa-in-fg)]">
               Chat Ebrystore
             </h1>
-            <p className="mt-1.5 max-w-md text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--wa-in-meta)]">
               Pilih percakapan di sebelah kiri untuk membaca balasan, mengirim pesan suara (VN),
-              foto, dokumen, atau kartu produk.
+              berbagi peta lokasi, foto, dokumen, atau kartu produk langsung ke toko.
             </p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              <Button asChild className="min-h-11 rounded-control">
-                <Link to="/produk">Jelajahi produk</Link>
-              </Button>
-              <Button asChild variant="outline" className="min-h-11 rounded-control bg-card">
-                <Link to="/layanan">Lihat jasa seller</Link>
-              </Button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+              <Link
+                to="/produk"
+                className="inline-flex min-h-11 items-center rounded-full bg-[var(--wa-action)] px-5 text-sm font-semibold text-[var(--wa-action-fg)] transition-opacity hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Jelajahi produk
+              </Link>
+              <Link
+                to="/layanan"
+                className="inline-flex min-h-11 items-center rounded-full border border-[var(--wa-border)] bg-[var(--wa-in)] px-5 text-sm font-semibold text-[var(--wa-in-fg)] transition-colors hover:bg-[var(--wa-panel-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Lihat jasa seller
+              </Link>
             </div>
-            <p className="mt-6 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1">
-                <Mic className="size-3.5 text-primary" aria-hidden="true" /> Pesan suara & lampiran
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-[var(--wa-in-meta)]">
+              <span className="inline-flex items-center gap-1.5">
+                <Mic className="size-3.5 text-[var(--wa-action)]" aria-hidden="true" /> Voice Note
               </span>
-              <span aria-hidden="true">·</span>
-              <span className="inline-flex items-center gap-1">
-                <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" /> Terhubung
-                langsung ke pesanan
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-3.5 text-[var(--wa-action)]" aria-hidden="true" /> Peta Lokasi
               </span>
+            </div>
+            <p className="absolute bottom-6 inline-flex items-center gap-1.5 text-xs text-[var(--wa-in-meta)]">
+              <Lock className="size-3.5" aria-hidden="true" />
+              Percakapan & transaksi dilindungi sistem Ebrystore
             </p>
           </div>
         </ChatSplit>
       </div>
 
-      {/* Mobile & Tablet (< lg): daftar percakapan bersih ala WhatsApp */}
-      <div className="mx-auto w-full max-w-2xl lg:hidden">
-        <header className="-mx-2 flex min-h-11 items-center">
-          <Link
-            to="/dashboard"
-            className="inline-flex min-h-11 items-center gap-0.5 rounded-lg pr-3 text-[16px] font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ChevronLeft className="size-5" aria-hidden="true" />
-            Akun
-          </Link>
+      {/* Mobile & Tablet (< lg): daftar chat 100% ala WhatsApp Mobile */}
+      <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-[var(--wa-border)] bg-[var(--wa-panel)] lg:hidden">
+        <header className="bg-[var(--wa-brand)] px-4 pb-3 pt-3 text-[var(--wa-brand-fg)]">
+          <div className="flex min-h-11 items-center justify-between gap-2">
+            <div className="flex items-center gap-1">
+              <Link
+                to="/dashboard"
+                aria-label="Kembali ke akun"
+                className="-ml-2 grid size-11 place-items-center rounded-full text-[var(--wa-brand-fg)] hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <ChevronLeft className="size-6" aria-hidden="true" />
+              </Link>
+              <h1 className="font-display text-xl font-bold tracking-tight">Chat</h1>
+            </div>
+            {unreadCount > 0 ? (
+              <span className="rounded-full bg-[var(--wa-unread)] px-2.5 py-0.5 text-xs font-bold tabular-nums text-[var(--wa-unread-fg)]">
+                {unreadCount} baru
+              </span>
+            ) : null}
+          </div>
+
+          <div className="relative mt-2.5">
+            <label htmlFor="chat-search" className="sr-only">
+              Cari percakapan
+            </label>
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2 text-[var(--wa-in-meta)]"
+              aria-hidden="true"
+            />
+            <input
+              id="chat-search"
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Cari toko, produk, atau pesan..."
+              className="h-10 w-full rounded-full bg-[var(--wa-input)] pl-10 pr-10 text-sm text-[var(--wa-in-fg)] placeholder:text-[var(--wa-in-meta)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white [&::-webkit-search-cancel-button]:hidden"
+            />
+            {q ? (
+              <button
+                type="button"
+                onClick={() => setQ("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-0.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-[var(--wa-in-meta)]"
+              >
+                <X className="size-4" aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
         </header>
-        <h1 className="mt-1 font-display text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
-          Chat
-        </h1>
 
-        <div className="relative mt-3">
-          <label htmlFor="chat-search" className="sr-only">
-            Cari percakapan
-          </label>
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <input
-            id="chat-search"
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Cari toko, produk, atau pesan..."
-            className="h-11 w-full rounded-xl bg-muted pl-10 pr-10 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-search-cancel-button]:hidden"
-          />
-          {q ? (
-            <button
-              type="button"
-              onClick={() => setQ("")}
-              aria-label="Hapus pencarian"
-              className="absolute right-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted-foreground"
-            >
-              <X className="size-4" aria-hidden="true" />
-            </button>
-          ) : null}
-        </div>
-
-        <div role="tablist" aria-label="Saring percakapan" className="mt-3 flex gap-2">
+        <div
+          role="tablist"
+          aria-label="Saring percakapan"
+          className="flex gap-2 border-b border-[var(--wa-border)] bg-[var(--wa-panel)] px-4 py-2.5"
+        >
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -231,10 +251,10 @@ function ChatListPage() {
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
               className={cn(
-                "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 tab === t.id
-                  ? "bg-surface-selected text-primary"
-                  : "bg-muted text-muted-foreground hover:text-foreground",
+                  ? "bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)]"
+                  : "bg-[var(--wa-search)] text-[var(--wa-in-meta)] hover:text-[var(--wa-in-fg)]",
               )}
             >
               {t.label}
@@ -245,30 +265,40 @@ function ChatListPage() {
           ))}
         </div>
 
-        <div className="mt-2 space-y-4">
-          {isPending ? <AdminLoading /> : null}
-          {error || data?.error ? <ErrorState onRetry={() => refetch()} /> : null}
+        <div className="bg-[var(--wa-panel)]">
+          {isPending ? (
+            <div className="p-4">
+              <AdminLoading />
+            </div>
+          ) : null}
+          {error || data?.error ? (
+            <div className="p-4">
+              <ErrorState onRetry={() => refetch()} />
+            </div>
+          ) : null}
 
           {data && !data.error && items.length === 0 ? (
-            <EmptyState
-              icon={MessagesSquare}
-              title="Belum ada percakapan"
-              description="Buka salah satu produk atau jasa lalu tekan tombol Chat untuk mulai berdiskusi dengan toko."
-              action={
-                <Button asChild className="min-h-11">
-                  <Link to="/produk">Lihat katalog produk</Link>
-                </Button>
-              }
-            />
+            <div className="p-4">
+              <EmptyState
+                icon={MessagesSquare}
+                title="Belum ada percakapan"
+                description="Buka salah satu produk atau jasa lalu tekan tombol Chat untuk mulai berdiskusi dengan toko."
+                action={
+                  <Button asChild className="min-h-11">
+                    <Link to="/produk">Lihat katalog produk</Link>
+                  </Button>
+                }
+              />
+            </div>
           ) : null}
 
           {items.length > 0 && visible.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
+            <p className="py-10 text-center text-sm text-[var(--wa-in-meta)]">
               {needle ? "Tidak ada percakapan yang cocok." : "Semua pesan sudah dibaca."}
             </p>
           ) : null}
 
-          <ul className="-mx-4 sm:mx-0" aria-label="Daftar percakapan">
+          <ul aria-label="Daftar percakapan">
             {visible.map((item, index) => {
               const pinned = isPinned(item.id);
               const lastMine = item.last_message_role === "customer";
@@ -282,14 +312,14 @@ function ChatListPage() {
                 <li
                   key={item.id}
                   className={cn(
-                    "relative flex items-center after:absolute after:bottom-0 after:left-[76px] after:right-0 after:h-px after:bg-border/70 last:after:hidden",
+                    "relative flex items-center after:absolute after:bottom-0 after:left-[76px] after:right-0 after:h-px after:bg-[var(--wa-border)] last:after:hidden",
                     index >= 6 && "cv-row",
                   )}
                 >
                   <Link
                     to="/dashboard/chat/$id"
                     params={{ id: item.id }}
-                    className="min-w-0 flex-1 px-4 py-2.5 transition-colors hover:bg-muted/60 active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:rounded-xl"
+                    className="min-w-0 flex-1 px-4 py-3 transition-colors hover:bg-[var(--wa-panel-hover)] active:bg-[var(--wa-panel-active)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                   >
                     <ChatListItemContent
                       title={item.store_name || item.subject}
@@ -309,7 +339,7 @@ function ChatListPage() {
                       <button
                         type="button"
                         aria-label={`Opsi percakapan ${item.subject}`}
-                        className="mr-2 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="mr-2 grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-in-meta)] hover:bg-[var(--wa-panel-hover)] hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <MoreVertical className="size-4" aria-hidden="true" />
                       </button>

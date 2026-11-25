@@ -195,9 +195,9 @@ export function AttachmentPreviewBar({
   onConfirmSend: () => void;
 }) {
   return (
-    <div className="border-t border-border bg-card/95 px-3 py-2.5 backdrop-blur-xl">
+    <div className="pb-safe border-t border-[var(--wa-border)] bg-[var(--wa-chrome)] px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 pb-2">
-        <p className="text-xs font-semibold text-foreground">
+        <p className="text-xs font-semibold text-[var(--wa-in-fg)]">
           {staged.kind === "images"
             ? `Pratinjau foto (${staged.files.length}/4)`
             : "Pratinjau dokumen"}
@@ -206,7 +206,7 @@ export function AttachmentPreviewBar({
           type="button"
           onClick={onCancel}
           aria-label="Batalkan lampiran"
-          className="grid size-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="grid size-9 place-items-center rounded-full text-[var(--wa-in-meta)] hover:bg-black/5 hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-white/10"
         >
           <X className="size-4" aria-hidden="true" />
         </button>
@@ -217,7 +217,7 @@ export function AttachmentPreviewBar({
           {staged.files.map((item, idx) => (
             <div
               key={`${item.file.name}-${idx}`}
-              className="relative size-16 shrink-0 overflow-hidden rounded-xl border border-border bg-muted"
+              className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-[var(--wa-border)] bg-[var(--wa-panel)]"
             >
               <img src={item.previewUrl} alt={item.file.name} className="size-full object-cover" />
               <button
@@ -235,20 +235,22 @@ export function AttachmentPreviewBar({
               type="button"
               onClick={onAddMoreImages}
               aria-label="Tambah foto lagi"
-              className="grid size-16 shrink-0 place-items-center rounded-xl border border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="grid size-16 shrink-0 place-items-center rounded-lg border border-dashed border-[var(--wa-border)] bg-[var(--wa-panel)] text-[var(--wa-in-meta)] hover:border-[var(--wa-action)] hover:text-[var(--wa-action)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Plus className="size-5" aria-hidden="true" />
             </button>
           ) : null}
         </div>
       ) : (
-        <div className="mb-2 flex items-center gap-2.5 rounded-xl border border-border bg-surface px-3 py-2">
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-selected text-primary">
+        <div className="mb-2 flex items-center gap-2.5 rounded-lg border border-[var(--wa-border)] bg-[var(--wa-panel)] px-3 py-2">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)]">
             <FileText className="size-4" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{staged.file.name}</p>
-            <p className="text-xs text-muted-foreground">{formatFileSize(staged.file.size)}</p>
+            <p className="truncate text-sm font-semibold text-[var(--wa-in-fg)]">
+              {staged.file.name}
+            </p>
+            <p className="text-xs text-[var(--wa-in-meta)]">{formatFileSize(staged.file.size)}</p>
           </div>
         </div>
       )}
@@ -265,15 +267,15 @@ export function AttachmentPreviewBar({
             }
           }}
           maxLength={2000}
-          placeholder="Tambah keterangan (opsional)..."
+          placeholder="Tambah keterangan..."
           aria-label="Keterangan lampiran"
-          className="h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground focus:border-primary"
+          className="h-11 min-w-0 flex-1 rounded-full border border-[var(--wa-border)] bg-[var(--wa-input)] px-4 text-sm text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)] focus:border-[var(--wa-action)]"
         />
         <button
           type="button"
           onClick={onConfirmSend}
           aria-label="Kirim lampiran"
-          className="press-scale grid size-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="press-scale grid size-11 shrink-0 place-items-center rounded-full bg-[var(--wa-action)] text-[var(--wa-action-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <SendHorizontal className="size-[18px]" aria-hidden="true" />
         </button>
@@ -492,6 +494,7 @@ export function ChatMediaDrawer({
   open,
   onOpenChange,
   partnerName,
+  partnerAvatarUrl,
   roleLabel,
   messages,
   attachmentUrls,
@@ -508,6 +511,7 @@ export function ChatMediaDrawer({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   partnerName: string;
+  partnerAvatarUrl?: string | null;
   roleLabel: string;
   messages: ChatMessage[];
   attachmentUrls?: Record<string, string>;
@@ -522,6 +526,8 @@ export function ChatMediaDrawer({
   onToggleClosed: () => void;
 }) {
   const [tab, setTab] = useState<"media" | "docs" | "links">("media");
+  const avatarImg = isRenderableImageUrl(partnerAvatarUrl) ? partnerAvatarUrl : null;
+  const initial = (partnerName.trim()[0] ?? "?").toUpperCase();
 
   const photos: Array<{ path: string; name: string; url?: string }> = [];
   const docs: Array<{ id: string; kind: "file" | "audio"; name: string; meta: string; url?: string }> = [];
@@ -559,21 +565,38 @@ export function ChatMediaDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="flex w-full max-w-sm flex-col p-0">
-        <SheetHeader className="border-b border-border px-5 pb-4 pt-5 text-left">
-          <SheetTitle className="truncate text-base">{partnerName}</SheetTitle>
-          <SheetDescription className="truncate text-xs">{roleLabel}</SheetDescription>
+      <SheetContent side="right" className="flex w-full max-w-sm flex-col bg-[var(--wa-panel)] p-0">
+        <SheetHeader className="border-b border-[var(--wa-border)] bg-[var(--wa-chrome)] px-5 pb-5 pt-6 text-center">
+          <div className="mx-auto grid size-20 place-items-center overflow-hidden rounded-full bg-[var(--wa-pill-active)] text-2xl font-bold text-[var(--wa-pill-active-fg)] ring-2 ring-[var(--wa-border)]">
+            {avatarImg ? (
+              <img
+                src={optimizedMediaUrl(avatarImg, 128)}
+                alt=""
+                width={80}
+                height={80}
+                className="size-full object-cover"
+              />
+            ) : (
+              initial
+            )}
+          </div>
+          <SheetTitle className="mt-2.5 truncate text-center text-base font-bold text-[var(--wa-in-fg)]">
+            {partnerName}
+          </SheetTitle>
+          <SheetDescription className="truncate text-center text-xs text-[var(--wa-in-meta)]">
+            {roleLabel}
+          </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-wrap gap-2 border-b border-border px-4 py-3">
+        <div className="flex flex-wrap justify-center gap-2 border-b border-[var(--wa-border)] bg-[var(--wa-panel)] px-4 py-3">
           {onTogglePin ? (
-            <Button type="button" variant="outline" size="sm" className="min-h-10 gap-1.5" onClick={onTogglePin}>
+            <Button type="button" variant="outline" size="sm" className="min-h-10 gap-1.5 rounded-full" onClick={onTogglePin}>
               {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
               {pinned ? "Lepas pin" : "Sematkan"}
             </Button>
           ) : null}
           {onToggleMute ? (
-            <Button type="button" variant="outline" size="sm" className="min-h-10 gap-1.5" onClick={onToggleMute}>
+            <Button type="button" variant="outline" size="sm" className="min-h-10 gap-1.5 rounded-full" onClick={onToggleMute}>
               {muted ? <Bell className="size-4" /> : <BellOff className="size-4" />}
               {muted ? "Aktifkan suara" : "Bisukan"}
             </Button>
@@ -583,15 +606,15 @@ export function ChatMediaDrawer({
               type="button"
               variant="outline"
               size="sm"
-              className="min-h-10 gap-1.5"
+              className="min-h-10 gap-1.5 rounded-full"
               onClick={onEnableBrowserNotify}
             >
-              <Bell className="size-4" /> Notifikasi browser
+              <Bell className="size-4" /> Notifikasi
             </Button>
           ) : null}
         </div>
 
-        <div role="tablist" aria-label="Media percakapan" className="grid grid-cols-3 border-b border-border">
+        <div role="tablist" aria-label="Media percakapan" className="grid grid-cols-3 border-b border-[var(--wa-border)] bg-[var(--wa-panel)]">
           {(
             [
               { id: "media", label: `Media (${photos.length})` },
@@ -608,8 +631,8 @@ export function ChatMediaDrawer({
               className={cn(
                 "min-h-11 border-b-2 px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                 tab === entry.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
+                  ? "border-[var(--wa-action)] text-[var(--wa-action)]"
+                  : "border-transparent text-[var(--wa-in-meta)] hover:text-[var(--wa-in-fg)]",
               )}
             >
               {entry.label}

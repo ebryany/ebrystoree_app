@@ -535,6 +535,8 @@ const attachmentSchema = z.discriminatedUnion("kind", [
     kind: z.literal("location"),
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180),
+    label: z.string().trim().max(120).optional(),
+    address: z.string().trim().max(260).optional(),
   }),
   z.object({
     kind: z.literal("product"),
@@ -1064,4 +1066,124 @@ export const listSellerInquiries = createServerFn({ method: "GET" })
       })),
       error: null,
     };
+  });
+
+/**
+ * Reverse geocode server-side (Nominatim OSM) agar nama jalan/area muncul di kartu lokasi
+ * tanpa melonggarkan CSP connect-src di browser dan tanpa membocorkan IP pengguna.
+ */
+export const reverseGeocodeLocation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        lat: z.number().min(-90).max(90),
+        lng: z.number().min(-180).max(180),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context as Ctx;
+    const limited = await enforceRateLimit(userId, "inquiry.message");
+    if (limited) return { ok: false as const, label: null, address: null };
+    try {
+      const url = new URL("https://nominatim.openstreetmap.org/reverse");
+      url.searchParams.set("format", "jsonv2");
+      url.searchParams.set("lat", data.lat.toFixed(6));
+      url.searchParams.set("lon", data.lng.toFixed(6));
+      url.searchParams.set("zoom", "18");
+      url.searchParams.set("addressdetails", "1");
+      const res = await fetch(url.toString(), {
+        headers: {
+          "User-Agent": "EbrystoreChat/1.0 (https://app.ebrystore.my.id)",
+          "Accept-Language": "id,en;q=0.8",
+        },
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return { ok: false as const, label: null, address: null };
+      const json = (await res.json()) as {
+        name?: string;
+        display_name?: string;
+        address?: Record<string, string | undefined>;
+      };
+      const addr = json.address ?? {};
+      const primary =
+        json.name ||
+        addr.road ||
+        addr.neighbourhood ||
+        addr.suburb ||
+        addr.village ||
+        addr.town ||
+        addr.city ||
+        "Lokasi terpilih";
+      const parts = [
+        addr.road,
+        addr.suburb || addr.village || addr.neighbourhood,
+        addr.city || addr.town || addr.county,
+        addr.state,
+      ].filter((v): v is string => Boolean(v && v.trim()));
+      const fullAddress = (parts.length ? parts.join(", ") : json.display_name || "").slice(0, 240);
+      return {
+        ok: true as const,
+        label: String(primary).slice(0, 110),
+        address: fullAddress || null,
+      };
+    } catch {
+      return { ok: false as const, label: null, address: null };
+    }
+  });
+
+/** Pencarian lokasi/alamat server-side (Nominatim OSM) untuk pemilih lokasi chat. */
+export const searchLocationPlaces = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        q: z.string().trim().min(2).max(160),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context as Ctx;
+    const limited = await enforceRateLimit(userId, "inquiry.message");
+    if (limited) return { items: [] as Array<{ lat: number; lng: number; label: string; address: string }> };
+    try {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("format", "jsonv2");
+      url.searchParams.set("q", data.q);
+      url.searchParams.set("limit", "5");
+      url.searchParams.set("addressdetails", "1");
+      const res = await fetch(url.toString(), {
+        headers: {
+          "User-Agent": "EbrystoreChat/1.0 (https://app.ebrystore.my.id)",
+          "Accept-Language": "id,en;q=0.8",
+        },
+        signal: AbortSignal.timeout(4500),
+      });
+      if (!res.ok) return { items: [] };
+      const rows = (await res.json()) as Array<{
+        lat?: string;
+        lon?: string;
+        name?: string;
+        display_name?: string;
+      }>;
+      const items = (rows ?? [])
+        .map((r) => {
+          const lat = Number(r.lat);
+          const lng = Number(r.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+          const display = String(r.display_name ?? "").trim();
+          const label = String(r.name || display.split(",")[0] || "Lokasi").slice(0, 110);
+          return {
+            lat: Number(lat.toFixed(6)),
+            lng: Number(lng.toFixed(6)),
+            label,
+            address: display.slice(0, 240),
+          };
+        })
+        .filter((x): x is { lat: number; lng: number; label: string; address: string } => Boolean(x));
+      return { items };
+    } catch {
+      return { items: [] };
+    }
   });

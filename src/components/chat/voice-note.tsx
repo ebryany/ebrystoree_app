@@ -289,7 +289,7 @@ export function VoiceNoteRecorder({
     <div
       role="region"
       aria-label="Merekam pesan suara"
-      className="pb-safe flex items-center gap-1.5 border-t border-border/60 bg-card/95 px-2 py-2 backdrop-blur-xl sm:gap-2 sm:px-3"
+      className="pb-safe flex items-center gap-1.5 border-t border-[var(--wa-border)] bg-[var(--wa-chrome)] px-2 py-2 sm:gap-2 sm:px-3"
     >
       <button
         type="button"
@@ -300,7 +300,7 @@ export function VoiceNoteRecorder({
         <Trash2 className="size-5" aria-hidden="true" />
       </button>
 
-      <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-border bg-background px-3">
+      <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-full border border-[var(--wa-border)] bg-[var(--wa-input)] px-3">
         <span className="flex shrink-0 items-center gap-1.5">
           <span
             aria-hidden="true"
@@ -309,7 +309,7 @@ export function VoiceNoteRecorder({
               status === "recording" && "motion-safe:animate-pulse",
             )}
           />
-          <span className="text-xs font-semibold tabular-nums text-foreground sm:text-sm">
+          <span className="text-xs font-semibold tabular-nums text-[var(--wa-in-fg)] sm:text-sm">
             {formatAudioClock(elapsedSec)}
           </span>
         </span>
@@ -322,7 +322,7 @@ export function VoiceNoteRecorder({
           {liveBars.map((level, i) => (
             <span
               key={i}
-              className="w-[3px] shrink-0 rounded-full bg-primary/70 transition-[height] duration-100 motion-reduce:transition-none"
+              className="w-[3px] shrink-0 rounded-full bg-[var(--wa-action)]/75 transition-[height] duration-100 motion-reduce:transition-none"
               style={{ height: `${Math.max(20, level)}%` }}
             />
           ))}
@@ -338,7 +338,7 @@ export function VoiceNoteRecorder({
           type="button"
           onClick={handleTogglePause}
           aria-label={status === "paused" ? "Lanjutkan rekaman" : "Jeda rekaman"}
-          className="grid size-11 shrink-0 place-items-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-in-fg)] transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-white/10"
         >
           {status === "paused" ? (
             <Mic className="size-5 text-destructive" aria-hidden="true" />
@@ -355,7 +355,7 @@ export function VoiceNoteRecorder({
         aria-label="Kirim pesan suara"
         className="press-scale grid size-11 shrink-0 place-items-center rounded-full disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <span className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
+        <span className="grid size-10 place-items-center rounded-full bg-[var(--wa-action)] text-[var(--wa-action-fg)]">
           {status === "starting" ? (
             <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
           ) : (
@@ -487,8 +487,8 @@ export function VoiceNotePlayer({
         className={cn(
           "grid size-11 shrink-0 place-items-center rounded-full transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           mine
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "bg-surface-selected text-primary hover:bg-primary/15",
+            ? "bg-[var(--wa-action)] text-[var(--wa-action-fg)] hover:opacity-90"
+            : "bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)] hover:opacity-90",
         )}
       >
         {!url ? (
@@ -528,10 +528,10 @@ export function VoiceNotePlayer({
                 className={cn(
                   "flex-1 rounded-full transition-colors",
                   filled
-                    ? "bg-primary"
+                    ? "bg-[var(--wa-tick-read)]"
                     : mine
-                      ? "bg-chat-out-foreground/30"
-                      : "bg-muted-foreground/35",
+                      ? "bg-[var(--wa-out-meta)]/40"
+                      : "bg-[var(--wa-in-meta)]/40",
                 )}
                 style={{ height: `${Math.max(22, val)}%` }}
               />
@@ -540,7 +540,7 @@ export function VoiceNotePlayer({
         </div>
 
         <div className="mt-1 flex items-center justify-between gap-2 text-[11px] tabular-nums">
-          <span className={mine ? "text-chat-out-foreground/75" : "text-muted-foreground"}>
+          <span className={mine ? "text-[var(--wa-out-meta)]" : "text-[var(--wa-in-meta)]"}>
             {failed
               ? "Audio tidak tersedia"
               : playing || currentSec > 0
@@ -554,8 +554,8 @@ export function VoiceNotePlayer({
             className={cn(
               "rounded-full px-1.5 py-0.5 text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               mine
-                ? "bg-chat-out-foreground/15 text-chat-out-foreground hover:bg-chat-out-foreground/25"
-                : "bg-muted text-foreground hover:bg-muted/80",
+                ? "bg-black/10 text-chat-out-foreground hover:bg-black/15 dark:bg-white/15 dark:hover:bg-white/25"
+                : "bg-[var(--wa-search)] text-[var(--wa-in-fg)] hover:opacity-85",
             )}
           >
             {SPEEDS[speedIndex]}x

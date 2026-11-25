@@ -85,6 +85,28 @@
   --color-chat-out: var(--chat-out);
   --color-chat-out-foreground: var(--chat-out-foreground);
   --color-chat-wallpaper: var(--chat-wallpaper);
+  --color-wa-chrome: var(--wa-chrome);
+  --color-wa-panel: var(--wa-panel);
+  --color-wa-panel-hover: var(--wa-panel-hover);
+  --color-wa-panel-active: var(--wa-panel-active);
+  --color-wa-input: var(--wa-input);
+  --color-wa-search: var(--wa-search);
+  --color-wa-border: var(--wa-border);
+  --color-wa-brand: var(--wa-brand);
+  --color-wa-brand-fg: var(--wa-brand-fg);
+  --color-wa-action: var(--wa-action);
+  --color-wa-action-fg: var(--wa-action-fg);
+  --color-wa-unread: var(--wa-unread);
+  --color-wa-unread-fg: var(--wa-unread-fg);
+  --color-wa-pill-active: var(--wa-pill-active);
+  --color-wa-pill-active-fg: var(--wa-pill-active-fg);
+  --color-wa-in: var(--wa-in);
+  --color-wa-in-fg: var(--wa-in-fg);
+  --color-wa-in-meta: var(--wa-in-meta);
+  --color-wa-out-meta: var(--wa-out-meta);
+  --color-wa-notice: var(--wa-notice);
+  --color-wa-notice-fg: var(--wa-notice-fg);
+  --color-wa-tick-read: var(--wa-tick-read);
   --ease-ebry: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Marketplace density scale — jarak/ritme konsisten untuk layout padat. */
@@ -158,10 +180,32 @@
   --border: oklch(0.9 0.012 195);
   --input: oklch(0.9 0.012 195);
   --ring: oklch(0.52 0.098 195);
-  /* Chat gaya WhatsApp: bubble keluar mint-teal, latar krem lembut. */
-  --chat-out: oklch(0.925 0.05 172);
-  --chat-out-foreground: oklch(0.22 0.03 205);
-  --chat-wallpaper: oklch(0.955 0.013 90);
+  /* Chat 100% gaya WhatsApp (terverifikasi WCAG AA light mode). */
+  --chat-out: oklch(0.955 0.058 145);
+  --chat-out-foreground: oklch(0.215 0.016 225);
+  --chat-wallpaper: oklch(0.935 0.012 80);
+  --wa-chrome: oklch(0.958 0.004 240);
+  --wa-panel: oklch(1 0 0);
+  --wa-panel-hover: oklch(0.972 0.002 220);
+  --wa-panel-active: oklch(0.952 0.005 230);
+  --wa-input: oklch(1 0 0);
+  --wa-search: oklch(0.958 0.004 240);
+  --wa-border: oklch(0.928 0.006 220);
+  --wa-brand: oklch(0.47 0.095 170);
+  --wa-brand-fg: oklch(1 0 0);
+  --wa-action: oklch(0.52 0.105 170);
+  --wa-action-fg: oklch(1 0 0);
+  --wa-unread: oklch(0.75 0.185 150);
+  --wa-unread-fg: oklch(0.18 0.015 225);
+  --wa-pill-active: oklch(0.96 0.04 145);
+  --wa-pill-active-fg: oklch(0.47 0.095 170);
+  --wa-in: oklch(1 0 0);
+  --wa-in-fg: oklch(0.215 0.016 225);
+  --wa-in-meta: oklch(0.49 0.022 225);
+  --wa-out-meta: oklch(0.45 0.02 220);
+  --wa-notice: oklch(0.95 0.055 85);
+  --wa-notice-fg: oklch(0.36 0.045 80);
+  --wa-tick-read: oklch(0.58 0.145 238);
   --chart-1: oklch(0.62 0.14 200);
   --chart-2: oklch(0.52 0.098 195);
   --chart-3: oklch(0.6 0.13 158);
@@ -243,9 +287,32 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.68 0.1 192);
-  --chat-out: oklch(0.37 0.065 182);
-  --chat-out-foreground: oklch(0.97 0.008 95);
-  --chat-wallpaper: oklch(0.16 0.025 205);
+  /* Chat 100% gaya WhatsApp Dark Mode (terverifikasi WCAG AA). */
+  --chat-out: oklch(0.42 0.085 170);
+  --chat-out-foreground: oklch(0.94 0.005 220);
+  --chat-wallpaper: oklch(0.18 0.015 225);
+  --wa-chrome: oklch(0.285 0.018 225);
+  --wa-panel: oklch(0.215 0.016 225);
+  --wa-panel-hover: oklch(0.265 0.018 225);
+  --wa-panel-active: oklch(0.335 0.022 225);
+  --wa-input: oklch(0.335 0.022 225);
+  --wa-search: oklch(0.285 0.018 225);
+  --wa-border: oklch(0.335 0.02 225);
+  --wa-brand: oklch(0.285 0.018 225);
+  --wa-brand-fg: oklch(0.94 0.005 220);
+  --wa-action: oklch(0.65 0.125 168);
+  --wa-action-fg: oklch(0.18 0.015 225);
+  --wa-unread: oklch(0.65 0.125 168);
+  --wa-unread-fg: oklch(0.18 0.015 225);
+  --wa-pill-active: oklch(0.29 0.05 170);
+  --wa-pill-active-fg: oklch(0.82 0.125 168);
+  --wa-in: oklch(0.285 0.018 225);
+  --wa-in-fg: oklch(0.94 0.005 220);
+  --wa-in-meta: oklch(0.72 0.018 225);
+  --wa-out-meta: oklch(0.84 0.032 175);
+  --wa-notice: oklch(0.24 0.018 225);
+  --wa-notice-fg: oklch(0.88 0.08 85);
+  --wa-tick-read: oklch(0.75 0.115 225);
   --chart-1: oklch(0.72 0.11 200);
   --chart-2: oklch(0.68 0.1 192);
   --chart-3: oklch(0.68 0.13 158);
@@ -451,14 +518,47 @@
   border-radius: var(--radius-control) !important;
 }
 
-/* Latar percakapan: pola titik halus (tanpa gambar) di atas warna wallpaper. */
+/* Latar percakapan gaya WhatsApp: motif doodle vektor halus di atas kanvas krem/gelap. */
 @utility chat-wallpaper {
   background-color: var(--chat-wallpaper);
-  background-image: radial-gradient(
-    color-mix(in oklch, var(--foreground) 7%, transparent) 1px,
-    transparent 1.2px
-  );
-  background-size: 18px 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%2354656F' stroke-opacity='0.09' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 24h20a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H29l-7 6v-6a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z'/%3E%3Ccircle cx='126' cy='34' r='9'/%3E%3Cpath d='M123 32h.01M129 32h.01M122 37c2 2.5 6 2.5 8 0'/%3E%3Cpath d='M78 20l12 6-12 6 3-6-3-6z'/%3E%3Cpath d='M154 78c0 7-9 15-9 15s-9-8-9-15a9 9 0 1 1 18 0z'/%3E%3Ccircle cx='145' cy='78' r='3'/%3E%3Crect x='24' y='92' width='22' height='16' rx='3'/%3E%3Cpath d='M28 104l5-5 4 4 3-3 4 4'/%3E%3Cpath d='M92 84a8 8 0 0 1 8 8v8a8 8 0 0 1-16 0v-8a8 8 0 0 1 8-8z'/%3E%3Cpath d='M80 100a12 12 0 0 0 24 0M92 112v6'/%3E%3Cpath d='M42 146l8-8 8 8v10H42v-10z'/%3E%3Cpath d='M124 136h20l-2 16h-16l-2-16zM129 136v-3a5 5 0 0 1 10 0v3'/%3E%3Ccircle cx='90' cy='150' r='8'/%3E%3Cpath d='M90 146v4l3 2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.dark .chat-wallpaper {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%23E9EDEF' stroke-opacity='0.06' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 24h20a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H29l-7 6v-6a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z'/%3E%3Ccircle cx='126' cy='34' r='9'/%3E%3Cpath d='M123 32h.01M129 32h.01M122 37c2 2.5 6 2.5 8 0'/%3E%3Cpath d='M78 20l12 6-12 6 3-6-3-6z'/%3E%3Cpath d='M154 78c0 7-9 15-9 15s-9-8-9-15a9 9 0 1 1 18 0z'/%3E%3Ccircle cx='145' cy='78' r='3'/%3E%3Crect x='24' y='92' width='22' height='16' rx='3'/%3E%3Cpath d='M28 104l5-5 4 4 3-3 4 4'/%3E%3Cpath d='M92 84a8 8 0 0 1 8 8v8a8 8 0 0 1-16 0v-8a8 8 0 0 1 8-8z'/%3E%3Cpath d='M80 100a12 12 0 0 0 24 0M92 112v6'/%3E%3Cpath d='M42 146l8-8 8 8v10H42v-10z'/%3E%3Cpath d='M124 136h20l-2 16h-16l-2-16zM129 136v-3a5 5 0 0 1 10 0v3'/%3E%3Ccircle cx='90' cy='150' r='8'/%3E%3Cpath d='M90 146v4l3 2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Scrollbar tipis khas WhatsApp Web (standar CSS + fallback @supports WebKit). */
+.chat-scroll {
+  --scrollbar-thumb: oklch(0.54 0.018 225);
+  --scrollbar-track: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.dark .chat-scroll {
+  --scrollbar-thumb: oklch(0.57 0.018 225);
+}
+
+@supports not (scrollbar-color: auto) {
+  .chat-scroll {
+    scrollbar-width: auto;
+  }
+
+  .chat-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 9999px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
 }
 
 @utility press-scale {

@@ -101,7 +101,7 @@ const CSP = [
   "img-src 'self' data: blob: https:",
   `media-src 'self' blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
   `connect-src 'self' ${supabaseConnectSources} ${lovableConnectSource}`.replace(/\s+/g, " ").trim(),
-  "frame-src 'self' https://*.sumopod.com https://*.pymnt.app https://checkout.pymnt.app",
+  "frame-src 'self' https://*.sumopod.com https://*.pymnt.app https://checkout.pymnt.app https://www.openstreetmap.org https://maps.google.com https://www.google.com",
   `frame-ancestors ${frameAncestors}`,
   "base-uri 'self'",
   "form-action 'self'",

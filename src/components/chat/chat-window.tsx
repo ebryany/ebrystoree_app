@@ -28,6 +28,7 @@ import {
   ImageIcon,
   Info,
   Loader2,
+  Lock,
   Mail,
   MapPin,
   Mic,
@@ -74,6 +75,12 @@ import {
 } from "./chat-overlays";
 import { loadThreadDraft, saveThreadDraft } from "./chat-prefs";
 import { chatDayLabel } from "./chat-time";
+import {
+  LocationBubbleCard,
+  LocationMapModal,
+  LocationPickerDialog,
+  type SharedLocationPayload,
+} from "./location-map";
 import { VoiceNotePlayer, VoiceNoteRecorder, type RecordedVoiceNote } from "./voice-note";
 
 export type ChatMessage = {
@@ -104,7 +111,7 @@ export type ChatAttachInput =
   | { kind: "gallery"; files: File[]; caption?: string }
   | { kind: "file"; file: File; caption?: string }
   | { kind: "audio"; file: File; durationSec: number; waveform: number[] }
-  | { kind: "location" }
+  | { kind: "location"; lat?: number; lng?: number; label?: string; address?: string; caption?: string }
   | { kind: "product"; productId: string; label: string }
   | { kind: "service"; serviceId: string; label: string };
 
@@ -199,24 +206,27 @@ function replySnippet(msg: Partial<ChatMessage>): string {
   if (att.kind === "image") return "Foto";
   if (att.kind === "gallery") return `Album foto (${att.items.length})`;
   if (att.kind === "audio") return "Pesan suara";
-  if (att.kind === "location") return "Lokasi";
+  if (att.kind === "location") return att.label ? `Lokasi: ${att.label}` : "Lokasi";
   if (att.kind === "product") return `Produk: ${att.name ?? "Produk digital"}`;
   if (att.kind === "service") return `Jasa: ${att.name ?? "Jasa seller"}`;
   return `Dokumen: ${att.name}`;
 }
 
-/** Ekor bubble gaya WhatsApp di sudut atas pesan pertama sebuah kelompok. */
+/** Ekor bubble presisi gaya WhatsApp di sudut atas pesan pertama sebuah kelompok. */
 function BubbleTail({ mine }: { mine: boolean }) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 8 13"
       className={cn(
-        "absolute top-0 h-[13px] w-2",
-        mine ? "-right-2 text-chat-out" : "-left-2 -scale-x-100 text-card",
+        "pointer-events-none absolute top-0 h-[13px] w-2",
+        mine ? "-right-[7px] text-chat-out" : "-left-[7px] -scale-x-100 text-[var(--wa-in)]",
       )}
     >
-      <path fill="currentColor" d="M0 0h8L1.6 9.4C1 10.3 0 9.9 0 8.8z" />
+      <path
+        fill="currentColor"
+        d="M5.188 1H0v11.193l6.467-8.625C7.526 2.156 6.958 1 5.188 1z"
+      />
     </svg>
   );
 }
@@ -241,10 +251,10 @@ function BubbleMeta({
       className={cn(
         "inline-flex items-center gap-1 whitespace-nowrap text-[11px] leading-none tabular-nums",
         overlay
-          ? "rounded-full bg-black/50 px-1.5 py-1 text-white"
+          ? "rounded-full bg-black/55 px-1.5 py-1 text-white"
           : mine
-            ? "text-chat-out-foreground/65"
-            : "text-muted-foreground",
+            ? "text-[var(--wa-out-meta)]"
+            : "text-[var(--wa-in-meta)]",
       )}
     >
       {edited ? <span className="italic">Diedit</span> : null}
@@ -254,7 +264,7 @@ function BubbleMeta({
           <Clock className="size-3" aria-label="Mengirim" />
         ) : read ? (
           <CheckCheck
-            className={cn("size-4", !overlay && "text-sky-500 dark:text-sky-400")}
+            className={cn("size-4", !overlay && "text-[var(--wa-tick-read)]")}
             aria-label="Dibaca"
           />
         ) : (
@@ -332,6 +342,8 @@ export function ChatWindow({
   // Overlay & panel tambahan
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
+  const [activeMapLocation, setActiveMapLocation] = useState<SharedLocationPayload | null>(null);
   const [lightbox, setLightbox] = useState<{
     items: Array<{ url: string; name: string }>;
     index: number;
@@ -376,6 +388,8 @@ export function ChatWindow({
     setSearchCursor(0);
     setDrawerOpen(false);
     setCatalogOpen(false);
+    setLocationPickerOpen(false);
+    setActiveMapLocation(null);
     setLightbox(null);
     setDismissedSafety(false);
   }, [threadId]);
@@ -545,8 +559,8 @@ export function ChatWindow({
       onDrop={handleDrop}
       style={mobileViewportHeight ? { height: `${mobileViewportHeight}px` } : undefined}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col overflow-hidden bg-card",
-        "md:relative md:inset-auto md:z-auto md:mx-auto md:h-[calc(100dvh-8.5rem)] md:min-h-[28rem] md:w-full md:max-w-3xl md:rounded-2xl md:border md:border-border",
+        "fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col overflow-hidden bg-[var(--wa-panel)]",
+        "md:relative md:inset-auto md:z-auto md:mx-auto md:h-[calc(100dvh-8.5rem)] md:min-h-[30rem] md:w-full md:max-w-4xl md:rounded-xl md:border md:border-[var(--wa-border)]",
         embedded
           ? "lg:mx-0 lg:h-full lg:min-h-0 lg:max-w-none lg:rounded-none lg:border-0"
           : "lg:h-[calc(100dvh-7.5rem)]",
@@ -554,28 +568,28 @@ export function ChatWindow({
     >
       {/* Overlay seret-dan-lepas lampiran */}
       {dragActive ? (
-        <div className="pointer-events-none absolute inset-0 z-40 grid place-items-center bg-primary/15 backdrop-blur-[2px]">
-          <div className="rounded-2xl border-2 border-dashed border-primary bg-card/95 px-6 py-5 text-center shadow-lg">
-            <ImageIcon className="mx-auto size-8 text-primary" aria-hidden="true" />
-            <p className="mt-2 text-sm font-semibold text-foreground">
+        <div className="pointer-events-none absolute inset-0 z-40 grid place-items-center bg-[var(--wa-action)]/15 backdrop-blur-[2px]">
+          <div className="rounded-2xl border-2 border-dashed border-[var(--wa-action)] bg-[var(--wa-panel)]/95 px-6 py-5 text-center shadow-lg">
+            <ImageIcon className="mx-auto size-8 text-[var(--wa-action)]" aria-hidden="true" />
+            <p className="mt-2 text-sm font-semibold text-[var(--wa-in-fg)]">
               Lepas foto atau dokumen di sini
             </p>
-            <p className="text-xs text-muted-foreground">Hingga 4 foto atau 1 dokumen (maks 10 MB)</p>
+            <p className="text-xs text-[var(--wa-in-meta)]">Hingga 4 foto atau 1 dokumen (maks 10 MB)</p>
           </div>
         </div>
       ) : null}
 
-      {/* Header clean ala WhatsApp */}
-      <header className="pt-safe z-10 border-b border-border/70 bg-card/95 backdrop-blur-xl">
-        <div className="flex min-h-14 items-center gap-1.5 px-1.5 sm:gap-2 sm:px-3">
+      {/* Header 100% ala WhatsApp: hijau emerald di HP (light) & bilah abu WhatsApp Web di desktop */}
+      <header className="pt-safe z-10 border-b border-[var(--wa-border)] bg-[var(--wa-brand)] text-[var(--wa-brand-fg)] md:bg-[var(--wa-chrome)] md:text-[var(--wa-in-fg)]">
+        <div className="flex min-h-[60px] items-center gap-1 px-1.5 sm:gap-1.5 sm:px-3">
           {backSlot}
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-xl px-1 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-xl px-1 text-left transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:hover:bg-black/5 md:focus-visible:ring-ring dark:md:hover:bg-white/10"
           >
             <span className="relative shrink-0" aria-hidden="true">
-              <span className="grid size-10 place-items-center overflow-hidden rounded-full border border-border/60 bg-surface-selected text-[15px] font-semibold text-primary">
+              <span className="grid size-10 place-items-center overflow-hidden rounded-full bg-white/20 text-[15px] font-semibold text-[var(--wa-brand-fg)] ring-1 ring-white/25 md:bg-[var(--wa-pill-active)] md:text-[var(--wa-pill-active-fg)] md:ring-black/5 dark:md:ring-white/10">
                 {partnerImg ? (
                   <img
                     src={optimizedMediaUrl(partnerImg, 96)}
@@ -589,11 +603,11 @@ export function ChatWindow({
                 )}
               </span>
               {partnerOnline ? (
-                <span className="absolute bottom-0 right-0 size-3 rounded-full bg-success ring-2 ring-card" />
+                <span className="absolute bottom-0 right-0 size-3 rounded-full bg-[var(--wa-unread)] ring-2 ring-[var(--wa-brand)] md:ring-[var(--wa-chrome)]" />
               ) : null}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[15px] font-semibold leading-tight text-foreground">
+              <span className="block truncate text-[15.5px] font-semibold leading-tight text-[var(--wa-brand-fg)] md:text-[var(--wa-in-fg)]">
                 {partnerName}
               </span>
               <span
@@ -601,10 +615,10 @@ export function ChatWindow({
                 className={cn(
                   "block truncate text-[12px] leading-tight",
                   partnerTyping || partnerRecording
-                    ? "font-medium text-primary"
+                    ? "font-semibold text-[#D9FDD3] md:text-[var(--wa-action)]"
                     : partnerOnline
-                      ? "text-success"
-                      : "text-muted-foreground",
+                      ? "text-[#E2F8F3] md:text-[var(--wa-action)]"
+                      : "text-[#E2F8F3]/90 md:text-[var(--wa-in-meta)]",
                 )}
               >
                 {presence}
@@ -617,7 +631,7 @@ export function ChatWindow({
             onClick={() => setSearchOpen((v) => !v)}
             aria-label="Cari pesan dalam percakapan"
             aria-expanded={searchOpen}
-            className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-brand-fg)] transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:text-[var(--wa-in-meta)] md:hover:bg-black/5 md:hover:text-[var(--wa-in-fg)] md:focus-visible:ring-ring dark:md:hover:bg-white/10"
           >
             <Search className="size-5" aria-hidden="true" />
           </button>
@@ -626,7 +640,7 @@ export function ChatWindow({
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Info dan media percakapan"
-            className="hidden size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid"
+            className="hidden size-11 shrink-0 place-items-center rounded-full text-[var(--wa-in-meta)] transition-colors hover:bg-black/5 hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-white/10 md:grid"
           >
             <Info className="size-5" aria-hidden="true" />
           </button>
@@ -636,28 +650,28 @@ export function ChatWindow({
               <button
                 type="button"
                 aria-label="Menu percakapan"
-                className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-brand-fg)] transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:text-[var(--wa-in-meta)] md:hover:bg-black/5 md:hover:text-[var(--wa-in-fg)] md:focus-visible:ring-ring dark:md:hover:bg-white/10"
               >
                 <MoreVertical className="size-5" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5">
-              <DropdownMenuItem className="min-h-11 gap-2.5 rounded-xl" onSelect={() => setDrawerOpen(true)}>
-                <Info className="size-4" /> Info, media & tautan
+            <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5">
+              <DropdownMenuItem className="min-h-11 gap-2.5 rounded-lg" onSelect={() => setDrawerOpen(true)}>
+                <Info className="size-4" /> Info kontak & media
               </DropdownMenuItem>
               {onTogglePin ? (
-                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-xl" onSelect={onTogglePin}>
+                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-lg" onSelect={onTogglePin}>
                   {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
                   {pinned ? "Lepas sematan chat" : "Sematkan percakapan"}
                 </DropdownMenuItem>
               ) : null}
               {onMarkUnread ? (
-                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-xl" onSelect={onMarkUnread}>
+                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-lg" onSelect={onMarkUnread}>
                   <Mail className="size-4" /> Tandai belum dibaca
                 </DropdownMenuItem>
               ) : null}
               {onToggleMute ? (
-                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-xl" onSelect={onToggleMute}>
+                <DropdownMenuItem className="min-h-11 gap-2.5 rounded-lg" onSelect={onToggleMute}>
                   <BellOff className="size-4" />
                   {muted ? "Aktifkan suara chat" : "Bisukan suara chat"}
                 </DropdownMenuItem>
@@ -665,7 +679,7 @@ export function ChatWindow({
               {canToggleClosed ? (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="min-h-11 gap-2.5 rounded-xl" onSelect={onToggleClosed}>
+                  <DropdownMenuItem className="min-h-11 gap-2.5 rounded-lg" onSelect={onToggleClosed}>
                     <Ban className="size-4" />
                     {closed ? "Buka kembali percakapan" : `Tutup percakapan (${statusLabel})`}
                   </DropdownMenuItem>
@@ -677,8 +691,8 @@ export function ChatWindow({
 
         {/* Bar pencarian in-chat */}
         {searchOpen ? (
-          <div className="flex items-center gap-1.5 border-t border-border/60 bg-surface/80 px-3 py-2">
-            <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <div className="flex items-center gap-1.5 border-t border-[var(--wa-border)] bg-[var(--wa-panel)] px-3 py-2 text-[var(--wa-in-fg)]">
+            <Search className="size-4 shrink-0 text-[var(--wa-in-meta)]" aria-hidden="true" />
             <input
               type="search"
               autoFocus
@@ -686,10 +700,10 @@ export function ChatWindow({
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Cari teks di percakapan ini..."
               aria-label="Kata kunci pencarian pesan"
-              className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="h-9 min-w-0 flex-1 bg-transparent text-sm text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)]"
             />
             {searchTerm.trim() ? (
-              <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+              <span className="shrink-0 text-xs tabular-nums text-[var(--wa-in-meta)]">
                 {searchMatches.length ? `${searchCursor + 1}/${searchMatches.length}` : "0/0"}
               </span>
             ) : null}
@@ -700,7 +714,7 @@ export function ChatWindow({
                 setSearchCursor((c) => (c > 0 ? c - 1 : searchMatches.length - 1))
               }
               aria-label="Hasil sebelumnya"
-              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
+              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-[var(--wa-panel-hover)] disabled:opacity-40"
             >
               <ChevronUp className="size-4" aria-hidden="true" />
             </button>
@@ -711,7 +725,7 @@ export function ChatWindow({
                 setSearchCursor((c) => (c < searchMatches.length - 1 ? c + 1 : 0))
               }
               aria-label="Hasil berikutnya"
-              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
+              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-[var(--wa-panel-hover)] disabled:opacity-40"
             >
               <ChevronDown className="size-4" aria-hidden="true" />
             </button>
@@ -722,7 +736,7 @@ export function ChatWindow({
                 setSearchTerm("");
               }}
               aria-label="Tutup pencarian"
-              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-muted"
+              className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-[var(--wa-panel-hover)]"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -735,7 +749,7 @@ export function ChatWindow({
         {isOffline ? (
           <div
             role="status"
-            className="flex items-center gap-2 border-t border-warning/30 bg-warning/15 px-3 py-1.5 text-xs font-medium text-warning-foreground"
+            className="flex items-center gap-2 border-t border-warning/30 bg-warning/20 px-3 py-1.5 text-xs font-medium text-warning-foreground"
           >
             <WifiOff className="size-3.5 shrink-0" aria-hidden="true" />
             <span>Koneksi terputus. Pesan yang dikirim akan masuk antrean otomatis.</span>
@@ -746,10 +760,10 @@ export function ChatWindow({
         {showSafetyNotice ? (
           <div
             role="status"
-            className="flex items-center justify-between gap-2 border-t border-border bg-surface px-3 py-1.5 text-xs text-muted-foreground"
+            className="flex items-center justify-between gap-2 border-t border-[var(--wa-border)] bg-[var(--wa-notice)] px-3 py-1.5 text-xs text-[var(--wa-notice-fg)]"
           >
             <p className="flex min-w-0 items-center gap-2">
-              <ShieldAlert className="size-4 shrink-0 text-primary" aria-hidden="true" />
+              <ShieldAlert className="size-4 shrink-0" aria-hidden="true" />
               <span>
                 Demi keamanan, lakukan pembayaran dan serah terima hasil hanya di Ebrystore.
               </span>
@@ -758,7 +772,7 @@ export function ChatWindow({
               type="button"
               onClick={() => setDismissedSafety(true)}
               aria-label="Tutup pengingat keamanan"
-              className="grid size-8 shrink-0 place-items-center rounded-full hover:bg-muted"
+              className="grid size-8 shrink-0 place-items-center rounded-full hover:bg-black/10"
             >
               <X className="size-3.5" aria-hidden="true" />
             </button>
@@ -774,15 +788,25 @@ export function ChatWindow({
           onScroll={handleScroll}
           role="log"
           aria-label="Riwayat pesan"
-          className="chat-wallpaper relative flex-1 overflow-y-auto overscroll-contain px-2.5 py-2.5 sm:px-[6%]"
+          className="chat-wallpaper chat-scroll relative flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-[7%]"
         >
+          {/* Pil pengingat keamanan khas WhatsApp di atas riwayat percakapan */}
+          <div className="mb-2 flex justify-center">
+            <p className="inline-flex max-w-md items-center gap-1.5 rounded-lg bg-[var(--wa-notice)] px-3 py-1.5 text-center text-[11.5px] leading-snug text-[var(--wa-notice-fg)] shadow-[0_1px_0.5px_rgba(11,20,26,0.12)]">
+              <Lock className="size-3 shrink-0" aria-hidden="true" />
+              <span>
+                Percakapan & transaksi dilindungi sistem Ebrystore. Hindari transfer di luar platform.
+              </span>
+            </p>
+          </div>
+
           {hasMore ? (
             <div className="pb-2 pt-1 text-center">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="min-h-11 rounded-full bg-card/90 px-4 text-xs font-semibold text-primary shadow-sm"
+                className="min-h-11 rounded-full bg-[var(--wa-in)]/95 px-4 text-xs font-semibold text-[var(--wa-action)] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] hover:bg-[var(--wa-in)]"
                 disabled={loadingMore}
                 onClick={handleLoadMore}
               >
@@ -817,19 +841,19 @@ export function ChatWindow({
               >
                 {dayBreak ? (
                   <p className="sticky top-1 z-[1] flex justify-center py-2">
-                    <span className="rounded-lg bg-card/95 px-3 py-1 text-[12px] font-medium text-muted-foreground shadow-sm">
+                    <span className="rounded-lg bg-[var(--wa-in)]/95 px-3 py-1 text-[12px] font-medium text-[var(--wa-in-meta)] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
                       {chatDayLabel(message.created_at)}
                     </span>
                   </p>
                 ) : null}
                 {index === unreadDividerIndex ? (
-                  <p className="-mx-2.5 my-2 bg-card/80 py-1 text-center text-[12px] font-semibold text-primary sm:-mx-[6%]">
+                  <p className="-mx-3 my-2 bg-[var(--wa-in)]/85 py-1.5 text-center text-[12px] font-semibold text-[var(--wa-action)] sm:-mx-[7%]">
                     Pesan baru
                   </p>
                 ) : null}
                 {message.is_system ? (
                   <p className="flex justify-center py-1.5">
-                    <span className="max-w-[85%] rounded-lg bg-card/90 px-3 py-1 text-center text-[12px] text-muted-foreground shadow-sm">
+                    <span className="max-w-[85%] rounded-lg bg-[var(--wa-in)]/95 px-3 py-1 text-center text-[12px] text-[var(--wa-in-meta)] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
                       {message.body}
                     </span>
                   </p>
@@ -865,6 +889,7 @@ export function ChatWindow({
                     onReact={(emoji) => onReact?.(message.id, emoji)}
                     onJumpToQuoted={(qid) => scrollToMessage(qid)}
                     onOpenLightbox={(items, idx) => setLightbox({ items, index: idx })}
+                    onOpenLocationMap={(loc) => setActiveMapLocation(loc)}
                     onRefreshAttachmentUrl={onRefreshAttachmentUrl}
                   />
                 )}
@@ -876,9 +901,9 @@ export function ChatWindow({
             <div key={item.tempId} className="flex justify-end pr-2 pt-1">
               <div
                 className={cn(
-                  "relative max-w-[82%] rounded-[18px] px-3 pb-1.5 pt-1.5 text-[15px] leading-[1.35] shadow-[0_1px_0.5px_oklch(0_0_0/13%)] sm:max-w-[65%]",
+                  "relative max-w-[84%] rounded-[8px] px-2.5 pb-1.5 pt-1.5 text-[14.5px] leading-[1.38] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] sm:max-w-[66%]",
                   item.status === "failed"
-                    ? "border border-destructive bg-card text-foreground"
+                    ? "border border-destructive bg-[var(--wa-in)] text-[var(--wa-in-fg)]"
                     : "bg-chat-out text-chat-out-foreground opacity-90",
                 )}
               >
@@ -913,7 +938,7 @@ export function ChatWindow({
                         <button
                           type="button"
                           onClick={() => onDiscardPending(item.tempId)}
-                          className="inline-flex min-h-11 items-center text-xs text-muted-foreground hover:text-foreground"
+                          className="inline-flex min-h-11 items-center text-xs text-[var(--wa-in-meta)] hover:text-[var(--wa-in-fg)]"
                         >
                           Hapus
                         </button>
@@ -927,12 +952,15 @@ export function ChatWindow({
 
           {partnerTyping || partnerRecording ? (
             <div className="flex justify-start pl-2 pt-1.5">
-              <div className="relative flex items-center gap-1.5 rounded-[18px] bg-card px-3.5 py-2.5 shadow-[0_1px_0.5px_oklch(0_0_0/13%)]">
+              <div className="relative flex items-center gap-1.5 rounded-[8px] rounded-tl-none bg-[var(--wa-in)] px-3.5 py-2.5 shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]">
                 <BubbleTail mine={false} />
                 {partnerRecording ? (
                   <>
-                    <Mic className="size-4 text-primary motion-safe:animate-pulse" aria-hidden="true" />
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <Mic
+                      className="size-4 text-[var(--wa-action)] motion-safe:animate-pulse"
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs font-medium text-[var(--wa-in-meta)]">
                       Merekam suara...
                     </span>
                   </>
@@ -943,7 +971,7 @@ export function ChatWindow({
                       <span
                         key={dot}
                         aria-hidden="true"
-                        className="size-2 animate-bounce rounded-full bg-muted-foreground/60 motion-reduce:animate-none"
+                        className="size-2 animate-bounce rounded-full bg-[var(--wa-in-meta)]/70 motion-reduce:animate-none"
                         style={{ animationDelay: `${dot * 150}ms` }}
                       />
                     ))}
@@ -954,7 +982,7 @@ export function ChatWindow({
           ) : null}
         </div>
 
-        {/* Tombol lompat ke bawah melayang di luar aliran daftar */}
+        {/* Tombol lompat ke bawah melayang khas WhatsApp */}
         {showJump ? (
           <button
             type="button"
@@ -965,11 +993,11 @@ export function ChatWindow({
               setUnseenBelow(0);
               scrollToBottom(true);
             }}
-            className="absolute bottom-3 right-3 z-20 grid size-11 place-items-center rounded-full border border-border bg-card/95 text-foreground shadow-[0_3px_10px_oklch(0_0_0/18%)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="absolute bottom-3 right-3 z-20 grid size-11 place-items-center rounded-full border border-[var(--wa-border)] bg-[var(--wa-in)] text-[var(--wa-in-meta)] shadow-[0_3px_10px_rgba(11,20,26,0.2)] transition-transform hover:scale-105 hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ChevronDown className="size-5" aria-hidden="true" />
             {unseenBelow > 0 ? (
-              <span className="absolute -top-2 right-0 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground tabular-nums">
+              <span className="absolute -top-2 right-0 grid h-5 min-w-5 place-items-center rounded-full bg-[var(--wa-unread)] px-1 text-[10px] font-bold text-[var(--wa-unread-fg)] tabular-nums">
                 {unseenBelow > 99 ? "99+" : unseenBelow}
               </span>
             ) : null}
@@ -978,7 +1006,7 @@ export function ChatWindow({
       </div>
 
       {closed ? (
-        <div className="pb-safe flex flex-wrap items-center justify-between gap-2 border-t border-border/60 bg-card/95 px-4 py-3 text-sm text-muted-foreground backdrop-blur-xl">
+        <div className="pb-safe flex flex-wrap items-center justify-between gap-2 border-t border-[var(--wa-border)] bg-[var(--wa-chrome)] px-4 py-3 text-sm text-[var(--wa-in-meta)]">
           <span>Percakapan ini sudah ditutup.</span>
           {canToggleClosed ? (
             <Button variant="outline" size="sm" className="min-h-11" onClick={onToggleClosed}>
@@ -1001,6 +1029,7 @@ export function ChatWindow({
           onRecordingPulse={onRecordingPulse}
           onAttach={onAttach ? handleAttach : undefined}
           onOpenCatalog={onAttach ? () => setCatalogOpen(true) : undefined}
+          onOpenLocationPicker={onAttach ? () => setLocationPickerOpen(true) : undefined}
           droppedFiles={stagedFromDrop}
           onConsumedDroppedFiles={() => setStagedFromDrop(null)}
         />
@@ -1016,6 +1045,28 @@ export function ChatWindow({
         />
       ) : null}
 
+      {/* Modal peta interaktif lokasi */}
+      <LocationMapModal
+        location={activeMapLocation}
+        onClose={() => setActiveMapLocation(null)}
+      />
+
+      {/* Dialog pemilih & pratinjau lokasi ala WhatsApp */}
+      <LocationPickerDialog
+        open={locationPickerOpen}
+        onOpenChange={setLocationPickerOpen}
+        onConfirmSend={(loc, cap) =>
+          handleAttach({
+            kind: "location",
+            lat: loc.lat,
+            lng: loc.lng,
+            label: loc.label,
+            address: loc.address,
+            caption: cap,
+          })
+        }
+      />
+
       {/* Dialog kirim kartu produk/jasa */}
       <CatalogCardPicker
         open={catalogOpen}
@@ -1030,6 +1081,7 @@ export function ChatWindow({
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
         partnerName={partnerName}
+        partnerAvatarUrl={partnerAvatarUrl}
         roleLabel={roleLabel}
         messages={messages}
         attachmentUrls={attachmentUrls}
@@ -1072,6 +1124,7 @@ const Bubble = memo(function Bubble({
   onReact,
   onJumpToQuoted,
   onOpenLightbox,
+  onOpenLocationMap,
   onRefreshAttachmentUrl,
 }: {
   message: ChatMessage;
@@ -1094,6 +1147,7 @@ const Bubble = memo(function Bubble({
   onReact: (emoji: (typeof CHAT_REACTION_EMOJIS)[number]) => void;
   onJumpToQuoted: (id: string) => void;
   onOpenLightbox: (items: Array<{ url: string; name: string }>, index: number) => void;
+  onOpenLocationMap: (location: SharedLocationPayload) => void;
   onRefreshAttachmentUrl?: (path: string) => void;
 }) {
   const [swipeX, setSwipeX] = useState(0);
@@ -1104,6 +1158,8 @@ const Bubble = memo(function Bubble({
   const body = deleted ? "" : message.body;
   const isImage = attachment?.kind === "image";
   const isGallery = attachment?.kind === "gallery";
+  const isLocation = attachment?.kind === "location";
+  const isFlushCard = isImage || isGallery || isLocation;
   const overlayMeta = (isImage || isGallery) && !body && !quoted;
 
   const reactionEntries = useMemo(() => {
@@ -1143,7 +1199,7 @@ const Bubble = memo(function Bubble({
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       className={cn(
-        "group/row relative flex items-center gap-1",
+        "group/row relative flex touch-pan-y items-center gap-1",
         mine ? "justify-end pr-2" : "justify-start pl-2",
         groupStart ? "pt-2" : "pt-0.5",
         groupEnd && "pb-1",
@@ -1153,7 +1209,7 @@ const Bubble = memo(function Bubble({
       {swipeX > 12 ? (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-2 grid size-8 place-items-center rounded-full bg-surface-selected text-primary"
+          className="pointer-events-none absolute left-2 grid size-8 place-items-center rounded-full bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)]"
           style={{ opacity: Math.min(1, swipeX / 48) }}
         >
           <Reply className="size-4" />
@@ -1175,15 +1231,17 @@ const Bubble = memo(function Bubble({
       ) : null}
 
       <div
-        className="flex max-w-[82%] flex-col sm:max-w-[66%]"
+        className="flex max-w-[85%] flex-col sm:max-w-[66%]"
         style={swipeX ? { transform: `translateX(${swipeX}px)` } : undefined}
       >
         <div
           className={cn(
-            "relative rounded-[18px] text-[15px] leading-[1.35] shadow-[0_1px_0.5px_oklch(0_0_0/13%)]",
-            (isImage || isGallery) && !quoted ? "p-[3px]" : "px-3 pb-1.5 pt-1.5",
-            mine ? "bg-chat-out text-chat-out-foreground" : "bg-card text-card-foreground",
-            groupStart && (mine ? "rounded-tr-[4px]" : "rounded-tl-[4px]"),
+            "relative rounded-[8px] text-[14.5px] leading-[1.38] shadow-[0_1px_0.5px_rgba(11,20,26,0.13)]",
+            isFlushCard && !quoted ? "p-[3px]" : "px-2.5 pb-1.5 pt-1.5",
+            mine
+              ? "bg-chat-out text-chat-out-foreground"
+              : "bg-[var(--wa-in)] text-[var(--wa-in-fg)]",
+            groupStart && (mine ? "rounded-tr-none" : "rounded-tl-none"),
           )}
         >
           {groupStart ? <BubbleTail mine={mine} /> : null}
@@ -1198,19 +1256,19 @@ const Bubble = memo(function Bubble({
             </p>
           ) : (
             <>
-              {/* Blok kutipan / Reply */}
+              {/* Blok kutipan / Reply ala WhatsApp */}
               {quoted && message.reply_to_id ? (
                 <button
                   type="button"
                   onClick={() => onJumpToQuoted(message.reply_to_id!)}
                   className={cn(
-                    "mb-1.5 block w-full rounded-lg border-l-[3px] border-primary px-2.5 py-1.5 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "mb-1.5 block w-full rounded-[6px] border-l-4 border-[var(--wa-action)] px-2.5 py-1.5 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     mine
-                      ? "bg-chat-out-foreground/8 hover:bg-chat-out-foreground/12"
-                      : "bg-muted/80 hover:bg-muted",
+                      ? "bg-black/6 hover:bg-black/10 dark:bg-black/20 dark:hover:bg-black/30"
+                      : "bg-[var(--wa-search)] hover:bg-[var(--wa-panel-active)]",
                   )}
                 >
-                  <span className="block truncate font-semibold text-primary">
+                  <span className="block truncate font-semibold text-[var(--wa-action)]">
                     {quoted.sender_id === selfId ? "Anda" : partnerName}
                   </span>
                   <span className="line-clamp-2 break-words opacity-80">
@@ -1225,7 +1283,18 @@ const Bubble = memo(function Bubble({
                     attachment={attachment}
                     attachmentUrls={attachmentUrls}
                     mine={mine}
+                    locationMeta={
+                      isLocation && !body ? (
+                        <BubbleMeta
+                          time={time}
+                          mine={mine}
+                          read={read}
+                          edited={Boolean(message.edited_at)}
+                        />
+                      ) : undefined
+                    }
                     onOpenLightbox={onOpenLightbox}
+                    onOpenLocationMap={onOpenLocationMap}
                     onRefreshAttachmentUrl={onRefreshAttachmentUrl}
                   />
                   {overlayMeta ? (
@@ -1233,7 +1302,7 @@ const Bubble = memo(function Bubble({
                       <BubbleMeta time={time} mine={mine} read={read} overlay />
                     </span>
                   ) : null}
-                  {!overlayMeta && !body ? (
+                  {!overlayMeta && !isLocation && !body ? (
                     <span className="flex justify-end pt-1">
                       <BubbleMeta
                         time={time}
@@ -1250,7 +1319,7 @@ const Bubble = memo(function Bubble({
                 <p
                   className={cn(
                     "whitespace-pre-line break-words",
-                    (isImage || isGallery) && !quoted && "px-2 pb-1 pt-1.5",
+                    isFlushCard && !quoted && "px-2 pb-1 pt-1.5",
                   )}
                 >
                   {renderFormattedChatText(body, searchTerm)}
@@ -1265,7 +1334,7 @@ const Bubble = memo(function Bubble({
                   <span
                     className={cn(
                       "absolute bottom-1.5",
-                      (isImage || isGallery) && !quoted ? "right-2.5" : "right-3",
+                      isFlushCard && !quoted ? "right-2.5" : "right-2.5",
                     )}
                   >
                     <BubbleMeta
@@ -1281,9 +1350,9 @@ const Bubble = memo(function Bubble({
           )}
         </div>
 
-        {/* Bar reaksi emoji di bawah bubble */}
+        {/* Bar reaksi emoji melayang di bawah bubble */}
         {reactionEntries.length > 0 ? (
-          <div className={cn("mt-0.5 flex flex-wrap gap-1", mine ? "justify-end" : "justify-start")}>
+          <div className={cn("-mt-1.5 z-[1] flex flex-wrap gap-1 px-1.5", mine ? "justify-end" : "justify-start")}>
             {reactionEntries.map(([emoji, users]) => {
               const reactedByMe = Boolean(selfId && users.includes(selfId));
               return (
@@ -1296,8 +1365,8 @@ const Bubble = memo(function Bubble({
                   className={cn(
                     "inline-flex h-6 items-center gap-1 rounded-full border px-1.5 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     reactedByMe
-                      ? "border-primary/50 bg-surface-selected text-primary"
-                      : "border-border bg-card text-foreground hover:bg-muted",
+                      ? "border-[var(--wa-action)]/50 bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)]"
+                      : "border-[var(--wa-border)] bg-[var(--wa-in)] text-[var(--wa-in-fg)] hover:bg-[var(--wa-panel-hover)]",
                   )}
                 >
                   <span>{emoji}</span>
@@ -1411,39 +1480,37 @@ function AttachmentView({
   attachment,
   attachmentUrls,
   mine,
+  locationMeta,
   onOpenLightbox,
+  onOpenLocationMap,
   onRefreshAttachmentUrl,
 }: {
   attachment: ChatAttachment;
   attachmentUrls?: Record<string, string>;
   mine: boolean;
+  locationMeta?: ReactNode;
   onOpenLightbox: (items: Array<{ url: string; name: string }>, index: number) => void;
+  onOpenLocationMap: (location: SharedLocationPayload) => void;
   onRefreshAttachmentUrl?: (path: string) => void;
 }) {
   if (attachment.kind === "location") {
-    const href = `https://maps.google.com/?q=${attachment.lat},${attachment.lng}`;
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex min-h-11 items-center gap-2.5 underline-offset-2 hover:underline"
-      >
-        <span
-          className={cn(
-            "grid size-10 shrink-0 place-items-center rounded-full",
-            mine ? "bg-chat-out-foreground/10" : "bg-muted",
-          )}
-        >
-          <MapPin className="size-5 text-primary" aria-hidden="true" />
-        </span>
-        <span className="min-w-0">
-          <span className="block font-semibold">Lokasi dibagikan</span>
-          <span className="block text-xs tabular-nums opacity-80">
-            {attachment.lat.toFixed(5)}, {attachment.lng.toFixed(5)}
-          </span>
-        </span>
-      </a>
+      <LocationBubbleCard
+        lat={attachment.lat}
+        lng={attachment.lng}
+        label={attachment.label}
+        address={attachment.address}
+        mine={mine}
+        metaSlot={locationMeta}
+        onOpenFullMap={() =>
+          onOpenLocationMap({
+            lat: attachment.lat,
+            lng: attachment.lng,
+            label: attachment.label,
+            address: attachment.address,
+          })
+        }
+      />
     );
   }
 
@@ -1643,6 +1710,7 @@ function Composer({
   onRecordingPulse,
   onAttach,
   onOpenCatalog,
+  onOpenLocationPicker,
   droppedFiles,
   onConsumedDroppedFiles,
 }: {
@@ -1659,6 +1727,7 @@ function Composer({
   onRecordingPulse?: (active: boolean) => void;
   onAttach?: (input: ChatAttachInput) => void;
   onOpenCatalog?: () => void;
+  onOpenLocationPicker?: () => void;
   droppedFiles: File[] | null;
   onConsumedDroppedFiles: () => void;
 }) {
@@ -1898,15 +1967,15 @@ function Composer({
   }
 
   return (
-    <div className="relative border-t border-border/70 bg-card/95 backdrop-blur-xl">
+    <div className="relative border-t border-[var(--wa-border)] bg-[var(--wa-chrome)]">
       {/* Popup Slash Quick Replies (`/`) */}
       {quickReplies.length > 0 ? (
         <div
           role="listbox"
           aria-label="Template balasan cepat"
-          className="absolute bottom-full left-2 right-2 z-30 mb-1.5 overflow-hidden rounded-2xl border border-border bg-card shadow-lg sm:left-3 sm:right-3"
+          className="absolute bottom-full left-2 right-2 z-30 mb-1.5 overflow-hidden rounded-xl border border-[var(--wa-border)] bg-[var(--wa-panel)] shadow-lg sm:left-3 sm:right-3"
         >
-          <p className="border-b border-border bg-surface px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">
+          <p className="border-b border-[var(--wa-border)] bg-[var(--wa-chrome)] px-3 py-1.5 text-[11px] font-semibold text-[var(--wa-in-meta)]">
             Balasan cepat (pilih atau tekan Enter)
           </p>
           <ul className="max-h-52 overflow-y-auto p-1">
@@ -1922,15 +1991,17 @@ function Composer({
                     inputRef.current?.focus();
                   }}
                   className={cn(
-                    "flex w-full flex-col rounded-xl px-3 py-2 text-left transition-colors",
-                    idx === quickIndex ? "bg-surface-selected" : "hover:bg-muted/70",
+                    "flex w-full flex-col rounded-lg px-3 py-2 text-left transition-colors",
+                    idx === quickIndex
+                      ? "bg-[var(--wa-pill-active)]"
+                      : "hover:bg-[var(--wa-panel-hover)]",
                   )}
                 >
-                  <span className="flex items-center gap-2 text-xs font-semibold text-primary">
+                  <span className="flex items-center gap-2 text-xs font-semibold text-[var(--wa-action)]">
                     <span className="font-mono">{tpl.command}</span>
-                    <span className="text-foreground">{tpl.label}</span>
+                    <span className="text-[var(--wa-in-fg)]">{tpl.label}</span>
                   </span>
-                  <span className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                  <span className="mt-0.5 line-clamp-1 text-xs text-[var(--wa-in-meta)]">
                     {tpl.body}
                   </span>
                 </button>
@@ -1940,16 +2011,16 @@ function Composer({
         </div>
       ) : null}
 
-      {/* Banner Reply atau Edit */}
+      {/* Banner Reply atau Edit ala WhatsApp */}
       {replyingTo || editingMsg ? (
-        <div className="flex items-center justify-between gap-2 border-b border-border/60 bg-surface/80 px-3 py-2 text-xs">
-          <div className="min-w-0 flex-1 border-l-[3px] border-primary pl-2.5">
-            <p className="font-semibold text-primary">
+        <div className="flex items-center justify-between gap-2 border-b border-[var(--wa-border)] bg-[var(--wa-chrome)] px-3 py-2 text-xs">
+          <div className="min-w-0 flex-1 rounded-md border-l-4 border-[var(--wa-action)] bg-[var(--wa-panel)] px-2.5 py-1.5">
+            <p className="font-semibold text-[var(--wa-action)]">
               {editingMsg
                 ? "Mengedit pesan"
                 : `Membalas ${replyingTo?.sender_id === selfId ? "Anda" : partnerName}`}
             </p>
-            <p className="truncate text-muted-foreground">
+            <p className="truncate text-[var(--wa-in-meta)]">
               {editingMsg ? editingMsg.body : replyingTo ? replySnippet(replyingTo) : ""}
             </p>
           </div>
@@ -1964,14 +2035,14 @@ function Composer({
               }
             }}
             aria-label={editingMsg ? "Batalkan edit pesan" : "Batalkan balas pesan"}
-            className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="grid size-9 shrink-0 place-items-center rounded-full text-[var(--wa-in-meta)] hover:bg-black/5 hover:text-[var(--wa-in-fg)] dark:hover:bg-white/10"
           >
             <X className="size-4" aria-hidden="true" />
           </button>
         </div>
       ) : null}
 
-      <form onSubmit={submit} className="pb-safe flex items-end gap-1 px-1.5 py-1.5 sm:px-2.5">
+      <form onSubmit={submit} className="pb-safe flex items-end gap-1.5 px-2 py-2 sm:px-3">
         {onAttach ? (
           <>
             <input
@@ -2004,43 +2075,57 @@ function Composer({
               <button
                 type="button"
                 aria-label="Lampirkan"
-                className="grid size-11 shrink-0 place-items-center rounded-full text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-in-meta)] transition-colors hover:bg-black/5 hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-white/10"
               >
                 <Plus className="size-6" strokeWidth={2.25} aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" className="w-56 rounded-2xl p-1.5">
+            <DropdownMenuContent side="top" align="start" className="w-60 rounded-2xl p-2">
               <DropdownMenuItem
                 className="min-h-11 gap-3 rounded-xl"
                 onSelect={() => imageRef.current?.click()}
               >
-                <ImageIcon className="size-5 text-primary" aria-hidden="true" /> Foto (hingga 4)
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                  <ImageIcon className="size-4" aria-hidden="true" />
+                </span>
+                <span>Foto & Galeri (maks 4)</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="min-h-11 gap-3 rounded-xl"
                 onSelect={() => fileRef.current?.click()}
               >
-                <FileText className="size-5 text-primary" aria-hidden="true" /> Dokumen
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+                  <FileText className="size-4" aria-hidden="true" />
+                </span>
+                <span>Dokumen</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="min-h-11 gap-3 rounded-xl"
+                onSelect={() =>
+                  onOpenLocationPicker ? onOpenLocationPicker() : onAttach({ kind: "location" })
+                }
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
+                  <MapPin className="size-4" aria-hidden="true" />
+                </span>
+                <span>Lokasi (dengan peta)</span>
               </DropdownMenuItem>
               {onOpenCatalog ? (
                 <DropdownMenuItem
                   className="min-h-11 gap-3 rounded-xl"
                   onSelect={onOpenCatalog}
                 >
-                  <ShoppingBag className="size-5 text-primary" aria-hidden="true" /> Produk / Jasa
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400">
+                    <ShoppingBag className="size-4" aria-hidden="true" />
+                  </span>
+                  <span>Produk / Jasa</span>
                 </DropdownMenuItem>
               ) : null}
-              <DropdownMenuItem
-                className="min-h-11 gap-3 rounded-xl"
-                onSelect={() => onAttach({ kind: "location" })}
-              >
-                <MapPin className="size-5 text-primary" aria-hidden="true" /> Lokasi saya
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
 
-        <div className="my-0.5 flex min-h-10 flex-1 items-end rounded-[22px] border border-border bg-background pl-1 pr-3 focus-within:border-primary/60">
+        <div className="flex min-h-11 flex-1 items-end rounded-[22px] bg-[var(--wa-input)] pl-1 pr-3 shadow-[0_1px_1px_rgba(11,20,26,0.06)] ring-1 ring-[var(--wa-border)] focus-within:ring-[var(--wa-action)]/60">
           <EmojiQuickPicker
             onPick={(emoji) => {
               setDraft((prev) => `${prev}${emoji}`);
@@ -2063,15 +2148,15 @@ function Composer({
               editingMsg
                 ? "Ubah isi pesan..."
                 : viewerRole === "customer"
-                  ? "Ketik pesan atau / untuk cepat..."
-                  : "Balas pembeli atau ketik /..."
+                  ? "Ketik pesan..."
+                  : "Ketik balasan atau / untuk cepat..."
             }
             aria-label="Tulis pesan"
-            className="max-h-32 min-h-[38px] w-full min-w-0 flex-1 resize-none bg-transparent py-2 text-base leading-snug outline-none placeholder:text-muted-foreground [field-sizing:content]"
+            className="max-h-32 min-h-[40px] w-full min-w-0 flex-1 resize-none bg-transparent py-2.5 text-[15px] leading-snug text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)] [field-sizing:content]"
           />
         </div>
 
-        {/* Gaya WhatsApp: kosong = Mikrofon VN, ada teks / edit = Kirim */}
+        {/* Tombol lingkaran hijau khas WhatsApp: kosong = Mikrofon VN, ada teks / edit = Kirim */}
         {onAttach && !hasText && !editingMsg ? (
           <button
             type="button"
@@ -2079,7 +2164,7 @@ function Composer({
             onClick={() => setRecording(true)}
             className="press-scale grid size-11 shrink-0 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
+            <span className="grid size-11 place-items-center rounded-full bg-[var(--wa-action)] text-[var(--wa-action-fg)] shadow-xs">
               <Mic className="size-5" aria-hidden="true" />
             </span>
           </button>
@@ -2090,7 +2175,7 @@ function Composer({
             disabled={!hasText}
             className="press-scale group grid size-11 shrink-0 place-items-center rounded-full disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
+            <span className="grid size-11 place-items-center rounded-full bg-[var(--wa-action)] text-[var(--wa-action-fg)] shadow-xs">
               {editingMsg ? (
                 <Check className="size-5" aria-hidden="true" />
               ) : (

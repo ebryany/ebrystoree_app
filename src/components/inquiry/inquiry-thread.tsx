@@ -392,13 +392,25 @@ export function InquiryThread({
     try {
       let attachment: ChatAttachment;
       if (input.kind === "location") {
-        const pos = await getPosition().catch(() => null);
-        if (!pos) {
-          drop();
-          toast.error("Lokasi tidak bisa diambil. Izinkan akses lokasi di browser.");
-          return;
+        let lat = input.lat;
+        let lng = input.lng;
+        if (typeof lat !== "number" || typeof lng !== "number") {
+          const pos = await getPosition().catch(() => null);
+          if (!pos) {
+            drop();
+            toast.error("Lokasi tidak bisa diambil. Izinkan akses lokasi di browser.");
+            return;
+          }
+          lat = pos.lat;
+          lng = pos.lng;
         }
-        attachment = { kind: "location", ...pos };
+        attachment = {
+          kind: "location",
+          lat,
+          lng,
+          ...(input.label ? { label: input.label } : {}),
+          ...(input.address ? { address: input.address } : {}),
+        };
       } else if (input.kind === "product") {
         attachment = { kind: "product", productId: input.productId };
       } else if (input.kind === "service") {
@@ -573,9 +585,9 @@ export function InquiryThread({
     <Link
       to="/produk/$slug"
       params={{ slug: product.slug }}
-      className="flex min-h-11 items-center gap-2.5 border-t border-border/60 bg-surface/60 px-3 py-1.5 transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex min-h-11 items-center gap-2.5 border-t border-[var(--wa-border)] bg-[var(--wa-panel)] px-3 py-1.5 transition-colors hover:bg-[var(--wa-panel-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-secondary text-primary">
+      <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-[var(--wa-border)] bg-[var(--wa-search)] text-[var(--wa-action)]">
         {thumbnail ? (
           <img src={optimizedMediaUrl(thumbnail, 96)} alt="" className="size-full object-cover" />
         ) : (
@@ -583,31 +595,35 @@ export function InquiryThread({
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-semibold text-foreground">{product.name}</span>
+        <span className="block truncate text-xs font-semibold text-[var(--wa-in-fg)]">
+          {product.name}
+        </span>
         <span className="block text-[11px] font-semibold tabular-nums text-price">
           {formatRupiah(finalPrice)}
         </span>
       </span>
-      <span className="shrink-0 text-xs font-semibold text-primary">Lihat produk</span>
+      <span className="shrink-0 text-xs font-semibold text-[var(--wa-action)]">Lihat produk</span>
     </Link>
   ) : service ? (
     <Link
       to="/jasa/$id"
       params={{ id: service.id }}
-      className="flex min-h-11 items-center gap-2.5 border-t border-border/60 bg-surface/60 px-3 py-1.5 transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex min-h-11 items-center gap-2.5 border-t border-[var(--wa-border)] bg-[var(--wa-panel)] px-3 py-1.5 transition-colors hover:bg-[var(--wa-panel-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-border bg-surface-selected text-primary">
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-[var(--wa-border)] bg-[var(--wa-pill-active)] text-[var(--wa-pill-active-fg)]">
         <BriefcaseBusiness className="size-4" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-semibold text-foreground">{service.name}</span>
-        <span className="block text-[11px] tabular-nums text-muted-foreground">
+        <span className="block truncate text-xs font-semibold text-[var(--wa-in-fg)]">
+          {service.name}
+        </span>
+        <span className="block text-[11px] tabular-nums text-[var(--wa-in-meta)]">
           <strong className="text-price">{formatRupiah(Number(service.price))}</strong>
           {service.duration_days ? ` · ${service.duration_days} hari` : ""}
           {service.revision_limit != null ? ` · ${service.revision_limit} revisi` : ""}
         </span>
       </span>
-      <span className="shrink-0 text-xs font-semibold text-primary">Lihat jasa</span>
+      <span className="shrink-0 text-xs font-semibold text-[var(--wa-action)]">Lihat jasa</span>
     </Link>
   ) : null;
 
@@ -675,7 +691,7 @@ export function InquiryThread({
           to={BACK_ROUTES[mode]}
           aria-label="Kembali ke daftar chat"
           className={cn(
-            "grid size-11 shrink-0 place-items-center rounded-full text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "grid size-11 shrink-0 place-items-center rounded-full text-[var(--wa-brand-fg)] hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:text-[var(--wa-in-meta)] md:hover:bg-black/5 md:hover:text-[var(--wa-in-fg)] md:focus-visible:ring-ring dark:md:hover:bg-white/10",
             embedded && "lg:hidden",
           )}
         >
