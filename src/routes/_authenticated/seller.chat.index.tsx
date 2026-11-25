@@ -1,24 +1,37 @@
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageSquare, Search } from "lucide-react";
+import { Mail, MessageSquare, MoreVertical, Pin, PinOff, Search } from "lucide-react";
+import { toast } from "sonner";
 
 import { ChatListItemContent } from "@/components/chat/chat-list-item";
+import { broadcastReadChange, subscribeChatSync, usePinnedChats } from "@/components/chat/chat-prefs";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { StatusPill } from "@/components/ebry/status";
 import { INQUIRY_STATUS_LABEL } from "@/components/inquiry/inquiry-thread";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
-import { listInquiryUnreadCounts, listSellerInquiries } from "@/lib/inquiries.functions";
+import { useSession } from "@/hooks/use-session";
+import {
+  listInquiryUnreadCounts,
+  listSellerInquiries,
+  markInquiryUnread,
+} from "@/lib/inquiries.functions";
 
 export const Route = createFileRoute("/_authenticated/seller/chat/")({
   head: () => ({
     meta: [
-      { title: "Chat Pelanggan — Seller Ebrystore" },
-      { name: "description", content: "Pertanyaan pelanggan tentang produk Anda." },
+      { title: "Chat Pelanggan | Seller Ebrystore" },
+      { name: "description", content: "Pertanyaan pelanggan tentang produk dan jasa Anda." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -35,11 +48,15 @@ const TABS = [
 type TabKey = (typeof TABS)[number]["key"];
 
 function SellerChatList() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabKey>("all");
   const [q, setQ] = useState("");
   const deferredQ = useDeferredValue(q);
   const fetchList = useServerFn(listSellerInquiries);
   const fetchUnread = useServerFn(listInquiryUnreadCounts);
+  const setUnread = useServerFn(markInquiryUnread);
+  const { pinnedIds, isPinned, togglePin } = usePinnedChats(user?.id);
 
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["seller-inquiries", "all"],
@@ -52,6 +69,15 @@ function SellerChatList() {
     tables: ["product_inquiries", "product_inquiry_messages"],
     keys: [["seller-inquiries", "all"], ["inquiry-unread"]],
   });
+
+  useEffect(() => {
+    return subscribeChatSync((ev) => {
+      if (ev.type === "read-changed") {
+        void queryClient.invalidateQueries({ queryKey: ["inquiry-unread"] });
+        void queryClient.invalidateQueries({ queryKey: ["seller-inquiries", "all"] });
+      }
+    });
+  }, [queryClient]);
 
   const allItems = useMemo(() => (data?.items ?? []) as any[], [data?.items]);
   const counts = useMemo(() => {
@@ -69,12 +95,21 @@ function SellerChatList() {
   const visible = useMemo(() => {
     const filtered = tab === "all" ? allItems : allItems.filter((i: any) => i.status === tab);
     const term = deferredQ.trim().toLowerCase();
-    return term
+    const searched = term
       ? filtered.filter((i: any) =>
-          `${i.customer_name ?? ""} ${i.subject ?? ""}`.toLowerCase().includes(term),
+          `${i.customer_name ?? ""} ${i.subject ?? ""} ${i.last_message_body ?? ""}`
+            .toLowerCase()
+            .includes(term),
         )
       : filtered;
-  }, [allItems, tab, deferredQ]);
+    const pinIndex = new Map(pinnedIds.map((pid, idx) => [pid, idx]));
+    return [...searched].sort((a, b) => {
+      const pa = pinIndex.has(a.id) ? pinIndex.get(a.id)! : 9999;
+      const pb = pinIndex.has(b.id) ? pinIndex.get(b.id)! : 9999;
+      if (pa !== pb) return pa - pb;
+      return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
+    });
+  }, [allItems, tab, deferredQ, pinnedIds]);
 
   const unreadById = useMemo(
     () =>
@@ -84,13 +119,25 @@ function SellerChatList() {
     [unreadQ.data?.items],
   );
 
+  async function handleMarkUnread(inquiryId: string) {
+    const res = await setUnread({ data: { inquiryId } });
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
+    broadcastReadChange(inquiryId);
+    await queryClient.invalidateQueries({ queryKey: ["inquiry-unread"] });
+    await queryClient.invalidateQueries({ queryKey: ["seller-inquiries", "all"] });
+    toast.success("Ditandai belum dibaca.");
+  }
+
   return (
     <div className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold sm:text-xl">Chat Pelanggan</h1>
+          <h1 className="font-display text-lg font-bold sm:text-xl">Chat Pelanggan</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Pertanyaan pembeli tentang produk di toko Anda.
+            Pertanyaan pembeli tentang produk dan jasa di toko Anda. Ketik <code className="rounded bg-muted px-1">/</code> di chat untuk balasan cepat.
           </p>
         </div>
         <Button
@@ -103,8 +150,10 @@ function SellerChatList() {
         </Button>
       </header>
 
-      {/* Kotak masuk: tab garis bawah + pencarian di header kartu, baris chat di bawahnya. */}
-      <section className="overflow-hidden rounded-2xl border border-border bg-card" aria-label="Kotak masuk chat">
+      <section
+        className="overflow-hidden rounded-2xl border border-border bg-card"
+        aria-label="Kotak masuk chat"
+      >
         <div className="flex flex-col gap-2 border-b border-border px-3 pt-1 lg:flex-row lg:items-center lg:justify-between lg:pb-0">
           <div
             role="tablist"
@@ -123,7 +172,7 @@ function SellerChatList() {
                   className={cn(
                     "relative flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                     active
-                      ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-accent"
+                      ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -132,7 +181,7 @@ function SellerChatList() {
                     className={cn(
                       "min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold tabular-nums leading-5",
                       entry.key === "open" && counts.open > 0
-                        ? "bg-accent text-accent-foreground"
+                        ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground",
                     )}
                   >
@@ -152,7 +201,7 @@ function SellerChatList() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari pembeli atau topik"
-              className="min-h-10 pl-9"
+              className="min-h-11 pl-9"
             />
           </label>
         </div>
@@ -172,7 +221,7 @@ function SellerChatList() {
             title={allItems.length === 0 ? "Belum ada pertanyaan" : "Tidak ada chat yang cocok"}
             description={
               allItems.length === 0
-                ? "Pertanyaan dari pembeli tentang produk Anda akan muncul di sini."
+                ? "Pertanyaan dari pembeli tentang produk dan jasa Anda akan muncul di sini."
                 : TABS.find((t) => t.key === tab)?.hint
             }
           />
@@ -181,27 +230,38 @@ function SellerChatList() {
             {visible.map((item: any, index: number) => {
               const unread = unreadById.get(item.id) ?? 0;
               const name: string = item.customer_name || item.subject || "Pembeli";
+              const pinned = isPinned(item.id);
+              const lastMine = item.last_message_role === "seller" || item.last_message_role === "staff";
+              const lastRead =
+                lastMine &&
+                Boolean(item.customer_read_at) &&
+                new Date(item.last_message_at).getTime() <=
+                  new Date(item.customer_read_at).getTime();
+
               return (
-                <li key={item.id} className={index >= 6 ? "cv-row" : undefined}>
+                <li
+                  key={item.id}
+                  className={cn(
+                    "flex items-center transition-colors hover:bg-surface",
+                    unread > 0 && "bg-primary/[0.04]",
+                    index >= 6 && "cv-row",
+                  )}
+                >
                   <Link
                     to="/seller/chat/$id"
                     params={{ id: item.id }}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                      unread > 0 && "bg-accent/[0.04]",
-                    )}
+                    className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                   >
-                    <span
-                      className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-selected text-sm font-bold uppercase text-accent"
-                      aria-hidden="true"
-                    >
-                      {name.trim().charAt(0) || "?"}
-                    </span>
                     <div className="min-w-0 flex-1">
                       <ChatListItemContent
                         title={name}
+                        subtitle={item.subject}
                         preview={item.last_message_body}
+                        previewPrefix={lastMine ? "Anda:" : undefined}
+                        lastMessageMine={lastMine}
+                        lastMessageRead={lastRead}
                         lastMessageAt={item.last_message_at}
+                        pinned={pinned}
                         unread={unread}
                       />
                     </div>
@@ -209,9 +269,35 @@ function SellerChatList() {
                       value={item.status}
                       kind="raw"
                       label={INQUIRY_STATUS_LABEL[item.status]}
-                      className="hidden sm:inline-flex"
+                      className="hidden shrink-0 sm:inline-flex"
                     />
                   </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`Opsi chat ${name}`}
+                        className="mr-2 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <MoreVertical className="size-4" aria-hidden="true" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 rounded-xl p-1">
+                      <DropdownMenuItem
+                        className="min-h-11 gap-2 rounded-lg"
+                        onSelect={() => togglePin(item.id)}
+                      >
+                        {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+                        {pinned ? "Lepas sematan" : "Sematkan ke atas"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="min-h-11 gap-2 rounded-lg"
+                        onSelect={() => void handleMarkUnread(item.id)}
+                      >
+                        <Mail className="size-4" /> Tandai belum dibaca
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </li>
               );
             })}

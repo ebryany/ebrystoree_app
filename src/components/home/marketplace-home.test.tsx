@@ -377,7 +377,7 @@ describe("Banner settings validation", () => {
 });
 
 describe("Home-only product cards", () => {
-  it("shows home products in a tabbed 2-column-on-mobile grid", () => {
+  it("shows home products in a tabbed 2-column-on-mobile grid with full price and visible seller", () => {
     state.products.items = [{ ...product, short_description: "File template untuk presentasi" }];
     const html = home();
     expect(html).toContain("grid grid-cols-2");
@@ -385,9 +385,23 @@ describe("Home-only product cards", () => {
     expect(html).toContain('role="tabpanel"');
     expect(html).toContain("h-full flex-col overflow-hidden rounded-xl");
     expect(html).toContain("Template asli");
-    // Tile ringkas tidak memuat deskripsi, dan tidak ada carousel lama.
+    expect(html).toMatch(/80[.]000/);
+    expect(html).toMatch(/100[.]000/);
+    expect(html).toContain("-20%");
+    expect(html).toContain("Toko Contoh");
+    expect(html).not.toContain("aria-controls=");
     expect(html).not.toContain("File template untuk presentasi");
-    expect(html).not.toContain('aria-roledescription="carousel"');
+  });
+
+  it("renders PromoDealsShelf with computed max discount when 2+ discounted products exist", () => {
+    state.products.items = [
+      { ...product, id: "p-1", slug: "produk-1", price: 100000, discount_price: 50000 },
+      { ...product, id: "p-2", slug: "produk-2", price: 100000, discount_price: 80000 },
+    ];
+    const html = home();
+    expect(html).toContain("Promo hemat hari ini");
+    expect(html).toContain("Potongan harga langsung hingga 50%");
+    expect(html).not.toContain("—");
   });
 
   it("keeps the default card appearance and hides home-only content", () => {

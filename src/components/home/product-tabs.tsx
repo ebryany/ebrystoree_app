@@ -1,4 +1,5 @@
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { Link } from "@tanstack/react-router";
 
 import {
   PRODUCT_GRID,
@@ -6,6 +7,7 @@ import {
   SeeAllLink,
   type ProductTileItem,
 } from "@/components/ebry/product-shelf";
+import { formatCategoryLabel } from "@/components/home/category-rail";
 import { SectionHeader } from "@/components/home/section-header";
 import { cn } from "@/lib/utils";
 
@@ -21,38 +23,87 @@ export type ProductTab = {
 const MAX_ITEMS = 12;
 
 /**
- * Koleksi produk bertab: satu section menggantikan banyak rak bertumpuk.
- * Tab kosong disaring di pemanggil, jadi setiap tab selalu berisi produk.
+ * Koleksi produk bertab satu baris ala feed kategori marketplace (Tokopedia).
+ * Mengikuti Modern Web Guidance (tabs):
+ * - Selalu satu baris horizontal dengan fade tepi (scroll-driven + fallback IntersectionObserver).
+ * - Indikator tab aktif memakai garis bawah border 3px pada pseudo-element (bukan warna saja)
+ *   dan ukuran teks tetap konstan agar tab tidak melompat saat berpindah.
+ * - Tanpa aria-controls redundan; tab terpilih digulir masuk viewport tablist otomatis.
  */
 export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
   const [active, setActive] = useState(0);
+  const tablistRef = useRef<HTMLDivElement>(null);
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const base = useId();
+
+  useEffect(() => {
+    const scroller = tablistRef.current;
+    if (!scroller || typeof CSS === "undefined" || CSS.supports("animation-timeline", "scroll()")) {
+      return;
+    }
+    const first = scroller.firstElementChild;
+    const last = scroller.lastElementChild;
+    if (!first || !last) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.target === first) {
+            scroller.classList.toggle("more-start", entry.intersectionRatio < 1);
+          }
+          if (entry.target === last) {
+            scroller.classList.toggle("more-end", entry.intersectionRatio < 1);
+          }
+        }
+      },
+      { root: scroller, threshold: 1, rootMargin: "1px" },
+    );
+    observer.observe(first);
+    observer.observe(last);
+    return () => observer.disconnect();
+  }, [tabs.length]);
+
   if (!tabs.length) return null;
-  const current = tabs[Math.min(active, tabs.length - 1)];
+  const currentIndex = Math.min(active, tabs.length - 1);
+  const current = tabs[currentIndex];
+
+  function selectTab(next: number, moveFocus: boolean) {
+    setActive(next);
+    const el = refs.current[next];
+    if (moveFocus) el?.focus();
+    el?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
 
   function onKey(event: KeyboardEvent<HTMLDivElement>) {
-    const dir = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
-    if (!dir) return;
-    event.preventDefault();
-    const next = (active + dir + tabs.length) % tabs.length;
-    setActive(next);
-    refs.current[next]?.focus();
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      selectTab((currentIndex + 1) % tabs.length, true);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      selectTab((currentIndex - 1 + tabs.length) % tabs.length, true);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      selectTab(0, true);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      selectTab(tabs.length - 1, true);
+    }
   }
 
   return (
     <section aria-labelledby={`${base}-heading`}>
       <SectionHeader
         id={`${base}-heading`}
-        title="Produk digital"
-        desc="Siap dipakai setelah pembayaran terverifikasi."
+        title="Jelajahi produk digital"
+        desc="Siap unduh setelah pembayaran diverifikasi."
         action={<SeeAllLink to="/produk" kategori={current.kategori} />}
       />
+
       <div
+        ref={tablistRef}
         role="tablist"
         aria-label="Koleksi produk"
         onKeyDown={onKey}
-        className="-mx-4 mb-5 flex gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="ebry-tab-scroller -mx-3 mb-5 flex flex-nowrap items-center gap-1 overflow-x-auto border-b border-border px-3 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0"
       >
         {tabs.map((tab, i) => {
           const selected = tab.key === current.key;
@@ -66,21 +117,22 @@ export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
               type="button"
               role="tab"
               aria-selected={selected}
-              aria-controls={`${base}-panel`}
               tabIndex={selected ? 0 : -1}
-              onClick={() => setActive(i)}
+              onClick={() => selectTab(i, false)}
               className={cn(
-                "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-medium capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "relative inline-flex min-h-11 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap px-3.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring motion-reduce:transition-none",
                 selected
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-accent/50 hover:text-accent",
+                  ? "text-primary after:absolute after:inset-x-2 after:bottom-0 after:border-b-[3px] after:border-primary after:content-['']"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {tab.label.toLowerCase()}
+              <span>{formatCategoryLabel(tab.label)}</span>
               <span
                 className={cn(
-                  "text-xs tabular-nums",
-                  selected ? "text-primary-foreground/70" : "text-muted-foreground",
+                  "rounded-md px-1.5 py-0.5 text-[11px] tabular-nums",
+                  selected
+                    ? "bg-surface-selected text-primary"
+                    : "bg-surface text-muted-foreground",
                 )}
               >
                 {Math.min(tab.items.length, MAX_ITEMS)}
@@ -89,14 +141,25 @@ export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
           );
         })}
       </div>
+
       <div id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${current.key}`}>
-        <ul className={PRODUCT_GRID}>
+        <ul role="list" className={PRODUCT_GRID}>
           {current.items.slice(0, MAX_ITEMS).map((item, i) => (
             <li key={item.id} className="min-w-0">
               <ProductTile item={item} rank={current.ranked ? i + 1 : undefined} />
             </li>
           ))}
         </ul>
+
+        <div className="mt-6 flex justify-center">
+          <Link
+            to="/produk"
+            search={current.kategori ? ({ kategori: current.kategori } as never) : undefined}
+            className="inline-flex min-h-11 items-center justify-center rounded-control border border-border bg-card px-6 text-sm font-semibold text-foreground transition-colors hover:border-primary/45 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Lihat semua produk
+          </Link>
+        </div>
       </div>
     </section>
   );

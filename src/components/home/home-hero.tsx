@@ -160,7 +160,7 @@ export function SellerJoinSection({
                 <Link
                   to="/toko/$slug"
                   params={{ slug: store.slug }}
-                  className="inline-flex min-h-9 items-center rounded-full border border-border bg-card px-3 text-xs font-medium transition-colors hover:border-accent/50 hover:bg-accent/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-border bg-card px-3.5 text-xs font-medium text-foreground transition-colors hover:border-primary/45 hover:bg-surface-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {store.name}
                 </Link>

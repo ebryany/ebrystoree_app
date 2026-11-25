@@ -23,8 +23,8 @@ beforeEach(() => {
   state.items = [];
 });
 
-describe("CategoryRail icon image", () => {
-  it("renders the uploaded PNG/JPEG inside a unified framed badge instead of the built-in icon", () => {
+describe("CategoryRail custom 3D artwork & uploaded icon", () => {
+  it("renders the uploaded PNG/JPEG inside a unified framed badge when valid", () => {
     state.items = [{ id: "1", name: "chatgpt", slug: "chatgpt", image_url: IMG }];
     const html = renderToStaticMarkup(<CategoryRail />);
     expect(html).toContain(`src="${IMG}?w=96&amp;f=webp"`);
@@ -35,14 +35,26 @@ describe("CategoryRail icon image", () => {
     expect(html).not.toContain("fetchpriority");
   });
 
-  it("falls back to the built-in icon badge when the image is missing or unsafe", () => {
+  it("rejects unsafe image_url and falls back safely to built-in 3D WebP artwork", () => {
     for (const image_url of [null, "javascript:alert(1)", "/api/public/catalog-image/../x.png"]) {
       state.items = [{ id: "1", name: "Jasa Web", slug: "jasa-web", image_url }];
       const html = renderToStaticMarkup(<CategoryRail />);
-      expect(html).not.toContain("<img");
-      expect(html).toContain("<svg");
+      expect(html).not.toContain("javascript:");
+      expect(html).not.toContain("/../x.png");
+      expect(html).toContain("jasa-digital.webp");
       expect(html).toContain("rounded-[13px]");
     }
+  });
+
+  it("places Semua Produk and Semua Jasa cleanly side by side at the start", () => {
+    state.items = [{ id: "1", name: "Makalah", slug: "makalah", image_url: null }];
+    const html = renderToStaticMarkup(<CategoryRail />);
+    const idxProd = html.indexOf("Semua Produk");
+    const idxServ = html.indexOf("Semua Jasa");
+    const idxMakalah = html.indexOf("Makalah");
+    expect(idxProd).toBeGreaterThan(-1);
+    expect(idxServ).toBeGreaterThan(idxProd);
+    expect(idxMakalah).toBeGreaterThan(idxServ);
   });
 
   it("formats category labels cleanly while preserving acronyms and Indonesian connectors", () => {

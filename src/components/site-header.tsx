@@ -144,18 +144,19 @@ export function SiteHeader() {
     <header className="pt-safe sticky top-0 z-40">
       {/* Navbar diam saat digulir: lebar penuh, tanpa efek mengambang. */}
       <div>
-        <div className="relative w-full border-b border-border bg-card text-foreground">
+        <div className="relative w-full border-b border-border bg-card text-foreground shadow-[var(--elev-1)]">
           <div
             className={cn(
-              // Mobile: satu baris (nowrap) supaya ikon tidak turun ke baris kedua.
-              "flex min-h-14 w-full flex-nowrap items-center gap-x-2 gap-y-1.5 px-3 py-1.5 sm:gap-x-4 sm:px-6 lg:flex-wrap lg:px-8",
+              // Mobile: satu baris ringkas berisi brand, tombol pencarian ala marketplace, dan menu.
+              "mx-auto flex min-h-14 w-full max-w-7xl flex-nowrap items-center gap-x-2 gap-y-1.5 px-3 py-1.5 sm:gap-x-3.5 sm:px-6 lg:flex-wrap lg:px-8 2xl:max-w-[88rem]",
             )}
           >
             <Link
               ref={homeLinkRef}
               to="/"
               className={cn(
-                "flex min-h-11 min-w-0 shrink items-center justify-start gap-2 rounded-md text-base font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:text-lg",
+                "flex min-h-11 shrink-0 items-center justify-start gap-2 rounded-md text-base font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:text-lg",
+                publicPage ? "max-w-[7.5rem] sm:max-w-none" : "min-w-0 shrink",
               )}
             >
               {logoUrl ? (
@@ -172,8 +173,27 @@ export function SiteHeader() {
                   <ShoppingBag className="size-5" aria-hidden="true" />
                 </span>
               )}
-              <span className="truncate">{brandName}</span>
+              <span
+                className={cn(
+                  "truncate",
+                  publicPage ? "sr-only sm:not-sr-only sm:inline" : "inline",
+                )}
+              >
+                {brandName}
+              </span>
             </Link>
+            {/* Mobile marketplace search bar: selalu terlihat di baris atas tanpa membuka menu. */}
+            {publicPage ? (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Cari produk di Ebrystore"
+                className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-left text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+              >
+                <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span className="truncate">Cari produk atau jasa...</span>
+              </button>
+            ) : null}
             {/* Navigasi utama sebaris dengan pencarian, bukan baris terpisah:
                 satu baris membuat navbar terbaca sebagai satu permukaan. */}
             {navItems.length ? (
@@ -199,17 +219,14 @@ export function SiteHeader() {
             ) : null}
             {publicPage ? (
               <>
-                {/* Mobile: satu tombol search. Desktop: form inline penuh.
-                    Pemisahan ini menghapus dua ikon search yang sebelumnya
-                    tampil berdampingan di satu form. */}
                 <form
                   onSubmit={searchProducts}
                   role="search"
                   aria-label="Cari produk di marketplace"
-                  className="hidden min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-background p-1 focus-within:ring-2 focus-within:ring-ring lg:flex"
+                  className="hidden min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-background p-1 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/30 lg:flex"
                 >
                   <Search
-                    className="ml-2 size-4 shrink-0 text-muted-foreground"
+                    className="ml-2.5 size-4 shrink-0 text-muted-foreground"
                     aria-hidden="true"
                   />
                   <input
@@ -218,11 +235,11 @@ export function SiteHeader() {
                     maxLength={80}
                     value={term}
                     onChange={(event) => setTerm(event.target.value)}
-                    placeholder="Cari produk digital…"
+                    placeholder="Cari template, akun AI, atau jasa seller..."
                     aria-label="Cari produk digital"
-                    className="min-h-11 min-w-0 flex-1 bg-transparent px-1 text-base outline-none placeholder:text-muted-foreground"
+                    className="min-h-11 min-w-0 flex-1 bg-transparent px-1 text-sm outline-none placeholder:text-muted-foreground"
                   />
-                  <Button type="submit" variant="ghost" className="min-h-11">
+                  <Button type="submit" size="sm" className="min-h-11 rounded-lg px-4">
                     Cari
                   </Button>
                 </form>
@@ -525,6 +542,12 @@ export function SiteHeader() {
                 placeholder="Cari produk digital…"
                 aria-label="Cari produk digital"
                 enterKeyHint="search"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    setSearchOpen(false);
+                  }
+                }}
                 className="min-h-11 min-w-0 flex-1 bg-transparent px-1 text-base outline-none placeholder:text-muted-foreground"
               />
               <Button type="submit" size="sm" className="min-h-11 shrink-0">

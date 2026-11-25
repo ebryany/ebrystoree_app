@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { createFileRoute, Link, stripSearchParams, useNavigate } from "@tanstack/react-router";
 import {
   infiniteQueryOptions,
@@ -9,12 +10,22 @@ import {
 import { PageShell } from "@/components/page-shell";
 import { RouteError } from "@/components/route-fallback";
 import { Button } from "@/components/ui/button";
-import { SellerServiceCard } from "@/components/home/seller-service-card";
+import { ServiceTile } from "@/components/home/service-tile";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
 import { CatalogFilters } from "@/components/catalog-filters";
 import { listCatalogCategories, listPublicMarketplaceServices } from "@/lib/catalog.functions";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 12;
+type ServiceSort = "latest" | "price_asc" | "price_desc" | "fastest" | "most_revisions";
+
+const SERVICE_SORT_OPTIONS: Array<{ value: ServiceSort; label: string }> = [
+  { value: "latest", label: "Terbaru" },
+  { value: "price_asc", label: "Harga terendah" },
+  { value: "price_desc", label: "Harga tertinggi" },
+  { value: "fastest", label: "Pengerjaan tercepat" },
+  { value: "most_revisions", label: "Revisi terbanyak" },
+];
+
 const servicesQuery = (filters: { q: string; category: string }) =>
   infiniteQueryOptions({
     queryKey: ["seller-services", "infinite", PAGE_SIZE, filters.q, filters.category],
@@ -30,6 +41,7 @@ const servicesQuery = (filters: { q: string; category: string }) =>
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
+
 const categoriesQuery = queryOptions({
   queryKey: ["categories", "service"],
   queryFn: () => listCatalogCategories({ data: { kind: "service" } }),
@@ -72,7 +84,7 @@ export const Route = createFileRoute("/layanan/")({
   pendingMs: 200,
   pendingComponent: () => (
     <PageShell>
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="mx-auto w-full max-w-7xl px-3 py-8 sm:px-6 lg:px-8 2xl:max-w-[88rem]">
         <CardsSkeleton count={3} />
       </div>
     </PageShell>
@@ -89,8 +101,31 @@ function HalamanLayanan() {
   const filters = { q: search.q ?? "", category: search.kategori ?? "" };
   const query = useSuspenseInfiniteQuery(servicesQuery(filters));
   const categories = useSuspenseQuery(categoriesQuery);
+  const [sortBy, setSortBy] = useState<ServiceSort>("latest");
+
   const firstPage = query.data.pages[0];
-  const items = query.data.pages.flatMap((page) => page.items);
+  const rawItems = useMemo(
+    () => query.data.pages.flatMap((page) => page.items),
+    [query.data.pages],
+  );
+
+  const items = useMemo(() => {
+    if (sortBy === "latest") return rawItems;
+    const sorted = [...rawItems];
+    if (sortBy === "price_asc") {
+      sorted.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === "price_desc") {
+      sorted.sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortBy === "fastest") {
+      sorted.sort((a, b) => Number(a.agreement.durationDays) - Number(b.agreement.durationDays));
+    } else if (sortBy === "most_revisions") {
+      sorted.sort(
+        (a, b) => Number(b.agreement.revisionLimit) - Number(a.agreement.revisionLimit),
+      );
+    }
+    return sorted;
+  }, [rawItems, sortBy]);
+
   const isFiltered = Boolean(filters.q || filters.category);
   const nextPageFailed =
     query.isFetchNextPageError || query.data.pages.slice(1).some((page) => Boolean(page.error));
@@ -98,10 +133,10 @@ function HalamanLayanan() {
   return (
     <PageShell>
       <div className="min-h-[60vh] bg-surface">
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-6 sm:py-7 lg:px-8 2xl:max-w-[88rem]">
           <nav
             aria-label="Breadcrumb"
-            className="mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+            className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
           >
             <Link
               to="/"
@@ -110,25 +145,32 @@ function HalamanLayanan() {
               Beranda
             </Link>
             <span aria-hidden="true">/</span>
-            <span aria-current="page">Jasa seller</span>
+            <span aria-current="page" className="text-foreground">
+              Jasa seller
+            </span>
           </nav>
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Jasa dari seller</h1>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Cek harga, durasi, revisi, dan lingkup pekerjaan sebelum memesan.
+
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                Jasa dari seller
+              </h1>
+              <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                Bandingkan harga, durasi pengerjaan, dan jatah revisi. Dana ditahan sampai hasil
+                Anda terima.
               </p>
             </div>
-            <Button asChild variant="outline" className="min-h-11">
+            <Button asChild variant="outline" className="min-h-11 shrink-0 rounded-control">
               <Link to="/produk">Cari produk siap pakai</Link>
             </Button>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+
+          <div className="rounded-2xl border border-border bg-card p-3.5 shadow-[var(--elev-1)] sm:p-5">
             <CatalogFilters
               q={filters.q}
               category={filters.category}
               categories={categories.data.items}
-              placeholder="Cari jasa seller…"
+              placeholder="Cari jasa seller..."
               onChange={(next) =>
                 void navigate({
                   search: (prev) => ({
@@ -139,6 +181,33 @@ function HalamanLayanan() {
                 })
               }
             />
+
+            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-border pt-3.5">
+              <p className="text-xs text-muted-foreground">
+                Diskusikan kebutuhan lewat tombol Chat sebelum memesan.
+              </p>
+              <div className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 sm:w-auto">
+                <label
+                  htmlFor="layanan-sort"
+                  className="shrink-0 text-xs font-medium text-muted-foreground sm:text-sm"
+                >
+                  Urutkan
+                </label>
+                <select
+                  id="layanan-sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as ServiceSort)}
+                  className="min-h-11 min-w-0 max-w-full flex-1 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none"
+                >
+                  {SERVICE_SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {categories.data.error ? (
               <div className="mt-3">
                 <SectionError
@@ -150,7 +219,8 @@ function HalamanLayanan() {
               </div>
             ) : null}
           </div>
-          <section aria-label="Hasil katalog layanan" className="mt-7">
+
+          <section aria-label="Hasil katalog layanan" className="mt-6">
             {firstPage.error ? (
               <SectionError
                 message={firstPage.error}
@@ -171,37 +241,37 @@ function HalamanLayanan() {
                   }
                 />
                 {isFiltered ? (
-                  <Button
-                    variant="outline"
-                    className="min-h-11"
-                    onClick={() =>
-                      void navigate({ search: { q: "", kategori: "" }, replace: true })
-                    }
-                  >
-                    Reset semua filter
-                  </Button>
+                  <div className="flex justify-center">
+                    <Button
+                      variant="outline"
+                      className="min-h-11"
+                      onClick={() => {
+                        setSortBy("latest");
+                        void navigate({ search: { q: "", kategori: "" }, replace: true });
+                      }}
+                    >
+                      Reset semua filter
+                    </Button>
+                  </div>
                 ) : null}
               </div>
             ) : (
               <>
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="font-semibold">
+                  <h2 className="font-display text-base font-bold sm:text-lg">
                     {isFiltered ? "Hasil pencarian" : "Pilihan jasa seller"}
                   </h2>
-                  <p className="text-sm text-muted-foreground" aria-live="polite">
+                  <p className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
                     {items.length} layanan ditampilkan
                   </p>
                 </div>
-                {/* Grid berbasis lebar minimum, sama dengan /produk. Kolom tetap
-                    md:2/lg:3 membuat dua jasa meregang setengah / sepertiga
-                    container sehingga kartu terlihat raksasa; auto-fill +
-                    minmax(260px,1fr) menjaga kartu di rentang 260-320px
-                    seberapa pun sedikit isinya, dan baris terakhir tidak
-                    ikut melebar. */}
-                <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-3 sm:gap-4">
+                <ul
+                  role="list"
+                  className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                >
                   {items.map((item) => (
-                    <li key={item.id} className="flex min-w-0 flex-col">
-                      <SellerServiceCard item={item} />
+                    <li key={item.id} className="min-w-0">
+                      <ServiceTile item={item} />
                     </li>
                   ))}
                 </ul>
@@ -215,7 +285,9 @@ function HalamanLayanan() {
                     <SectionError
                       message="Layanan berikutnya gagal dimuat. Layanan sebelumnya tetap tersedia."
                       onRetry={() => {
-                        void (query.isFetchNextPageError ? query.fetchNextPage() : query.refetch());
+                        void (query.isFetchNextPageError
+                          ? query.fetchNextPage()
+                          : query.refetch());
                       }}
                     />
                   </div>
@@ -223,13 +295,13 @@ function HalamanLayanan() {
                   <div className="mt-6 flex justify-center">
                     <Button
                       variant="outline"
-                      className="min-h-11"
+                      className="min-h-11 rounded-control px-6"
                       onClick={() => {
                         void query.fetchNextPage();
                       }}
                       disabled={query.isFetchingNextPage}
                     >
-                      {query.isFetchingNextPage ? "Memuat…" : "Muat lebih banyak"}
+                      {query.isFetchingNextPage ? "Memuat..." : "Muat lebih banyak"}
                     </Button>
                   </div>
                 ) : (

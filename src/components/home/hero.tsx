@@ -1,148 +1,387 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import { BadgeCheck, Search, ShieldCheck, Store } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import {
+  BadgeCheck,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Package,
+  ShieldCheck,
+  Store,
+} from "lucide-react";
 
 import heroMascotUrl from "@/assets/ebrystore-hero-mascot.webp";
-import { WordAnimator } from "@/components/ui/word-animator";
-import { listCatalogCategories } from "@/lib/catalog.functions";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
+import { clampBannerPosition, homeBannerSlides } from "@/lib/website-settings";
+import { cn } from "@/lib/utils";
 
-const WORDS = ["produk digital", "jasa"];
+type BannerSlide = ReturnType<typeof homeBannerSlides>[number];
 
-const productCategoriesQuery = queryOptions({
-  queryKey: ["categories", "product"],
-  queryFn: () => listCatalogCategories({ data: { kind: "product" } }),
-  staleTime: 5 * 60_000,
-});
+const QUICK_LINKS = [
+  { label: "Produk digital", desc: "Siap unduh", to: "/produk" as const, icon: Package },
+  { label: "Jasa seller", desc: "Sesuai brief", to: "/layanan" as const, icon: Briefcase },
+  { label: "Pesanan saya", desc: "Pantau status", to: "/dashboard" as const, icon: ClipboardList },
+  { label: "Buka toko", desc: "Mulai jualan", to: "/auth" as const, icon: Store },
+] as const;
 
-const TRUST = [
+const GUARANTEES = [
   { icon: ShieldCheck, label: "Pembayaran diverifikasi" },
   { icon: BadgeCheck, label: "Dana jasa ditahan sampai hasil diterima" },
   { icon: Store, label: "Toko ditinjau sebelum tayang" },
-];
+] as const;
 
 /**
- * Hero beranda gaya toko modern: judul, pencarian besar sebagai aksi utama,
- * pintasan kategori, lalu tiga jaminan yang memang berjalan di sistem.
- * Tepi kiri memakai padding yang sama dengan navbar dan section di bawahnya.
+ * Carousel banner promo berbasis native CSS scroll-snap.
+ * Mengikuti pola Modern Web Guidance:
+ * - Slide 0 memakai fetchPriority="high" tanpa loading="lazy" (kandidat LCP);
+ *   slide berikutnya memakai fetchPriority="low" + loading="lazy".
+ * - Kontrol Previous/Next berada sebelum track di DOM, mendukung pengalihan fokus
+ *   saat tombol mencapai batas akhir, dan marker memiliki indikator bentuk non-warna.
+ * - Status pengumuman polite hanya diperbarui setelah perpindahan slide selesai.
+ */
+function PromoBannerCarousel({
+  slides,
+  posX,
+  posY,
+}: {
+  slides: BannerSlide[];
+  posX: number;
+  posY: number;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const prevRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  const settledRef = useRef(0);
+  const pendingRef = useRef<number | null>(null);
+  const userInitiatedRef = useRef(false);
+  const [active, setActive] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
+
+  const total = slides.length;
+  const isFirst = active === 0;
+  const isLast = active === total - 1;
+
+  const nearestSlide = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || total <= 1) return 0;
+    const width = track.clientWidth;
+    if (width <= 0) return 0;
+    return Math.max(0, Math.min(total - 1, Math.round(track.scrollLeft / width)));
+  }, [total]);
+
+  const scrollToSlide = useCallback(
+    (target: number) => {
+      const track = trackRef.current;
+      if (!track || total <= 1) return;
+      const clamped = Math.max(0, Math.min(total - 1, target));
+      userInitiatedRef.current = true;
+      pendingRef.current = clamped;
+      setActive(clamped);
+      const slideEl = track.children[clamped] as HTMLElement | undefined;
+      if (slideEl) {
+        const reduced =
+          typeof window !== "undefined" &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        track.scrollTo({
+          left: slideEl.offsetLeft,
+          behavior: reduced ? "auto" : "smooth",
+        });
+      }
+    },
+    [total],
+  );
+
+  const handleStep = useCallback(
+    (dir: -1 | 1) => {
+      const base = pendingRef.current ?? active;
+      const next = Math.max(0, Math.min(total - 1, base + dir));
+      if (next === base) return;
+      scrollToSlide(next);
+      // Redirect fokus ke tombol lawan bila tombol aktif akan nonaktif di ujung slide.
+      if (dir === -1 && next === 0) {
+        nextRef.current?.focus();
+      } else if (dir === 1 && next === total - 1) {
+        prevRef.current?.focus();
+      }
+    },
+    [active, scrollToSlide, total],
+  );
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || total <= 1) return;
+
+    let rafId = 0;
+    let fallbackTimer = 0;
+    const supportsScrollEnd = "onscrollend" in window;
+
+    const handleSettle = () => {
+      const idx = nearestSlide();
+      pendingRef.current = null;
+      setActive(idx);
+      if (userInitiatedRef.current && idx !== settledRef.current) {
+        settledRef.current = idx;
+        setAnnouncement(`Slide ${idx + 1} dari ${total}`);
+      }
+      userInitiatedRef.current = false;
+    };
+
+    const handleScroll = () => {
+      if (pendingRef.current === null) {
+        userInitiatedRef.current = true;
+        if (!rafId) {
+          rafId = window.requestAnimationFrame(() => {
+            rafId = 0;
+            const idx = nearestSlide();
+            setActive((prev) => (prev === idx ? prev : idx));
+          });
+        }
+      }
+      if (!supportsScrollEnd) {
+        window.clearTimeout(fallbackTimer);
+        fallbackTimer = window.setTimeout(handleSettle, 140);
+      }
+    };
+
+    track.addEventListener("scroll", handleScroll, { passive: true });
+    if (supportsScrollEnd) {
+      track.addEventListener("scrollend", handleSettle);
+    }
+    return () => {
+      track.removeEventListener("scroll", handleScroll);
+      if (supportsScrollEnd) {
+        track.removeEventListener("scrollend", handleSettle);
+      }
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (fallbackTimer) window.clearTimeout(fallbackTimer);
+    };
+  }, [nearestSlide, total]);
+
+  return (
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Promo Ebrystore"
+      className="relative min-w-0 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--elev-1)]"
+    >
+      {total > 1 ? (
+        <div className="pointer-events-none absolute inset-x-2.5 top-1/2 z-10 flex -translate-y-1/2 justify-between">
+          <button
+            ref={prevRef}
+            type="button"
+            disabled={isFirst}
+            onClick={() => handleStep(-1)}
+            aria-label="Slide promo sebelumnya"
+            className="pointer-events-auto grid size-11 place-items-center rounded-full border border-border bg-card/95 text-foreground shadow-card transition-colors hover:bg-card disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
+          >
+            <ChevronLeft className="size-5" aria-hidden="true" />
+          </button>
+          <button
+            ref={nextRef}
+            type="button"
+            disabled={isLast}
+            onClick={() => handleStep(1)}
+            aria-label="Slide promo berikutnya"
+            className="pointer-events-auto grid size-11 place-items-center rounded-full border border-border bg-card/95 text-foreground shadow-card transition-colors hover:bg-card disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
+          >
+            <ChevronRight className="size-5" aria-hidden="true" />
+          </button>
+        </div>
+      ) : null}
+
+      <div
+        ref={trackRef}
+        tabIndex={0}
+        role="group"
+        aria-label="Daftar slide promo"
+        className="ebry-carousel-track h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      >
+        {slides.map((slide, i) => (
+          <div
+            key={`${i}-${slide.imageUrl}`}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`Slide ${i + 1} dari ${total}`}
+            className="relative aspect-[16/9] w-full shrink-0 snap-center bg-surface sm:aspect-[16/7] lg:aspect-auto lg:min-h-[300px]"
+          >
+            <picture>
+              {slide.mobileUrl ? (
+                <source media="(max-width: 639px)" srcSet={slide.mobileUrl} />
+              ) : null}
+              <img
+                src={slide.imageUrl}
+                alt={slide.alt || `Promo Ebrystore ${i + 1}`}
+                width={1200}
+                height={525}
+                fetchPriority={i === 0 ? "high" : "low"}
+                loading={i === 0 ? undefined : "lazy"}
+                decoding="async"
+                style={{ objectPosition: `${posX}% ${posY}%` }}
+                className="size-full object-cover"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      <p className="sr-only" role="status" aria-live="polite">
+        {announcement}
+      </p>
+
+      {total > 1 ? (
+        <nav
+          aria-label="Pilih slide promo"
+          className="absolute inset-x-0 bottom-2 z-10 flex items-center justify-center gap-0.5"
+        >
+          {slides.map((slide, i) => {
+            const current = i === active;
+            return (
+              <button
+                key={`marker-${i}-${slide.imageUrl}`}
+                type="button"
+                onClick={() => scrollToSlide(i)}
+                aria-label={`Buka slide ${i + 1} dari ${total}`}
+                aria-current={current ? "true" : undefined}
+                className="grid min-h-11 min-w-8 place-items-center px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "block h-2.5 rounded-full border transition-all duration-200 motion-reduce:transition-none",
+                    current
+                      ? "w-7 border-primary-foreground/90 bg-primary shadow-sm"
+                      : "w-2.5 border-foreground/30 bg-card/90 hover:bg-card",
+                  )}
+                />
+              </button>
+            );
+          })}
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Banner pengganti saat admin belum mengunggah gambar banner promo.
+ * Tetap berformat banner marketplace dengan kontras tinggi dan aksi langsung.
+ */
+function DefaultPromoBanner() {
+  return (
+    <div className="relative flex min-h-[220px] min-w-0 items-center overflow-hidden rounded-2xl bg-hero-gradient p-5 text-[#faf8f3] shadow-[var(--elev-1)] sm:min-h-[260px] sm:p-7 lg:min-h-[300px] lg:p-8">
+      <div className="relative z-10 flex max-w-lg flex-col justify-center">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[#faf8f3]/85">
+          Etalase Produk Digital & Jasa
+        </p>
+        <p className="mt-2 font-display text-2xl font-bold leading-tight tracking-tight text-[#faf8f3] sm:text-3xl">
+          Temukan produk siap pakai dan jasa seller terverifikasi
+        </p>
+        <p className="mt-2.5 text-sm leading-relaxed text-[#faf8f3]/85">
+          Bandingkan harga antar toko, bayar lewat kanal resmi, dan pantau progres pesanan langsung
+          dari akunmu.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2.5">
+          <Link
+            to="/produk"
+            className="inline-flex min-h-11 items-center justify-center rounded-control bg-[#faf8f3] px-4 text-sm font-semibold text-[#003f42] transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#faf8f3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#003f42]"
+          >
+            Belanja produk
+          </Link>
+          <Link
+            to="/layanan"
+            className="inline-flex min-h-11 items-center justify-center rounded-control border border-[#faf8f3]/50 bg-transparent px-4 text-sm font-semibold text-[#faf8f3] transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#faf8f3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#003f42]"
+          >
+            Lihat jasa seller
+          </Link>
+        </div>
+      </div>
+      <div className="ml-auto hidden shrink-0 lg:block">
+        <img
+          src={heroMascotUrl}
+          alt="Maskot Ebrystore membawa laptop"
+          width={320}
+          height={320}
+          fetchPriority="high"
+          decoding="async"
+          className="size-56 object-contain xl:size-64"
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Hero beranda gaya marketplace (Tokopedia x Itemku):
+ * - Kiri: Banner promo carousel dari pengaturan admin (atau banner default Ebrystore).
+ * - Kanan: Panel akses cepat 2x2 dan jaminan sistem yang benar-benar berjalan.
  */
 export function HomeHero() {
-  const navigate = useNavigate();
-  const [q, setQ] = useState("");
-  const categories = useQuery(productCategoriesQuery);
-  const chips = (
-    (categories.data as { items?: Array<{ id: string; name: string; slug: string }> } | undefined)
-      ?.items ?? []
-  ).slice(0, 5);
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const term = q.trim().slice(0, 80);
-    void navigate({ to: "/produk", search: term ? { q: term } : {} });
-  }
+  const settings = useWebsiteSettings();
+  const slides = homeBannerSlides(settings);
+  const posX = clampBannerPosition(settings.home_banner_position_x);
+  const posY = clampBannerPosition(settings.home_banner_position_y);
 
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative isolate overflow-hidden border-b border-border bg-background px-3 sm:px-6 lg:px-8"
+      className="border-b border-border bg-surface/65 px-3 py-4 sm:px-6 sm:py-5 lg:px-8"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_70%_40%,var(--surface-selected),transparent_70%)]"
-      />
-      {/* Teks dan gambar satu blok rapat di tengah; di layar lg tepinya tetap
-          sejajar navbar, di layar lebih lebar sisa ruang dibagi rata kiri-kanan. */}
-      <div className="mx-auto grid w-full max-w-7xl items-center 2xl:max-w-[88rem] gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10 lg:py-14 xl:gap-14">
-        <div className="min-w-0">
-          <h1
-            id="hero-heading"
-            className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl"
-          >
-            Marketplace
-            <span className="mt-1 block">
-              <WordAnimator
-                words={WORDS}
-                duration={3}
-                className="max-w-full text-accent [&>span]:whitespace-normal"
-              />
-            </span>
-          </h1>
-          <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base xl:mt-5 xl:max-w-2xl xl:text-lg">
-            Produk digital dan jasa dari banyak toko dalam satu tempat. Bandingkan harga dan toko,
-            lalu pantau setiap pesanan sampai tuntas.
-          </p>
+      <div className="mx-auto grid w-full max-w-7xl gap-3.5 lg:grid-cols-[minmax(0,1.95fr)_minmax(0,1fr)] lg:items-stretch 2xl:max-w-[88rem]">
+        {slides.length > 0 ? (
+          <PromoBannerCarousel slides={slides} posX={posX} posY={posY} />
+        ) : (
+          <DefaultPromoBanner />
+        )}
 
-          <form
-            role="search"
-            onSubmit={submit}
-            className="mt-6 flex max-w-2xl items-center gap-2 rounded-2xl border border-border bg-card p-1.5 shadow-card focus-within:border-accent/50 focus-within:ring-2 focus-within:ring-ring/30"
-          >
-            <Search className="ml-2.5 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <label htmlFor="hero-search" className="sr-only">
-              Cari produk
-            </label>
-            <input
-              id="hero-search"
-              type="search"
-              value={q}
-              maxLength={80}
-              onChange={(event) => setQ(event.target.value)}
-              placeholder="Cari template, akun premium, makalah…"
-              className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground sm:text-base"
-            />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:px-6"
+        <aside className="flex min-w-0 flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-4 shadow-[var(--elev-1)] sm:p-5">
+          <div>
+            <h1
+              id="hero-heading"
+              className="font-display text-lg font-bold leading-snug tracking-tight text-foreground sm:text-xl"
             >
-              Cari
-            </button>
-          </form>
+              Marketplace produk digital & jasa
+            </h1>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              Pilih produk siap unduh atau pesan jasa seller dalam satu akun.
+            </p>
 
-          {chips.length ? (
-            <ul aria-label="Kategori produk" className="mt-4 flex flex-wrap gap-2">
-              {chips.map((c) => (
-                <li key={c.id}>
+            <ul role="list" className="mt-3.5 grid grid-cols-2 gap-2">
+              {QUICK_LINKS.map((item) => (
+                <li key={item.label} className="min-w-0">
                   <Link
-                    to="/produk"
-                    search={{ kategori: c.slug }}
-                    className="inline-flex min-h-9 items-center rounded-full border border-border bg-card px-3.5 text-xs font-medium capitalize text-foreground transition-colors hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
+                    to={item.to}
+                    className="group flex min-h-12 items-center gap-2.5 rounded-xl border border-border bg-surface/60 px-2.5 py-2 transition-colors hover:border-primary/45 hover:bg-surface-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
                   >
-                    {c.name.toLowerCase()}
+                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-card text-primary shadow-[var(--elev-1)]">
+                      <item.icon className="size-4" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-xs font-semibold text-foreground group-hover:text-primary">
+                        {item.label}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {item.desc}
+                      </span>
+                    </span>
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  to="/layanan"
-                  className="inline-flex min-h-9 items-center rounded-full border border-dashed border-accent/50 px-3.5 text-xs font-medium text-accent transition-colors hover:bg-accent/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
-                >
-                  Cari jasa
-                </Link>
-              </li>
             </ul>
-          ) : null}
+          </div>
 
-          <ul className="mt-7 flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-5 sm:text-sm">
-            {TRUST.map((t) => (
-              <li key={t.label} className="flex items-center gap-1.5">
-                <t.icon className="size-4 shrink-0 text-accent" aria-hidden="true" />
-                {t.label}
+          <ul
+            aria-label="Jaminan sistem Ebrystore"
+            className="grid gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground"
+          >
+            {GUARANTEES.map((g) => (
+              <li key={g.label} className="flex items-center gap-2">
+                <g.icon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+                <span>{g.label}</span>
               </li>
             ))}
           </ul>
-        </div>
-
-        <div className="hidden min-w-0 justify-center lg:flex">
-          <img
-            src={heroMascotUrl}
-            alt="Maskot Ebrystore membawa laptop"
-            width={768}
-            height={768}
-            fetchPriority="high"
-            decoding="async"
-            className="-my-6 h-auto w-full max-w-xl object-contain xl:-my-10 xl:max-w-2xl 2xl:max-w-3xl"
-          />
-        </div>
+        </aside>
       </div>
     </section>
   );

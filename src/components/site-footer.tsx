@@ -32,8 +32,8 @@ function FooterNav({ label, location }: { label: string; location: NavLocation }
 export function SiteFooter() {
   const settings = useWebsiteSettings();
   return (
-    <footer className="pb-safe border-t border-border bg-card">
-      <div className="mx-auto grid w-full gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12 lg:px-8 lg:py-10">
+    <footer className="pb-safe border-t border-border bg-card pb-16 lg:pb-0">
+      <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12 lg:px-8 lg:py-10 2xl:max-w-[88rem]">
         <div className="min-w-0">
           <Link
             to="/"
@@ -98,7 +98,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border">
-        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs leading-relaxed text-muted-foreground sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs leading-relaxed text-muted-foreground sm:px-6 lg:px-8 2xl:max-w-[88rem]">
           <p>
             © {new Date().getFullYear()} {String(settings.site_business_name ?? "Ebrystore")}
           </p>

@@ -128,7 +128,7 @@ export function SellerServiceCard({
           ditentukan lebar KARTU (container query, sama dengan kartu produk),
           bukan lebar viewport: kartu katalog ~260px membuat dua tombol
           sebaris menyempit, jadi di bawah 300px CTA ditumpuk. */}
-      <div className="flex flex-col gap-2 border-t border-border p-3 @[300px]:flex-row">
+      <div className="relative z-10 flex flex-col gap-2 border-t border-border p-3 @[300px]:flex-row">
         <ServiceChatButton
           serviceId={item.id}
           serviceName={item.name}

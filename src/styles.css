@@ -798,3 +798,92 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
 @utility animate-infinite-scroll {
   animation: infinite-scroll 40s linear infinite;
 }
+
+/* ---------------------------------------------------------------------------
+ * Marketplace carousel & single-row horizontal tablist (Modern Web Guidance).
+ * - Native scroll-snap + overscroll-behavior-x: contain agar geseran mentok
+ *   tidak memicu gestur back/forward browser.
+ * - Scroll-driven fade edge pada tablist memakai registered @property dengan
+ *   fallback IntersectionObserver (.more-start / .more-end).
+ * ------------------------------------------------------------------------- */
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes ebry-reveal-fade-start {
+  to {
+    --fade-start: var(--fade-size);
+  }
+}
+
+@keyframes ebry-hide-fade-end {
+  from {
+    --fade-end: var(--fade-size);
+  }
+}
+
+@utility ebry-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  touch-action: manipulation;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ebry-carousel-track {
+    scroll-behavior: smooth;
+  }
+}
+
+.ebry-tab-scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 2.25rem;
+  scrollbar-width: none;
+  --fade-size: 2.25rem;
+  mask-image:
+    linear-gradient(black, black),
+    linear-gradient(to right, black, transparent),
+    linear-gradient(to right, transparent, black);
+  mask-composite: subtract, add;
+  mask-position: 0 0, 0 0, 100% 0;
+  mask-size: 100% 100%, var(--fade-start) 100%, var(--fade-end) 100%;
+  mask-repeat: no-repeat;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@supports (animation-timeline: scroll(self inline)) {
+  .ebry-tab-scroller {
+    animation: ebry-reveal-fade-start linear both, ebry-hide-fade-end linear both;
+    animation-timeline: scroll(self inline);
+    animation-range: 0 var(--fade-size), calc(100% - var(--fade-size)) 100%;
+  }
+}
+
+@supports not (animation-timeline: scroll(self inline)) {
+  .ebry-tab-scroller {
+    transition: --fade-start 180ms ease, --fade-end 180ms ease;
+    &.more-start {
+      --fade-start: var(--fade-size);
+    }
+    &.more-end {
+      --fade-end: var(--fade-size);
+    }
+  }
+}

@@ -12,11 +12,13 @@ import { ReviewMarqueeSection } from "@/components/home/review-marquee-section";
 import { ServiceTile } from "@/components/home/service-tile";
 import { PlatformServiceCard, type PlatformServiceItem } from "@/components/home/catalog-cards";
 import { CardsSkeleton, SectionEmpty, SectionError } from "@/components/home/section-states";
-import { PRODUCT_GRID, SeeAllLink } from "@/components/ebry/product-shelf";
+import { SeeAllLink } from "@/components/ebry/product-shelf";
 import { FeaturedSellers } from "@/components/home/featured-sellers";
 import { ProductTabs, type ProductTab } from "@/components/home/product-tabs";
+import { PromoDealsShelf } from "@/components/home/promo-deals-shelf";
 import { SectionHeader } from "@/components/home/section-header";
 import { RecentlyViewedShelf } from "@/components/ebry/recently-viewed-shelf";
+import { priceDetails } from "@/lib/format";
 import {
   listProductShelves,
   listServices,
@@ -150,13 +152,13 @@ function Beranda() {
   return (
     <PageShell>
       <HomeHero />
-      {/* Urutan mengikuti cara orang belanja: kategori, lanjut yang terakhir
-          dilihat, katalog produk, lalu jasa, toko, ulasan, dan ajakan buka toko. */}
-      <div className="w-full px-4 pb-16 pt-8 sm:px-6 sm:pt-10 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-14 2xl:max-w-[88rem]">
+      {/* Alur belanja marketplace: kategori pilihan, terakhir dilihat, pita promo/terlaris,
+          katalog produk bertab, lalu jasa seller, toko pilihan, ulasan, dan ajakan jualan. */}
+      <div className="w-full px-3 pb-12 pt-5 sm:px-6 sm:pb-14 sm:pt-7 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl space-y-8 sm:space-y-10 2xl:max-w-[88rem]">
           <SectionSuspense
             fallback={
-              <div className="h-32 animate-pulse rounded-xl bg-muted/60 motion-reduce:animate-none" />
+              <div className="h-32 animate-pulse rounded-2xl bg-muted/60 motion-reduce:animate-none" />
             }
             queryKey={homeCategoriesQuery.queryKey}
           >
@@ -174,7 +176,7 @@ function Beranda() {
       {/* Jasa di pita sendiri: alur jasa (brief, pengerjaan, serah terima)
           berbeda dari produk instan, jadi dipisah secara visual. */}
       {showServices ? (
-        <div className="w-full border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="w-full border-y border-border bg-surface px-3 py-9 sm:px-6 sm:py-12 lg:px-8">
           <div className="mx-auto w-full max-w-7xl space-y-10 sm:space-y-12 2xl:max-w-[88rem]">
             <section aria-labelledby="jasa-heading">
               <SectionHeader
@@ -196,8 +198,8 @@ function Beranda() {
         </div>
       ) : null}
 
-      <div className="w-full px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:px-8">
-        <div className="defer-render mx-auto w-full max-w-7xl space-y-10 sm:space-y-14 2xl:max-w-[88rem]">
+      <div className="w-full px-3 pb-12 pt-9 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8">
+        <div className="defer-render mx-auto w-full max-w-7xl space-y-9 sm:space-y-12 2xl:max-w-[88rem]">
           <FeaturedSellers />
           <ReviewMarqueeSection />
           {settings.feature_home_tracking_preview !== false ? (
@@ -258,6 +260,13 @@ function ProductShelves() {
     websiteSettings.storefront_featured_products,
     websiteSettings.storefront_default_sort,
   );
+  const discountedItems = latestItems
+    .filter((item) => priceDetails(item.price, item.discount_price).hasDiscount)
+    .sort(
+      (a, b) =>
+        priceDetails(b.price, b.discount_price).discountPercent -
+        priceDetails(a.price, a.discount_price).discountPercent,
+    );
   // Satu section bertab menggantikan rak bertumpuk. Tab kategori hanya untuk
   // kategori yang cukup isi; sisanya tetap muncul di tab "Terbaru".
   const tabs: ProductTab[] = [
@@ -269,7 +278,12 @@ function ProductShelves() {
       .filter((s) => s.items.length >= MIN_CATEGORY_TAB)
       .map((s) => ({ key: `c-${s.slug}`, label: s.name, items: s.items, kategori: s.slug })),
   ];
-  return <ProductTabs tabs={tabs} />;
+  return (
+    <div className="space-y-8 sm:space-y-10">
+      <PromoDealsShelf discounted={discountedItems} bestSellers={data.bestSellers} />
+      <ProductTabs tabs={tabs} />
+    </div>
+  );
 }
 
 const MIN_CATEGORY_TAB = 2;
@@ -293,7 +307,10 @@ function SellerServicesSection() {
     websiteSettings.storefront_default_sort,
   );
   return (
-    <ul className={PRODUCT_GRID}>
+    <ul
+      role="list"
+      className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+    >
       {serviceItems.map((item) => (
         <li key={item.id} className="min-w-0">
           <ServiceTile item={item} />

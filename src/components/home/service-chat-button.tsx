@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, MessagesSquare } from "lucide-react";
@@ -19,7 +20,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
-import { createProductInquiry } from "@/lib/inquiries.functions";
+import { createProductInquiry, findMyStoreThread } from "@/lib/inquiries.functions";
 
 const QUICK = [
   "Apakah jasa ini bisa untuk kebutuhan saya?",
@@ -29,15 +30,8 @@ const QUICK = [
 
 /**
  * Tombol chat untuk kartu jasa.
- *
- * Alasan desain:
- * - Pertanyaan tentang jasa biasanya muncul sebelum memesan, jadi tombol chat
- *   diletakkan berdampingan dengan "Pesan jasa", bukan disembunyikan.
- * - Percakapan memakai sistem inquiry yang sudah ada (product_inquiries dengan
- *   service_id), sehingga penjual membalas dari menu Chat yang sama dan pembeli
- *   menerima balasan di dashboard — tidak ada kanal baru yang perlu dipantau.
- * - Pengguna yang belum masuk diarahkan ke halaman masuk, membawa konteks balik
- *   ke layanan, bukan diam-diam gagal.
+ * Jika pembeli sudah memiliki percakapan terbuka dengan toko/jasa yang sama,
+ * langsung melanjutkan thread tersebut agar tidak membuat duplikat.
  */
 export function ServiceChatButton({
   serviceId,
@@ -67,9 +61,17 @@ export function ServiceChatButton({
   const navigate = useNavigate();
   const { user, loading } = useSession();
   const create = useServerFn(createProductInquiry);
+  const findThread = useServerFn(findMyStoreThread);
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState(QUICK[0]);
   const [busy, setBusy] = useState(false);
+
+  const existing = useQuery({
+    queryKey: ["my-store-thread", user?.id ?? "anon", "service", serviceId],
+    queryFn: () => findThread({ data: { serviceId } }),
+    enabled: Boolean(user),
+    staleTime: 30_000,
+  });
 
   async function submit() {
     const text = body.trim();
@@ -89,6 +91,20 @@ export function ServiceChatButton({
     setOpen(false);
     toast.success("Pertanyaan terkirim. Penjual akan membalas di chat.");
     navigate({ to: "/dashboard/chat/$id", params: { id: result.id } });
+  }
+
+  if (user && existing.data?.id) {
+    const threadId = existing.data.id;
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        className={className}
+        onClick={() => navigate({ to: "/dashboard/chat/$id", params: { id: threadId } })}
+      >
+        {label}
+      </Button>
+    );
   }
 
   if (!loading && !user) {

@@ -12,7 +12,7 @@ import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, Package, Star } from
 
 import { formatRupiah, priceDetails } from "@/lib/format";
 import { cn, isRenderableImageUrl, optimizedMediaUrl } from "@/lib/utils";
-import { OnlineDot, PresenceLabel } from "@/components/ebry/online-status";
+import { OnlineDot } from "@/components/ebry/online-status";
 import type { StorePresence } from "@/lib/store-presence";
 
 export type ProductTileItem = {
@@ -59,34 +59,17 @@ export function shortRupiah(n: number) {
   return String(n);
 }
 
-function MiniStars({ value }: { value: number }) {
-  const full = Math.round(value);
-  return (
-    <span
-      className="flex items-center gap-0.5"
-      aria-label={`Rating toko ${value.toFixed(1)} dari 5`}
-    >
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star
-          key={i}
-          aria-hidden="true"
-          className={cn("size-3", i < full ? "fill-warning text-warning" : "text-border")}
-        />
-      ))}
-    </span>
-  );
-}
-
 /**
- * Kartu produk ringkas (muat 2 kolom di 320px).
- * - Label kiri atas: "Top Seller" (laris) dan "Official" (toko resmi Ebrystore).
- * - Harga ringkas di pita kanan bawah gambar; diskon tampil sebagai persen.
- * - Baris penjual (logo, centang, bintang): di perangkat dengan hover muncul saat
- *   kartu disorot; di layar sentuh selalu tampil karena tidak ada hover.
+ * Kartu produk bergaya marketplace besar (Tokopedia / Itemku):
+ * - Foto rasio 1:1 dengan label status ringan di kiri atas.
+ * - Judul 2 baris, harga penuh (format Rupiah), badge diskon + harga coret,
+ *   rating & jumlah terjual nyata, serta identitas toko selalu terlihat.
+ * - Seluruh kartu adalah satu destinasi tautan tanpa elemen interaktif bersarang.
  */
 export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: number }) {
   const {
     price,
+    basePrice,
     hasDiscount,
     discountPercent: discountPct,
   } = priceDetails(item.price, item.discount_price);
@@ -97,6 +80,7 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
   const logo = isRenderableImageUrl(item.store_logo_url) ? item.store_logo_url : null;
   const sellerName = official ? (item.store_name ?? "Ebrystore") : item.store_name;
   const hasSeller = Boolean(sellerName);
+  const hasStats = Boolean(item.store_rating || sold > 0);
   const glass = useContext(GlassContext);
 
   return (
@@ -104,141 +88,141 @@ export function ProductTile({ item, rank }: { item: ProductTileItem; rank?: numb
       to="/produk/$slug"
       params={{ slug: item.slug }}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        glass ? GLASS_TILE : "border-border bg-card hover:border-foreground/30",
+        "group block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       )}
     >
-      {/* overflow-hidden wajib: tanpa itu aspect-ratio hanya batas minimum dan
-          gambar tinggi ikut memanjangkan bingkai (kartu jadi tidak sejajar). */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        {thumb ? (
-          <img
-            src={optimizedMediaUrl(thumb, 480)}
-            alt=""
-            width={480}
-            height={360}
-            loading="lazy"
-            decoding="async"
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
-          />
-        ) : (
-          <span className="grid size-full place-items-center bg-surface-selected">
-            <span className="flex flex-col items-center gap-1.5 text-accent">
-              <Package className="size-8" aria-hidden="true" />
-              <span className="text-[11px] font-medium text-muted-foreground">Produk digital</span>
-            </span>
-          </span>
+      <article
+        className={cn(
+          "relative flex h-full flex-col overflow-hidden rounded-xl border transition-[border-color,box-shadow] duration-150 motion-reduce:transition-none",
+          glass
+            ? GLASS_TILE
+            : "border-border bg-card shadow-[var(--elev-1)] group-hover:border-primary/40 group-hover:shadow-[var(--elev-2)]",
         )}
+      >
+        <div className="relative aspect-square overflow-hidden border-b border-border/60 bg-surface-selected">
+          {thumb ? (
+            <img
+              src={optimizedMediaUrl(thumb, 480)}
+              alt=""
+              width={480}
+              height={480}
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            />
+          ) : (
+            <span className="grid size-full place-items-center bg-surface-selected">
+              <span className="flex flex-col items-center gap-1.5 text-primary">
+                <Package className="size-8" aria-hidden="true" />
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  Produk digital
+                </span>
+              </span>
+            </span>
+          )}
 
-        {/* Label status, bertumpuk di kiri atas seperti pita. */}
-        <div className="absolute left-0 top-2 flex flex-col items-start gap-1">
-          {rank ? (
-            <span className="rounded-r-md bg-foreground px-2 py-0.5 text-[11px] font-bold tabular-nums text-background">
-              #{rank}
-            </span>
-          ) : null}
-          {topSeller ? (
-            <span className="rounded-r-md bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
-              Top Seller
-            </span>
-          ) : null}
-          {official ? (
-            <span className="rounded-r-md bg-warning px-2 py-0.5 text-[11px] font-semibold text-warning-foreground">
-              Official
-            </span>
+          {/* Label status nyata di kiri atas (rank / official / terlaris). */}
+          {rank || official || topSeller ? (
+            <div className="absolute left-0 top-2 flex flex-col items-start gap-1">
+              {rank ? (
+                <span className="rounded-r-md bg-foreground px-2 py-0.5 text-[11px] font-bold tabular-nums text-background">
+                  #{rank}
+                </span>
+              ) : null}
+              {official ? (
+                <span className="rounded-r-md bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                  Official
+                </span>
+              ) : null}
+              {topSeller ? (
+                <span className="rounded-r-md bg-warning px-2 py-0.5 text-[10px] font-semibold text-warning-foreground">
+                  Terlaris
+                </span>
+              ) : null}
+            </div>
           ) : null}
         </div>
 
-        {/* Pita harga kanan bawah; nominal lengkap tetap ada untuk pembaca layar. */}
-        <span className="absolute bottom-2 right-0 flex items-center gap-1 rounded-l-full bg-success py-1 pl-2.5 pr-2 text-xs font-bold text-success-foreground">
-          <span aria-hidden="true">{shortRupiah(price)}</span>
-          <span className="sr-only">{formatRupiah(price)}</span>
-          {hasDiscount ? (
-            <span className="rounded bg-success-foreground/20 px-1 text-[10px] font-semibold">
-              -{discountPct}%
-            </span>
-          ) : null}
-        </span>
-      </div>
+        <div className="flex flex-1 flex-col p-2.5 sm:p-3">
+          <p className="line-clamp-2 text-[13px] font-medium leading-snug text-foreground transition-colors group-hover:text-primary sm:text-sm">
+            {item.name}
+          </p>
 
-      <div className="flex flex-1 flex-col p-2.5">
-        <p className="line-clamp-2 text-sm font-medium leading-snug transition-colors group-hover:text-accent">
-          {item.name}
-        </p>
-        {sold ? <p className="mt-1 text-[11px] text-muted-foreground">{sold} terjual</p> : null}
-
-        {hasSeller ? (
-          /* grid-rows 0fr -> 1fr: animasi tinggi tanpa angka tetap. Hanya
-             perangkat ber-hover yang menyembunyikannya lebih dulu. */
-          <div className="mt-auto grid grid-rows-[1fr] transition-[grid-template-rows] duration-200 motion-reduce:transition-none [@media(hover:hover)]:grid-rows-[0fr] [@media(hover:hover)]:group-hover:grid-rows-[1fr] [@media(hover:hover)]:group-focus-visible:grid-rows-[1fr]">
-            <div className="min-h-0 overflow-hidden">
-              <div className="mt-2 flex items-center gap-2 border-t border-border pt-2">
-                <span className="relative shrink-0">
-                  {logo ? (
-                    <img
-                      src={optimizedMediaUrl(logo, 96)}
-                      alt=""
-                      width={28}
-                      height={28}
-                      loading="lazy"
-                      decoding="async"
-                      className="size-7 rounded-full border border-border object-cover"
-                    />
-                  ) : (
-                    <span
-                      className={cn(
-                        "grid size-7 place-items-center rounded-full text-[11px] font-bold",
-                        official ? "bg-primary text-primary-foreground" : "bg-muted",
-                      )}
-                    >
-                      {(sellerName?.trim()[0] ?? "?").toUpperCase()}
-                    </span>
-                  )}
-                  {item.store_presence ? (
-                    <OnlineDot
-                      presence={item.store_presence}
-                      className="-bottom-0.5 -right-0.5 size-2.5 sm:size-2.5"
-                    />
-                  ) : null}
+          {/* Harga penuh + potongan diskon langsung terbaca di bawah judul. */}
+          <div className="mt-1.5">
+            <p className="text-sm font-bold tabular-nums text-price sm:text-[15px]">
+              {formatRupiah(price)}
+            </p>
+            {hasDiscount ? (
+              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                <span className="rounded bg-destructive px-1.5 py-0.5 text-[10px] font-bold leading-none tabular-nums text-destructive-foreground">
+                  -{discountPct}%
                 </span>
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1">
-                    <span className="truncate text-xs font-medium">{sellerName}</span>
-                    {/* Centang khusus toko resmi platform agar tetap bermakna. */}
-                    {official ? (
-                      <BadgeCheck
-                        className="size-3.5 shrink-0 text-accent"
-                        aria-label="Toko resmi Ebrystore"
-                      />
-                    ) : null}
-                  </span>
-                  {official ? (
-                    // Produk owner dijamin platform; bintang dari sedikit ulasan justru menyesatkan.
-                    <span className="mt-0.5 block text-[10px] font-medium text-accent">
-                      Dijamin Ebrystore
-                    </span>
-                  ) : item.store_rating ? (
-                    <span className="mt-0.5 flex items-center gap-1">
-                      <MiniStars value={item.store_rating} />
-                      <span className="text-[10px] tabular-nums text-muted-foreground">
-                        {item.store_rating.toFixed(1)}
-                      </span>
-                    </span>
-                  ) : item.store_rating === null ? (
-                    <span className="mt-0.5 block text-[10px] text-muted-foreground">
-                      Belum ada ulasan
-                    </span>
-                  ) : null}
-                  <PresenceLabel
-                    presence={item.store_presence}
-                    className="mt-0.5 flex max-w-full text-[10px]"
-                  />
-                </span>
+                <s className="text-[11px] tabular-nums text-muted-foreground">
+                  <span className="sr-only">Harga sebelumnya </span>
+                  {formatRupiah(basePrice)}
+                </s>
               </div>
-            </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
+
+          {hasStats ? (
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] tabular-nums text-muted-foreground">
+              {item.store_rating ? (
+                <span className="inline-flex items-center gap-0.5">
+                  <Star className="size-3 fill-warning text-warning" aria-hidden="true" />
+                  <span className="sr-only">Rating toko </span>
+                  <span>{item.store_rating.toFixed(1)}</span>
+                </span>
+              ) : null}
+              {item.store_rating && sold > 0 ? <span aria-hidden="true">·</span> : null}
+              {sold > 0 ? <span>{sold} terjual</span> : null}
+            </div>
+          ) : null}
+
+          {hasSeller ? (
+            <div className="mt-auto flex items-center gap-1.5 border-t border-border/70 pt-2 text-[11px] text-muted-foreground">
+              <span className="relative shrink-0">
+                {logo ? (
+                  <img
+                    src={optimizedMediaUrl(logo, 96)}
+                    alt=""
+                    width={18}
+                    height={18}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-[18px] rounded-full border border-border object-cover"
+                  />
+                ) : official ? (
+                  <BadgeCheck
+                    className="size-4 text-primary"
+                    aria-label="Toko resmi Ebrystore"
+                  />
+                ) : (
+                  <span className="grid size-[18px] place-items-center rounded-full bg-muted text-[9px] font-bold text-foreground">
+                    {(sellerName?.trim()[0] ?? "?").toUpperCase()}
+                  </span>
+                )}
+                {item.store_presence ? (
+                  <OnlineDot
+                    presence={item.store_presence}
+                    className="-bottom-0.5 -right-0.5 size-2 sm:size-2"
+                  />
+                ) : null}
+              </span>
+              <span className="min-w-0 flex-1 truncate font-medium text-foreground/85">
+                {sellerName}
+              </span>
+              {official && logo ? (
+                <BadgeCheck
+                  className="size-3.5 shrink-0 text-primary"
+                  aria-label="Toko resmi Ebrystore"
+                />
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </article>
     </Link>
   );
 }
@@ -253,7 +237,7 @@ export function SeeAllLink({ to, kategori }: { to: "/produk" | "/layanan"; kateg
     <Link
       to={to}
       search={kategori ? ({ kategori } as never) : undefined}
-      className="flex min-h-11 items-center gap-1 text-xs font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex min-h-11 items-center gap-1 text-xs font-semibold text-primary underline-offset-4 hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
     >
       Lihat semua <ArrowRight className="size-3.5" aria-hidden="true" />
     </Link>
@@ -397,7 +381,7 @@ export function Shelf({
       </div>
       <ul
         ref={track}
-        className="mt-1 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto scroll-px-4 px-4 pb-1 sm:scroll-px-5 sm:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative mt-1 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto overscroll-x-contain scroll-px-4 px-4 pb-1 sm:scroll-px-5 sm:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((item, i) => (
           <li key={item.id} className={cn("shrink-0 snap-start", SHELF_ITEM_WIDTH)}>

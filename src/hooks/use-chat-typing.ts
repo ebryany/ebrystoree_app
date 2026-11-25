@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
+export type PartnerActivity = "typing" | "recording" | null;
+
 /**
- * Indikator "sedang mengetik" + status online lawan bicara, lewat satu channel
- * Supabase per thread (broadcast untuk typing, presence untuk online).
+ * Indikator "sedang mengetik" / "merekam suara" + status online lawan bicara,
+ * lewat satu channel Supabase per thread (broadcast untuk aktivitas, presence untuk online).
  *
  * - Tidak ada data persist: hilang begitu koneksi putus, channel dibersihkan
  *   saat unmount, dan event sendiri diabaikan.
@@ -24,13 +26,15 @@ export function useChatTyping({
   throttleMs?: number;
   visibleMs?: number;
 }) {
-  const [partnerTyping, setPartnerTyping] = useState(false);
+  const [partnerActivity, setPartnerActivity] = useState<PartnerActivity>(null);
   const [partnerOnline, setPartnerOnline] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const clearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSentRef = useRef(0);
 
   useEffect(() => {
+    setPartnerActivity(null);
+    setPartnerOnline(false);
     if (!enabled || !channel || !selfId) return;
     const ch = supabase.channel(`chat-typing:${channel}`, {
       config: { broadcast: { self: false }, presence: { key: selfId } },
@@ -40,15 +44,23 @@ export function useChatTyping({
     ch.on("broadcast" as any, { event: "typing" } as any, (payload: any) => {
       const from = payload?.payload?.userId as string | undefined;
       if (!from || from === selfId) return;
-      setPartnerTyping(true);
+      const activity: PartnerActivity =
+        payload?.payload?.activity === "recording"
+          ? "recording"
+          : payload?.payload?.activity === "idle"
+            ? null
+            : "typing";
+      setPartnerActivity(activity);
       if (clearRef.current) clearTimeout(clearRef.current);
-      clearRef.current = setTimeout(() => setPartnerTyping(false), visibleMs);
+      if (activity) {
+        clearRef.current = setTimeout(() => setPartnerActivity(null), visibleMs);
+      }
     });
 
     ch.on("presence" as any, { event: "sync" } as any, () => {
       const others = Object.keys(ch.presenceState()).filter((key) => key !== selfId);
       setPartnerOnline(others.length > 0);
-      if (!others.length) setPartnerTyping(false);
+      if (!others.length) setPartnerActivity(null);
     });
 
     const track = () => {
@@ -65,19 +77,36 @@ export function useChatTyping({
       document.removeEventListener("visibilitychange", track);
       if (clearRef.current) clearTimeout(clearRef.current);
       channelRef.current = null;
+      setPartnerActivity(null);
       setPartnerOnline(false);
       supabase.removeChannel(ch);
     };
   }, [channel, enabled, selfId, visibleMs]);
 
-  const sendTyping = useCallback(() => {
-    const ch = channelRef.current;
-    if (!ch) return;
-    const now = Date.now();
-    if (now - lastSentRef.current < throttleMs) return;
-    lastSentRef.current = now;
-    void ch.send({ type: "broadcast", event: "typing", payload: { userId: selfId } });
-  }, [selfId, throttleMs]);
+  const sendActivity = useCallback(
+    (activity: "typing" | "recording" | "idle", force = false) => {
+      const ch = channelRef.current;
+      if (!ch) return;
+      const now = Date.now();
+      if (!force && now - lastSentRef.current < throttleMs) return;
+      lastSentRef.current = now;
+      void ch.send({ type: "broadcast", event: "typing", payload: { userId: selfId, activity } });
+    },
+    [selfId, throttleMs],
+  );
 
-  return { partnerTyping, partnerOnline, sendTyping };
+  const sendTyping = useCallback(() => sendActivity("typing"), [sendActivity]);
+  const sendRecording = useCallback(
+    (active = true) => sendActivity(active ? "recording" : "idle", !active),
+    [sendActivity],
+  );
+
+  return {
+    partnerTyping: partnerActivity === "typing",
+    partnerRecording: partnerActivity === "recording",
+    partnerActivity,
+    partnerOnline,
+    sendTyping,
+    sendRecording,
+  };
 }

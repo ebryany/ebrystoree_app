@@ -13,7 +13,6 @@ import {
   Layers,
   Network,
   Package,
-  Radio,
   Receipt,
   ShieldCheck,
   User,
@@ -173,17 +172,16 @@ export function TrackingPreviewSection() {
   const [activeIndex, setActiveIndex] = useState(2);
 
   return (
-    <section className="bg-surface">
-      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 md:grid-cols-2 md:items-center">
+    <section className="rounded-2xl border border-border bg-card shadow-[var(--elev-1)]">
+      <div className="grid gap-6 p-5 sm:p-7 md:grid-cols-2 md:items-center lg:gap-10 lg:p-8">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary shadow-card">
-            <Radio className="size-3.5 text-success motion-safe:animate-pulse" aria-hidden="true" />
-            Pantau status real-time
-          </span>
-          <h2 className="mt-4 text-xl font-bold sm:text-2xl md:text-3xl">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            Transparansi pesanan
+          </p>
+          <h2 className="mt-2 font-display text-xl font-bold tracking-tight sm:text-2xl">
             Pantau pesanan tanpa menebak-nebak
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Setiap perubahan status tercatat pada riwayat pesanan. Status diperbarui saat prosesnya
             berubah, jadi kamu tidak perlu menanyakan kabar pesanan satu per satu.
           </p>
@@ -197,16 +195,13 @@ export function TrackingPreviewSection() {
               Hasil pengerjaan dan catatan revisi tercatat per versi.
             </li>
           </ul>
-          <Button asChild className="mt-6">
-            <Link to="/dashboard">
-              Buka pesanan saya
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
+          <Button asChild className="mt-6 min-h-11 rounded-control">
+            <Link to="/dashboard">Buka pesanan saya</Link>
           </Button>
         </div>
 
         <div
-          className="relative rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6"
+          className="relative rounded-xl border border-border bg-surface/65 p-4 sm:p-5"
           role="region"
           aria-label="Demo status pesanan"
         >
@@ -364,23 +359,44 @@ const faqs = [
 
 export function FaqSection() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 py-16">
-      <h2 className="text-xl font-bold sm:text-2xl">Pertanyaan yang sering muncul</h2>
-      <Accordion type="single" collapsible className="mt-6">
-        {faqs.map((faq) => (
-          <AccordionItem key={faq.q} value={faq.q}>
-            <AccordionTrigger className="text-left text-sm font-semibold">{faq.q}</AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground">{faq.a}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-      <p className="mt-6 text-sm text-muted-foreground">
-        Belum terjawab?{" "}
-        <Link to="/bantuan" className="font-semibold text-primary underline-offset-4 hover:underline">
-          Buka pusat bantuan
-        </Link>
-        .
-      </p>
+    <section
+      aria-labelledby="faq-heading"
+      className="rounded-2xl border border-border bg-card p-5 shadow-[var(--elev-1)] sm:p-7"
+    >
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] lg:items-start lg:gap-10">
+        <div>
+          <h2
+            id="faq-heading"
+            className="font-display text-xl font-bold tracking-tight sm:text-2xl"
+          >
+            Pertanyaan yang sering muncul
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Ringkasan aturan pembayaran, unduhan produk digital, revisi jasa, dan kebijakan refund.
+          </p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Belum terjawab?{" "}
+            <Link
+              to="/bantuan"
+              className="inline-flex min-h-11 items-center font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Buka pusat bantuan
+            </Link>
+          </p>
+        </div>
+        <Accordion type="single" collapsible>
+          {faqs.map((faq) => (
+            <AccordionItem key={faq.q} value={faq.q}>
+              <AccordionTrigger className="min-h-11 text-left text-sm font-semibold">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
     </section>
   );
 }

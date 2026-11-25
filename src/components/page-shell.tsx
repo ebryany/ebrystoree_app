@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { MobileBottomNav } from "@/components/ebry/mobile-bottom-nav";
 
 export function PageShell({ children }: { children: ReactNode }) {
   return (
@@ -16,6 +17,7 @@ export function PageShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </div>
   );
 }

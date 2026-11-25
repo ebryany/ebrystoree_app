@@ -107,7 +107,7 @@ export const CATEGORY_TONES = {
   },
   brand: {
     className:
-      "border border-primary/25 bg-hero-gradient text-primary-foreground shadow-[inset_0_1px_0_oklch(1_0_0/20%),0_2px_6px_oklch(0.22_0.03_205/16%)]",
+      "border border-primary/25 bg-hero-gradient text-[#faf8f3] shadow-[inset_0_1px_0_oklch(1_0_0/20%),0_2px_6px_oklch(0.22_0.03_205/16%)]",
     label: "Gelap",
   },
 } as const;

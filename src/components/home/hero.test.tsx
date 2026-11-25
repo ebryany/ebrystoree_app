@@ -1,6 +1,10 @@
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const state = vi.hoisted(() => ({
+  settings: null as Record<string, unknown> | null,
+}));
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({
@@ -9,46 +13,66 @@ vi.mock("@tanstack/react-router", () => ({
     ...props
   }: ComponentProps<"a"> & { to: string; search?: unknown }) =>
     createElement("a", { ...props, href: to }),
-  useNavigate: () => vi.fn(),
+  useRouterState: (opts?: { select?: (s: unknown) => unknown }) => {
+    const routerState = { matches: [{ loaderData: { values: state.settings } }] };
+    return opts?.select ? opts.select(routerState) : routerState;
+  },
 }));
-vi.mock("@tanstack/react-query", () => ({
-  queryOptions: (options: unknown) => options,
-  useQuery: () => ({ data: { items: [] } }),
-}));
-vi.mock("@/lib/catalog.functions", () => ({ listCatalogCategories: vi.fn() }));
 
 import { HomeHero } from "./hero";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 
-describe("HomeHero (gaya toko modern)", () => {
+beforeEach(() => {
+  state.settings = null;
+});
+
+describe("HomeHero (gaya marketplace Tokopedia x Itemku)", () => {
   const renderHero = () => renderToStaticMarkup(<HomeHero />);
 
-  it("renders one heading with both animated words", () => {
+  it("renders one visible heading, quick marketplace links, and real guarantees when no banners uploaded", () => {
     const html = renderHero();
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html).toContain('aria-labelledby="hero-heading"');
-    expect(html).toContain("Marketplace");
-    expect(html).toContain("produk digital, jasa");
-  });
-
-  it("puts a labelled search form first, submitting to the product catalogue", () => {
-    const html = renderHero();
-    expect(html).toContain('role="search"');
-    expect(html).toContain('for="hero-search"');
-    expect(html).toContain('id="hero-search"');
-    expect(html).toContain('maxLength="80"');
-    expect(html).toContain('type="submit"');
-    expect(html).toContain("min-h-11");
-  });
-
-  it("lists only real guarantees and keeps the mascot desktop-only", () => {
-    const html = renderHero();
+    expect(html).toContain("Marketplace produk digital &amp; jasa");
+    expect(html).toContain('href="/produk"');
+    expect(html).toContain('href="/layanan"');
+    expect(html).toContain('href="/dashboard"');
+    expect(html).toContain('href="/auth"');
     expect(html).toContain("Pembayaran diverifikasi");
+    expect(html).toContain("Dana jasa ditahan sampai hasil diterima");
     expect(html).toContain("Toko ditinjau sebelum tayang");
-    expect(html).toContain("ebrystore-hero-mascot.webp");
     expect(html).toContain('fetchPriority="high"');
-    expect(html).toMatch(/<div class="hidden min-w-0 justify-center lg:flex"><img\b/);
-    expect(html).not.toMatch(/min-h-screen|h-screen|100vh/);
+    expect(html).not.toMatch(/min-h-screen|h-screen|100vh|—/);
+  });
+
+  it("renders accessible native scroll-snap promo carousel with LCP fetchPriority when banners exist", () => {
+    const u1 = "0f8f86a1-2b3c-4d5e-6f70-8a9b0c1d2e3f";
+    const u2 = "1f8f86a1-2b3c-4d5e-6f70-8a9b0c1d2e3f";
+    state.settings = {
+      home_banner_image_url: `/api/public/catalog-image/branding/home/${u1}.png`,
+      home_banner_mobile_image_url: `/api/public/catalog-image/branding/home/${u1}.webp`,
+      home_banner_alt: "Promo Ebrystore",
+      home_banner_slides: [
+        {
+          imageUrl: `/api/public/catalog-image/branding/home/${u2}.png`,
+          mobileUrl: "",
+          alt: "Promo Kedua",
+        },
+      ],
+    };
+    const html = renderHero();
+    expect(html).toContain('aria-roledescription="carousel"');
+    expect(html).toContain('aria-roledescription="slide"');
+    expect(html).toContain('aria-label="Slide 1 dari 2"');
+    expect(html).toContain('aria-label="Slide 2 dari 2"');
+    expect(html).toContain('aria-label="Slide promo sebelumnya"');
+    expect(html).toContain('aria-label="Slide promo berikutnya"');
+    expect(html).toContain('aria-label="Pilih slide promo"');
+    expect(html).toContain('aria-current="true"');
+    expect(html).toContain('role="status"');
+    expect(html).toContain('fetchPriority="high"');
+    expect(html).toContain('fetchPriority="low"');
+    expect(html).toContain('loading="lazy"');
   });
 });
 

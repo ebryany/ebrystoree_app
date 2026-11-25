@@ -99,6 +99,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
+  `media-src 'self' blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
   `connect-src 'self' ${supabaseConnectSources} ${lovableConnectSource}`.replace(/\s+/g, " ").trim(),
   "frame-src 'self' https://*.sumopod.com https://*.pymnt.app https://checkout.pymnt.app",
   `frame-ancestors ${frameAncestors}`,
@@ -155,7 +156,7 @@ function applySecurityHeaders(response: Response, requestId: string, requestUrl 
     headers.set("X-Frame-Options", "SAMEORIGIN");
     headers.set(
       "Permissions-Policy",
-      "camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), interest-cohort=()",
+      "camera=(), microphone=(self), geolocation=(self), payment=(self), usb=(), interest-cohort=()",
     );
   }
   return new Response(response.body, {
