@@ -1,5 +1,17 @@
 # Catatan pembaruan EBRYSTORE
 
+## 2026-11-27
+
+### Backend REST Mobile API v1 (Slice 1–3) & Persiapan Push Notification FCM
+
+- **Endpoint Mobile API v1 (`src/routes/api/mobile/v1/$.ts`, `src/lib/mobile-auth.server.ts`, `src/lib/mobile-api.server.ts`, `src/lib/mobile-commerce.server.ts`, `src/lib/mobile-slice3.server.ts`, `src/routeTree.gen.ts`)**:
+  - **Slice 1 (Bootstrap, Auth, Storefront, Social)**: Menambahkan `/api/mobile/v1/bootstrap` (konfigurasi publik, maintenance gate, feature flags, branding/logo, dan `homeBannerSlides`), `/api/mobile/v1/auth/login` & `/auth/verify-session` (memblokir akun admin/staf dengan `403 ADMIN_BLOCKED` dan fail-closed rate limit), `/api/mobile/v1/home` (kategori produk & jasa, promo, terlaris, terbaru, jasa seller dengan media URL & presence, rating toko, toko populer, ulasan terbaru), `/api/mobile/v1/products` (filter `official`, `discount`, kategori, sortir, paginasi), `/api/mobile/v1/products/:slug`, `/api/mobile/v1/p/:id`, `/api/mobile/v1/stores/:slug`, `/api/mobile/v1/stores/presence`, serta social like/follow.
+  - **Slice 2 (Keranjang, Checkout Digital, Pembayaran, Pesanan, Library, Notifikasi, Profil)**: Menambahkan `/api/mobile/v1/cart/validate`, `/api/mobile/v1/dashboard/summary`, `/api/mobile/v1/credit`, `/api/mobile/v1/orders` & `/orders/:id`, pembuatan pesanan digital dengan validasi harga server & idempotency key, pembayaran QRIS SumoPod, ShopeePay, bukti transfer manual DANA, penggunaan saldo kredit, konfirmasi terima/escrow, batal & refund, library unduhan & kode lisensi (`/entitlements`), notifikasi, serta pengaturan profil & avatar.
+  - **Slice 3 (Layanan Resmi, Jasa Seller, Dompet & Top-Up, Disimpan, Artikel, Bantuan/Legal, Token Push)**: Menambahkan `/api/mobile/v1/services` (platform & seller), detail & checkout layanan akademik/umum/jasa seller, alur pemenuhan jasa (terima/revisi/komplain/perpanjangan), dompet & top-up QRIS/manual (`/wallet/*`), produk disukai & toko diikuti (`/social/saved`), artikel (`/articles`), konten bantuan & legal (`/content/legal`), serta pendaftaran/pencabutan token FCM (`/push/tokens`).
+- **Push Dispatch FCM & Migrasi Aditif (`src/lib/fcm.server.ts`, `src/routes/api/public/jobs/push-dispatch.ts`, `supabase/migrations/20261127060000_mobile_push_tokens.sql`)**: Menambahkan pengirim FCM HTTP v1 (`google-auth`/JWT RS256 tanpa dependency baru), endpoint job terproteksi bearer secret `/api/public/jobs/push-dispatch`, dan file migrasi aditif idempoten `20261127060000_mobile_push_tokens.sql` (disimpan di repo, belum diterapkan ke database produksi sampai disetujui terpisah; server menangani ketiadaan tabel dengan aman).
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `eslint` `0` error pada file baru/ubah, `npx vitest run src/lib/__tests__/mobile-api-slice1.test.ts src/lib/__tests__/mobile-api-slice2.test.ts src/lib/__tests__/mobile-api-slice3.test.ts --maxWorkers=1` lulus **24/24 test**, serta `$env:NITRO_PRESET='node-server'; npm run build` lulus (`exit 0`).
+- **Status deploy**: Dipublish ke GitHub `main` dan di-deploy ke VPS produksi `43.156.83.235` (`ebrystore-20261127-01`); seluruh rute website existing tidak berubah dan migrasi opsional push token belum dijalankan ke Supabase produksi.
+
 ## 2026-11-26
 
 ### Hardening Infrastruktur: Cloudflare Access + Cloudflare Tunnel (Paket B)

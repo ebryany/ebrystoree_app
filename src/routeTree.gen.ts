@@ -113,9 +113,11 @@ import { Route as AuthenticatedSellerChatIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedSellerProdukIndexRouteImport } from './routes/_authenticated/seller.produk.index'
 import { Route as AuthenticatedSellerProdukIdRouteImport } from './routes/_authenticated/seller.produk.$id'
 import { Route as AuthenticatedSellerProdukBaruRouteImport } from './routes/_authenticated/seller.produk.baru'
+import { Route as ApiMobileV1SplatRouteImport } from './routes/api/mobile/v1/$'
 import { Route as ApiPublicAnalyticsTrackRouteImport } from './routes/api/public/analytics/track'
 import { Route as ApiPublicCatalogImageSplatRouteImport } from './routes/api/public/catalog-image.$'
 import { Route as ApiPublicJobsEmailDispatchRouteImport } from './routes/api/public/jobs/email-dispatch'
+import { Route as ApiPublicJobsPushDispatchRouteImport } from './routes/api/public/jobs/push-dispatch'
 import { Route as ApiPublicJobsShopeepayReconcileRouteImport } from './routes/api/public/jobs/shopeepay-reconcile'
 import { Route as ApiPublicJobsTelegramDispatchRouteImport } from './routes/api/public/jobs/telegram-dispatch'
 import { Route as ApiPublicOgImageSplatRouteImport } from './routes/api/public/og-image.$'
@@ -709,6 +711,11 @@ const AuthenticatedSellerProdukBaruRoute =
     path: '/baru',
     getParentRoute: () => AuthenticatedSellerProdukRoute,
   } as any)
+const ApiMobileV1SplatRoute = ApiMobileV1SplatRouteImport.update({
+  id: '/api/mobile/v1/$',
+  path: '/api/mobile/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAnalyticsTrackRoute = ApiPublicAnalyticsTrackRouteImport.update({
   id: '/api/public/analytics/track',
   path: '/api/public/analytics/track',
@@ -724,6 +731,12 @@ const ApiPublicJobsEmailDispatchRoute =
   ApiPublicJobsEmailDispatchRouteImport.update({
     id: '/api/public/jobs/email-dispatch',
     path: '/api/public/jobs/email-dispatch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicJobsPushDispatchRoute =
+  ApiPublicJobsPushDispatchRouteImport.update({
+    id: '/api/public/jobs/push-dispatch',
+    path: '/api/public/jobs/push-dispatch',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicJobsShopeepayReconcileRoute =
@@ -874,9 +887,11 @@ export interface FileRoutesByFullPath {
   '/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
+  '/api/mobile/v1/$': typeof ApiMobileV1SplatRoute
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/push-dispatch': typeof ApiPublicJobsPushDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
@@ -986,9 +1001,11 @@ export interface FileRoutesByTo {
   '/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
+  '/api/mobile/v1/$': typeof ApiMobileV1SplatRoute
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/push-dispatch': typeof ApiPublicJobsPushDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
@@ -1106,9 +1123,11 @@ export interface FileRoutesById {
   '/_authenticated/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/_authenticated/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/_authenticated/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
+  '/api/mobile/v1/$': typeof ApiMobileV1SplatRoute
   '/api/public/analytics/track': typeof ApiPublicAnalyticsTrackRoute
   '/api/public/catalog-image/$': typeof ApiPublicCatalogImageSplatRoute
   '/api/public/jobs/email-dispatch': typeof ApiPublicJobsEmailDispatchRoute
+  '/api/public/jobs/push-dispatch': typeof ApiPublicJobsPushDispatchRoute
   '/api/public/jobs/shopeepay-reconcile': typeof ApiPublicJobsShopeepayReconcileRoute
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
@@ -1226,9 +1245,11 @@ export interface FileRouteTypes {
     | '/seller/chat/$id'
     | '/seller/produk/$id'
     | '/seller/produk/baru'
+    | '/api/mobile/v1/$'
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/push-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
@@ -1338,9 +1359,11 @@ export interface FileRouteTypes {
     | '/seller/chat/$id'
     | '/seller/produk/$id'
     | '/seller/produk/baru'
+    | '/api/mobile/v1/$'
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/push-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
@@ -1457,9 +1480,11 @@ export interface FileRouteTypes {
     | '/_authenticated/seller/chat/$id'
     | '/_authenticated/seller/produk/$id'
     | '/_authenticated/seller/produk/baru'
+    | '/api/mobile/v1/$'
     | '/api/public/analytics/track'
     | '/api/public/catalog-image/$'
     | '/api/public/jobs/email-dispatch'
+    | '/api/public/jobs/push-dispatch'
     | '/api/public/jobs/shopeepay-reconcile'
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
@@ -1513,9 +1538,11 @@ export interface RootRouteChildren {
   ProdukIndexRoute: typeof ProdukIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiMobileV1SplatRoute: typeof ApiMobileV1SplatRoute
   ApiPublicAnalyticsTrackRoute: typeof ApiPublicAnalyticsTrackRoute
   ApiPublicCatalogImageSplatRoute: typeof ApiPublicCatalogImageSplatRoute
   ApiPublicJobsEmailDispatchRoute: typeof ApiPublicJobsEmailDispatchRoute
+  ApiPublicJobsPushDispatchRoute: typeof ApiPublicJobsPushDispatchRoute
   ApiPublicJobsShopeepayReconcileRoute: typeof ApiPublicJobsShopeepayReconcileRoute
   ApiPublicJobsTelegramDispatchRoute: typeof ApiPublicJobsTelegramDispatchRoute
   ApiPublicOgImageSplatRoute: typeof ApiPublicOgImageSplatRoute
@@ -2258,6 +2285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSellerProdukBaruRouteImport
       parentRoute: typeof AuthenticatedSellerProdukRoute
     }
+    '/api/mobile/v1/$': {
+      id: '/api/mobile/v1/$'
+      path: '/api/mobile/v1/$'
+      fullPath: '/api/mobile/v1/$'
+      preLoaderRoute: typeof ApiMobileV1SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/analytics/track': {
       id: '/api/public/analytics/track'
       path: '/api/public/analytics/track'
@@ -2277,6 +2311,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/jobs/email-dispatch'
       fullPath: '/api/public/jobs/email-dispatch'
       preLoaderRoute: typeof ApiPublicJobsEmailDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jobs/push-dispatch': {
+      id: '/api/public/jobs/push-dispatch'
+      path: '/api/public/jobs/push-dispatch'
+      fullPath: '/api/public/jobs/push-dispatch'
+      preLoaderRoute: typeof ApiPublicJobsPushDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/jobs/shopeepay-reconcile': {
@@ -2626,9 +2667,11 @@ const rootRouteChildren: RootRouteChildren = {
   ProdukIndexRoute: ProdukIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiMobileV1SplatRoute: ApiMobileV1SplatRoute,
   ApiPublicAnalyticsTrackRoute: ApiPublicAnalyticsTrackRoute,
   ApiPublicCatalogImageSplatRoute: ApiPublicCatalogImageSplatRoute,
   ApiPublicJobsEmailDispatchRoute: ApiPublicJobsEmailDispatchRoute,
+  ApiPublicJobsPushDispatchRoute: ApiPublicJobsPushDispatchRoute,
   ApiPublicJobsShopeepayReconcileRoute: ApiPublicJobsShopeepayReconcileRoute,
   ApiPublicJobsTelegramDispatchRoute: ApiPublicJobsTelegramDispatchRoute,
   ApiPublicOgImageSplatRoute: ApiPublicOgImageSplatRoute,
