@@ -1,5 +1,23 @@
 # Catatan pembaruan EBRYSTORE
 
+## 2026-11-26
+
+### Hardening Infrastruktur: Cloudflare Access + Cloudflare Tunnel (Paket B)
+
+- **Nginx Real-IP Loopback & Blokir Endpoint MCP (`/etc/nginx/conf.d/02-ebrystore-tunnel-realip.conf`, `/etc/nginx/snippets/ebrystore-block-mcp.conf`, `/etc/nginx/sites-available/ebrystore`)**: Menambahkan `set_real_ip_from 127.0.0.1;` dan `set_real_ip_from ::1;` agar header `CF-Connecting-IP` tetap diekstrak menjadi IP asli klien saat trafik masuk melalui `cloudflared` (menjaga akurasi `limit_req` / `limit_conn` per-IP di Nginx), serta memblokir `/mcp`, `/mcp/*`, `/.mcp/*`, dan `/.well-known/oauth-protected-resource` dengan status `404`.
+- **Cloudflare Zero Trust Access OTP untuk Portal Admin**: Membuat reusable policy `EBRYSTORE Admin OTP` (allowlist 1 email admin pemilik, sesi `12h`) dan aplikasi Self-Hosted `EBRYSTORE Admin Portal` untuk melindungi `/admin`, `/admin/*`, `/as/feb/auth/admin`, `/as/feb/auth/admin/*`, `/see`, dan `/see/*` di edge Cloudflare (`auto_redirect_to_identity: true`, `httpOnly`, `SameSite=Lax`, tersembunyi dari App Launcher) tanpa menyentuh rute publik, seller, maupun webhook pembayaran.
+- **Cloudflare Tunnel (`cloudflared 2026.11.2`, tunnel lokal `ebrystore-origin`, `/etc/cloudflared/config.yml`) & Pembersihan DNS**: Memasang `cloudflared` sebagai systemd service aktif di VPS produksi `43.156.83.235`, mengarahkan ingress `app.ebrystore.my.id` dan `router.ebrystore.my.id` (tanpa Access OTP untuk `router` agar klien API/AI `9router` tetap bekerja) ke Nginx loopback `https://127.0.0.1:443` dengan `originServerName` per host dan `noTLSVerify: true`, mengalihkan DNS `app` & `router` ke `CNAME` tunnel (`proxied: true`), menghapus 3 record DNS lama (`cloud`, `pg`, `zenith`) sambil mempertahankan `@`, `www`, `MX`, dan `TXT`, serta menghapus (`shred`) `cert.pem` dari VPS setelah tunnel dibuat.
+- **Penutupan Port Origin Publik di Firewall (`ufw`)**: Menghapus aturan `80/tcp` dan `443/tcp` (IPv4 & IPv6) pada UFW sehingga hanya `OpenSSH` (`22`) yang terbuka; backup konfigurasi pra-perubahan disimpan di `/root/infra-backup-20261126-1744.tgz`.
+- **Verifikasi**:
+  - `nginx -t` dan reload lulus; service `cloudflared` berstatus `active` dan `healthy` di Cloudflare dengan 4 koneksi QUIC (`sin16`, `sin14`, `sin06`, `sin23`, `25` request terlayani, `0` error).
+  - Log akses Nginx (`/var/log/nginx/access.log`) terverifikasi mencatat IP publik klien asli (bukan `127.0.0.1`) untuk trafik melalui tunnel.
+  - Pasca penutupan UFW `80/443`: probe TCP langsung ke IP VPS port `80` dan `443` mengembalikan `False` (`OpenSSH` tetap `SSH_OK`); seluruh rute publik (`/`, `/api/health`, `/produk`, `/dashboard/chat`, `/auth`, `/seller`) tetap `200`, `router.ebrystore.my.id/` tetap `307 -> /dashboard`, seluruh rute admin (`/admin`, `/admin/chat`, `/as/feb/auth/admin`, `/see/masuk`) redirect `302` ke `ebry.cloudflareaccess.com`, seluruh endpoint MCP mengembalikan `404`, dan kedua webhook pembayaran (`webhook.shopeepay`, `webhook.sumopod`) tetap sesuai baseline `404` untuk GET (tidak diarahkan ke Access).
+- **Catatan operasional & rollback**:
+  - *Single connector (non-HA)*: hanya 1 instance `cloudflared` berjalan di VPS; ketersediaan origin bergantung pada service/VPS tersebut.
+  - *Pembaruan sertifikat Let's Encrypt (`certbot.timer`)*: validasi HTTP-01 akan gagal selama port `80` tertutup (sertifikat saat ini aktif hingga 14 Feb 2027). Tunnel tidak terdampak karena memakai `noTLSVerify: true` ke loopback `127.0.0.1:443`, tetapi jika suatu saat rollback ke DNS `A` record pasca sertifikat kedaluwarsa, buka sementara port `80` dan jalankan `certbot renew` terlebih dahulu.
+  - *Rollback*: buka `ufw allow 80/tcp` & `443/tcp`, kembalikan DNS `app` & `router` ke `A` record `43.156.83.235` (`proxied: true`), hentikan `cloudflared`, pulihkan konfigurasi Nginx dari `/root/infra-backup-20261126-1744.tgz` + `nginx -t && systemctl reload nginx`, dan hapus Access App bila diperlukan.
+- **Status deploy**: Perubahan infrastruktur murni (tanpa perubahan kode aplikasi dan tanpa build/deploy rilis aplikasi baru); catatan pembaruan dipublish ke GitHub `main`.
+
 ## 2026-11-25
 
 ### Redesain Chat 100% ala WhatsApp & Pratinjau Peta Lokasi Interaktif
