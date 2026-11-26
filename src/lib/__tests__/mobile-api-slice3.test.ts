@@ -6,7 +6,8 @@ import {
   dispatchPendingPushNotifications,
   hashPushToken,
 } from "../fcm.server";
-import { handleMobileV1Request } from "../mobile-api.server";
+import { handleMobileV1Request, mobileErr, mobileOk } from "../mobile-api.server";
+import { handleMobileCommerceRoute, type MobileCommerceHelpers } from "../mobile-commerce.server";
 
 function mockAuthContext(supabaseOverrides: Record<string, unknown> = {}) {
   return {
@@ -83,7 +84,121 @@ describe("Mobile API v1 Slice 3 & FCM", () => {
       "kebijakan-privasi",
       "kebijakan-refund",
     ]);
-    expect(body.data.helpTopics.length).toBeGreaterThanOrEqual(4);
+    expect(body.data.helpTopics).toHaveLength(12);
+    expect(res.headers.get("cache-control")).toContain("public");
+  });
+
+  it("validates password change length and manual topup status ID", async () => {
+    const shortPw = await handleMobileV1Request(
+      new Request("https://app.ebrystore.my.id/api/mobile/v1/auth/change-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ password: "short" }),
+      }),
+      { requireAuth: async () => mockAuthContext(), checkRateLimit: async () => null },
+    );
+    expect(shortPw.status).toBe(400);
+
+    const badTopupId = await handleMobileV1Request(
+      new Request("https://app.ebrystore.my.id/api/mobile/v1/wallet/topup/manual/not-a-uuid", {
+        method: "GET",
+      }),
+      { requireAuth: async () => mockAuthContext(), checkRateLimit: async () => null },
+    );
+    expect(badTopupId.status).toBe(400);
+
+    const maybeSingle = vi.fn().mockResolvedValue({
+      data: {
+        id: "44444444-4444-4444-8444-444444444444",
+        topup_number: "TOP-001",
+        status: "rejected",
+        amount: 50000,
+        expires_at: "2026-11-28T00:00:00Z",
+        proof_submitted_at: "2026-11-27T01:00:00Z",
+        review_note: "Nominal tidak sesuai mutasi",
+        paid_at: null,
+        method_snapshot: null,
+      },
+      error: null,
+    });
+    const eqUser = vi.fn().mockReturnValue({ maybeSingle });
+    const eqId = vi.fn().mockReturnValue({ eq: eqUser });
+    const select = vi.fn().mockReturnValue({ eq: eqId });
+    const from = vi.fn().mockReturnValue({ select });
+
+    const topupStatus = await handleMobileV1Request(
+      new Request(
+        "https://app.ebrystore.my.id/api/mobile/v1/wallet/topup/manual/44444444-4444-4444-8444-444444444444",
+        { method: "GET" },
+      ),
+      { requireAuth: async () => mockAuthContext({ from }), checkRateLimit: async () => null },
+    );
+    expect(topupStatus.status).toBe(200);
+    const json = (await topupStatus.json()) as {
+      ok: boolean;
+      data: { status: string; reviewNote: string };
+    };
+    expect(json.ok).toBe(true);
+    expect(json.data.status).toBe("rejected");
+    expect(json.data.reviewNote).toBe("Nominal tidak sesuai mutasi");
+  });
+
+  it("returns cacheable headers on /home and surfaces creditWarning when digital credit fails", async () => {
+    const homeRes = await handleMobileV1Request(
+      new Request("https://app.ebrystore.my.id/api/mobile/v1/home", { method: "GET" }),
+      {
+        checkRateLimit: async () => null,
+        readHome: async () => ({ categories: [], latest: [] }),
+      },
+    );
+    expect(homeRes.status).toBe(200);
+    expect(homeRes.headers.get("cache-control")).toContain("public");
+
+    const rpc = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: {
+          order_id: "22222222-2222-4222-8222-222222222222",
+          order_number: "EBR-002",
+          duplicate: false,
+        },
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: null, error: { message: "INSUFFICIENT_CREDIT" } });
+
+    const helpers: MobileCommerceHelpers = {
+      ok: mobileOk,
+      err: mobileErr,
+      readJsonBody: async (request) => {
+        const raw = await request.text();
+        return { ok: true, body: raw ? JSON.parse(raw) : {} };
+      },
+      requireAuth: async () => mockAuthContext({ rpc }),
+      checkPublicRateLimit: async () => null,
+      checkFeature: async () => true,
+      checkUserRateLimit: async () => null,
+    };
+    const url = new URL("https://app.ebrystore.my.id/api/mobile/v1/orders/digital");
+    const orderRes = await handleMobileCommerceRoute(
+      new Request(url.toString(), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          productId: "11111111-1111-4111-8111-111111111111",
+          quantity: 1,
+          idempotencyKey: "idem-warn-1234",
+          useCredit: true,
+        }),
+      }),
+      url.pathname,
+      "POST",
+      url,
+      helpers,
+    );
+    expect(orderRes?.status).toBe(201);
+    const body = (await orderRes!.json()) as { ok: boolean; data: { creditWarning?: string } };
+    expect(body.ok).toBe(true);
+    expect(body.data.creditWarning).toBeTruthy();
   });
 
   it("registers and revokes mobile push token for authenticated user", async () => {

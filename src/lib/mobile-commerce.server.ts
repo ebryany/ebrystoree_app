@@ -3,6 +3,7 @@ import { clientIpFrom } from "./client-ip.server";
 import { canSubmitManualProof, PROOF_MAX_BYTES, PROOF_MIME_TYPES } from "./manual-payment";
 import type { MobileAuthContext, MobileAuthResult } from "./mobile-auth.server";
 import { enforceRateLimit } from "./rate-limit.server";
+import { getOrLoad } from "./server-cache.server";
 import { isFeatureEnabled } from "./website-settings.server";
 
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -139,6 +140,12 @@ const avatarSaveSchema = z
       .max(300)
       .regex(/^\/api\/public\/avatar\/[A-Za-z0-9/_-]+\.[A-Za-z0-9]{2,5}$/, "URL avatar tidak valid")
       .or(z.literal("")),
+  })
+  .strict();
+
+const changePasswordSchema = z
+  .object({
+    password: z.string().min(8).max(200),
   })
   .strict();
 
@@ -307,6 +314,56 @@ export async function handleMobileCommerceRoute(
     const { supabase: sb, userId: uid } = auth.context;
     const count = (q: any) => q.select("id", { count: "exact", head: true });
 
+    const loadPopularSellersCached = async () => {
+      const load = async () => {
+        const { createPublicClient } = await import("./supabase-public.server");
+        const { readPresenceMap } = await import("./store-presence");
+        const pub = createPublicClient();
+        const { data: rows } = await pub
+          .from("product_reviews")
+          .select("store_id, rating")
+          .eq("is_visible", true)
+          .eq("is_verified", true)
+          .not("store_id", "is", null)
+          .limit(500);
+        const agg = new Map<string, { sum: number; n: number }>();
+        for (const r of (rows ?? []) as Array<{ store_id: string; rating: number }>) {
+          const cur = agg.get(r.store_id) ?? { sum: 0, n: 0 };
+          cur.sum += Number(r.rating);
+          cur.n += 1;
+          agg.set(r.store_id, cur);
+        }
+        if (!agg.size) return [];
+        const [{ data: stores }, presence] = await Promise.all([
+          pub
+            .from("stores")
+            .select("id, name, slug, logo_url")
+            .in("id", [...agg.keys()])
+            .eq("status", "active"),
+          readPresenceMap(pub),
+        ]);
+        return (stores ?? [])
+          .map((s) => {
+            const a = agg.get(s.id)!;
+            return {
+              id: s.id,
+              name: s.name,
+              slug: s.slug,
+              logoUrl: s.logo_url ?? null,
+              rating: Number((a.sum / a.n).toFixed(2)),
+              reviews: a.n,
+              presence: presence.get(s.id),
+            };
+          })
+          .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
+          .slice(0, 8);
+      };
+      if (process.env.VITEST) return [];
+      return getOrLoad("mobile:popular-sellers", "v1", 60_000, load, { maxEntries: 2 }).catch(
+        () => [],
+      );
+    };
+
     const [
       total,
       awaiting,
@@ -318,6 +375,9 @@ export async function handleMobileCommerceRoute(
       unreadNotif,
       creditBal,
       recentRes,
+      recentNotifRes,
+      myStoreRes,
+      featuredSellers,
     ] = await Promise.all([
       count(sb.from("orders")).eq("user_id", uid),
       count(sb.from("orders")).eq("user_id", uid).eq("status", "awaiting_payment"),
@@ -348,12 +408,24 @@ export async function handleMobileCommerceRoute(
       sb
         .from("orders")
         .select(
-          "id, order_number, order_type, status, total, created_at, order_items(name_snapshot)",
+          "id, order_number, order_type, status, total, created_at, order_items(name_snapshot, quantity)",
         )
         .eq("user_id", uid)
         .not("status", "in", "(completed,cancelled,refunded)")
         .order("created_at", { ascending: false })
         .limit(5),
+      sb
+        .from("notifications")
+        .select("id, type, title, message, related_type, related_id, read_at, created_at")
+        .eq("recipient_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      sb
+        .from("stores")
+        .select("id, name, slug, status")
+        .eq("owner_id", uid)
+        .maybeSingle(),
+      loadPopularSellersCached(),
     ]);
 
     return h.ok({
@@ -367,6 +439,9 @@ export async function handleMobileCommerceRoute(
       unreadNotifications: unreadNotif.count ?? 0,
       creditBalance: Number(creditBal.data ?? 0),
       recentOrders: recentRes.data ?? [],
+      recentNotifications: recentNotifRes.data ?? [],
+      myStore: myStoreRes.data ?? null,
+      featuredSellers,
     });
   }
 
@@ -424,12 +499,19 @@ export async function handleMobileCommerceRoute(
     const created = result as { order_id: string; order_number: string; duplicate: boolean };
     let creditUsed = 0;
     let amountDue: number | null = null;
+    let creditWarning: string | null = null;
     if (parsed.data.useCredit) {
-      const { data: creditRes } = await auth.context.supabase.rpc("apply_credit_to_order", {
-        _order_id: created.order_id,
-        _max_credit: null as unknown as number,
-      });
-      if (creditRes) {
+      const { data: creditRes, error: creditErr } = await auth.context.supabase.rpc(
+        "apply_credit_to_order",
+        {
+          _order_id: created.order_id,
+          _max_credit: null as unknown as number,
+        },
+      );
+      if (creditErr) {
+        creditWarning =
+          "Pesanan dibuat, tetapi saldo gagal diterapkan otomatis. Kamu bisa menerapkan saldo di halaman pembayaran.";
+      } else if (creditRes) {
         creditUsed = Number((creditRes as { credit_used?: number }).credit_used ?? 0);
         amountDue = Number((creditRes as { amount_due?: number }).amount_due ?? 0);
       }
@@ -442,6 +524,7 @@ export async function handleMobileCommerceRoute(
         duplicate: Boolean(created.duplicate),
         creditUsed,
         amountDue,
+        ...(creditWarning ? { creditWarning } : {}),
       },
       201,
     );
@@ -480,10 +563,17 @@ export async function handleMobileCommerceRoute(
         "assigned",
         "queued",
         "in_progress",
+        "waiting_customer_review",
       ]);
     else if (parsed.data.filter === "completed") query = query.eq("status", "completed");
     else if (parsed.data.filter === "cancelled")
-      query = query.in("status", ["cancelled", "refunded"]);
+      query = query.in("status", [
+        "cancelled",
+        "refunded",
+        "refund_requested",
+        "refund_processing",
+        "disputed",
+      ]);
 
     const { data: rows, count, error } = await query;
     if (error) return h.err("ORDERS_UNAVAILABLE", "Daftar pesanan tidak dapat dimuat.", 503);
@@ -598,6 +688,7 @@ export async function handleMobileCommerceRoute(
       entitlements,
       refunds,
       receiptRes,
+      creditBalRes,
       manualAccount,
       instruction,
       methods,
@@ -632,6 +723,7 @@ export async function handleMobileCommerceRoute(
         .select("refund_number, amount, status, reason, created_at")
         .eq("order_id", order.id),
       sb.rpc("get_my_digital_receipt", { _order_id: order.id }),
+      sb.rpc("get_my_credit_balance"),
       tx.loadManualAccount(),
       tx.loadPaymentInstruction(sb),
       tx.loadPaymentMethods(),
@@ -646,6 +738,7 @@ export async function handleMobileCommerceRoute(
       entitlements: entitlements.data ?? [],
       refunds: refunds.data ?? [],
       digitalReceipt: receiptRes.error ? null : (receiptRes.data ?? null),
+      creditBalance: Number(creditBalRes.data ?? 0),
       manualAccount,
       instruction: instruction.instruction,
       qrisAvailable: methods.qris,
@@ -667,7 +760,8 @@ export async function handleMobileCommerceRoute(
 
     const sumopod = await import("./sumopod.server");
     const cfg = sumopod.sumopodConfig();
-    if (!cfg) {
+    const { loadPaymentMethods } = await import("./transaction.server");
+    if (!cfg || !(await loadPaymentMethods()).qris) {
       return h.err(
         "QRIS_UNAVAILABLE",
         "Pembayaran QRIS belum dikonfigurasi. Gunakan transfer manual.",
@@ -771,6 +865,8 @@ export async function handleMobileCommerceRoute(
 
     if (!payment) return h.err("PAYMENT_NOT_FOUND", "Pembayaran tidak ditemukan.", 404);
     if (payment.status === "paid") return h.ok({ status: "paid" });
+    const limited = await checkUserRate(auth.context.userId, "qris.check");
+    if (limited) return h.ok({ status: "pending" });
 
     const stored = parseSumopodQr(payment.qr_reference);
     const providerId =
@@ -1316,6 +1412,26 @@ export async function handleMobileCommerceRoute(
       .update({ avatar_url: parsed.data.avatarUrl || null })
       .eq("id", auth.context.userId);
     if (error) return h.err("PROFILE_UPDATE_FAILED", "Foto profil gagal disimpan.", 503);
+    return h.ok({ updated: true });
+  }
+
+  if (path === "/api/mobile/v1/auth/change-password") {
+    if (method !== "POST") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
+    const auth = await h.requireAuth(request);
+    if (!auth.ok) return h.err(auth.code, auth.message, auth.status);
+    const bodyRes = await h.readJsonBody(request);
+    if (!bodyRes.ok) return bodyRes.response;
+    const parsed = changePasswordSchema.safeParse(bodyRes.body);
+    if (!parsed.success) {
+      return h.err("INVALID_INPUT", "Kata sandi baru minimal 8 karakter.", 400);
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(auth.context.userId, {
+      password: parsed.data.password,
+    });
+    if (error) {
+      return h.err("PASSWORD_CHANGE_FAILED", "Kata sandi gagal diperbarui. Coba lagi.", 400);
+    }
     return h.ok({ updated: true });
   }
 

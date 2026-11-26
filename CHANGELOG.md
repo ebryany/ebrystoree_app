@@ -2,6 +2,18 @@
 
 ## 2026-11-27
 
+### Optimasi Performa, Cache Server & Perbaikan Kontrak Mobile API v1 (Wave 1)
+
+- **Cache RAM Server (`getOrLoad`) & Rate Limiter Memori untuk GET Publik (`src/lib/mobile-api.server.ts`, `src/lib/mobile-slice3.server.ts`)**:
+  - Membungkus pembacaan publik (`/bootstrap` 30 dtk, `/home` 30 dtk + `platformServices`, `/products/:slug` detail publik + `relatedProducts`, `/stores/:slug` 20 dtk + `contact_phone` & `services[].media[].url`, `/services` 20 dtk, `/articles` 30 dtk) dengan `getOrLoad()` dari `server-cache.server.ts` serta header `Cache-Control: public, max-age=..., stale-while-revalidate=...` pada endpoint katalog publik (menjaga `no-store` pada `/bootstrap` dan seluruh rute terautentikasi).
+  - Mengalihkan rate limit bucket baca publik (`catalog.public`) ke limiter in-memory berbatas (180 req/menit/IP) untuk menghilangkan round-trip RPC DB blocking di setiap browse katalog, sambil mempertahankan `enforceRateLimit` fail-closed berbasis DB untuk seluruh endpoint autentikasi, pesanan, pembayaran, top-up, dan mutasi sosial.
+- **Perbaikan Kontrak Data & Fitur Paritas Web (`src/lib/public-catalog.server.ts`, `src/lib/mobile-api.server.ts`, `src/lib/mobile-commerce.server.ts`, `src/lib/mobile-slice3.server.ts`)**:
+  - Menormalisasi `is_official: !storeId || Boolean(i.is_official)` dan `store_name: i.store_name ?? (storeId ? null : "Ebrystore")` di `readCatalogProducts()` agar filter `?official=1` mengembalikan produk resmi platform.
+  - Memperbaiki klasifikasi `is_academic` pada `/services/platform/:slug` memakai `isAcademicCategorySlug()`, memetakan `media[].url` pada `/services/seller/:id/quote`, menangani PostgREST `416`/`PGRST103` pada `/articles` sebagai halaman kosong `200 OK`, serta melengkapi `LEGAL_AND_HELP_CONTENT.helpTopics` menjadi **12 topik identik `bantuan.tsx`** (8 Pembeli + 4 Seller dengan `icon`, `cardTitle`, dan `keywords`).
+  - Memperbaiki filter `GET /orders` (`active` menyertakan `waiting_customer_review`; `cancelled` menyertakan `refund_requested`, `refund_processing`, `disputed`), memperkaya `GET /dashboard/summary` (`recentNotifications`, `myStore`, `featuredSellers` ter-cache 60 dtk), menyertakan `creditBalance` pada `GET /orders/:id` dan `creditWarning` saat apply kredit gagal pada `POST /orders/digital`, menegakkan saklar admin `qris` & rate limit `qris.check`, menambahkan `useCredit` opsional pada `POST /services/seller/orders`, `operatorName` & `internal_deadline` pada `GET /orders/:id/service`, memperkaya `GET /social/saved` (`sold_count`, info toko & presence), serta menambahkan endpoint `POST /products/:slug/reviews`, `POST /auth/change-password`, `GET /wallet/topup/manual/:id` (+ guard kedaluwarsa upload bukti), dan `GET/DELETE /services/platform/attachments`.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `eslint` `0` error pada 5 file diubah, `npx vitest run src/lib/__tests__/mobile-api-slice1.test.ts src/lib/__tests__/mobile-api-slice2.test.ts src/lib/__tests__/mobile-api-slice3.test.ts --maxWorkers=1` lulus **26/26 test**, dan `$env:NITRO_PRESET='node-server'; npm run build` lulus (`exit 0`).
+- **Status deploy**: Siap dipublish ke GitHub `main` dan di-deploy ke VPS produksi `43.156.83.235` (`ebrystore-20261127-02`); tanpa migrasi database baru.
+
 ### Backend REST Mobile API v1 (Slice 1–3) & Persiapan Push Notification FCM
 
 - **Endpoint Mobile API v1 (`src/routes/api/mobile/v1/$.ts`, `src/lib/mobile-auth.server.ts`, `src/lib/mobile-api.server.ts`, `src/lib/mobile-commerce.server.ts`, `src/lib/mobile-slice3.server.ts`, `src/routeTree.gen.ts`)**:

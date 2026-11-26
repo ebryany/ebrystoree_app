@@ -11,10 +11,12 @@ import {
 import type { MobileAuthResult } from "./mobile-auth.server";
 import { parsePaymentMethods, type CustomPaymentMethod } from "./payment-methods";
 import { enforceRateLimit } from "./rate-limit.server";
-import { looksLikeSecret } from "./service-types";
+import { getOrLoad } from "./server-cache.server";
+import { isAcademicCategorySlug, looksLikeSecret } from "./service-types";
 
 export interface MobileSlice3Helpers {
   ok: (data: unknown, status?: number) => Response;
+  okPublic?: (data: unknown, maxAgeSeconds?: number, swrSeconds?: number) => Response;
   err: (code: string, message: string, status: number) => Response;
   readJsonBody: (
     request: Request,
@@ -334,60 +336,158 @@ const LEGAL_AND_HELP_CONTENT = {
     {
       id: "beli-produk",
       audience: "buyer",
+      icon: "package_search",
+      cardTitle: "Beli produk digital",
       title: "Cara membeli produk digital",
       summary: "Dari memilih produk sampai akses unduhan terbit.",
+      keywords: "produk digital beli checkout unduh file ebook template akun",
       markdown: [
-        "1. Buka katalog **Produk** lalu pilih produk dan variasi yang sesuai kebutuhan.",
-        "2. Ketuk **Beli Sekarang**, atau simpan ke **Keranjang** bila ingin membandingkan beberapa produk.",
-        "3. Selesaikan pembayaran lewat QRIS, ShopeePay, Saldo Ebrystore, atau transfer manual.",
-        "4. Setelah pembayaran lunas, akses file atau kode lisensi langsung tampil di menu **Produk Saya**.",
+        "1. Buka katalog **Produk digital** lalu pilih produk dan variasi yang sesuai kebutuhan.",
+        "2. Ketuk **Beli sekarang**, atau simpan ke **Keranjang** bila ingin membandingkan beberapa produk.",
+        "3. Lakukan pembayaran sesuai instruksi di halaman pembayaran (QRIS, ShopeePay, Saldo Ebrystore, atau transfer manual).",
+        "4. Setelah pembayaran diverifikasi, akses unduhan atau kode lisensi terbit otomatis di menu **Produk saya**.",
       ].join("\n"),
     },
     {
-      id: "pesan-jasa",
+      id: "pesan-layanan",
       audience: "buyer",
-      title: "Cara memesan jasa & layanan",
-      summary: "Bandingkan durasi, jatah revisi, isi kebutuhan, lalu bayar aman dengan escrow.",
+      icon: "briefcase",
+      cardTitle: "Pesan jasa seller",
+      title: "Cara memesan jasa seller",
+      summary: "Bandingkan durasi, revisi, chat seller, lalu pesan.",
+      keywords: "layanan jasa seller tugas paket brief revisi escrow dana ditahan",
       markdown: [
-        "1. Buka menu **Layanan & Jasa** lalu pilih jasa seller atau layanan resmi Ebrystore.",
-        "2. Periksa ruang lingkup pekerjaan, estimasi hari, dan jumlah revisi gratis.",
-        "3. Isi brief kebutuhan pengerjaan dengan jelas (jangan menyertakan kata sandi akun pribadi).",
-        "4. Selesaikan pembayaran. Dana ditahan sistem sampai hasil dikirim dan kamu konfirmasi terima.",
+        "1. Buka **Jasa seller** dan bandingkan harga, durasi pengerjaan, serta jatah revisi.",
+        "2. Periksa ruang lingkup pekerjaan, hasil yang diterima, serta pengecualian sebelum memesan.",
+        "3. Isi detail kebutuhan pengerjaan selengkap mungkin agar proses berjalan lancar (tanpa menyertakan kata sandi akun).",
+        "4. Selesaikan pembayaran. Dana ditahan sistem sampai hasil pekerjaan dikirim dan Anda terima.",
       ].join("\n"),
     },
     {
-      id: "topup-saldo",
+      id: "pembayaran",
       audience: "buyer",
-      title: "Cara isi Saldo Ebrystore",
-      summary: "Isi saldo Rp10.000 sampai Rp1.000.000 lewat QRIS instan atau transfer manual.",
+      icon: "credit_card",
+      cardTitle: "Pembayaran",
+      title: "Cara pembayaran",
+      summary: "Aturan nominal, batas waktu, dan bukti transfer.",
+      keywords: "bayar pembayaran qris manual transfer bukti dana nominal batas waktu saldo topup",
       markdown: [
-        "1. Buka **Dompet & Top-Up** dari tab Akun.",
-        "2. Pilih nominal cepat atau masukkan nominal yang diinginkan (minimal Rp10.000).",
-        "3. Pilih **QRIS** untuk pengisian otomatis, atau metode transfer manual dan unggah bukti transfer.",
-        "4. Saldo dapat langsung dipakai memotong tagihan saat checkout.",
+        "- Pembayaran dilakukan ke kanal yang ditampilkan pada halaman pembayaran pesanan.",
+        "- Nominal transfer harus sama persis dengan total pesanan yang dihitung server.",
+        "- Batas waktu pembayaran manual adalah 24 jam sejak pesanan dibuat.",
+        "- Bukti transfer dapat berupa JPG, PNG, WEBP, atau PDF dengan ukuran maksimal 5 MB.",
+        "- Unggah ulang bukti maksimal 3 kali per pembayaran.",
       ].join("\n"),
     },
     {
-      id: "revisi-refund",
+      id: "pantau-order",
       audience: "buyer",
-      title: "Revisi, komplain, dan pengembalian dana",
-      summary: "Cara mengajukan revisi hasil jasa atau refund pesanan.",
+      icon: "file_text",
+      cardTitle: "Pantau pesanan",
+      title: "Cara memantau pesanan",
+      summary: "Status pesanan diperbarui otomatis di dashboard.",
+      keywords: "pantau status order pesanan tracking progres",
+      markdown:
+        "Semua pesanan tercatat di menu **Pesanan saya**. Status diperbarui saat prosesnya berubah, mulai dari verifikasi pembayaran, pengerjaan, pengiriman hasil, hingga penyelesaian.",
+    },
+    {
+      id: "unduh",
+      audience: "buyer",
+      icon: "download",
+      cardTitle: "Unduh produk",
+      title: "Cara mengunduh produk",
+      summary: "Kuota 5 kali unduh, masa aktif 365 hari.",
+      keywords: "unduh download kuota masa aktif akses file kode lisensi",
       markdown: [
-        "- Untuk **pesanan jasa**, gunakan tombol **Minta Revisi** di detail progres jasa selama jatah revisi masih tersedia.",
-        "- Jika hasil tidak sesuai kesepakatan dan jatah revisi habis, gunakan **Ajukan Komplain** agar tim admin meninjau.",
-        "- Untuk **produk digital**, ajukan refund dari halaman detail pesanan bila terjadi kendala akses.",
+        "- Akses unduhan atau kode muncul di menu **Produk saya** setelah pembayaran diverifikasi.",
+        "- Kuota default adalah 5 kali unduh dengan masa aktif 365 hari sejak akses terbit.",
+        "- Setiap aktivitas unduhan dicatat sistem demi keamanan akun Anda.",
       ].join("\n"),
     },
     {
-      id: "mulai-jualan",
+      id: "revisi",
+      audience: "buyer",
+      icon: "rotate_ccw",
+      cardTitle: "Minta revisi",
+      title: "Cara meminta revisi",
+      summary: "Jatah revisi mengikuti kesepakatan jasa.",
+      keywords: "revisi perbaikan hasil paket jasa",
+      markdown:
+        "Ajukan revisi dari halaman progres pesanan saat hasil pengerjaan dikirim. Jumlah revisi gratis mengikuti kesepakatan jasa yang dipilih; permintaan di luar lingkup atau batas revisi memerlukan kesepakatan tambahan.",
+    },
+    {
+      id: "refund",
+      audience: "buyer",
+      icon: "refresh_ccw",
+      cardTitle: "Ajukan refund",
+      title: "Cara mengajukan refund",
+      summary: "Refund parsial dimungkinkan dengan persetujuan admin.",
+      keywords: "refund pengembalian dana uang batal",
+      markdown:
+        "Ajukan refund dari halaman pesanan dengan menuliskan alasan yang jelas. Refund parsial dimungkinkan dan memerlukan persetujuan admin. Total refund atas satu pesanan tidak melebihi total yang sudah dibayar, dan refund produk digital akan mencabut akses unduhan terkait.",
+    },
+    {
+      id: "dukungan",
+      audience: "buyer",
+      icon: "life_buoy",
+      cardTitle: "Hubungi dukungan",
+      title: "Cara menghubungi dukungan",
+      summary: "Lewat pesanan terkait atau toko resmi Ebrystore.",
+      keywords: "kontak dukungan bantuan support komplain chat admin",
+      markdown: [
+        "- Untuk masalah pesanan, buka pesanan terkait di **Pesanan saya** agar riwayat kasusnya terlihat langsung oleh tim kami.",
+        "- Untuk pertanyaan umum, kunjungi profil **Ebrystore Official** dari katalog atau hubungi kanal dukungan resmi yang tertera.",
+      ].join("\n"),
+    },
+    {
+      id: "seller-buka-toko",
       audience: "seller",
-      title: "Berjualan produk & jasa di Ebrystore",
-      summary: "Ajukan toko seller, kelola katalog, dan cairkan penghasilan.",
+      icon: "store",
+      cardTitle: "Buka toko seller",
+      title: "Cara membuka toko di Ebrystore",
+      summary: "Daftar akun, lengkapi profil toko, lalu mulai berjualan.",
+      keywords: "seller buka toko jualan daftar verifikasi profil toko",
       markdown: [
-        "- Daftar akun lalu lengkapi profil sebelum membuka toko seller.",
-        "- Semua produk digital dan jasa seller melewati peninjauan agar kualitas katalog terjaga.",
-        "- Penghasilan masuk ke saldo seller setelah pembeli mengonfirmasi penerimaan atau masa review berakhir.",
+        "1. Daftar atau masuk akun melalui halaman **Masuk**.",
+        "2. Lengkapi nama, slug, dan deskripsi toko Anda lewat menu Seller di web Ebrystore.",
+        "3. Setelah toko aktif, halaman toko Anda dapat dikunjungi pembeli lengkap dengan daftar produk dan jasa yang tersedia.",
       ].join("\n"),
+    },
+    {
+      id: "seller-publikasi",
+      audience: "seller",
+      icon: "package_plus",
+      cardTitle: "Tayangkan produk & jasa",
+      title: "Cara menayangkan produk dan jasa",
+      summary: "Tulis detail jelas; setiap jasa ditinjau admin sebelum tayang.",
+      keywords: "seller upload produk digital jasa moderasi review admin harga variasi",
+      markdown: [
+        "- Untuk produk digital, unggah berkas dan tentukan harga serta variasi bila diperlukan.",
+        "- Untuk jasa seller, lengkapi ruang lingkup, pengecualian, durasi pengerjaan, dan batas revisi agar ekspektasi pembeli jelas sejak awal.",
+        "- Setiap jasa seller ditinjau admin terlebih dahulu sebelum tayang di katalog publik.",
+      ].join("\n"),
+    },
+    {
+      id: "seller-chat-pesanan",
+      audience: "seller",
+      icon: "messages_square",
+      cardTitle: "Chat & kelola pesanan",
+      title: "Menangani chat pembeli dan pesanan masuk",
+      summary: "Diskusikan kebutuhan di Chat dan kirim hasil lewat dashboard.",
+      keywords: "seller chat pembeli pesanan order kirim hasil revisi",
+      markdown:
+        "Pembeli dapat menghubungi toko Anda sebelum memesan. Saat pesanan masuk, pantau statusnya di dashboard seller, kirim hasil pekerjaan sesuai durasi yang disepakati, dan tanggapi permintaan revisi dalam batas kesepakatan jasa.",
+    },
+    {
+      id: "seller-saldo",
+      audience: "seller",
+      icon: "wallet",
+      cardTitle: "Saldo & pendapatan",
+      title: "Saldo toko dan pencairan pendapatan",
+      summary: "Pendapatan masuk ke saldo toko setelah pembeli menerima hasil.",
+      keywords: "seller saldo pendapatan withdraw pencairan rekening dana ditahan escrow",
+      markdown:
+        "Dana pembayaran pembeli ditahan sistem selama pengerjaan jasa berlangsung. Pendapatan baru dicatat ke saldo toko setelah pembeli menerima hasil atau transaksi dinyatakan selesai, kemudian dapat dipantau dan ditarik lewat menu keuangan toko.",
     },
   ],
 };
@@ -553,21 +653,36 @@ export async function handleMobileSlice3Route(
       };
     };
 
-    const [categoriesRes, platform, seller] = await Promise.all([
-      readCatalogCategories({ kind: "service" }),
-      loadPlatform(),
-      loadSeller(),
-    ]);
+    const loadAll = async () => {
+      const [categoriesRes, platform, seller] = await Promise.all([
+        readCatalogCategories({ kind: "service" }),
+        loadPlatform(),
+        loadSeller(),
+      ]);
+      return {
+        categories: categoriesRes.items ?? [],
+        platformServices: platform.items,
+        platformTotal: platform.total,
+        platformNextPage: platform.nextPage,
+        marketplaceServices: seller.items,
+        marketplaceTotal: seller.total,
+        marketplaceNextPage: seller.nextPage,
+      };
+    };
 
-    return h.ok({
-      categories: categoriesRes.items ?? [],
-      platformServices: platform.items,
-      platformTotal: platform.total,
-      platformNextPage: platform.nextPage,
-      marketplaceServices: seller.items,
-      marketplaceTotal: seller.total,
-      marketplaceNextPage: seller.nextPage,
-    });
+    const qNorm = (parsed.data.q ?? "").trim().toLowerCase();
+    const payload =
+      process.env.VITEST || qNorm.length > 40
+        ? await loadAll()
+        : await getOrLoad(
+            "mobile:services",
+            `${parsed.data.kind}|${parsed.data.category ?? ""}|${qNorm}|${parsed.data.page}|${parsed.data.pageSize}`,
+            20_000,
+            loadAll,
+            { maxEntries: 64 },
+          );
+
+    return (h.okPublic ?? h.ok)(payload, 20, 60);
   }
 
   const platformDetailMatch = /^\/api\/mobile\/v1\/services\/platform\/([^/]+)$/.exec(path);
@@ -609,21 +724,24 @@ export async function handleMobileSlice3Route(
       sellerStats: null,
     }));
 
-    const isAcademic = Boolean(
-      (row.supported_education_levels && row.supported_education_levels.length > 0) ||
-        row.categories,
+    const isAcademic = isAcademicCategorySlug(
+      (row.categories as { slug?: string | null } | null)?.slug,
     );
 
-    return h.ok({
-      service: {
-        ...row,
-        is_academic: isAcademic,
-        service_packages: packages,
-        service_addons: addons,
-        seller,
-        sellerStats,
+    return (h.okPublic ?? h.ok)(
+      {
+        service: {
+          ...row,
+          is_academic: isAcademic,
+          service_packages: packages,
+          service_addons: addons,
+          seller,
+          sellerStats,
+        },
       },
-    });
+      20,
+      60,
+    );
   }
 
   const sellerQuoteMatch = /^\/api\/mobile\/v1\/services\/seller\/([^/]+)\/quote$/.exec(path);
@@ -641,7 +759,17 @@ export async function handleMobileSlice3Route(
     if (error || !quote) {
       return h.err("QUOTE_FAILED", marketplaceOrderError(error?.message ?? ""), 400);
     }
-    return h.ok({ quote });
+    const rawQuote = quote as Record<string, unknown>;
+    const rawMedia = Array.isArray(rawQuote.media) ? rawQuote.media : null;
+    const enrichedQuote = rawMedia
+      ? {
+          ...rawQuote,
+          media: rawMedia.map((m: any) =>
+            m && typeof m.path === "string" ? { ...m, url: serviceMediaUrl(m.path) } : m,
+          ),
+        }
+      : rawQuote;
+    return h.ok({ quote: enrichedQuote });
   }
 
   const sellerDetailMatch = /^\/api\/mobile\/v1\/services\/seller\/([^/]+)$/.exec(path);
@@ -770,6 +898,55 @@ export async function handleMobileSlice3Route(
     return h.ok({ attachment: row });
   }
 
+  if (path === "/api/mobile/v1/services/platform/attachments") {
+    if (method !== "GET") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
+    const auth = await h.requireAuth(request);
+    if (!auth.ok) return h.err(auth.code, auth.message, auth.status);
+    const draftKeyRes = uuidSchema.safeParse(url.searchParams.get("draftKey") ?? "");
+    if (!draftKeyRes.success) return h.err("INVALID_QUERY", "draftKey tidak valid.", 400);
+    const { data: rows, error } = await auth.context.supabase
+      .from("academic_order_attachments")
+      .select("id, attachment_type, original_name, file_size, created_at")
+      .eq("draft_key", draftKeyRes.data)
+      .eq("uploaded_by", auth.context.userId)
+      .is("order_id", null)
+      .order("created_at", { ascending: true });
+    if (error) return h.err("ATTACHMENT_LIST_FAILED", "Daftar lampiran tidak dapat dimuat.", 503);
+    return h.ok({ items: rows ?? [] });
+  }
+
+  const deleteAttachmentMatch = /^\/api\/mobile\/v1\/services\/platform\/attachments\/([^/]+)$/.exec(
+    path,
+  );
+  if (
+    deleteAttachmentMatch &&
+    !["upload-url", "register"].includes(deleteAttachmentMatch[1])
+  ) {
+    if (method !== "DELETE") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
+    const auth = await h.requireAuth(request);
+    if (!auth.ok) return h.err(auth.code, auth.message, auth.status);
+    const attIdRes = uuidSchema.safeParse(decodeURIComponent(deleteAttachmentMatch[1]));
+    if (!attIdRes.success) return h.err("INVALID_QUERY", "ID lampiran tidak valid.", 400);
+    const { data: deleted, error } = await auth.context.supabase
+      .from("academic_order_attachments")
+      .delete()
+      .eq("id", attIdRes.data)
+      .eq("uploaded_by", auth.context.userId)
+      .is("order_id", null)
+      .select("storage_path")
+      .maybeSingle();
+    if (error) return h.err("ATTACHMENT_DELETE_FAILED", "Lampiran gagal dihapus.", 503);
+    if (!deleted) return h.err("NOT_FOUND", "Lampiran tidak ditemukan.", 404);
+    if (deleted.storage_path) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.storage
+        .from("academic-order-attachments")
+        .remove([deleted.storage_path])
+        .catch(() => {});
+    }
+    return h.ok({ deleted: true });
+  }
+
   if (path === "/api/mobile/v1/services/platform/orders/general") {
     if (method !== "POST") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
     const auth = await h.requireAuth(request);
@@ -896,7 +1073,10 @@ export async function handleMobileSlice3Route(
 
     const bodyRes = await h.readJsonBody(request);
     if (!bodyRes.ok) return bodyRes.response;
-    const parsed = marketplaceServiceCheckoutSchema.safeParse(bodyRes.body);
+    const rawBody = (bodyRes.body ?? {}) as Record<string, unknown>;
+    const useCredit = rawBody.useCredit === true;
+    const { useCredit: _ignoredUseCredit, ...checkoutInput } = rawBody;
+    const parsed = marketplaceServiceCheckoutSchema.safeParse(checkoutInput);
     if (!parsed.success) {
       return h.err(
         "INVALID_INPUT",
@@ -925,7 +1105,32 @@ export async function handleMobileSlice3Route(
       );
     }
     const r = result as { order_id: string; order_number: string; duplicate?: boolean };
-    return h.ok({ orderId: r.order_id, orderNumber: r.order_number, duplicate: Boolean(r.duplicate) });
+    let creditUsed = 0;
+    let amountDue: number | null = null;
+    let creditWarning: string | null = null;
+    if (useCredit) {
+      const { data: creditRes, error: creditErr } = await auth.context.supabase.rpc(
+        "apply_credit_to_order",
+        {
+          _order_id: r.order_id,
+          _max_credit: null as unknown as number,
+        },
+      );
+      if (creditErr) {
+        creditWarning =
+          "Pesanan dibuat, tetapi saldo gagal diterapkan otomatis. Kamu bisa menerapkan saldo di halaman pembayaran.";
+      } else if (creditRes) {
+        creditUsed = Number((creditRes as { credit_used?: number }).credit_used ?? 0);
+        amountDue = Number((creditRes as { amount_due?: number }).amount_due ?? 0);
+      }
+    }
+    return h.ok({
+      orderId: r.order_id,
+      orderNumber: r.order_number,
+      duplicate: Boolean(r.duplicate),
+      ...(useCredit ? { creditUsed, amountDue } : {}),
+      ...(creditWarning ? { creditWarning } : {}),
+    });
   }
 
   /* ------------------- Buyer Service Order Detail & Actions ------------------- */
@@ -982,7 +1187,9 @@ export async function handleMobileSlice3Route(
         const [assignment, progress, results, revisions, serviceDetail] = await Promise.all([
           auth.context.supabase
             .from("operator_assignments")
-            .select("id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at")
+            .select(
+              "id, operator_id, status, assigned_at, accepted_at, started_at, completed_at, deadline_at",
+            )
             .eq("order_id", order.id)
             .order("assigned_at", { ascending: false })
             .limit(1)
@@ -1004,14 +1211,27 @@ export async function handleMobileSlice3Route(
             .order("sequence", { ascending: false }),
           auth.context.supabase
             .from("service_order_details")
-            .select("package_snapshot, addons_snapshot, requirements_note, estimated_days, revision_allowance")
+            .select(
+              "package_snapshot, addons_snapshot, requirements_note, estimated_days, revision_allowance, internal_deadline",
+            )
             .eq("order_id", order.id)
             .maybeSingle(),
         ]);
+        let operatorName: string | null = null;
+        if (assignment.data?.operator_id) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: op } = await supabaseAdmin
+            .from("profiles")
+            .select("full_name")
+            .eq("id", assignment.data.operator_id)
+            .maybeSingle();
+          operatorName = op?.full_name ?? null;
+        }
         return h.ok({
           kind: "platform_service",
           order,
           assignment: assignment.data ?? null,
+          operatorName,
           progress: progress.data ?? [],
           results: results.data ?? [],
           revisions: revisions.data ?? [],
@@ -1405,6 +1625,9 @@ export async function handleMobileSlice3Route(
     if (!topup || topup.provider !== "manual" || topup.status !== "waiting_payment") {
       return h.err("PROOF_NOT_ALLOWED", "Isi saldo tidak menerima bukti transfer.", 409);
     }
+    if (topup.expires_at && new Date(topup.expires_at).getTime() <= Date.now()) {
+      return h.err("TOPUP_EXPIRED", "Batas waktu pembayaran isi saldo sudah berakhir.", 409);
+    }
     if (topup.proof_submitted_at) {
       return h.err("ALREADY_SUBMITTED", "Bukti transfer sudah dikirim dan menunggu verifikasi.", 409);
     }
@@ -1445,6 +1668,40 @@ export async function handleMobileSlice3Route(
     return h.ok({ submitted: true });
   }
 
+  const manualTopupStatusMatch = /^\/api\/mobile\/v1\/wallet\/topup\/manual\/([^/]+)$/.exec(path);
+  if (
+    manualTopupStatusMatch &&
+    !["proof-upload-url", "submit"].includes(manualTopupStatusMatch[1])
+  ) {
+    if (method !== "GET") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
+    const auth = await h.requireAuth(request);
+    if (!auth.ok) return h.err(auth.code, auth.message, auth.status);
+    const idRes = uuidSchema.safeParse(decodeURIComponent(manualTopupStatusMatch[1]));
+    if (!idRes.success) return h.err("INVALID_QUERY", "ID isi saldo tidak valid.", 400);
+    const { data: row, error } = await (auth.context.supabase as any)
+      .from("credit_topups")
+      .select(
+        "id, topup_number, status, amount, expires_at, proof_submitted_at, review_note, paid_at, method_snapshot",
+      )
+      .eq("id", idRes.data)
+      .eq("user_id", auth.context.userId)
+      .maybeSingle();
+    if (error) return h.err("TOPUP_STATUS_UNAVAILABLE", "Status isi saldo gagal dimuat.", 503);
+    if (!row) return h.err("NOT_FOUND", "Isi saldo tidak ditemukan.", 404);
+    return h.ok({
+      id: String(row.id),
+      topupNumber: String(row.topup_number ?? ""),
+      status: String(row.status ?? "waiting_payment"),
+      amount: Number(row.amount ?? 0),
+      expiresAt: String(row.expires_at ?? ""),
+      proofSubmitted: Boolean(row.proof_submitted_at),
+      proofSubmittedAt: (row.proof_submitted_at as string | null) ?? null,
+      reviewNote: (row.review_note as string | null) ?? null,
+      paidAt: (row.paid_at as string | null) ?? null,
+      method: (row.method_snapshot as CustomPaymentMethod | null) ?? null,
+    });
+  }
+
   /* ------------------- Saved (Liked Products & Followed Stores) ------------------- */
   if (path === "/api/mobile/v1/social/saved") {
     if (method !== "GET") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
@@ -1462,7 +1719,7 @@ export async function handleMobileSlice3Route(
       auth.context.supabase
         .from("product_likes")
         .select(
-          "created_at, digital_products(id, name, slug, short_description, thumbnail_url, price, discount_price, store_id)",
+          "created_at, digital_products(id, name, slug, short_description, thumbnail_url, price, discount_price, sold_count, store_id, stores(name, slug, logo_url, is_platform))",
         )
         .eq("user_id", auth.context.userId)
         .order("created_at", { ascending: false })
@@ -1477,7 +1734,24 @@ export async function handleMobileSlice3Route(
         .map((r: any) => r.stores)
         .filter(Boolean)
         .map((s: any) => ({ ...s, presence: presence.get(s.id) ?? { online: false, lastSeenAt: null } })),
-      products: (likes.data ?? []).map((r: any) => r.digital_products).filter(Boolean),
+      products: (likes.data ?? [])
+        .map((r: any) => r.digital_products)
+        .filter(Boolean)
+        .map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          short_description: p.short_description ?? null,
+          thumbnail_url: p.thumbnail_url ?? null,
+          price: Number(p.price ?? 0),
+          discount_price: p.discount_price == null ? null : Number(p.discount_price),
+          sold_count: Number(p.sold_count ?? 0),
+          store_name: p.stores?.name ?? (p.store_id ? null : "Ebrystore"),
+          store_slug: p.stores?.slug ?? null,
+          store_logo_url: p.stores?.logo_url ?? null,
+          is_official: !p.store_id || Boolean(p.stores?.is_platform),
+          store_presence: presence.get(p.store_id ?? null),
+        })),
     });
   }
 
@@ -1490,34 +1764,60 @@ export async function handleMobileSlice3Route(
     const parsed = articlesQuerySchema.safeParse(Object.fromEntries(url.searchParams));
     if (!parsed.success) return h.err("INVALID_QUERY", "Parameter artikel tidak valid.", 400);
 
-    const { createPublicClient } = await import("./supabase-public.server");
-    const supabase = createPublicClient();
     const { page, pageSize } = parsed.data;
-    let query = supabase
-      .from("articles")
-      .select(
-        "id, title, slug, excerpt, cover_url, tags, reading_minutes, author_name, published_at, view_count",
-        { count: "exact" },
-      )
-      .eq("status", "published")
-      .is("deleted_at", null)
-      .order("published_at", { ascending: false })
-      .range(page * pageSize, page * pageSize + pageSize - 1);
+    const loadArticles = async () => {
+      const { createPublicClient } = await import("./supabase-public.server");
+      const supabase = createPublicClient();
+      let query = supabase
+        .from("articles")
+        .select(
+          "id, title, slug, excerpt, cover_url, tags, reading_minutes, author_name, published_at, view_count",
+          { count: "exact" },
+        )
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false })
+        .range(page * pageSize, page * pageSize + pageSize - 1);
 
-    const term = parsed.data.q ? escapeLike(parsed.data.q) : "";
-    if (term) query = query.or(`title.ilike.%${term}%,excerpt.ilike.%${term}%`);
-    if (parsed.data.tag) query = query.contains("tags", [parsed.data.tag]);
+      const term = parsed.data.q ? escapeLike(parsed.data.q) : "";
+      if (term) query = query.or(`title.ilike.%${term}%,excerpt.ilike.%${term}%`);
+      if (parsed.data.tag) query = query.contains("tags", [parsed.data.tag]);
 
-    const { data: rows, error, count } = await query;
-    if (error) return h.err("ARTICLES_UNAVAILABLE", "Artikel tidak dapat dimuat.", 503);
-    const items = rows ?? [];
-    const total = count ?? items.length;
-    return h.ok({
-      items,
-      total,
-      page,
-      nextPage: items.length === pageSize && (page + 1) * pageSize < total ? page + 1 : null,
-    });
+      const { data: rows, error, count } = await query;
+      if (error) {
+        if (error.code === "PGRST103" || /range not satisfiable/i.test(error.message ?? "")) {
+          return { error: null, payload: { items: [], total: count ?? 0, page, nextPage: null } };
+        }
+        return { error: "ARTICLES_UNAVAILABLE" as const, payload: null };
+      }
+      const items = rows ?? [];
+      const total = count ?? items.length;
+      return {
+        error: null,
+        payload: {
+          items,
+          total,
+          page,
+          nextPage: items.length === pageSize && (page + 1) * pageSize < total ? page + 1 : null,
+        },
+      };
+    };
+
+    const qNorm = (parsed.data.q ?? "").trim().toLowerCase();
+    const res =
+      process.env.VITEST || qNorm.length > 40
+        ? await loadArticles()
+        : await getOrLoad(
+            "mobile:articles",
+            `${qNorm}|${parsed.data.tag ?? ""}|${page}|${pageSize}`,
+            30_000,
+            loadArticles,
+            { maxEntries: 32, shouldCache: (v) => v.error === null },
+          );
+    if (res.error || !res.payload) {
+      return h.err("ARTICLES_UNAVAILABLE", "Artikel tidak dapat dimuat.", 503);
+    }
+    return (h.okPublic ?? h.ok)(res.payload, 30, 120);
   }
 
   const articleMatch = /^\/api\/mobile\/v1\/articles\/([^/]+)$/.exec(path);
@@ -1551,12 +1851,12 @@ export async function handleMobileSlice3Route(
       .order("published_at", { ascending: false })
       .limit(3);
 
-    return h.ok({ article, related: related ?? [] });
+    return (h.okPublic ?? h.ok)({ article, related: related ?? [] }, 30, 120);
   }
 
   if (path === "/api/mobile/v1/content/legal") {
     if (method !== "GET") return h.err("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
-    return h.ok(LEGAL_AND_HELP_CONTENT);
+    return (h.okPublic ?? h.ok)(LEGAL_AND_HELP_CONTENT, 300, 600);
   }
 
   return null;

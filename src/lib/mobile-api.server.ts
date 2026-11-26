@@ -17,6 +17,7 @@ import {
   readCatalogProducts,
 } from "./public-catalog.server";
 import { enforceRateLimit } from "./rate-limit.server";
+import { getOrLoad } from "./server-cache.server";
 import { homeBannerSlides } from "./website-settings";
 import { readPublicSettings } from "./website-settings.server";
 
@@ -53,6 +54,13 @@ const socialStateQuerySchema = z
 
 const toggleLikeSchema = z.object({ productId: z.string().uuid() }).strict();
 const toggleFollowSchema = z.object({ storeId: z.string().uuid() }).strict();
+const submitProductReviewSchema = z
+  .object({
+    rating: z.number().int().min(1).max(5),
+    title: z.string().trim().max(120).optional(),
+    body: z.string().trim().max(1000).optional(),
+  })
+  .strict();
 const uuidSchema = z.string().uuid();
 const slugSchema = z.string().trim().min(1).max(120);
 
@@ -74,6 +82,21 @@ export function mobileOk(data: unknown, status = 200): Response {
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+    },
+  });
+}
+
+export function mobileOkPublic(
+  data: unknown,
+  maxAgeSeconds = 15,
+  swrSeconds = 60,
+): Response {
+  return new Response(JSON.stringify({ ok: true, data }), {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${swrSeconds}`,
       "x-content-type-options": "nosniff",
     },
   });
@@ -165,64 +188,104 @@ function sortProducts<
   }
 }
 
+// Bounded in-memory rate limiter strictly for non-financial read-only public GETs.
+// Financial, auth, and mutation buckets continue using fail-closed DB RPC `enforceRateLimit`.
+const publicRateWindows = new Map<string, { count: number; resetAt: number }>();
+const PUBLIC_RATE_LIMIT = 180;
+const PUBLIC_RATE_WINDOW_MS = 60_000;
+const PUBLIC_RATE_MAX_KEYS = 4000;
+
+function checkLocalPublicRateLimit(ipKey: string): { error: string } | null {
+  const now = Date.now();
+  const entry = publicRateWindows.get(ipKey);
+  if (!entry || now >= entry.resetAt) {
+    if (publicRateWindows.size >= PUBLIC_RATE_MAX_KEYS && !publicRateWindows.has(ipKey)) {
+      const oldest = publicRateWindows.keys().next().value;
+      if (oldest !== undefined) publicRateWindows.delete(oldest);
+    }
+    publicRateWindows.set(ipKey, { count: 1, resetAt: now + PUBLIC_RATE_WINDOW_MS });
+    return null;
+  }
+  entry.count += 1;
+  if (entry.count > PUBLIC_RATE_LIMIT) {
+    return { error: "Terlalu banyak permintaan. Coba lagi dalam 1 menit." };
+  }
+  return null;
+}
+
 async function defaultCheckRateLimit(
   request: Request,
   bucket: "catalog.public" | "social.toggle",
   keyOverride?: string,
 ) {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
   const key = keyOverride ?? `ip:${clientIpFrom((name) => request.headers.get(name)) ?? "unknown"}`;
+  if (bucket === "catalog.public") {
+    return checkLocalPublicRateLimit(key);
+  }
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
   return enforceRateLimit(key, bucket);
 }
 
 async function readBootstrapData() {
-  const { values, updatedAt } = await readPublicSettings();
-  return {
-    mobile: {
-      apiVersion: "v1",
-      minVersionCode: 1,
-      latestVersionCode: 1,
-    },
-    supabase: {
-      url: process.env.SUPABASE_URL ?? "",
-      publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ?? "",
-    },
-    maintenance: {
-      active: Boolean(values.maintenance_active),
-      title: String(values.maintenance_title ?? ""),
-      message: String(values.maintenance_message ?? ""),
-      eta: String(values.maintenance_eta ?? ""),
-    },
-    features: {
-      registration: values.feature_registration !== false,
-      checkout: values.feature_checkout !== false,
-      digitalProducts: values.feature_digital_products !== false,
-      academicServices: values.feature_academic_services !== false,
-      creditTopup: values.feature_credit_topup !== false,
-      refund: values.feature_refund !== false,
-    },
-    branding: {
-      siteName: String(values.store_name ?? values.site_name ?? "Ebrystore"),
-      tagline: String(values.site_tagline ?? ""),
-      accentColor: String(values.site_accent_color ?? "#0f8f86"),
-      logoUrl: String(values.site_logo_url ?? ""),
-      logoDarkUrl: String(values.site_logo_dark_url ?? ""),
-      heroTitle: String(values.home_hero_title ?? ""),
-      heroSubtitle: String(values.home_hero_subtitle ?? ""),
-      banners: homeBannerSlides(values),
-    },
-    updatedAt,
+  const load = async () => {
+    const { values, updatedAt } = await readPublicSettings();
+    return {
+      mobile: {
+        apiVersion: "v1",
+        minVersionCode: 1,
+        latestVersionCode: 1,
+      },
+      supabase: {
+        url: process.env.SUPABASE_URL ?? "",
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ?? "",
+      },
+      maintenance: {
+        active: Boolean(values.maintenance_active),
+        title: String(values.maintenance_title ?? ""),
+        message: String(values.maintenance_message ?? ""),
+        eta: String(values.maintenance_eta ?? ""),
+      },
+      features: {
+        registration: values.feature_registration !== false,
+        checkout: values.feature_checkout !== false,
+        digitalProducts: values.feature_digital_products !== false,
+        academicServices: values.feature_academic_services !== false,
+        creditTopup: values.feature_credit_topup !== false,
+        refund: values.feature_refund !== false,
+      },
+      branding: {
+        siteName: String(values.store_name ?? values.site_name ?? "Ebrystore"),
+        tagline: String(values.site_tagline ?? ""),
+        accentColor: String(values.site_accent_color ?? "#0f8f86"),
+        logoUrl: String(values.site_logo_url ?? ""),
+        logoDarkUrl: String(values.site_logo_dark_url ?? ""),
+        heroTitle: String(values.home_hero_title ?? ""),
+        heroSubtitle: String(values.home_hero_subtitle ?? ""),
+        banners: homeBannerSlides(values),
+      },
+      updatedAt,
+    };
   };
+  if (process.env.VITEST) return load();
+  return getOrLoad("mobile:bootstrap", "v1", 30_000, load, { maxEntries: 4 });
 }
 
 async function readHomeData() {
-  const { createPublicClient } = await import("./supabase-public.server");
-  const { readPresenceMap } = await import("./store-presence");
-  const { readPublicMarketplaceServices } = await import("./marketplace-service-catalog.server");
-  const supabase = createPublicClient();
+  const load = async () => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const { readPresenceMap } = await import("./store-presence");
+    const { readPublicMarketplaceServices } = await import("./marketplace-service-catalog.server");
+    const supabase = createPublicClient();
 
-  const [categoriesRes, serviceCategoriesRes, productsRes, servicesRes, reviewsRes, presence] =
-    await Promise.all([
+    const [
+      categoriesRes,
+      serviceCategoriesRes,
+      productsRes,
+      servicesRes,
+      platformServicesRes,
+      reviewsRes,
+      presence,
+    ] = await Promise.all([
       readCatalogCategories({ kind: "product" }),
       readCatalogCategories({ kind: "service" }),
       supabase
@@ -237,6 +300,15 @@ async function readHomeData() {
         .limit(120),
       readPublicMarketplaceServices({ page: 0, pageSize: 8 }),
       supabase
+        .from("services")
+        .select(
+          "id, name, slug, short_description, thumbnail_url, category:categories!services_category_id_fkey(slug, name), service_packages(id, name, price, estimated_days, free_revisions, is_active)",
+        )
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(4),
+      supabase
         .from("product_reviews")
         .select(
           "id, rating, title, body, reviewer_name, created_at, store_id, digital_products(name, slug, thumbnail_url), stores(name, slug, logo_url)",
@@ -247,108 +319,132 @@ async function readHomeData() {
       readPresenceMap(supabase),
     ]);
 
-  if (productsRes.error) {
-    throw new Error("HOME_PRODUCTS_FAILED");
-  }
+    if (productsRes.error) {
+      throw new Error("HOME_PRODUCTS_FAILED");
+    }
 
-  const storeStats = new Map<
-    string,
-    { id: string; name: string; slug: string; logoUrl: string | null; sum: number; count: number }
-  >();
-  for (const rev of (reviewsRes.data ?? []) as any[]) {
-    if (!rev.store_id || !rev.stores?.slug) continue;
-    const cur = storeStats.get(rev.store_id) ?? {
-      id: rev.store_id,
-      name: rev.stores.name,
-      slug: rev.stores.slug,
-      logoUrl: rev.stores.logo_url ?? null,
-      sum: 0,
-      count: 0,
-    };
-    cur.sum += Number(rev.rating ?? 0);
-    cur.count += 1;
-    storeStats.set(rev.store_id, cur);
-  }
+    const storeStats = new Map<
+      string,
+      { id: string; name: string; slug: string; logoUrl: string | null; sum: number; count: number }
+    >();
+    for (const rev of (reviewsRes.data ?? []) as any[]) {
+      if (!rev.store_id || !rev.stores?.slug) continue;
+      const cur = storeStats.get(rev.store_id) ?? {
+        id: rev.store_id,
+        name: rev.stores.name,
+        slug: rev.stores.slug,
+        logoUrl: rev.stores.logo_url ?? null,
+        sum: 0,
+        count: 0,
+      };
+      cur.sum += Number(rev.rating ?? 0);
+      cur.count += 1;
+      storeStats.set(rev.store_id, cur);
+    }
 
-  const rawProducts = (productsRes.data ?? []) as any[];
-  const normalizedProducts = rawProducts.map((r) => {
-    const stat = r.store_id ? storeStats.get(r.store_id) : undefined;
-    const storeRating =
-      stat && stat.count > 0 ? Number((stat.sum / stat.count).toFixed(1)) : null;
-    return {
+    const rawProducts = (productsRes.data ?? []) as any[];
+    const normalizedProducts = rawProducts.map((r) => {
+      const stat = r.store_id ? storeStats.get(r.store_id) : undefined;
+      const storeRating =
+        stat && stat.count > 0 ? Number((stat.sum / stat.count).toFixed(1)) : null;
+      return {
+        id: r.id as string,
+        name: r.name as string,
+        slug: r.slug as string,
+        shortDescription: (r.short_description as string | null) ?? null,
+        thumbnailUrl: (r.thumbnail_url as string | null) ?? null,
+        price: Number(r.price),
+        discountPrice: r.discount_price == null ? null : Number(r.discount_price),
+        soldCount: Number(r.sold_count ?? 0),
+        storeRating,
+        categoryId: (r.category_id as string | null) ?? null,
+        storeId: (r.store_id as string | null) ?? null,
+        storeName: (r.stores?.name as string | null) ?? (r.store_id ? null : "Ebrystore"),
+        storeSlug: (r.stores?.slug as string | null) ?? null,
+        storeLogoUrl: (r.stores?.logo_url as string | null) ?? null,
+        isOfficial: !r.store_id || Boolean(r.stores?.is_platform),
+        storePresence: presence.get(r.store_id ?? null),
+      };
+    });
+
+    const promoDeals = normalizedProducts
+      .filter((p) => discountPercent(p.price, p.discountPrice) > 0)
+      .sort(
+        (a, b) =>
+          discountPercent(b.price, b.discountPrice) - discountPercent(a.price, a.discountPrice),
+      )
+      .slice(0, 10);
+
+    const bestSellers = [...normalizedProducts]
+      .filter((p) => p.soldCount > 0)
+      .sort((a, b) => b.soldCount - a.soldCount)
+      .slice(0, 12);
+
+    const latest = normalizedProducts.slice(0, 12);
+
+    const featuredSellers = [...storeStats.values()]
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        logoUrl: s.logoUrl,
+        rating: s.count > 0 ? Number((s.sum / s.count).toFixed(2)) : 0,
+        reviews: s.count,
+        presence: presence.get(s.id),
+      }))
+      .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
+      .slice(0, 10);
+
+    const recentReviews = ((reviewsRes.data ?? []) as any[]).slice(0, 10).map((r) => ({
       id: r.id as string,
-      name: r.name as string,
-      slug: r.slug as string,
-      shortDescription: (r.short_description as string | null) ?? null,
-      thumbnailUrl: (r.thumbnail_url as string | null) ?? null,
-      price: Number(r.price),
-      discountPrice: r.discount_price == null ? null : Number(r.discount_price),
-      soldCount: Number(r.sold_count ?? 0),
-      storeRating,
-      categoryId: (r.category_id as string | null) ?? null,
-      storeId: (r.store_id as string | null) ?? null,
-      storeName: (r.stores?.name as string | null) ?? (r.store_id ? null : "Ebrystore"),
-      storeSlug: (r.stores?.slug as string | null) ?? null,
-      storeLogoUrl: (r.stores?.logo_url as string | null) ?? null,
-      isOfficial: !r.store_id || Boolean(r.stores?.is_platform),
-      storePresence: presence.get(r.store_id ?? null),
+      rating: Number(r.rating),
+      title: (r.title as string | null) ?? null,
+      body: (r.body as string | null) ?? null,
+      reviewerName: (r.reviewer_name as string | null) ?? null,
+      createdAt: r.created_at as string,
+      product: r.digital_products ?? null,
+      store: r.stores ? { name: r.stores.name, slug: r.stores.slug } : null,
+    }));
+
+    const sellerServices = servicesRes.items.map((item) => ({
+      ...item,
+      media: item.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
+    }));
+
+    const platformServices = ((platformServicesRes.data ?? []) as any[]).map((r) => {
+      const pkgs = (r.service_packages ?? []).filter((p: any) => p.is_active !== false);
+      const minPrice = pkgs.length ? Math.min(...pkgs.map((p: any) => Number(p.price))) : 0;
+      const minDays = pkgs.length
+        ? Math.min(...pkgs.map((p: any) => Number(p.estimated_days ?? 1)))
+        : 1;
+      return {
+        id: r.id as string,
+        name: r.name as string,
+        slug: r.slug as string,
+        shortDescription: (r.short_description as string | null) ?? null,
+        thumbnailUrl: (r.thumbnail_url as string | null) ?? null,
+        category: r.category ?? null,
+        startingPrice: minPrice,
+        minEstimatedDays: minDays,
+        packageCount: pkgs.length,
+      };
+    });
+
+    return {
+      categories: categoriesRes.items,
+      serviceCategories: serviceCategoriesRes.items,
+      promoDeals,
+      bestSellers,
+      latest,
+      sellerServices,
+      platformServices,
+      featuredSellers,
+      recentReviews,
     };
-  });
-
-  const promoDeals = normalizedProducts
-    .filter((p) => discountPercent(p.price, p.discountPrice) > 0)
-    .sort(
-      (a, b) =>
-        discountPercent(b.price, b.discountPrice) - discountPercent(a.price, a.discountPrice),
-    )
-    .slice(0, 10);
-
-  const bestSellers = [...normalizedProducts]
-    .filter((p) => p.soldCount > 0)
-    .sort((a, b) => b.soldCount - a.soldCount)
-    .slice(0, 12);
-
-  const latest = normalizedProducts.slice(0, 12);
-
-  const featuredSellers = [...storeStats.values()]
-    .map((s) => ({
-      id: s.id,
-      name: s.name,
-      slug: s.slug,
-      logoUrl: s.logoUrl,
-      rating: s.count > 0 ? Number((s.sum / s.count).toFixed(2)) : 0,
-      reviews: s.count,
-      presence: presence.get(s.id),
-    }))
-    .sort((a, b) => b.reviews - a.reviews || b.rating - a.rating)
-    .slice(0, 10);
-
-  const recentReviews = ((reviewsRes.data ?? []) as any[]).slice(0, 10).map((r) => ({
-    id: r.id as string,
-    rating: Number(r.rating),
-    title: (r.title as string | null) ?? null,
-    body: (r.body as string | null) ?? null,
-    reviewerName: (r.reviewer_name as string | null) ?? null,
-    createdAt: r.created_at as string,
-    product: r.digital_products ?? null,
-    store: r.stores ? { name: r.stores.name, slug: r.stores.slug } : null,
-  }));
-
-  const sellerServices = servicesRes.items.map((item) => ({
-    ...item,
-    media: item.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
-  }));
-
-  return {
-    categories: categoriesRes.items,
-    serviceCategories: serviceCategoriesRes.items,
-    promoDeals,
-    bestSellers,
-    latest,
-    sellerServices,
-    featuredSellers,
-    recentReviews,
   };
+
+  if (process.env.VITEST) return load();
+  return getOrLoad("mobile:home", "v1", 30_000, load, { maxEntries: 4 });
 }
 
 async function readProductDetailData(slug: string, viewer: MobileAuthContext | null) {
@@ -360,15 +456,65 @@ async function readProductDetailData(slug: string, viewer: MobileAuthContext | n
   const { createPublicClient } = await import("./supabase-public.server");
   const pub = createPublicClient();
 
-  const [likesRes, reviewsRes, viewerSocial] = await Promise.all([
-    pub.rpc("product_like_summary", { _product_id: product.id }),
-    pub
-      .from("product_reviews")
-      .select("id, rating, title, body, reviewer_name, created_at, is_verified")
-      .eq("product_id", product.id)
-      .eq("is_visible", true)
-      .order("created_at", { ascending: false })
-      .limit(20),
+  const loadPublicExtras = async () => {
+    const ownerFilter = product.store_id
+      ? `store_id.eq.${product.store_id}`
+      : "store_id.is.null";
+    const [likesRes, reviewsRes, relatedRes] = await Promise.all([
+      pub.rpc("product_like_summary", { _product_id: product.id }),
+      pub
+        .from("product_reviews")
+        .select("id, rating, title, body, reviewer_name, created_at, is_verified")
+        .eq("product_id", product.id)
+        .eq("is_visible", true)
+        .order("created_at", { ascending: false })
+        .limit(30),
+      pub
+        .from("digital_products")
+        .select(
+          "id, name, slug, short_description, thumbnail_url, price, discount_price, sold_count, store_id, stores(name, slug, logo_url, is_platform)",
+        )
+        .or(ownerFilter)
+        .neq("id", product.id)
+        .eq("status", "published")
+        .eq("moderation_status", "approved")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(6),
+    ]);
+    const reviews = reviewsRes.data ?? [];
+    const verified = reviews.filter((r) => Boolean(r.is_verified));
+    const ratingAverage = verified.length
+      ? Number((verified.reduce((sum, r) => sum + Number(r.rating), 0) / verified.length).toFixed(2))
+      : 0;
+    const relatedProducts = ((relatedRes.data ?? []) as any[]).map((r) => ({
+      id: r.id as string,
+      name: r.name as string,
+      slug: r.slug as string,
+      shortDescription: (r.short_description as string | null) ?? null,
+      thumbnailUrl: (r.thumbnail_url as string | null) ?? null,
+      price: Number(r.price),
+      discountPrice: r.discount_price == null ? null : Number(r.discount_price),
+      soldCount: Number(r.sold_count ?? 0),
+      storeId: (r.store_id as string | null) ?? null,
+      storeName: (r.stores?.name as string | null) ?? (r.store_id ? null : "Ebrystore"),
+      storeSlug: (r.stores?.slug as string | null) ?? null,
+      storeLogoUrl: (r.stores?.logo_url as string | null) ?? null,
+      isOfficial: !r.store_id || Boolean(r.stores?.is_platform),
+    }));
+    return {
+      likes: Number((likesRes.data as { likes?: number } | null)?.likes ?? 0),
+      reviews: { items: reviews, average: ratingAverage, total: verified.length },
+      relatedProducts,
+    };
+  };
+
+  const [extras, viewerSocial] = await Promise.all([
+    process.env.VITEST
+      ? loadPublicExtras()
+      : getOrLoad("mobile:product-extras", product.id, 15_000, loadPublicExtras, {
+          maxEntries: 128,
+        }),
     viewer
       ? Promise.all([
           viewer.supabase
@@ -385,32 +531,39 @@ async function readProductDetailData(slug: string, viewer: MobileAuthContext | n
                 .eq("store_id", product.store_id)
                 .maybeSingle()
             : Promise.resolve({ data: null }),
+          viewer.supabase
+            .from("order_items")
+            .select("id, orders!inner(status, user_id)")
+            .eq("product_id", product.id)
+            .eq("orders.user_id", viewer.userId)
+            .in("orders.status", ["paid", "processing", "delivered", "completed"])
+            .limit(1)
+            .maybeSingle(),
+          viewer.supabase
+            .from("product_reviews")
+            .select("id, rating, title, body")
+            .eq("product_id", product.id)
+            .eq("user_id", viewer.userId)
+            .maybeSingle(),
         ])
       : Promise.resolve(null),
   ]);
-
-  const reviews = reviewsRes.data ?? [];
-  const verified = reviews.filter((r) => Boolean(r.is_verified));
-  const ratingAverage = verified.length
-    ? Number((verified.reduce((sum, r) => sum + Number(r.rating), 0) / verified.length).toFixed(2))
-    : 0;
 
   return {
     error: null,
     data: {
       product,
-      likes: Number((likesRes.data as { likes?: number } | null)?.likes ?? 0),
-      reviews: {
-        items: reviews,
-        average: ratingAverage,
-        total: verified.length,
-      },
+      likes: extras.likes,
+      reviews: extras.reviews,
+      relatedProducts: extras.relatedProducts,
       viewer: viewerSocial
         ? {
             liked: Boolean(viewerSocial[0].data),
             followingStore: Boolean(viewerSocial[1].data),
+            canReview: Boolean(viewerSocial[2].data),
+            myReview: viewerSocial[3].data ?? null,
           }
-        : { liked: false, followingStore: false },
+        : { liked: false, followingStore: false, canReview: false, myReview: null },
     },
   };
 }
@@ -461,82 +614,117 @@ async function readProductSlugById(id: string) {
 }
 
 async function readPublicStoreData(slug: string, viewer: MobileAuthContext | null) {
-  const { createPublicClient } = await import("./supabase-public.server");
-  const { readPublicStoreServices } = await import("./marketplace-service-catalog.server");
-  const { readStorePresence } = await import("./store-presence");
-  const supabase = createPublicClient();
+  const loadPublicStore = async () => {
+    const { createPublicClient } = await import("./supabase-public.server");
+    const { readPublicStoreServices } = await import("./marketplace-service-catalog.server");
+    const { readStorePresence } = await import("./store-presence");
+    const supabase = createPublicClient();
 
-  const { data: store, error } = await supabase
-    .from("stores")
-    .select(
-      "id, name, slug, description, logo_url, banner_url, banner_position, is_platform, created_at",
-    )
-    .eq("slug", slug)
-    .eq("status", "active")
-    .maybeSingle();
-  if (error) return { error: "STORE_UNAVAILABLE" as const, data: null };
-  if (!store) return { error: null, data: null };
+    const { data: store, error } = await supabase
+      .from("stores")
+      .select(
+        "id, name, slug, description, logo_url, banner_url, banner_position, contact_phone, is_platform, created_at",
+      )
+      .eq("slug", slug)
+      .eq("status", "active")
+      .maybeSingle();
+    if (error) return { error: "STORE_UNAVAILABLE" as const, data: null };
+    if (!store) return { error: null, data: null };
 
-  const ownerFilter = store.is_platform
-    ? `store_id.eq.${store.id},store_id.is.null`
-    : `store_id.eq.${store.id}`;
+    const ownerFilter = store.is_platform
+      ? `store_id.eq.${store.id},store_id.is.null`
+      : `store_id.eq.${store.id}`;
 
-  const [
-    productsResult,
-    ratingResult,
-    soldResult,
-    socialResult,
-    servicesResult,
-    presence,
-    viewerResult,
-  ] = await Promise.all([
-    supabase
-      .from("digital_products")
-      .select("id, name, slug, short_description, thumbnail_url, price, discount_price, sold_count")
-      .or(ownerFilter)
-      .eq("status", "published")
-      .eq("moderation_status", "approved")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false })
-      .order("id")
-      .limit(49),
-    supabase.rpc("store_rating_summary", { _store_id: store.id }),
-    supabase
-      .from("digital_products")
-      .select("sold_count")
-      .or(ownerFilter)
-      .eq("status", "published")
-      .eq("moderation_status", "approved")
-      .is("deleted_at", null),
-    supabase.rpc("store_social_summary", { _store_id: store.id }),
-    readPublicStoreServices(store.id),
-    readStorePresence(supabase, store.id),
-    viewer
-      ? Promise.all([
-          viewer.supabase
-            .from("store_follows")
-            .select("store_id")
-            .eq("user_id", viewer.userId)
-            .eq("store_id", store.id)
-            .maybeSingle(),
-          viewer.supabase.from("stores").select("owner_id").eq("id", store.id).maybeSingle(),
-        ])
-      : Promise.resolve(null),
-  ]);
+    const [
+      productsResult,
+      ratingResult,
+      soldResult,
+      socialResult,
+      servicesResult,
+      presence,
+    ] = await Promise.all([
+      supabase
+        .from("digital_products")
+        .select("id, name, slug, short_description, thumbnail_url, price, discount_price, sold_count")
+        .or(ownerFilter)
+        .eq("status", "published")
+        .eq("moderation_status", "approved")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .limit(49),
+      supabase.rpc("store_rating_summary", { _store_id: store.id }),
+      supabase
+        .from("digital_products")
+        .select("sold_count")
+        .or(ownerFilter)
+        .eq("status", "published")
+        .eq("moderation_status", "approved")
+        .is("deleted_at", null),
+      supabase.rpc("store_social_summary", { _store_id: store.id }),
+      readPublicStoreServices(store.id),
+      readStorePresence(supabase, store.id),
+    ]);
 
-  if (productsResult.error) return { error: "STORE_UNAVAILABLE" as const, data: null };
+    if (productsResult.error) return { error: "STORE_UNAVAILABLE" as const, data: null };
 
-  const products = productsResult.data ?? [];
-  const hasMoreProducts = products.length > 48;
-  const rating = (ratingResult.data ?? { average: 0, total: 0 }) as {
-    average: number;
-    total: number;
+    const products = productsResult.data ?? [];
+    const hasMoreProducts = products.length > 48;
+    const rating = (ratingResult.data ?? { average: 0, total: 0 }) as {
+      average: number;
+      total: number;
+    };
+    const socialRow = (socialResult.data ?? {}) as Record<string, unknown>;
+    const soldCount = (soldResult.data ?? []).reduce(
+      (sum, row) => sum + Number((row as { sold_count?: number }).sold_count ?? 0),
+      0,
+    );
+    const services = servicesResult.items.map((item) => ({
+      ...item,
+      media: item.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
+    }));
+
+    return {
+      error: null,
+      data: {
+        store: { ...store, presence },
+        products: products.slice(0, 48),
+        hasMoreProducts,
+        services,
+        rating: { average: Number(rating.average) || 0, total: Number(rating.total) || 0 },
+        social: {
+          followers: Number(socialRow.followers ?? 0),
+          likes: Number(socialRow.likes ?? 0),
+        },
+        soldCount,
+      },
+    };
   };
-  const socialRow = (socialResult.data ?? {}) as Record<string, unknown>;
-  const soldCount = (soldResult.data ?? []).reduce(
-    (sum, row) => sum + Number((row as { sold_count?: number }).sold_count ?? 0),
-    0,
-  );
+
+  const base = process.env.VITEST
+    ? await loadPublicStore()
+    : await getOrLoad("mobile:store", slug, 20_000, loadPublicStore, {
+        maxEntries: 64,
+        shouldCache: (v) => v.error === null && v.data !== null,
+      });
+
+  if (base.error || !base.data) return base;
+
+  const viewerResult = viewer
+    ? await Promise.all([
+        viewer.supabase
+          .from("store_follows")
+          .select("store_id")
+          .eq("user_id", viewer.userId)
+          .eq("store_id", base.data.store.id)
+          .maybeSingle(),
+        viewer.supabase
+          .from("stores")
+          .select("owner_id")
+          .eq("id", base.data.store.id)
+          .maybeSingle(),
+      ])
+    : null;
 
   // Explicitly compare owner_id to avoid RLS staff-read false positives.
   const isOwner = Boolean(viewer && viewerResult?.[1]?.data?.owner_id === viewer.userId);
@@ -544,16 +732,7 @@ async function readPublicStoreData(slug: string, viewer: MobileAuthContext | nul
   return {
     error: null,
     data: {
-      store: { ...store, presence },
-      products: products.slice(0, 48),
-      hasMoreProducts,
-      services: servicesResult.items,
-      rating: { average: Number(rating.average) || 0, total: Number(rating.total) || 0 },
-      social: {
-        followers: Number(socialRow.followers ?? 0),
-        likes: Number(socialRow.likes ?? 0),
-      },
-      soldCount,
+      ...base.data,
       viewer: {
         following: Boolean(viewerResult?.[0]?.data),
         isOwner,
@@ -668,7 +847,7 @@ export async function handleMobileV1Request(
       if (method !== "GET") return mobileErr("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
       const limited = await deps.checkRateLimit(request, "catalog.public");
       if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
-      return mobileOk(await deps.readHome());
+      return mobileOkPublic(await deps.readHome(), 20, 60);
     }
 
     if (path === "/api/mobile/v1/products") {
@@ -699,28 +878,69 @@ export async function handleMobileV1Request(
       if (parsed.data.discount === "1" || parsed.data.discount === "true") {
         filtered = filtered.filter((item) => discountPercent(item.price, item.discount_price) > 0);
       }
-      return mobileOk({
-        items: sortProducts(filtered, parsed.data.sort),
-        page: result.page,
-        pageSize: parsed.data.pageSize,
-        nextPage: result.nextPage,
-      });
+      return mobileOkPublic(
+        {
+          items: sortProducts(filtered, parsed.data.sort),
+          page: result.page,
+          pageSize: parsed.data.pageSize,
+          nextPage: result.nextPage,
+        },
+        15,
+        45,
+      );
     }
 
     const reviewsMatch = /^\/api\/mobile\/v1\/products\/([^/]+)\/reviews$/.exec(path);
     if (reviewsMatch) {
-      if (method !== "GET") return mobileErr("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
-      const limited = await deps.checkRateLimit(request, "catalog.public");
-      if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
       const decoded = decodeURIComponent(reviewsMatch[1]);
       const slug = slugSchema.safeParse(decoded);
       if (!slug.success || !isSafeSlugSegment(slug.data)) {
         return mobileErr("INVALID_QUERY", "Slug produk tidak valid.", 400);
       }
-      const res = await deps.readProductReviews(slug.data);
-      if (res.error) return mobileErr(res.error, "Ulasan sedang tidak dapat dimuat.", 503);
-      if (!res.data) return mobileErr("PRODUCT_NOT_FOUND", "Produk tidak ditemukan.", 404);
-      return mobileOk(res.data);
+      if (method === "GET") {
+        const limited = await deps.checkRateLimit(request, "catalog.public");
+        if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
+        const res = await deps.readProductReviews(slug.data);
+        if (res.error) return mobileErr(res.error, "Ulasan sedang tidak dapat dimuat.", 503);
+        if (!res.data) return mobileErr("PRODUCT_NOT_FOUND", "Produk tidak ditemukan.", 404);
+        return mobileOkPublic(res.data, 15, 45);
+      }
+      if (method === "POST") {
+        const auth = await deps.requireAuth(request);
+        if (!auth.ok) return mobileErr(auth.code, auth.message, auth.status);
+        const limited = await deps.checkRateLimit(request, "social.toggle", auth.context.userId);
+        if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
+        const parsedBody = await readJsonBody(request);
+        if (!parsedBody.ok) return parsedBody.response;
+        const parsed = submitProductReviewSchema.safeParse(parsedBody.body);
+        if (!parsed.success) {
+          return mobileErr("INVALID_INPUT", "Rating 1-5 dan format ulasan tidak valid.", 400);
+        }
+        const { createPublicClient } = await import("./supabase-public.server");
+        const { data: prod } = await createPublicClient()
+          .from("digital_products")
+          .select("id")
+          .eq("slug", slug.data)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .maybeSingle();
+        if (!prod) return mobileErr("PRODUCT_NOT_FOUND", "Produk tidak ditemukan.", 404);
+        const { error } = await auth.context.supabase.rpc("submit_product_review", {
+          _product_id: prod.id,
+          _rating: parsed.data.rating,
+          _title: parsed.data.title ?? undefined,
+          _body: parsed.data.body ?? undefined,
+        });
+        if (error) {
+          return mobileErr(
+            "REVIEW_FAILED",
+            "Ulasan gagal dikirim. Pastikan kamu sudah membeli produk ini.",
+            400,
+          );
+        }
+        return mobileOk({ submitted: true });
+      }
+      return mobileErr("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
     }
 
     const productMatch = /^\/api\/mobile\/v1\/products\/([^/]+)$/.exec(path);
@@ -871,6 +1091,7 @@ export async function handleMobileV1Request(
 
     const slice3Response = await handleMobileSlice3Route(request, path, method, url, {
       ok: mobileOk,
+      okPublic: mobileOkPublic,
       err: mobileErr,
       readJsonBody,
       requireAuth: deps.requireAuth,

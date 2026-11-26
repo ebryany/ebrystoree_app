@@ -130,11 +130,14 @@ export async function readCatalogProducts(
     ]);
     return {
       items: items.map((i) => {
-        const storeId = extra.get(i.id)?.store_id ?? null;
+        const meta = extra.get(i.id);
+        const storeId = meta?.store_id ?? null;
         return {
           ...i,
-          sold_count: extra.get(i.id)?.sold_count ?? 0,
-          store_logo_url: extra.get(i.id)?.store_logo_url ?? null,
+          store_name: i.store_name ?? (storeId ? null : "Ebrystore"),
+          is_official: !storeId || Boolean(i.is_official),
+          sold_count: meta?.sold_count ?? 0,
+          store_logo_url: meta?.store_logo_url ?? null,
           store_presence: presence.get(storeId),
         };
       }),
