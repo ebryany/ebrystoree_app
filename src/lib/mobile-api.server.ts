@@ -10,6 +10,7 @@ import {
   type MobileLoginResult,
 } from "./mobile-auth.server";
 import { handleMobileCommerceRoute } from "./mobile-commerce.server";
+import { handleMobileChatRoute } from "./mobile-chat.server";
 import { handleMobileSlice3Route } from "./mobile-slice3.server";
 import {
   readCatalogCategories,
@@ -1104,6 +1105,14 @@ export async function handleMobileV1Request(
       checkPublicRateLimit: (req) => deps.checkRateLimit(req, "catalog.public"),
     });
     if (slice3Response) return slice3Response;
+
+    const chatResponse = await handleMobileChatRoute(request, path, method, url, {
+      ok: mobileOk,
+      err: mobileErr,
+      readJsonBody,
+      requireAuth: deps.requireAuth,
+    });
+    if (chatResponse) return chatResponse;
 
     return mobileErr("NOT_FOUND", "Endpoint tidak ditemukan.", 404);
   } catch (error) {

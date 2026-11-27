@@ -2,6 +2,20 @@
 
 ## 2026-11-27
 
+### Integrasi Realtime Firebase Push Terisolasi ("Penempatan Khusus") & Mobile Chat API v1
+
+- **Modul & Worker Khusus Firebase Push (`src/services/firebase-push/config.ts`, `fcm-client.ts`, `dispatcher.ts`, `worker.ts`, `src/lib/fcm.server.ts`)**:
+  - Memisahkan seluruh logika Firebase Cloud Messaging (FCM HTTP v1, RS256 OAuth2 JWT + cache token, tanpa dependency eksternal) ke direktori terisolasi `src/services/firebase-push/`, dengan `src/lib/fcm.server.ts` menjadi facade re-export yang kompatibel mundur.
+  - Mengirim payload Android **High-Priority Data-Only** (tanpa blok top-level `notification`) agar `EbryFirebaseMessagingService.onMessageReceived()` selalu bangun saat background/layar mati untuk menampilkan `MessagingStyle`, **Balas Langsung (Direct Reply)**, **Tandai Dibaca**, dan **Lihat Pesanan**.
+  - Menambahkan worker realtime mandiri (`worker.ts`) yang berlangganan `supabase_realtime` (`notifications` INSERT & `product_inquiry_messages` INSERT) plus safety sweep berkala, menghormati preferensi per kategori (`orders`, `chat`, `wallet`, `seller`, `promo`), mencegah self-push pengirim, dan deduplikasi per pesan via `event_key` (`chat:<message_id>`).
+- **Penempatan Khusus VPS, Bundler Mandiri & Panduan Setup (`scripts/build-push-worker.mjs`, `package.json`, `deploy/ebrystore-push-worker.service`, `deploy/firebase-push.env.example`, `docs/engineering/firebase-push-setup.md`, `supabase/migrations/20261127090000_push_preferences_and_chat_events.sql`)**:
+  - Menambahkan skrip `npm run build:push-worker` untuk membundle worker menjadi satu file ESM mandiri (`dist/push-worker/firebase-push-worker.mjs`, `785.71 kB`, tanpa ketergantungan `node_modules`) yang berjalan pada systemd service terpisah (`ebrystore-push-worker.service`, `MemoryMax=256M`, membaca kredensial khusus dari `/etc/ebrystore/firebase-push.env` dengan `chmod 640`).
+  - Menambahkan migrasi SQL aditif & idempoten `20261127090000_push_preferences_and_chat_events.sql` (kolom `push_preferences` jsonb dan kolom `event_key` dedupe) serta panduan aktivasi Firebase Console dan VPS di `docs/engineering/firebase-push-setup.md`.
+- **Mobile Chat & Preferensi Push API v1 (`src/lib/mobile-chat.server.ts`, `src/lib/mobile-api.server.ts`)**:
+  - Menambahkan endpoint terautentikasi `GET/POST /api/mobile/v1/chats`, `GET /api/mobile/v1/chats/:id`, `POST /api/mobile/v1/chats/:id/messages`, `POST /api/mobile/v1/chats/:id/read`, serta `GET/PUT/PATCH /api/mobile/v1/devices/push-preferences` dengan validasi kepemilikan thread di server, sanitasi pesan, dan rate limit fail-closed.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `eslint` `0` error pada file baru/ubah, `npx vitest run src/lib/__tests__/mobile-api-slice1.test.ts src/lib/__tests__/mobile-api-slice3.test.ts src/lib/__tests__/firebase-push-and-chat.test.ts --maxWorkers=1` lulus **25/25 test** (termasuk 6 test baru untuk FCM data-only payload, isolasi kredensial, chat self-push exclusion, preferensi push, dan kontrak Chat API), `$env:NITRO_PRESET='node-server'; npm run build` lulus (`exit 0`), `npm run build:push-worker` lulus (`dist/push-worker/firebase-push-worker.mjs` 785.71 kB), dan smoke-test boot Node pada bundle mandiri terverifikasi tanpa error impor.
+- **Status deploy**: Dipublish ke GitHub `main` dan di-deploy ke VPS produksi `43.156.83.235` (`ebrystore-20261127-04`, restart `ebrystore` & `ebrystore-worker2` serta pemasangan daemon terisolasi `ebrystore-push-worker.service`). Kedua migrasi SQL aditif (`20261127060000_mobile_push_tokens.sql` & `20261127090000_push_preferences_and_chat_events.sql`) tetap perlu dijalankan oleh pemilik via Supabase SQL Editor / `supabase db push` karena password Postgres tidak tersedia di sesi CLI; seluruh endpoint Chat API aktif langsung dan server/worker menangani ketiadaan tabel push dengan aman.
+
 ### Cloudflare Edge Cache Headers, Flag Pembayaran Dasbor & Perbaikan Status QRIS Top-Up
 
 - **Header Edge CDN (`CDN-Cache-Control` + `Cache-Control` + `Vary: Accept-Encoding`) (`src/lib/mobile-api.server.ts`, `src/lib/mobile-slice3.server.ts`)**:

@@ -64,6 +64,9 @@ debug.log
 *.p12
 *.pfx
 *.key
+firebase-service-account*.json
+*firebase-adminsdk*.json
+google-services.json
 
 # OS
 Thumbs.db

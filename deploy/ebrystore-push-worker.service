@@ -1,0 +1,28 @@
+[Unit]
+Description=Ebrystore Isolated Firebase Realtime Push Worker
+Documentation=https://app.ebrystore.my.id
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ebrystore
+Group=ebrystore
+WorkingDirectory=/srv/ebrystore/app
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/ebrystore/app/.env
+EnvironmentFile=-/etc/ebrystore/firebase-push.env
+ExecStart=/usr/bin/node /srv/ebrystore/push-worker/firebase-push-worker.mjs
+Restart=always
+RestartSec=5
+MemoryMax=256M
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadOnlyPaths=/etc/ebrystore
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ebrystore-push-worker
+
+[Install]
+WantedBy=multi-user.target
