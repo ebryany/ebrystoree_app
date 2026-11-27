@@ -677,12 +677,12 @@ export async function handleMobileSlice3Route(
         : await getOrLoad(
             "mobile:services",
             `${parsed.data.kind}|${parsed.data.category ?? ""}|${qNorm}|${parsed.data.page}|${parsed.data.pageSize}`,
-            20_000,
+            45_000,
             loadAll,
             { maxEntries: 64 },
           );
 
-    return (h.okPublic ?? h.ok)(payload, 20, 60);
+    return (h.okPublic ?? h.ok)(payload, 30, 120);
   }
 
   const platformDetailMatch = /^\/api\/mobile\/v1\/services\/platform\/([^/]+)$/.exec(path);
@@ -783,17 +783,21 @@ export async function handleMobileSlice3Route(
     if (res.error) return h.err("SERVICE_UNAVAILABLE", res.error, 503);
     if (!res.service) return h.err("NOT_FOUND", "Jasa tidak ditemukan.", 404);
 
-    return h.ok({
-      service: {
-        ...res.service,
-        media: res.service.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
+    return (h.okPublic ?? h.ok)(
+      {
+        service: {
+          ...res.service,
+          media: res.service.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
+        },
+        related: res.related.map((item) => ({
+          ...item,
+          media: item.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
+        })),
+        stats: res.stats,
       },
-      related: res.related.map((item) => ({
-        ...item,
-        media: item.media.map((m) => ({ ...m, url: serviceMediaUrl(m.path) })),
-      })),
-      stats: res.stats,
-    });
+      30,
+      120,
+    );
   }
 
   /* ------------------- Platform Service Quote, Attachments & Checkout ------------------- */
@@ -1466,7 +1470,13 @@ export async function handleMobileSlice3Route(
 
     const sumopod = await import("./sumopod.server");
     const cfg = sumopod.sumopodConfig();
-    if (!cfg) return h.err("QRIS_UNAVAILABLE", "Pembayaran QRIS belum dikonfigurasi.", 503);
+    if (!cfg) {
+      return h.err(
+        "QRIS_UNAVAILABLE",
+        "Pembayaran QRIS sedang tidak aktif. Silakan gunakan metode transfer manual.",
+        409,
+      );
+    }
 
     const { data: topup, error } = await auth.context.supabase.rpc("create_credit_topup", {
       _amount: parsed.data.amount,
@@ -1519,7 +1529,13 @@ export async function handleMobileSlice3Route(
 
     const sumopod = await import("./sumopod.server");
     const cfg = sumopod.sumopodConfig();
-    if (!cfg) return h.err("QRIS_UNAVAILABLE", "Pembayaran QRIS belum dikonfigurasi.", 503);
+    if (!cfg) {
+      return h.err(
+        "QRIS_UNAVAILABLE",
+        "Pembayaran QRIS sedang tidak aktif. Silakan gunakan metode transfer manual.",
+        409,
+      );
+    }
 
     const { data: topup } = await auth.context.supabase
       .from("credit_topups")

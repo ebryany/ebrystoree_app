@@ -2,6 +2,17 @@
 
 ## 2026-11-27
 
+### Cloudflare Edge Cache Headers, Flag Pembayaran Dasbor & Perbaikan Status QRIS Top-Up
+
+- **Header Edge CDN (`CDN-Cache-Control` + `Cache-Control` + `Vary: Accept-Encoding`) (`src/lib/mobile-api.server.ts`, `src/lib/mobile-slice3.server.ts`)**:
+  - Memperbarui `mobileOkPublic()` untuk mengirim `CDN-Cache-Control` agar Cloudflare Edge dapat meng-cache respons GET publik (`/bootstrap`, `/home`, `/products`, `/services`, `/services/platform/:slug`, `/services/seller/:id`, `/articles`, `/content/legal`, serta `/products/:slug` dan `/stores/:slug` ketika tidak ada `Authorization`), sementara seluruh respons terautentikasi tetap `Cache-Control: no-store`.
+  - Memperpanjang TTL cache RAM server (`mobile:bootstrap` 60 dtk, `mobile:home` 60 dtk, `mobile:services` 45 dtk) untuk menekan cold miss di kedua worker Node (`3000` & `3001`).
+- **Flag Ketersediaan Pembayaran & Status Semantik Top-Up QRIS (`src/lib/mobile-commerce.server.ts`, `src/lib/mobile-slice3.server.ts`)**:
+  - Menambahkan `qrisAvailable` dan `manualPaymentAvailable` pada `GET /api/mobile/v1/dashboard/summary` (dibaca dari `loadPaymentMethods()` ter-cache) agar dasbor mobile tidak menampilkan tombol QRIS saat gateway QRIS tidak aktif.
+  - Mengubah respons saat SumoPod belum dikonfigurasi pada `POST /api/mobile/v1/wallet/topup/qris` dan `/qris/check` dari `503` menjadi `409 QRIS_UNAVAILABLE` dengan pesan yang mengarahkan ke transfer manual.
+- **Verifikasi**: `npx tsc --noEmit` keluar `0`, `eslint` `0` error pada 5 file diubah, `npx vitest run src/lib/__tests__/mobile-api-slice1.test.ts src/lib/__tests__/mobile-api-slice2.test.ts src/lib/__tests__/mobile-api-slice3.test.ts src/lib/__tests__/image-optimize.test.ts --maxWorkers=1` lulus **29/29 test**, dan `$env:NITRO_PRESET='node-server'; npm run build` lulus (`exit 0`).
+- **Status deploy**: Dipublish ke GitHub `main`, di-deploy ke VPS produksi `43.156.83.235` (`ebrystore-20261127-03`, restart `ebrystore` & `ebrystore-worker2`), dan dipasangkan dengan Cloudflare Edge Cache Rule untuk endpoint GET publik mobile; tanpa migrasi database baru.
+
 ### Optimasi Performa, Cache Server & Perbaikan Kontrak Mobile API v1 (Wave 1)
 
 - **Cache RAM Server (`getOrLoad`) & Rate Limiter Memori untuk GET Publik (`src/lib/mobile-api.server.ts`, `src/lib/mobile-slice3.server.ts`)**:

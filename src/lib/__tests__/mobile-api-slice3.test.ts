@@ -143,7 +143,7 @@ describe("Mobile API v1 Slice 3 & FCM", () => {
     expect(json.data.reviewNote).toBe("Nominal tidak sesuai mutasi");
   });
 
-  it("returns cacheable headers on /home and surfaces creditWarning when digital credit fails", async () => {
+  it("returns cacheable CDN headers on /home and surfaces creditWarning when digital credit fails", async () => {
     const homeRes = await handleMobileV1Request(
       new Request("https://app.ebrystore.my.id/api/mobile/v1/home", { method: "GET" }),
       {
@@ -153,6 +153,7 @@ describe("Mobile API v1 Slice 3 & FCM", () => {
     );
     expect(homeRes.status).toBe(200);
     expect(homeRes.headers.get("cache-control")).toContain("public");
+    expect(homeRes.headers.get("cdn-cache-control")).toContain("public");
 
     const rpc = vi
       .fn()
@@ -237,7 +238,7 @@ describe("Mobile API v1 Slice 3 & FCM", () => {
     expect(update).toHaveBeenCalledTimes(1);
   });
 
-  it("rejects out-of-range wallet QRIS topup amount", async () => {
+  it("rejects out-of-range wallet QRIS topup amount and returns 409 when SumoPod is inactive", async () => {
     const req = new Request("https://app.ebrystore.my.id/api/mobile/v1/wallet/topup/qris", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -250,6 +251,22 @@ describe("Mobile API v1 Slice 3 & FCM", () => {
     expect(res.status).toBe(400);
     const body = (await res.json()) as { ok: boolean; error: { code: string } };
     expect(body.error.code).toBe("INVALID_INPUT");
+
+    const prevKey = process.env["SUMOPOD_API_KEY"];
+    delete process.env["SUMOPOD_API_KEY"];
+    const validReq = new Request("https://app.ebrystore.my.id/api/mobile/v1/wallet/topup/qris", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ amount: 50000 }),
+    });
+    const unavailRes = await handleMobileV1Request(validReq, {
+      requireAuth: async () => mockAuthContext(),
+      checkRateLimit: async () => null,
+    });
+    if (prevKey) process.env["SUMOPOD_API_KEY"] = prevKey;
+    expect(unavailRes.status).toBe(409);
+    const unavailBody = (await unavailRes.json()) as { ok: boolean; error: { code: string } };
+    expect(unavailBody.error.code).toBe("QRIS_UNAVAILABLE");
   });
 
   it("validates seller service checkout requirements length and agreement acceptance", async () => {

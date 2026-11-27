@@ -89,14 +89,18 @@ export function mobileOk(data: unknown, status = 200): Response {
 
 export function mobileOkPublic(
   data: unknown,
-  maxAgeSeconds = 15,
-  swrSeconds = 60,
+  maxAgeSeconds = 30,
+  swrSeconds = 120,
+  cdnMaxAgeSeconds = maxAgeSeconds * 2,
+  cdnSwrSeconds = swrSeconds * 2,
 ): Response {
   return new Response(JSON.stringify({ ok: true, data }), {
     status: 200,
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${swrSeconds}`,
+      "cdn-cache-control": `public, max-age=${cdnMaxAgeSeconds}, stale-while-revalidate=${cdnSwrSeconds}`,
+      vary: "Accept-Encoding",
       "x-content-type-options": "nosniff",
     },
   });
@@ -267,7 +271,7 @@ async function readBootstrapData() {
     };
   };
   if (process.env.VITEST) return load();
-  return getOrLoad("mobile:bootstrap", "v1", 30_000, load, { maxEntries: 4 });
+  return getOrLoad("mobile:bootstrap", "v1", 60_000, load, { maxEntries: 4 });
 }
 
 async function readHomeData() {
@@ -444,7 +448,7 @@ async function readHomeData() {
   };
 
   if (process.env.VITEST) return load();
-  return getOrLoad("mobile:home", "v1", 30_000, load, { maxEntries: 4 });
+  return getOrLoad("mobile:home", "v1", 60_000, load, { maxEntries: 4 });
 }
 
 async function readProductDetailData(slug: string, viewer: MobileAuthContext | null) {
@@ -513,39 +517,39 @@ async function readProductDetailData(slug: string, viewer: MobileAuthContext | n
     process.env.VITEST
       ? loadPublicExtras()
       : getOrLoad("mobile:product-extras", product.id, 15_000, loadPublicExtras, {
-          maxEntries: 128,
-        }),
+        maxEntries: 128,
+      }),
     viewer
       ? Promise.all([
-          viewer.supabase
-            .from("product_likes")
-            .select("product_id")
+        viewer.supabase
+          .from("product_likes")
+          .select("product_id")
+          .eq("user_id", viewer.userId)
+          .eq("product_id", product.id)
+          .maybeSingle(),
+        product.store_id
+          ? viewer.supabase
+            .from("store_follows")
+            .select("store_id")
             .eq("user_id", viewer.userId)
-            .eq("product_id", product.id)
-            .maybeSingle(),
-          product.store_id
-            ? viewer.supabase
-                .from("store_follows")
-                .select("store_id")
-                .eq("user_id", viewer.userId)
-                .eq("store_id", product.store_id)
-                .maybeSingle()
-            : Promise.resolve({ data: null }),
-          viewer.supabase
-            .from("order_items")
-            .select("id, orders!inner(status, user_id)")
-            .eq("product_id", product.id)
-            .eq("orders.user_id", viewer.userId)
-            .in("orders.status", ["paid", "processing", "delivered", "completed"])
-            .limit(1)
-            .maybeSingle(),
-          viewer.supabase
-            .from("product_reviews")
-            .select("id, rating, title, body")
-            .eq("product_id", product.id)
-            .eq("user_id", viewer.userId)
-            .maybeSingle(),
-        ])
+            .eq("store_id", product.store_id)
+            .maybeSingle()
+          : Promise.resolve({ data: null }),
+        viewer.supabase
+          .from("order_items")
+          .select("id, orders!inner(status, user_id)")
+          .eq("product_id", product.id)
+          .eq("orders.user_id", viewer.userId)
+          .in("orders.status", ["paid", "processing", "delivered", "completed"])
+          .limit(1)
+          .maybeSingle(),
+        viewer.supabase
+          .from("product_reviews")
+          .select("id, rating, title, body")
+          .eq("product_id", product.id)
+          .eq("user_id", viewer.userId)
+          .maybeSingle(),
+      ])
       : Promise.resolve(null),
   ]);
 
@@ -558,11 +562,11 @@ async function readProductDetailData(slug: string, viewer: MobileAuthContext | n
       relatedProducts: extras.relatedProducts,
       viewer: viewerSocial
         ? {
-            liked: Boolean(viewerSocial[0].data),
-            followingStore: Boolean(viewerSocial[1].data),
-            canReview: Boolean(viewerSocial[2].data),
-            myReview: viewerSocial[3].data ?? null,
-          }
+          liked: Boolean(viewerSocial[0].data),
+          followingStore: Boolean(viewerSocial[1].data),
+          canReview: Boolean(viewerSocial[2].data),
+          myReview: viewerSocial[3].data ?? null,
+        }
         : { liked: false, followingStore: false, canReview: false, myReview: null },
     },
   };
@@ -704,26 +708,26 @@ async function readPublicStoreData(slug: string, viewer: MobileAuthContext | nul
   const base = process.env.VITEST
     ? await loadPublicStore()
     : await getOrLoad("mobile:store", slug, 20_000, loadPublicStore, {
-        maxEntries: 64,
-        shouldCache: (v) => v.error === null && v.data !== null,
-      });
+      maxEntries: 64,
+      shouldCache: (v) => v.error === null && v.data !== null,
+    });
 
   if (base.error || !base.data) return base;
 
   const viewerResult = viewer
     ? await Promise.all([
-        viewer.supabase
-          .from("store_follows")
-          .select("store_id")
-          .eq("user_id", viewer.userId)
-          .eq("store_id", base.data.store.id)
-          .maybeSingle(),
-        viewer.supabase
-          .from("stores")
-          .select("owner_id")
-          .eq("id", base.data.store.id)
-          .maybeSingle(),
-      ])
+      viewer.supabase
+        .from("store_follows")
+        .select("store_id")
+        .eq("user_id", viewer.userId)
+        .eq("store_id", base.data.store.id)
+        .maybeSingle(),
+      viewer.supabase
+        .from("stores")
+        .select("owner_id")
+        .eq("id", base.data.store.id)
+        .maybeSingle(),
+    ])
     : null;
 
   // Explicitly compare owner_id to avoid RLS staff-read false positives.
@@ -820,7 +824,7 @@ export async function handleMobileV1Request(
       if (method !== "GET") return mobileErr("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
       const limited = await deps.checkRateLimit(request, "catalog.public");
       if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
-      return mobileOk(await deps.readBootstrap());
+      return mobileOkPublic(await deps.readBootstrap(), 15, 60, 30, 120);
     }
 
     if (path === "/api/mobile/v1/auth/login") {
@@ -847,7 +851,7 @@ export async function handleMobileV1Request(
       if (method !== "GET") return mobileErr("METHOD_NOT_ALLOWED", "Metode tidak diizinkan.", 405);
       const limited = await deps.checkRateLimit(request, "catalog.public");
       if (limited) return mobileErr("RATE_LIMITED", limited.error, 429);
-      return mobileOkPublic(await deps.readHome(), 20, 60);
+      return mobileOkPublic(await deps.readHome(), 30, 120, 60, 300);
     }
 
     if (path === "/api/mobile/v1/products") {
@@ -885,8 +889,10 @@ export async function handleMobileV1Request(
           pageSize: parsed.data.pageSize,
           nextPage: result.nextPage,
         },
-        15,
-        45,
+        30,
+        120,
+        60,
+        300,
       );
     }
 
@@ -957,7 +963,7 @@ export async function handleMobileV1Request(
       const res = await deps.readProductDetail(slug.data, viewer);
       if (res.error) return mobileErr(res.error, "Produk tidak dapat dimuat.", 503);
       if (!res.data) return mobileErr("PRODUCT_NOT_FOUND", "Produk tidak ditemukan.", 404);
-      return mobileOk(res.data);
+      return viewer ? mobileOk(res.data) : mobileOkPublic(res.data, 20, 60, 45, 180);
     }
 
     const shortProductMatch = /^\/api\/mobile\/v1\/p\/([^/]+)$/.exec(path);
@@ -972,7 +978,7 @@ export async function handleMobileV1Request(
       const res = await deps.readProductSlugById(parsedId.data);
       if (res.error) return mobileErr(res.error, "Produk tidak dapat dimuat.", 503);
       if (!res.slug) return mobileErr("PRODUCT_NOT_FOUND", "Produk tidak ditemukan.", 404);
-      return mobileOk({ slug: res.slug });
+      return mobileOkPublic({ slug: res.slug }, 60, 300, 120, 600);
     }
 
     if (path === "/api/mobile/v1/stores/presence") {
@@ -1004,7 +1010,7 @@ export async function handleMobileV1Request(
       const res = await deps.readStore(slug.data, viewer);
       if (res.error) return mobileErr(res.error, "Toko tidak dapat dimuat.", 503);
       if (!res.data) return mobileErr("STORE_NOT_FOUND", "Toko tidak ditemukan.", 404);
-      return mobileOk(res.data);
+      return viewer ? mobileOk(res.data) : mobileOkPublic(res.data, 20, 60, 45, 180);
     }
 
     if (path === "/api/mobile/v1/social/state") {
@@ -1022,19 +1028,19 @@ export async function handleMobileV1Request(
       const [follow, like] = await Promise.all([
         parsed.data.storeId
           ? supabase
-              .from("store_follows")
-              .select("store_id")
-              .eq("user_id", userId)
-              .eq("store_id", parsed.data.storeId)
-              .maybeSingle()
+            .from("store_follows")
+            .select("store_id")
+            .eq("user_id", userId)
+            .eq("store_id", parsed.data.storeId)
+            .maybeSingle()
           : Promise.resolve({ data: null }),
         parsed.data.productId
           ? supabase
-              .from("product_likes")
-              .select("product_id")
-              .eq("user_id", userId)
-              .eq("product_id", parsed.data.productId)
-              .maybeSingle()
+            .from("product_likes")
+            .select("product_id")
+            .eq("user_id", userId)
+            .eq("product_id", parsed.data.productId)
+            .maybeSingle()
           : Promise.resolve({ data: null }),
       ]);
       return mobileOk({ following: Boolean(follow.data), liked: Boolean(like.data) });

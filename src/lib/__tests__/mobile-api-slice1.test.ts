@@ -20,7 +20,7 @@ function baseDeps(overrides: Partial<MobileV1Deps> = {}): Partial<MobileV1Deps> 
 }
 
 describe("Mobile API v1 Slice 1", () => {
-  it("returns bootstrap settings with no-store security headers", async () => {
+  it("returns bootstrap settings with edge-cacheable and nosniff security headers", async () => {
     const res = await handleMobileV1Request(
       req("/api/mobile/v1/bootstrap"),
       baseDeps({
@@ -32,7 +32,8 @@ describe("Mobile API v1 Slice 1", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(res.headers.get("cache-control")).toContain("public");
+    expect(res.headers.get("cdn-cache-control")).toContain("public");
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
     const json = await res.json();
     expect(json.ok).toBe(true);

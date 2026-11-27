@@ -364,6 +364,14 @@ export async function handleMobileCommerceRoute(
       );
     };
 
+    const loadPaymentFlagsSafe = async () => {
+      if (process.env.VITEST || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return { qris: false, manual: true, shopeepay: false };
+      }
+      const { loadPaymentMethods } = await import("./transaction.server");
+      return loadPaymentMethods().catch(() => ({ qris: false, manual: true, shopeepay: false }));
+    };
+
     const [
       total,
       awaiting,
@@ -378,6 +386,7 @@ export async function handleMobileCommerceRoute(
       recentNotifRes,
       myStoreRes,
       featuredSellers,
+      paymentFlags,
     ] = await Promise.all([
       count(sb.from("orders")).eq("user_id", uid),
       count(sb.from("orders")).eq("user_id", uid).eq("status", "awaiting_payment"),
@@ -426,6 +435,7 @@ export async function handleMobileCommerceRoute(
         .eq("owner_id", uid)
         .maybeSingle(),
       loadPopularSellersCached(),
+      loadPaymentFlagsSafe(),
     ]);
 
     return h.ok({
@@ -438,6 +448,8 @@ export async function handleMobileCommerceRoute(
       activeRefunds: refunds.count ?? 0,
       unreadNotifications: unreadNotif.count ?? 0,
       creditBalance: Number(creditBal.data ?? 0),
+      qrisAvailable: Boolean(paymentFlags.qris),
+      manualPaymentAvailable: Boolean(paymentFlags.manual),
       recentOrders: recentRes.data ?? [],
       recentNotifications: recentNotifRes.data ?? [],
       myStore: myStoreRes.data ?? null,
