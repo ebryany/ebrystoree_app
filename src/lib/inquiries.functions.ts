@@ -19,6 +19,25 @@ const STAFF_ROLES = ["admin", "super_admin", "support"] as const;
 
 const MESSAGE_PAGE_SIZE = 50;
 
+// Short-lived in-memory idempotency cache (prevents double-insert on retry / offline replay)
+const RECENT_CLIENT_MESSAGE_IDS = new Map<string, { messageId: string; expiresAt: number }>();
+
+function lookupRecentClientMessage(key: string): string | null {
+  const now = Date.now();
+  const hit = RECENT_CLIENT_MESSAGE_IDS.get(key);
+  if (hit && hit.expiresAt > now) return hit.messageId;
+  if (RECENT_CLIENT_MESSAGE_IDS.size > 1000) {
+    for (const [k, v] of RECENT_CLIENT_MESSAGE_IDS.entries()) {
+      if (v.expiresAt <= now) RECENT_CLIENT_MESSAGE_IDS.delete(k);
+    }
+  }
+  return null;
+}
+
+function rememberClientMessage(key: string, messageId: string) {
+  RECENT_CLIENT_MESSAGE_IDS.set(key, { messageId, expiresAt: Date.now() + 90_000 });
+}
+
 export const CHAT_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "🙏", "🔥"] as const;
 
 export function normalizeChatMime(raw: string): string {
@@ -381,25 +400,25 @@ export const getInquiry = createServerFn({ method: "GET" })
         queryMessagesWindow(supabase, data.id),
         inquiry.product_id
           ? supabase
-              .from("digital_products")
-              .select("id, name, slug, thumbnail_url, price, discount_price")
-              .eq("id", inquiry.product_id)
-              .maybeSingle()
+            .from("digital_products")
+            .select("id, name, slug, thumbnail_url, price, discount_price")
+            .eq("id", inquiry.product_id)
+            .maybeSingle()
           : Promise.resolve({ data: null }),
         serviceId
           ? supabase
-              .from("marketplace_services")
-              .select("id, name, price, duration_days, revision_limit")
-              .eq("id", serviceId)
-              .maybeSingle()
+            .from("marketplace_services")
+            .select("id, name, price, duration_days, revision_limit")
+            .eq("id", serviceId)
+            .maybeSingle()
           : Promise.resolve({ data: null }),
         supabase.from("profiles").select("full_name, email").eq("id", inquiry.user_id).maybeSingle(),
         storeId
           ? supabase
-              .from("stores")
-              .select("id, name, slug, logo_url, is_platform")
-              .eq("id", storeId)
-              .maybeSingle()
+            .from("stores")
+            .select("id, name, slug, logo_url, is_platform")
+            .eq("id", storeId)
+            .maybeSingle()
           : Promise.resolve({ data: null }),
       ]);
 
@@ -654,6 +673,7 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
         body: z.string().trim().max(2000),
         attachment: attachmentSchema.optional(),
         replyToId: z.string().uuid().nullable().optional(),
+        clientMessageId: z.string().uuid().optional(),
       })
       .refine((d) => d.body.length > 0 || d.attachment, "Pesan kosong.")
       .refine((d) => hasValidAttachmentPaths(d.inquiryId, d.attachment), "Lampiran tidak valid.")
@@ -661,6 +681,15 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as Ctx;
+    const idempotencyKey = data.clientMessageId
+      ? `${userId}:${data.inquiryId}:${data.clientMessageId}`
+      : null;
+    if (idempotencyKey) {
+      const duplicateId = lookupRecentClientMessage(idempotencyKey);
+      if (duplicateId) {
+        return { ok: true as const, deduplicated: true as const, messageId: duplicateId };
+      }
+    }
     const limited = await enforceRateLimit(userId, "inquiry.message");
     if (limited) return { ok: false as const, error: limited.error };
     const { data: inquiry } = await supabase
@@ -752,13 +781,46 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
       body: data.body,
       attachment: resolvedAttachment,
       ...(validReplyToId ? { reply_to_id: validReplyToId } : {}),
+      ...(data.clientMessageId ? { client_message_id: data.clientMessageId } : {}),
     };
 
-    let { error } = await supabase.from("product_inquiry_messages").insert(payload);
-    // Fallback kompatibilitas mundur jika kolom reply_to_id belum dimigrasi.
-    if (error && validReplyToId && isMissingColumnError(error)) {
-      const { reply_to_id: _drop, ...fallbackPayload } = payload;
-      const retry = await supabase.from("product_inquiry_messages").insert(fallbackPayload);
+    let { data: insertedMsg, error } = await supabase
+      .from("product_inquiry_messages")
+      .insert(payload)
+      .select(MESSAGE_FIELDS_RICH)
+      .maybeSingle();
+    // P0 #4: Multi-worker DB idempotency conflict (23505) returns the existing message cleanly
+    if (error && String(error.code ?? "") === "23505" && data.clientMessageId) {
+      const { data: existing } = await supabase
+        .from("product_inquiry_messages")
+        .select(MESSAGE_FIELDS_RICH)
+        .eq("inquiry_id", data.inquiryId)
+        .eq("sender_id", userId)
+        .eq("client_message_id", data.clientMessageId)
+        .maybeSingle();
+      if (existing) {
+        if (idempotencyKey) rememberClientMessage(idempotencyKey, String(existing.id));
+        return {
+          ok: true as const,
+          deduplicated: true as const,
+          message: existing,
+          messageId: existing.id,
+        };
+      }
+    }
+    // Fallback kompatibilitas mundur jika kolom baru belum dimigrasi.
+    if (error && isMissingColumnError(error)) {
+      const {
+        reply_to_id: _dropReply,
+        client_message_id: _dropClientId,
+        ...fallbackPayload
+      } = payload;
+      const retry = await supabase
+        .from("product_inquiry_messages")
+        .insert(fallbackPayload)
+        .select(MESSAGE_FIELDS_BASE)
+        .maybeSingle();
+      insertedMsg = retry.data;
       error = retry.error;
     }
     if (error) {
@@ -771,6 +833,9 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
         };
       }
       return { ok: false as const, error: "Pesan gagal dikirim. Coba lagi." };
+    }
+    if (idempotencyKey && insertedMsg?.id) {
+      rememberClientMessage(idempotencyKey, String(insertedMsg.id));
     }
 
     if (isOwner) {
@@ -793,7 +858,7 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
         inquiry.id as string,
       );
     }
-    return { ok: true as const };
+    return { ok: true as const, message: insertedMsg ?? null, messageId: insertedMsg?.id ?? null };
   });
 
 /** Toggle reaksi emoji pada satu pesan (otorisasi peserta di RPC DB). */
@@ -926,9 +991,8 @@ export const searchShareableCatalog = createServerFn({ method: "GET" })
 
     let svcQ = supabase
       .from("marketplace_services")
-      .select("id, name, price, duration_days, revision_limit, stores(name)")
-      .eq("status", "active")
-      .eq("moderation_status", "approved")
+      .select("id, name, price, agreement, stores(name)")
+      .eq("status", "approved")
       .order("created_at", { ascending: false })
       .limit(8);
     if (data.storeId) svcQ = svcQ.eq("store_id", data.storeId);
@@ -952,8 +1016,8 @@ export const searchShareableCatalog = createServerFn({ method: "GET" })
         serviceId: s.id as string,
         name: s.name as string,
         price: Number(s.price),
-        durationDays: Number(s.duration_days ?? 1),
-        revisionLimit: Number(s.revision_limit ?? 0),
+        durationDays: Number(s.agreement?.duration_days ?? s.agreement?.estimated_days ?? 1),
+        revisionLimit: Number(s.agreement?.revision_limit ?? s.agreement?.revisions ?? 0),
         storeName: (s.stores?.name as string | null) ?? null,
       })),
     };

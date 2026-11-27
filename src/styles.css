@@ -110,17 +110,26 @@
   --ease-ebry: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Marketplace density scale — jarak/ritme konsisten untuk layout padat. */
-  --spacing-gutter: 0.75rem; /* jarak antar kartu katalog */
-  --spacing-section: 1.25rem; /* jarak antar blok/section */
-  --spacing-block: 1rem; /* padding dalam panel */
-  --spacing-tight: 0.5rem; /* dalam kartu: antar baris teks */
-  --spacing-hair: 0.25rem; /* antar badge/label mikro */
+  --spacing-gutter: 0.75rem;
+  /* jarak antar kartu katalog */
+  --spacing-section: 1.25rem;
+  /* jarak antar blok/section */
+  --spacing-block: 1rem;
+  /* padding dalam panel */
+  --spacing-tight: 0.5rem;
+  /* dalam kartu: antar baris teks */
+  --spacing-hair: 0.25rem;
+  /* antar badge/label mikro */
 
   /* Radius scale — sudut agak tajam khas katalog padat. */
-  --radius-tile: 0.25rem; /* badge, chip, thumb kecil */
-  --radius-card: 0.5rem; /* kartu produk/layanan */
-  --radius-panel: 0.75rem; /* panel, sub-section */
-  --radius-modal: 1rem; /* dialog, sheet */
+  --radius-tile: 0.25rem;
+  /* badge, chip, thumb kecil */
+  --radius-card: 0.5rem;
+  /* kartu produk/layanan */
+  --radius-panel: 0.75rem;
+  /* panel, sub-section */
+  --radius-modal: 1rem;
+  /* dialog, sheet */
   /* Tombol: siku, mengikuti pola kontrol iOS (Apple memakai 0, ini 8px supaya
      tetap satu bahasa dengan token lain). Dipakai lewat utility `rounded-control`. */
   --radius-control: 0.5rem;
@@ -132,9 +141,12 @@
   --elev-3: 0 6px 20px oklch(0.22 0.03 205 / 12%);
 
   /* Ukuran komponen padat. */
-  --tap-min: 2.75rem; /* target sentuh minimum 44px */
-  --row-compact: 2.25rem; /* tinggi baris padat */
-  --badge-h: 1.25rem; /* tinggi badge/chip */
+  --tap-min: 2.75rem;
+  /* target sentuh minimum 44px */
+  --row-compact: 2.25rem;
+  /* tinggi baris padat */
+  --badge-h: 1.25rem;
+  /* tinggi badge/chip */
 }
 
 :root {
@@ -220,19 +232,15 @@
   --sidebar-border: oklch(0.36 0.04 202);
   --sidebar-ring: oklch(0.66 0.11 192);
 
-  --gradient-hero: linear-gradient(
-    155deg,
-    oklch(0.28 0.055 203) 0%,
-    oklch(0.36 0.07 196) 55%,
-    oklch(0.44 0.08 205) 100%
-  );
+  --gradient-hero: linear-gradient(155deg,
+      oklch(0.28 0.055 203) 0%,
+      oklch(0.36 0.07 196) 55%,
+      oklch(0.44 0.08 205) 100%);
   --gradient-accent: linear-gradient(100deg, oklch(0.56 0.098 192) 0%, oklch(0.44 0.09 205) 100%);
-  --gradient-auth: linear-gradient(
-    150deg,
-    oklch(0.2 0.04 204) 0%,
-    oklch(0.28 0.06 198) 55%,
-    oklch(0.34 0.07 205) 100%
-  );
+  --gradient-auth: linear-gradient(150deg,
+      oklch(0.2 0.04 204) 0%,
+      oklch(0.28 0.06 198) 55%,
+      oklch(0.34 0.07 205) 100%);
   --gradient-aurora: linear-gradient(110deg, oklch(0.87 0.13 86) 0%, oklch(0.76 0.16 69) 100%);
   /* Panel auth terang: kabut teal di kiri atas, cahaya amber di kanan bawah. */
   --gradient-auth-glow:
@@ -327,12 +335,10 @@
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.68 0.1 192);
 
-  --gradient-hero: linear-gradient(
-    155deg,
-    oklch(0.2 0.035 205) 0%,
-    oklch(0.27 0.05 198) 55%,
-    oklch(0.32 0.06 205) 100%
-  );
+  --gradient-hero: linear-gradient(155deg,
+      oklch(0.2 0.035 205) 0%,
+      oklch(0.27 0.05 198) 55%,
+      oklch(0.32 0.06 205) 100%);
   --gradient-accent: linear-gradient(100deg, oklch(0.5 0.1 192) 0%, oklch(0.38 0.08 205) 100%);
   --gradient-auth-glow:
     radial-gradient(110% 75% at 0% 0%, oklch(0.36 0.07 195 / 90%) 0%, transparent 62%),
@@ -385,10 +391,12 @@
 
 /* Orb kaca panel auth: melayang pelan; motion-reduce global menghentikannya. */
 @keyframes auth-float {
+
   0%,
   100% {
     transform: translate3d(0, 0, 0);
   }
+
   50% {
     transform: translate3d(0, -14px, 0);
   }
@@ -446,6 +454,7 @@
   transition:
     border-color var(--motion-fast) var(--ease-ebry),
     box-shadow var(--motion-fast) var(--ease-ebry);
+
   &:hover {
     border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border));
     box-shadow: var(--elev-2);
@@ -464,12 +473,15 @@
   display: grid;
   gap: var(--spacing-gutter);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+
   @media (min-width: 640px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
   @media (min-width: 1280px) {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -563,6 +575,7 @@
 
 @utility press-scale {
   transition: transform var(--motion-fast) var(--ease-ebry);
+
   &:active {
     transform: scale(0.97);
   }
@@ -619,6 +632,7 @@
 
 /* Fallback tanpa backdrop-filter: naikkan opasitas agar kontras aman. */
 @supports not (backdrop-filter: blur(1px)) {
+
   .popup-glass,
   .popup-glass-glow {
     background-color: color-mix(in oklab, var(--card) 98%, transparent);
@@ -634,6 +648,7 @@
     0 1px 2px oklch(0 0 0 / 30%),
     0 12px 32px -12px oklch(0 0 0 / 45%);
 }
+
 .dark .popup-glass-glow {
   box-shadow:
     inset 0 1px 0 0 oklch(1 0 0 / 14%),
@@ -646,6 +661,7 @@
 
 @layer base {
   @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -679,6 +695,7 @@
 }
 
 @supports not (content-visibility: auto) {
+
   .defer-render,
   .cv-row,
   .cv-card {
@@ -773,6 +790,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   dialog.ebry-mobile-drawer,
   dialog.ebry-mobile-drawer::backdrop {
     transition-duration: 0.08s;
@@ -784,6 +802,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: scaleY(0);
   }
+
   to {
     transform: scaleY(1);
   }
@@ -812,6 +831,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: scaleX(0.1);
   }
+
   to {
     transform: scaleX(1);
   }
@@ -824,6 +844,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
     opacity: 0;
     transform: translateY(0.35em);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -837,6 +858,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(calc(-100% - var(--marquee-gap)));
   }
@@ -846,6 +868,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: translateX(calc(-100% - var(--marquee-gap)));
   }
+
   to {
     transform: translateX(0);
   }
@@ -855,6 +878,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: translateY(0);
   }
+
   to {
     transform: translateY(calc(-100% - var(--marquee-gap)));
   }
@@ -864,6 +888,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: translateY(calc(-100% - var(--marquee-gap)));
   }
+
   to {
     transform: translateY(0);
   }
@@ -890,6 +915,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-100%);
   }
@@ -937,6 +963,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   overscroll-behavior-x: contain;
   touch-action: manipulation;
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -963,6 +990,7 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
   mask-position: 0 0, 0 0, 100% 0;
   mask-size: 100% 100%, var(--fade-start) 100%, var(--fade-end) 100%;
   mask-repeat: no-repeat;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -979,11 +1007,367 @@ dialog.ebry-mobile-drawer[open]:where(:not([data-closing]))::backdrop {
 @supports not (animation-timeline: scroll(self inline)) {
   .ebry-tab-scroller {
     transition: --fade-start 180ms ease, --fade-end 180ms ease;
+
     &.more-start {
       --fade-start: var(--fade-size);
     }
+
     &.more-end {
       --fade-end: var(--fade-size);
     }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Seller Workspace System Design (Modern Web Guidance).
+ * - Container queries (@container) agar kartu dan grid seller beradaptasi
+ *   terhadap ruang kerja aktual (sidebar + viewport), bukan hanya lebar layar.
+ * - Indikator tab aktif berbasis border-block-end pada ::after agar tetap
+ *   terbaca pada forced-colors mode (WCAG 1.4.1, tanpa mengandalkan warna saja).
+ * - Validasi form pasca-interaksi memakai :user-invalid / :user-valid dengan
+ *   sinkronisasi aria-invalid.
+ * ------------------------------------------------------------------------- */
+.seller-workspace-main {
+  container-type: inline-size;
+  container-name: seller-main;
+}
+
+.seller-heading {
+  text-wrap: balance;
+}
+
+.seller-prose {
+  text-wrap: pretty;
+}
+
+.seller-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+@container seller-main (min-width: 44rem) {
+  .seller-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+/* Native modal <dialog> swipe-to-close Seller Navigation Drawer (Modern Web Guidance). */
+.seller-drawer {
+  --drawer-width: min(20rem, 84dvw, calc(100dvw - 24px));
+  --drawer-backdrop: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  overflow: visible;
+}
+
+.seller-drawer::backdrop {
+  background: oklch(0.14 0.02 205);
+  opacity: calc(var(--drawer-backdrop) * 0.56);
+}
+
+.seller-drawer-scroller {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--drawer-width) 100%;
+  overflow-x: scroll;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .seller-drawer-scroller {
+    scroll-behavior: smooth;
+  }
+}
+
+.seller-drawer-scroller::after {
+  content: "";
+  scroll-snap-align: end;
+  scroll-initial-target: nearest;
+}
+
+.seller-drawer-sheet {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100svh;
+  background-color: var(--color-card);
+  color: var(--color-foreground);
+  border-inline-end: 1px solid var(--color-border);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-align: start;
+  scrollbar-width: thin;
+}
+
+@supports (animation-timeline: scroll()) {
+  @property --drawer-backdrop {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+
+  @keyframes seller-fade-drawer-backdrop {
+    0% {
+      --drawer-backdrop: 1;
+    }
+
+    100% {
+      --drawer-backdrop: 0;
+    }
+  }
+
+  .seller-drawer {
+    timeline-scope: --seller-drawer-fade;
+    animation: seller-fade-drawer-backdrop linear both;
+    animation-timeline: --seller-drawer-fade;
+  }
+
+  .seller-drawer-scroller {
+    scroll-timeline: --seller-drawer-fade x;
+  }
+}
+
+/* Native modal <dialog> swipe-to-close Seller Navigation Drawer (Modern Web Guidance). */
+.seller-drawer {
+  --drawer-width: min(20rem, 84dvw, calc(100dvw - 24px));
+  --drawer-backdrop: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  overflow: visible;
+}
+
+.seller-drawer::backdrop {
+  background: oklch(0.14 0.02 205);
+  opacity: calc(var(--drawer-backdrop) * 0.56);
+}
+
+.seller-drawer-scroller {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--drawer-width) 100%;
+  overflow-x: scroll;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .seller-drawer-scroller {
+    scroll-behavior: smooth;
+  }
+}
+
+.seller-drawer-scroller::after {
+  content: "";
+  scroll-snap-align: end;
+  scroll-initial-target: nearest;
+}
+
+.seller-drawer-sheet {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100svh;
+  background-color: var(--color-card);
+  color: var(--color-foreground);
+  border-inline-end: 1px solid var(--color-border);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-align: start;
+  scrollbar-width: thin;
+}
+
+@supports (animation-timeline: scroll()) {
+  @property --drawer-backdrop {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+
+  @keyframes seller-fade-drawer-backdrop {
+    0% {
+      --drawer-backdrop: 1;
+    }
+
+    100% {
+      --drawer-backdrop: 0;
+    }
+  }
+
+  .seller-drawer {
+    timeline-scope: --seller-drawer-fade;
+    animation: seller-fade-drawer-backdrop linear both;
+    animation-timeline: --seller-drawer-fade;
+  }
+
+  .seller-drawer-scroller {
+    scroll-timeline: --seller-drawer-fade x;
+  }
+}
+
+@media (max-width: 767px) {
+  html:has(.seller-mobile-shell) {
+    scroll-padding-top: 4.5rem;
+    scroll-padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.seller-queue-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background-color: var(--color-border);
+}
+
+@container seller-main (min-width: 34rem) {
+  .seller-queue-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container seller-main (min-width: 56rem) {
+  .seller-queue-grid[data-cols="6"] {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .seller-queue-grid[data-cols="5"] {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .seller-queue-grid[data-cols="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.seller-tab {
+  position: relative;
+}
+
+.seller-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0.5rem 0 0.5rem;
+  border-block-end: 2px solid var(--color-accent);
+  border-radius: 9999px;
+}
+
+.seller-queue-tab {
+  position: relative;
+}
+
+.seller-queue-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  border-block-end: 3px solid var(--color-accent);
+}
+
+.seller-field-control:is(:user-invalid, [aria-invalid="true"]) {
+  border-color: var(--color-destructive);
+  background-color: color-mix(in oklch, var(--color-destructive) 5%, var(--color-background));
+}
+
+.seller-field-control:user-valid:not(:placeholder-shown) {
+  border-color: color-mix(in oklch, var(--color-success) 65%, var(--color-border));
+}
+
+/* Native <dialog> scroll containment (modern-web-guidance: dialog) */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Auto-sizing textarea for Threads & Chat composers (modern-web-guidance: field-sizing) */
+.threads-textarea {
+  field-sizing: content;
+  width: 100%;
+  height: auto;
+  min-block-size: 2.5lh;
+  max-block-size: 12lh;
+}
+
+/* Authentic Threads tab active indicator */
+.threads-tab {
+  position: relative;
+}
+
+.threads-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  border-block-end: 2px solid var(--color-foreground);
+  border-radius: 9999px;
+}
+
+/* Defer off-screen Reels rendering (modern-web-guidance: efficient-background-processing) */
+.reels-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 620px;
+}
+
+/* Meta Threads elevated feed column surface (light & dark monochrome precision) */
+.threads-stage-column {
+  background-color: var(--color-card);
+  border-color: color-mix(in oklch, var(--color-border) 82%, transparent);
+  box-shadow: 0 0 16px -4px oklch(0.15 0.01 210 / 6%);
+}
+
+.dark .threads-stage-column {
+  background-color: color-mix(in oklch, var(--color-card) 92%, var(--color-background));
+  border-color: color-mix(in oklch, var(--color-border) 75%, transparent);
+  box-shadow: 0 0 24px -6px oklch(0 0 0 / 45%);
+}
+
+/* Tactile Threads like-heart micro-pop */
+@keyframes threads-heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.26);
+  }
+  75% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.threads-heart-pop {
+  animation: threads-heart-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .threads-heart-pop {
+    animation: none;
   }
 }

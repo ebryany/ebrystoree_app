@@ -38,12 +38,14 @@ import {
   Pin,
   PinOff,
   Plus,
+  RefreshCw,
   Reply,
   Search,
   SendHorizontal,
   ShieldAlert,
   ShoppingBag,
   Trash2,
+  Wifi,
   WifiOff,
   X,
 } from "lucide-react";
@@ -170,6 +172,8 @@ type Props = {
   onToggleMute?: () => void;
   onEnableBrowserNotify?: () => void;
   isOffline?: boolean;
+  realtimeStatus?: "subscribed" | "reconnecting" | "error" | null;
+  onManualSync?: () => void;
   embedded?: boolean;
 };
 
@@ -320,6 +324,8 @@ export function ChatWindow({
   onToggleMute,
   onEnableBrowserNotify,
   isOffline = false,
+  realtimeStatus = null,
+  onManualSync,
   embedded = false,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -491,7 +497,49 @@ export function ChatWindow({
       setShowJump((v) => (v ? false : v));
       setUnseenBelow(0);
     }
+    // Auto-prefetch older messages smoothly when scrolling near top edge
+    if (el.scrollTop < 96 && hasMore && !loadingMore) {
+      handleLoadMore();
+    }
   }
+
+  // Global in-chat keyboard ergonomics: Ctrl/Cmd+F opens in-chat search; Esc closes it.
+  useEffect(() => {
+    const onGlobalKey = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        setSearchOpen(true);
+      } else if (e.key === "Escape" && searchOpen) {
+        setSearchOpen(false);
+        setSearchTerm("");
+      }
+    };
+    window.addEventListener("keydown", onGlobalKey);
+    return () => window.removeEventListener("keydown", onGlobalKey);
+  }, [searchOpen]);
+
+  // Most recent own message still inside the 15-minute edit window (for ArrowUp quick-edit).
+  const lastEditableMessage = useMemo(() => {
+    if (closed || !selfId || !onEditMessage) return null;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (
+        m.sender_id === selfId &&
+        !m.deleted_at &&
+        !m.is_system &&
+        Boolean(m.body.trim()) &&
+        Date.now() - new Date(m.created_at).getTime() <= EDIT_WINDOW_MS
+      ) {
+        return m;
+      }
+    }
+    return null;
+  }, [closed, messages, onEditMessage, selfId]);
+
+  const queuedCount = useMemo(
+    () => pending.filter((p) => p.status === "queued" || p.status === "failed").length,
+    [pending],
+  );
 
   function handleLoadMore() {
     if (scrollRef.current) prevScrollHeightRef.current = scrollRef.current.scrollHeight;
@@ -536,6 +584,12 @@ export function ChatWindow({
             isCounterparty(m.sender_role, viewerRole) &&
             new Date(m.created_at).getTime() > myReadTime,
         );
+  const unreadDividerCount =
+    unreadDividerIndex < 0
+      ? 0
+      : messages
+          .slice(unreadDividerIndex)
+          .filter((m) => isCounterparty(m.sender_role, viewerRole) && !m.deleted_at).length;
 
   const presence = partnerRecording
     ? "merekam suara..."
@@ -625,6 +679,37 @@ export function ChatWindow({
               </span>
             </span>
           </button>
+
+          {/* Realtime sync telemetry chip (desktop) */}
+          {!isOffline && realtimeStatus ? (
+            <button
+              type="button"
+              onClick={onManualSync}
+              title={
+                realtimeStatus === "subscribed"
+                  ? "Sinkronisasi realtime aktif. Klik untuk menyegarkan."
+                  : "Menyambung ulang kanal realtime. Klik untuk sinkronkan manual."
+              }
+              className={cn(
+                "hidden h-7 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:inline-flex",
+                realtimeStatus === "subscribed"
+                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300"
+                  : "border-warning/40 bg-warning/15 text-warning-foreground hover:bg-warning/25",
+              )}
+            >
+              {realtimeStatus === "subscribed" ? (
+                <>
+                  <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                  <span>Live</span>
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="size-3 animate-spin" aria-hidden="true" />
+                  <span>Sinkron ulang</span>
+                </>
+              )}
+            </button>
+          ) : null}
 
           <button
             type="button"
@@ -745,14 +830,38 @@ export function ChatWindow({
 
         {productSlot}
 
-        {/* Peringatan offline */}
-        {isOffline ? (
+        {/* Peringatan offline / koneksi realtime terganggu */}
+        {isOffline || realtimeStatus === "error" || queuedCount > 0 ? (
           <div
             role="status"
-            className="flex items-center gap-2 border-t border-warning/30 bg-warning/20 px-3 py-1.5 text-xs font-medium text-warning-foreground"
+            className="flex flex-wrap items-center justify-between gap-2 border-t border-warning/30 bg-warning/20 px-3 py-1.5 text-xs font-medium text-warning-foreground"
           >
-            <WifiOff className="size-3.5 shrink-0" aria-hidden="true" />
-            <span>Koneksi terputus. Pesan yang dikirim akan masuk antrean otomatis.</span>
+            <span className="flex min-w-0 items-center gap-2">
+              {isOffline ? (
+                <WifiOff className="size-3.5 shrink-0" aria-hidden="true" />
+              ) : (
+                <Wifi className="size-3.5 shrink-0" aria-hidden="true" />
+              )}
+              <span>
+                {isOffline
+                  ? queuedCount > 0
+                    ? `Offline. ${queuedCount} pesan berada di antrean kirim otomatis.`
+                    : "Koneksi terputus. Pesan yang dikirim akan masuk antrean otomatis."
+                  : queuedCount > 0
+                    ? `${queuedCount} pesan menunggu pengiriman ulang.`
+                    : "Kanal realtime terputus sementara."}
+              </span>
+            </span>
+            {onManualSync && !isOffline ? (
+              <button
+                type="button"
+                onClick={onManualSync}
+                className="inline-flex min-h-7 items-center gap-1 rounded-full bg-background/80 px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <RefreshCw className="size-3" aria-hidden="true" />
+                Sinkronkan
+              </button>
+            ) : null}
           </div>
         ) : null}
 
@@ -847,8 +956,12 @@ export function ChatWindow({
                   </p>
                 ) : null}
                 {index === unreadDividerIndex ? (
-                  <p className="-mx-3 my-2 bg-[var(--wa-in)]/85 py-1.5 text-center text-[12px] font-semibold text-[var(--wa-action)] sm:-mx-[7%]">
-                    Pesan baru
+                  <p className="-mx-3 my-2 flex items-center justify-center gap-2 bg-[var(--wa-in)]/85 py-1.5 text-center text-[12px] font-semibold text-[var(--wa-action)] sm:-mx-[7%]">
+                    <span>
+                      {unreadDividerCount > 1
+                        ? `${unreadDividerCount} Pesan baru`
+                        : "Pesan baru"}
+                    </span>
                   </p>
                 ) : null}
                 {message.is_system ? (
@@ -1022,6 +1135,12 @@ export function ChatWindow({
           selfId={selfId}
           replyingTo={replyingTo}
           editingMsg={editingMsg}
+          lastEditableMessage={lastEditableMessage}
+          onQuickEditLast={() => {
+            if (!lastEditableMessage) return;
+            setReplyingTo(null);
+            setEditingMsg(lastEditableMessage);
+          }}
           onCancelReply={() => setReplyingTo(null)}
           onCancelEdit={() => setEditingMsg(null)}
           onSend={handleSendText}
@@ -1415,64 +1534,86 @@ function BubbleActionsMenu({
   onReact: (emoji: (typeof CHAT_REACTION_EMOJIS)[number]) => void;
 }) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          aria-label="Aksi pesan"
-          className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground opacity-65 transition-opacity hover:bg-card/80 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:opacity-0 sm:group-hover/row:opacity-100"
-        >
-          <MoreVertical className="size-4" aria-hidden="true" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-52 rounded-2xl p-1.5">
-        {!closed ? (
-          <>
-            <div className="flex items-center justify-between gap-0.5 px-1 pb-1.5">
-              {CHAT_REACTION_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => onReact(emoji)}
-                  aria-label={`Beri reaksi ${emoji}`}
-                  className="grid size-8 place-items-center rounded-full text-base transition-transform hover:scale-125 hover:bg-muted"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="min-h-10 gap-2.5 rounded-xl" onSelect={onReply}>
-              <Reply className="size-4" /> Balas pesan
+    <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-[var(--wa-panel)]/90 p-0.5 opacity-75 shadow-xs ring-1 ring-[var(--wa-border)]/70 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-hover/row:opacity-100">
+      {!closed ? (
+        <>
+          <button
+            type="button"
+            onClick={() => onReact("👍")}
+            aria-label="Reaksi cepat jempol"
+            className="hidden size-7 place-items-center rounded-full text-sm transition-transform hover:scale-110 hover:bg-[var(--wa-panel-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:grid"
+          >
+            👍
+          </button>
+          <button
+            type="button"
+            onClick={onReply}
+            aria-label="Balas pesan ini"
+            className="hidden size-7 place-items-center rounded-full text-[var(--wa-in-meta)] transition-colors hover:bg-[var(--wa-panel-hover)] hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:grid"
+          >
+            <Reply className="size-3.5" aria-hidden="true" />
+          </button>
+        </>
+      ) : null}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label="Aksi pesan"
+            className="grid size-7 shrink-0 place-items-center rounded-full text-[var(--wa-in-meta)] transition-colors hover:bg-[var(--wa-panel-hover)] hover:text-[var(--wa-in-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <MoreVertical className="size-4" aria-hidden="true" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" className="w-52 rounded-2xl p-1.5">
+          {!closed ? (
+            <>
+              <div className="flex items-center justify-between gap-0.5 px-1 pb-1.5">
+                {CHAT_REACTION_EMOJIS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => onReact(emoji)}
+                    aria-label={`Beri reaksi ${emoji}`}
+                    className="grid size-8 place-items-center rounded-full text-base transition-transform hover:scale-125 hover:bg-muted"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="min-h-10 gap-2.5 rounded-xl" onSelect={onReply}>
+                <Reply className="size-4" /> Balas pesan
+              </DropdownMenuItem>
+            </>
+          ) : null}
+          {body ? (
+            <DropdownMenuItem
+              className="min-h-10 gap-2.5 rounded-xl"
+              onSelect={() => {
+                void navigator.clipboard?.writeText(body);
+                toast.success("Pesan disalin.");
+              }}
+            >
+              <Copy className="size-4" /> Salin teks
             </DropdownMenuItem>
-          </>
-        ) : null}
-        {body ? (
-          <DropdownMenuItem
-            className="min-h-10 gap-2.5 rounded-xl"
-            onSelect={() => {
-              void navigator.clipboard?.writeText(body);
-              toast.success("Pesan disalin.");
-            }}
-          >
-            <Copy className="size-4" /> Salin teks
-          </DropdownMenuItem>
-        ) : null}
-        {canEdit ? (
-          <DropdownMenuItem className="min-h-10 gap-2.5 rounded-xl" onSelect={onEdit}>
-            <Pencil className="size-4" /> Edit pesan
-          </DropdownMenuItem>
-        ) : null}
-        {canDelete ? (
-          <DropdownMenuItem
-            className="min-h-10 gap-2.5 rounded-xl text-destructive focus:text-destructive"
-            onSelect={onDelete}
-          >
-            <Trash2 className="size-4" /> Hapus pesan
-          </DropdownMenuItem>
-        ) : null}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          ) : null}
+          {canEdit ? (
+            <DropdownMenuItem className="min-h-10 gap-2.5 rounded-xl" onSelect={onEdit}>
+              <Pencil className="size-4" /> Edit pesan
+            </DropdownMenuItem>
+          ) : null}
+          {canDelete ? (
+            <DropdownMenuItem
+              className="min-h-10 gap-2.5 rounded-xl text-destructive focus:text-destructive"
+              onSelect={onDelete}
+            >
+              <Trash2 className="size-4" /> Hapus pesan
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 
@@ -1703,6 +1844,8 @@ function Composer({
   selfId,
   replyingTo,
   editingMsg,
+  lastEditableMessage,
+  onQuickEditLast,
   onCancelReply,
   onCancelEdit,
   onSend,
@@ -1720,6 +1863,8 @@ function Composer({
   selfId: string | null | undefined;
   replyingTo: ChatMessage | null;
   editingMsg: ChatMessage | null;
+  lastEditableMessage?: ChatMessage | null;
+  onQuickEditLast?: () => void;
   onCancelReply: () => void;
   onCancelEdit: () => void;
   onSend: (body: string) => void;
@@ -1899,6 +2044,41 @@ function Composer({
       onCancelReply();
       onCancelEdit();
       return;
+    }
+
+    // ArrowUp on empty composer edits the most recent own message within 15m window
+    if (
+      event.key === "ArrowUp" &&
+      !draft.trim() &&
+      !editingMsg &&
+      lastEditableMessage &&
+      onQuickEditLast
+    ) {
+      event.preventDefault();
+      onQuickEditLast();
+      return;
+    }
+
+    // Inline formatting shortcuts: Ctrl/Cmd+B (*bold*), Ctrl/Cmd+I (_italic_), Ctrl/Cmd+Shift+X (~strike~)
+    if (event.ctrlKey || event.metaKey) {
+      const k = event.key.toLowerCase();
+      const wrap =
+        k === "b" ? "*" : k === "i" ? "_" : k === "x" && event.shiftKey ? "~" : null;
+      if (wrap && inputRef.current) {
+        const el = inputRef.current;
+        const start = el.selectionStart ?? 0;
+        const end = el.selectionEnd ?? 0;
+        if (end > start) {
+          event.preventDefault();
+          const selected = draft.slice(start, end);
+          const next = `${draft.slice(0, start)}${wrap}${selected}${wrap}${draft.slice(end)}`;
+          setDraft(next.slice(0, 2000));
+          requestAnimationFrame(() => {
+            el.setSelectionRange(start + 1, end + 1);
+          });
+          return;
+        }
+      }
     }
 
     // Desktop: Enter kirim (dengan perlindungan IME Safari keyCode === 229).
@@ -2154,6 +2334,16 @@ function Composer({
             aria-label="Tulis pesan"
             className="max-h-32 min-h-[40px] w-full min-w-0 flex-1 resize-none bg-transparent py-2.5 text-[15px] leading-snug text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)] [field-sizing:content]"
           />
+          {draft.length >= 1400 ? (
+            <span
+              className={cn(
+                "mb-2.5 ml-1.5 shrink-0 font-mono text-[10px] tabular-nums",
+                draft.length >= 1900 ? "font-semibold text-destructive" : "text-[var(--wa-in-meta)]",
+              )}
+            >
+              {draft.length}/2000
+            </span>
+          ) : null}
         </div>
 
         {/* Tombol lingkaran hijau khas WhatsApp: kosong = Mikrofon VN, ada teks / edit = Kirim */}

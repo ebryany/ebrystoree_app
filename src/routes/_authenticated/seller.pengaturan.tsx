@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Store } from "lucide-react";
+import { ExternalLink, ImagePlus, Loader2, Store } from "lucide-react";
 
 import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
+import {
+  SellerField,
+  SellerPageHeader,
+  SellerSectionCard,
+} from "@/components/seller/seller-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,9 +20,9 @@ import { getMyStore, updateMyStore, uploadStoreAsset } from "@/lib/seller.functi
 export const Route = createFileRoute("/_authenticated/seller/pengaturan")({
   head: () => ({
     meta: [
-      { title: "Pengaturan Toko — Ebrystore" },
+      { title: "Pengaturan Toko | Ebrystore" },
       { name: "description", content: "Perbarui identitas, logo, dan banner toko digital Anda." },
-      { property: "og:title", content: "Pengaturan Toko — Ebrystore" },
+      { property: "og:title", content: "Pengaturan Toko | Ebrystore" },
       { property: "og:description", content: "Kelola identitas toko Anda." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -83,7 +88,7 @@ function AssetUploader({
         return;
       }
       onChange(result.url);
-      toast.success(`${label} berhasil diunggah. Simpan untuk menerapkan.`);
+      toast.success(`${label} berhasil diunggah. Klik Simpan perubahan untuk menerapkan.`);
     } catch {
       toast.error("Gambar gagal diunggah. Coba lagi.");
     } finally {
@@ -95,6 +100,7 @@ function AssetUploader({
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
+      <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       <div className={className}>
         <div
           className={`relative overflow-hidden rounded-xl border border-dashed border-border bg-surface-selected ${aspect}`}
@@ -107,7 +113,7 @@ function AssetUploader({
             </span>
           )}
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2.5 flex flex-wrap gap-2">
           <Button
             type="button"
             variant="outline"
@@ -120,7 +126,7 @@ function AssetUploader({
             ) : (
               <ImagePlus className="mr-1.5 size-4" aria-hidden="true" />
             )}
-            {busy ? "Mengunggah…" : value ? "Ganti gambar" : "Unggah gambar"}
+            {busy ? "Mengunggah..." : value ? "Ganti gambar" : "Unggah gambar"}
           </Button>
           {value ? (
             <Button type="button" variant="ghost" className="min-h-11" onClick={() => onChange("")}>
@@ -136,7 +142,6 @@ function AssetUploader({
           onChange={(event) => void handleFile(event.target.files?.[0])}
         />
       </div>
-      <p className="text-xs text-muted-foreground">{hint}</p>
     </div>
   );
 }
@@ -145,6 +150,7 @@ function SellerSettings() {
   const queryClient = useQueryClient();
   const fetchStore = useServerFn(getMyStore);
   const saveStore = useServerFn(updateMyStore);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const { data, isPending, error } = useQuery({
     queryKey: ["my-store"],
@@ -159,6 +165,7 @@ function SellerSettings() {
   const [bannerUrl, setBannerUrl] = useState("");
   const [bannerPosition, setBannerPosition] = useState(50);
   const [phone, setPhone] = useState("");
+  const [nameError, setNameError] = useState<string | undefined>();
 
   // Isi form setelah data toko termuat.
   useEffect(() => {
@@ -194,106 +201,210 @@ function SellerSettings() {
     onError: () => toast.error("Perubahan gagal disimpan. Coba lagi."),
   });
 
-  if (isPending) return <AdminLoading label="Memuat pengaturan…" />;
+  if (isPending) return <AdminLoading label="Memuat pengaturan..." />;
   if (error || data?.error) return <AdminError message="Pengaturan tidak dapat dimuat." />;
   if (!store) return <AdminError message="Toko tidak ditemukan." />;
 
   return (
-    <form
-      className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (name.trim().length < 3) return toast.error("Nama toko minimal 3 karakter.");
-        mutation.mutate();
-      }}
-    >
-      <div className="flex items-start gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-surface-selected text-accent">
-          <Store className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-bold text-foreground">Identitas toko</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Alamat toko tetap: /toko/{store.slug}
-          </p>
+    <div className="space-y-5">
+      <SellerPageHeader
+        title="Pengaturan Toko"
+        description={`Perbarui tampilan etalase publik dan informasi kontak untuk alamat tetap /toko/${store.slug}.`}
+        actions={
+          store.status === "active" ? (
+            <Button asChild variant="outline" className="min-h-11">
+              <Link to="/toko/$slug" params={{ slug: store.slug }}>
+                <ExternalLink className="size-4" aria-hidden="true" />
+                Lihat etalase
+              </Link>
+            </Button>
+          ) : null
+        }
+      />
+
+      {/* Pratinjau langsung header etalase agar perubahan logo, banner, dan titik fokus terlihat real-time. */}
+      <SellerSectionCard
+        title="Pratinjau header etalase"
+        description="Perubahan tampil langsung di bawah ini. Klik Simpan perubahan agar diterapkan ke halaman publik."
+        headingId="preview-store-heading"
+        bodyClassName="p-0"
+      >
+        <div className="relative h-28 w-full overflow-hidden bg-hero-gradient sm:h-36">
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt=""
+              className="size-full object-cover"
+              style={{ objectPosition: `50% ${bannerPosition}%` }}
+            />
+          ) : null}
         </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <AssetUploader
-          label="Logo toko"
-          hint="Tampil sebagai ikon toko. Persegi, minimal 200×200 px."
-          kind="logo"
-          value={logoUrl}
-          onChange={setLogoUrl}
-          aspect="aspect-square max-w-[9rem]"
-        />
-        <AssetUploader
-          label="Banner toko"
-          hint="Tampil di bagian atas halaman toko. Disarankan lebar (mis. 1200×300 px)."
-          kind="banner"
-          value={bannerUrl}
-          onChange={setBannerUrl}
-          aspect="aspect-[4/1]"
-        />
-      </div>
-
-      {bannerUrl ? (
-        <div className="space-y-1.5">
-          <Label htmlFor="banner-fokus">Fokus banner (vertikal)</Label>
-          <input
-            id="banner-fokus"
-            type="range"
-            min={0}
-            max={100}
-            value={bannerPosition}
-            onChange={(e) => setBannerPosition(Number(e.target.value))}
-            className="h-11 w-full accent-accent"
-          />
-          <p className="text-xs text-muted-foreground">
-            Atur bagian gambar yang terlihat bila bannernya tinggi. Nilai {bannerPosition}%.
-          </p>
+        <div className="flex flex-wrap items-end gap-3.5 px-4 pb-4 sm:px-5">
+          <span className="-mt-8 block h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-card bg-surface-selected text-accent shadow-[var(--elev-1)] sm:-mt-10 sm:h-20 sm:w-20">
+            {logoUrl ? (
+              <img src={logoUrl} alt="" className="block h-full w-full object-cover object-center" />
+            ) : (
+              <span className="grid h-full w-full place-items-center">
+                <Store className="size-7 sm:size-8" aria-hidden="true" />
+              </span>
+            )}
+          </span>
+          <div className="min-w-0 flex-1 pt-2">
+            <p className="truncate font-display text-base font-bold text-foreground">
+              {name.trim() || store.name}
+            </p>
+            <p className="truncate font-mono text-xs text-muted-foreground">/toko/{store.slug}</p>
+          </div>
         </div>
-      ) : null}
+      </SellerSectionCard>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="toko-nama">Nama toko</Label>
-        <Input
-          id="toko-nama"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          maxLength={80}
-          required
-        />
-      </div>
+      <form
+        noValidate
+        className="space-y-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (name.trim().length < 3) {
+            setNameError("Nama toko minimal 3 karakter.");
+            nameRef.current?.focus();
+            return;
+          }
+          setNameError(undefined);
+          mutation.mutate();
+        }}
+      >
+        <SellerSectionCard
+          title="Media etalase"
+          description="Format JPG, PNG, WEBP, atau AVIF dengan ukuran maksimal 3 MB."
+          headingId="media-store-heading"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
+            <AssetUploader
+              label="Logo toko"
+              hint="Tampil sebagai ikon toko di katalog dan profil. Persegi, minimal 200x200 px."
+              kind="logo"
+              value={logoUrl}
+              onChange={setLogoUrl}
+              aspect="aspect-square max-w-[9rem]"
+            />
+            <AssetUploader
+              label="Banner toko"
+              hint="Tampil di bagian atas etalase. Disarankan rasio lebar 4:1 (misal 1200x300 px)."
+              kind="banner"
+              value={bannerUrl}
+              onChange={setBannerUrl}
+              aspect="aspect-[4/1]"
+            />
+          </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="toko-deskripsi">Deskripsi</Label>
-        <Textarea
-          id="toko-deskripsi"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          maxLength={1000}
-          placeholder="Ceritakan produk yang Anda jual"
-        />
-      </div>
+          {bannerUrl ? (
+            <div className="mt-5 space-y-1.5 border-t border-border pt-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <Label htmlFor="banner-fokus">Titik fokus banner (vertikal)</Label>
+                <span className="text-xs font-semibold tabular-nums text-foreground">
+                  {bannerPosition}%
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Geser untuk memilih bagian gambar yang tampil di pratinjau atas.
+              </p>
+              <input
+                id="banner-fokus"
+                type="range"
+                min={0}
+                max={100}
+                value={bannerPosition}
+                onChange={(e) => setBannerPosition(Number(e.target.value))}
+                className="h-11 w-full accent-accent"
+              />
+            </div>
+          ) : null}
+        </SellerSectionCard>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="toko-kontak">Nomor WhatsApp</Label>
-        <Input
-          id="toko-kontak"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          maxLength={30}
-          placeholder="08xxxxxxxxxx"
-          inputMode="tel"
-        />
-      </div>
+        <SellerSectionCard
+          title="Identitas & kontak"
+          description="Informasi ini ditampilkan di halaman publik toko dan digunakan saat koordinasi."
+          icon={Store}
+          headingId="identity-store-heading"
+          footer={
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
+              <p className="text-xs text-muted-foreground">
+                Alamat URL <span className="font-mono text-foreground">/toko/{store.slug}</span>{" "}
+                bersifat tetap.
+              </p>
+              <Button
+                type="submit"
+                className="min-h-11 w-full sm:w-auto"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? "Menyimpan..." : "Simpan perubahan"}
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-4">
+            <SellerField
+              id="toko-nama"
+              label="Nama toko"
+              required
+              counter={`${name.length}/80`}
+              hint="Minimal 3 karakter, maksimal 80 karakter."
+              error={nameError}
+            >
+              <Input
+                ref={nameRef}
+                id="toko-nama"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (nameError && e.target.value.trim().length >= 3) setNameError(undefined);
+                }}
+                maxLength={80}
+                required
+                aria-invalid={nameError ? "true" : "false"}
+                aria-describedby={nameError ? "toko-nama-hint toko-nama-error" : "toko-nama-hint"}
+                className="seller-field-control min-h-11"
+              />
+            </SellerField>
 
-      <Button type="submit" className="min-h-11 w-full sm:w-auto" disabled={mutation.isPending}>
-        {mutation.isPending ? "Menyimpan…" : "Simpan perubahan"}
-      </Button>
-    </form>
+            <SellerField
+              id="toko-deskripsi"
+              label="Deskripsi toko"
+              counter={`${description.length}/1000`}
+              hint="Ceritakan fokus produk/jasa dan informasi layanan yang perlu diketahui pembeli."
+            >
+              <Textarea
+                id="toko-deskripsi"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                maxLength={1000}
+                placeholder="Ceritakan produk yang Anda jual"
+                aria-invalid="false"
+                aria-describedby="toko-deskripsi-hint"
+              />
+            </SellerField>
+
+            <SellerField
+              id="toko-kontak"
+              label="Nomor WhatsApp"
+              hint="Format angka lokal atau internasional, contoh: 081234567890."
+            >
+              <Input
+                id="toko-kontak"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                maxLength={30}
+                placeholder="08xxxxxxxxxx"
+                inputMode="tel"
+                autoComplete="tel"
+                aria-invalid="false"
+                aria-describedby="toko-kontak-hint"
+                className="min-h-11"
+              />
+            </SellerField>
+          </div>
+        </SellerSectionCard>
+      </form>
+    </div>
   );
 }

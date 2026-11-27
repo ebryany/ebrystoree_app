@@ -17,7 +17,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { CartButton } from "@/components/ebry/cart-button";
@@ -42,7 +42,23 @@ const NAV_META: Record<string, { description: string; icon: typeof Package }> = 
   "/artikel": { description: "Panduan dari tim Ebrystore", icon: BookOpen },
 };
 
-export function SiteHeader() {
+export type SiteHeaderProps = {
+  /** Ganti isi drawer hamburger mobile sesuai konteks halaman (mis. Dashboard Seller). */
+  mobileDrawer?: (helpers: { close: () => void; signOut: () => void }) => ReactNode;
+  /** Judul header drawer hamburger mobile (default: nama brand). */
+  mobileDrawerTitle?: string;
+  /** Angka badge pada tombol hamburger mobile (mis. antrean tugas seller). */
+  mobileMenuBadge?: number;
+  /** Tujuan ikon chat di navbar (default: /dashboard/chat). */
+  chatTo?: string;
+};
+
+export function SiteHeader({
+  mobileDrawer,
+  mobileDrawerTitle,
+  mobileMenuBadge,
+  chatTo = "/dashboard/chat",
+}: SiteHeaderProps = {}) {
   const { user } = useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -90,7 +106,7 @@ export function SiteHeader() {
     setOpen(false);
     await queryClient.cancelQueries();
     queryClient.clear();
-    await signOutPortal({}).catch(() => {});
+    await signOutPortal({}).catch(() => { });
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
   }
@@ -173,12 +189,7 @@ export function SiteHeader() {
                   <ShoppingBag className="size-5" aria-hidden="true" />
                 </span>
               )}
-              <span
-                className={cn(
-                  "truncate",
-                  publicPage ? "sr-only sm:not-sr-only sm:inline" : "inline",
-                )}
-              >
+              <span className={cn("truncate", publicPage ? "hidden min-[380px]:inline" : "inline")}>
                 {brandName}
               </span>
             </Link>
@@ -295,7 +306,7 @@ export function SiteHeader() {
               {user ? (
                 <>
                   <Link
-                    to="/dashboard/chat"
+                    to={chatTo}
                     aria-label={chatUnread ? `Chat, ${chatUnread} belum dibaca` : "Chat"}
                     className="relative grid min-h-11 min-w-11 place-items-center rounded-full text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
@@ -333,13 +344,25 @@ export function SiteHeader() {
                 ref={menuTriggerRef}
                 variant="ghost"
                 size="icon"
-                className="min-h-11 min-w-11 rounded-lg bg-surface"
-                aria-label="Buka menu"
+                className="relative min-h-11 min-w-11 rounded-lg bg-surface"
+                aria-label={
+                  mobileMenuBadge
+                    ? `Buka menu, ${mobileMenuBadge} perlu tindakan`
+                    : "Buka menu"
+                }
                 aria-expanded={open}
                 aria-controls={drawerId}
                 onClick={() => handleDrawerOpenChange(!open)}
               >
                 <Menu className="size-5" aria-hidden="true" />
+                {mobileMenuBadge ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-4 text-destructive-foreground shadow-sm"
+                  >
+                    {mobileMenuBadge > 9 ? "9+" : mobileMenuBadge}
+                  </span>
+                ) : null}
               </Button>
             </div>
           </div>
@@ -355,7 +378,7 @@ export function SiteHeader() {
       >
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
           <h2 id={drawerTitleId} className="min-w-0 truncate text-lg font-semibold text-foreground">
-            {brandName}
+            {mobileDrawerTitle ?? brandName}
           </h2>
           <Button
             variant="ghost"
@@ -368,6 +391,13 @@ export function SiteHeader() {
             <X className="size-5" aria-hidden="true" />
           </Button>
         </div>
+        {mobileDrawer ? (
+          mobileDrawer({
+            close: () => handleDrawerOpenChange(false),
+            signOut: () => void handleSignOut(),
+          })
+        ) : (
+          <>
         {/* Pencarian & chat mobile (dipindah dari navbar supaya baris atas ringkas). */}
         <div className="flex gap-2 px-4 pt-4">
           {publicPage ? (
@@ -513,6 +543,8 @@ export function SiteHeader() {
             </>
           )}
         </div>
+          </>
+        )}
       </MobileNavDrawer>
 
       {/* Pencarian mobile: satu panel penuh agar input lega dan keyboard tidak
@@ -542,12 +574,6 @@ export function SiteHeader() {
                 placeholder="Cari produk digital…"
                 aria-label="Cari produk digital"
                 enterKeyHint="search"
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    event.preventDefault();
-                    setSearchOpen(false);
-                  }
-                }}
                 className="min-h-11 min-w-0 flex-1 bg-transparent px-1 text-base outline-none placeholder:text-muted-foreground"
               />
               <Button type="submit" size="sm" className="min-h-11 shrink-0">

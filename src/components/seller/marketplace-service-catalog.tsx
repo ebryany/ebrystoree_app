@@ -1,8 +1,13 @@
 import { useMemo, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, FileText, Info, Plus, Video } from "lucide-react";
+import { ChevronDown, FileText, Info, Plus, RefreshCw, Video } from "lucide-react";
 
+import {
+  SellerFilterTabs,
+  SellerMobileSegment,
+  SellerPageHeader,
+} from "@/components/seller/seller-ui";
 import { ServiceDraftWizard } from "@/components/seller/service-draft-wizard";
 
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -74,7 +79,7 @@ export function MarketplaceServiceCatalog() {
   const save = useServerFn(saveMyMarketplaceService);
   const act = useServerFn(actOnMyMarketplaceService);
   const queryKey = ["my-marketplace-services", page];
-  const { data, isPending, isPlaceholderData, error, refetch } = useQuery({
+  const { data, isPending, isFetching, isPlaceholderData, error, refetch } = useQuery({
     queryKey,
     queryFn: () => fetchListings({ data: { page } }),
     placeholderData: keepPreviousData,
@@ -120,84 +125,76 @@ export function MarketplaceServiceCatalog() {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-bold sm:text-xl">Jasa Saya</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Kelola semua jasa toko Anda: susun, ajukan moderasi, dan pantau statusnya.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {data?.categories.length && editing === undefined ? (
-            <Button
-              className="min-h-11"
-              onClick={() => {
-                setFeedback("");
-                setEditing(null);
-              }}
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              Tambahkan Jasa
-            </Button>
-          ) : null}
-          <Button
-            variant="outline"
-            className="min-h-11"
-            disabled={isPending}
-            onClick={() => void refetch()}
-          >
-            Muat ulang
-          </Button>
-        </div>
-      </header>
+    <div className="space-y-4 sm:space-y-5">
+      <SellerMobileSegment
+        ariaLabel="Pilih katalog toko"
+        items={[
+          { to: "/seller/produk", label: "Produk Digital" },
+          { to: "/seller/jasa", label: "Jasa Saya" },
+        ]}
+      />
 
-      <details className="group rounded-xl border border-border bg-card text-sm">
+      <SellerPageHeader
+        title="Jasa Saya"
+        description="Susun paket jasa toko Anda, ajukan moderasi, dan pantau status penayangannya."
+        actions={
+          <>
+            {data?.categories.length && editing === undefined ? (
+              <Button
+                className="min-h-11"
+                onClick={() => {
+                  setFeedback("");
+                  setEditing(null);
+                }}
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                Tambahkan Jasa
+              </Button>
+            ) : null}
+            <Button
+              variant="outline"
+              className="min-h-11"
+              disabled={isFetching}
+              onClick={() => void refetch()}
+            >
+              <RefreshCw
+                className={isFetching ? "size-4 animate-spin" : "size-4"}
+                aria-hidden="true"
+              />
+              Muat ulang
+            </Button>
+          </>
+        }
+      />
+
+      <details className="group rounded-[var(--radius-panel)] border border-border bg-card text-sm">
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
           <Info className="size-4 shrink-0 text-accent" aria-hidden="true" />
-          <span className="flex-1">Aturan tayang & edit jasa</span>
+          <span className="flex-1 font-medium">Aturan tayang &amp; edit jasa</span>
           <ChevronDown
-            className="size-4 shrink-0 transition-transform group-open:rotate-180"
+            className="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
             aria-hidden="true"
           />
         </summary>
-        <p className="border-t border-border px-4 py-3 text-muted-foreground">
+        <p className="border-t border-border px-4 py-3 leading-relaxed text-muted-foreground">
           Jasa yang disetujui dapat dipesan selama toko dan kategori aktif serta checkout diaktifkan
           admin. Mengedit jasa mengembalikannya ke draft; arsip menghapusnya dari katalog. Pesanan
           yang sudah dibuat tetap mengikuti kesepakatan tersimpan.
         </p>
       </details>
 
-      <div
-        role="tablist"
-        aria-label="Filter status jasa"
-        className="flex overflow-x-auto border-b border-border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {TABS.map((entry) => {
-          const active = tab === entry.key;
-          const count = counts[entry.key];
-          return (
-            <button
-              key={entry.key}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              title={entry.hint}
-              onClick={() => switchTab(entry.key)}
-              className={cn(
-                "relative flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                active
-                  ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-accent"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {entry.label}
-              <span className="text-xs tabular-nums text-muted-foreground">
-                {data ? count.toLocaleString("id-ID") : "0"}
-              </span>
-            </button>
-          );
-        })}
+      <div className="border-b border-border pb-1">
+        <SellerFilterTabs<TabKey>
+          ariaLabel="Filter status jasa"
+          value={tab}
+          onChange={switchTab}
+          items={TABS.map((entry) => ({
+            key: entry.key,
+            label: entry.label,
+            count: data ? counts[entry.key] : 0,
+            hint: entry.hint,
+          }))}
+        />
       </div>
 
       {feedback ? (

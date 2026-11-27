@@ -2,9 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  AtSign,
   Bell,
   Heart,
-  LayoutDashboard,
   MessagesSquare,
   Package,
   ReceiptText,
@@ -39,7 +39,13 @@ type SidebarGroup = {
  * Hanya dirender pada layar lg+ (dibungkus `hidden lg:block` oleh pemanggil),
  * sehingga tampilan mobile tidak terpengaruh sama sekali.
  */
-export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
+export function DashboardSidebar({
+  unread = 0,
+  unreadChats = 0,
+}: {
+  unread?: number;
+  unreadChats?: number;
+}) {
   const fetchStore = useServerFn(getMyStore);
   const { data, isPending } = useQuery({
     queryKey: ["my-store"],
@@ -51,28 +57,31 @@ export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
 
   const sellerItems: SidebarItem[] = storeActive
     ? [
-        { to: "/seller", label: "Dashboard Toko", icon: Store, exact: true },
-        { to: "/seller/pesanan", label: "Pesanan Toko", icon: ReceiptText },
-        { to: "/seller/produk", label: "Produk Toko", icon: Package },
-        { to: "/seller/jasa", label: "Jasa Saya", icon: ReceiptText },
-        { to: "/seller/jasa-pesanan", label: "Pesanan Jasa", icon: ReceiptText },
-        { to: "/seller/chat", label: "Chat Pelanggan", icon: MessageSquare },
-        { to: "/seller/keuangan", label: "Keuangan", icon: Wallet },
-        { to: "/seller/performa", label: "Performa", icon: BarChart3 },
-        { to: "/seller/pengaturan", label: "Pengaturan Toko", icon: Settings },
-      ]
+      { to: "/seller", label: "Dashboard Toko", icon: Store, exact: true },
+      { to: "/seller/pesanan", label: "Pesanan Toko", icon: ReceiptText },
+      { to: "/seller/produk", label: "Produk Toko", icon: Package },
+      { to: "/seller/jasa", label: "Jasa Saya", icon: ReceiptText },
+      { to: "/seller/jasa-pesanan", label: "Pesanan Jasa", icon: ReceiptText },
+      { to: "/seller/chat", label: "Chat Pelanggan", icon: MessageSquare },
+      { to: "/seller/keuangan", label: "Keuangan", icon: Wallet },
+      { to: "/seller/performa", label: "Performa", icon: BarChart3 },
+      { to: "/seller/pengaturan", label: "Pengaturan Toko", icon: Settings },
+    ]
     : [
-        {
-          to: "/seller",
-          label: isPending ? "Toko" : hasStore ? "Toko Saya" : "Buka Toko",
-          icon: Store,
-        },
-      ];
+      {
+        to: "/seller",
+        label: isPending ? "Toko" : hasStore ? "Toko Saya" : "Buka Toko",
+        icon: Store,
+      },
+    ];
 
   const groups: SidebarGroup[] = [
     {
-      label: "Menu",
-      items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true }],
+      label: "Sosial & Chat",
+      items: [
+        { to: "/dashboard", label: "Threads", icon: AtSign, exact: true },
+        { to: "/dashboard/chat", label: "Chat Produk", icon: MessagesSquare, badge: unreadChats },
+      ],
     },
     {
       label: "Aktivitas",
@@ -81,7 +90,6 @@ export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
         { to: "/dashboard/produk-saya", label: "Produk Saya", icon: Package },
         { to: "/dashboard/disukai", label: "Disukai & Diikuti", icon: Heart },
         { to: "/dashboard/po", label: "PO Custom", icon: MessageSquarePlus },
-        { to: "/dashboard/chat", label: "Chat Produk", icon: MessagesSquare },
         { to: "/dashboard/notifikasi", label: "Notifikasi", icon: Bell, badge: unread },
       ],
     },
@@ -92,7 +100,7 @@ export function DashboardSidebar({ unread = 0 }: { unread?: number }) {
     {
       label: "Akun",
       items: [
-        { to: "/dashboard/pengaturan", label: "Profil Saya", icon: UserRound },
+        { to: "/dashboard/profil", label: "Profil Threads", icon: UserRound },
         { to: "/dashboard/pengaturan", label: "Pengaturan", icon: Settings },
       ],
     },

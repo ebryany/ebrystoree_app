@@ -26,7 +26,11 @@ import {
   usePinnedChats,
 } from "@/components/chat/chat-prefs";
 import { useChatTyping } from "@/hooks/use-chat-typing";
-import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import {
+  realtimeStatusKey,
+  useRealtimeRefresh,
+  type RealtimeConnectionStatus,
+} from "@/hooks/use-realtime-refresh";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -157,11 +161,19 @@ export function InquiryThread({
     }
   }, [id, user?.id]);
 
+  const realtimeChannel = `inquiry-${id}`;
   useRealtimeRefresh({
-    channel: `inquiry-${id}`,
+    channel: realtimeChannel,
     tables: ["product_inquiry_messages", "product_inquiries"],
     keys: [queryKey, messagesKey],
     debounceMs: 60,
+  });
+
+  const { data: realtimeStatus } = useQuery<RealtimeConnectionStatus | null>({
+    queryKey: realtimeStatusKey(realtimeChannel),
+    queryFn: () => null,
+    enabled: false,
+    initialData: null,
   });
 
   // Sinkronkan penanda hasMore hanya bila pengguna belum mencapai ujung riwayat lama.
@@ -301,7 +313,12 @@ export function InquiryThread({
 
       try {
         const result = await postMessage({
-          data: { inquiryId: id, body: text, replyToId: replyToId ?? null },
+          data: {
+            inquiryId: id,
+            body: text,
+            replyToId: replyToId ?? null,
+            clientMessageId: tempId,
+          },
         });
         if (!result.ok) {
           setPending((prev) =>
@@ -310,11 +327,21 @@ export function InquiryThread({
           if (!existingTempId) toast.error(result.error);
           return;
         }
+        // 0ms cache reconciliation: inject confirmed server row before removing pending bubble
+        const confirmedMsg = "message" in result ? (result.message as ChatMessage | null) : null;
+        if (confirmedMsg) {
+          queryClient.setQueryData(queryKey, (cur: any) => {
+            if (!cur?.messages) return cur;
+            const list = cur.messages as ChatMessage[];
+            if (list.some((m) => m.id === confirmedMsg.id)) return cur;
+            return { ...cur, messages: [...list, confirmedMsg] };
+          });
+        }
         if (user?.id) removeOfflineMessage(user.id, tempId);
         setPending((prev) => prev.filter((p) => p.tempId !== tempId));
-        await queryClient.invalidateQueries({ queryKey });
-        await queryClient.invalidateQueries({ queryKey: messagesKey });
-        await queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
+        void queryClient.invalidateQueries({ queryKey });
+        void queryClient.invalidateQueries({ queryKey: messagesKey });
+        void queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
       } catch {
         setPending((prev) =>
           prev.map((p) => (p.tempId === tempId ? { ...p, status: "failed" } : p)),
@@ -465,35 +492,92 @@ export function InquiryThread({
   }
 
   async function handleReact(messageId: string, emoji: (typeof CHAT_REACTION_EMOJIS)[number]) {
+    // Optimistic reaction update with deterministic rollback
+    const snapshot = queryClient.getQueryData(queryKey);
+    const uid = user?.id;
+    if (uid) {
+      queryClient.setQueryData(queryKey, (cur: any) => {
+        if (!cur?.messages) return cur;
+        return {
+          ...cur,
+          messages: (cur.messages as ChatMessage[]).map((m) => {
+            if (m.id !== messageId) return m;
+            const prevMap = { ...(m.reactions ?? {}) };
+            const users = Array.isArray(prevMap[emoji]) ? [...prevMap[emoji]] : [];
+            const exists = users.includes(uid);
+            prevMap[emoji] = exists ? users.filter((u) => u !== uid) : [...users, uid];
+            if (prevMap[emoji].length === 0) delete prevMap[emoji];
+            return { ...m, reactions: prevMap };
+          }),
+        };
+      });
+    }
     const res = await toggleReactionFn({ data: { messageId, emoji } });
     if (!res.ok) {
+      queryClient.setQueryData(queryKey, snapshot);
       toast.error(res.error);
       return;
     }
-    await queryClient.invalidateQueries({ queryKey });
+    void queryClient.invalidateQueries({ queryKey });
   }
 
   async function handleEdit(messageId: string, body: string) {
+    const snapshot = queryClient.getQueryData(queryKey);
+    const editedAt = new Date().toISOString();
+    queryClient.setQueryData(queryKey, (cur: any) => {
+      if (!cur?.messages) return cur;
+      return {
+        ...cur,
+        messages: (cur.messages as ChatMessage[]).map((m) =>
+          m.id === messageId ? { ...m, body, edited_at: editedAt } : m,
+        ),
+      };
+    });
     const res = await editMessageFn({ data: { messageId, body } });
     if (!res.ok) {
+      queryClient.setQueryData(queryKey, snapshot);
       toast.error(res.error);
       return;
     }
     toast.success("Pesan diperbarui.");
-    await queryClient.invalidateQueries({ queryKey });
-    await queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
+    void queryClient.invalidateQueries({ queryKey });
+    void queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
   }
 
   async function handleDelete(messageId: string) {
+    const snapshot = queryClient.getQueryData(queryKey);
+    const deletedAt = new Date().toISOString();
+    queryClient.setQueryData(queryKey, (cur: any) => {
+      if (!cur?.messages) return cur;
+      return {
+        ...cur,
+        messages: (cur.messages as ChatMessage[]).map((m) =>
+          m.id === messageId ? { ...m, deleted_at: deletedAt } : m,
+        ),
+      };
+    });
     const res = await deleteMessageFn({ data: { messageId } });
     if (!res.ok) {
+      queryClient.setQueryData(queryKey, snapshot);
       toast.error(res.error);
       return;
     }
     toast.success("Pesan dihapus.");
-    await queryClient.invalidateQueries({ queryKey });
-    await queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
+    void queryClient.invalidateQueries({ queryKey });
+    void queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
   }
+
+  const handleManualSync = useCallback(() => {
+    void refetch();
+    void queryClient.invalidateQueries({ queryKey: ["inquiry-unread"] });
+    void queryClient.invalidateQueries({ queryKey: LIST_KEYS[mode] });
+    if (user?.id && typeof navigator !== "undefined" && navigator.onLine) {
+      const queued = loadOfflineOutbox(user.id, id);
+      for (const item of queued) {
+        void sendBody(item.body, item.tempId, item.replyToId);
+      }
+    }
+  }, [id, mode, queryClient, refetch, sendBody, user?.id]);
 
   async function handleMarkUnread() {
     const res = await markUnread({ data: { inquiryId: id } });
@@ -685,6 +769,8 @@ export function InquiryThread({
         });
       }}
       isOffline={isOffline}
+      realtimeStatus={realtimeStatus}
+      onManualSync={handleManualSync}
       embedded={embedded}
       backSlot={
         <Link

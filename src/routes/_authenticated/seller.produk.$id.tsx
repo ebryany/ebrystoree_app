@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  ArrowLeft,
   CheckCircle2,
   Lock,
   Package,
@@ -15,6 +14,23 @@ import {
   KeyRound,
 } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  SellerAlertBanner,
+  SellerField,
+  SellerPageHeader,
+  SellerSectionCard,
+} from "@/components/seller/seller-ui";
+import { StatusPill } from "@/components/ebry/status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,9 +61,9 @@ import {
 export const Route = createFileRoute("/_authenticated/seller/produk/$id")({
   head: () => ({
     meta: [
-      { title: "Kelola Produk — Ebrystore" },
+      { title: "Kelola Produk | Ebrystore" },
       { name: "description", content: "Kelola produk digital toko Anda." },
-      { property: "og:title", content: "Kelola Produk — Ebrystore" },
+      { property: "og:title", content: "Kelola Produk | Ebrystore" },
       { property: "og:description", content: "Kelola produk toko Anda." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -83,6 +99,7 @@ function EditProduct() {
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
 
   useEffect(() => {
     if (!product) return;
@@ -130,7 +147,8 @@ function EditProduct() {
     mutationFn: async () => archive({ data: { productId: id } }),
     onSuccess: async (res: any) => {
       if (!res?.ok) return toast.error(res?.error ?? "Gagal menghapus.");
-      toast.success("Produk dihapus.");
+      toast.success("Produk diarsipkan dari katalog.");
+      setConfirmArchiveOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["my-store-products"] });
       navigate({ to: "/seller/produk" });
     },
@@ -138,136 +156,187 @@ function EditProduct() {
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-        Memuat produk…
+      <div className="rounded-[var(--radius-panel)] border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+        Memuat produk...
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+      <div className="rounded-[var(--radius-panel)] border border-border bg-card p-6 text-center text-sm text-muted-foreground">
         Produk tidak ditemukan.
       </div>
     );
   }
 
+  const modLabel =
+    product.moderation_status === "approved"
+      ? "Disetujui"
+      : product.moderation_status === "rejected"
+        ? "Ditolak"
+        : "Menunggu moderasi";
+
   return (
-    <div className="space-y-4">
-      <Link
-        to="/seller/produk"
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Kembali ke daftar produk
-      </Link>
+    <div className="space-y-5">
+      <SellerPageHeader
+        title={product.name || "Kelola Produk"}
+        description="Perbarui informasi katalog, variasi, serta file atau stok kode pengiriman produk digital."
+        backTo="/seller/produk"
+        backLabel="Kembali ke daftar produk"
+        badge={<StatusPill value={product.moderation_status} kind="raw" label={modLabel} />}
+      />
 
       {product.moderation_status === "rejected" && product.moderation_note ? (
-        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-3.5 text-xs text-muted-foreground">
-          <strong className="text-foreground">Ditolak:</strong> {product.moderation_note}
-        </div>
+        <SellerAlertBanner tone="danger" title="Produk ditolak moderasi">
+          {product.moderation_note}
+        </SellerAlertBanner>
       ) : null}
 
       {product.moderation_status === "pending" ? (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 text-xs text-muted-foreground">
-          <strong className="text-foreground">Menunggu moderasi</strong> — produk belum tayang
-          sampai disetujui admin.
-        </div>
+        <SellerAlertBanner tone="warning" title="Menunggu moderasi admin">
+          Produk belum tayang di katalog publik sampai disetujui oleh tim moderator.
+        </SellerAlertBanner>
       ) : null}
 
       <form
-        className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           if (name.trim().length < 3) return toast.error("Nama produk minimal 3 karakter.");
           saveMutation.mutate();
         }}
       >
-        <div className="space-y-1.5">
-          <Label htmlFor="p-name">Nama produk</Label>
-          <Input
-            id="p-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={160}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="p-short">Deskripsi singkat</Label>
-          <Input
-            id="p-short"
-            value={shortDescription}
-            onChange={(e) => setShortDesc(e.target.value)}
-            maxLength={300}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="p-desc">Deskripsi lengkap</Label>
-          <Textarea
-            id="p-desc"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={5}
-            maxLength={5000}
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="p-price">Harga (Rp)</Label>
-            <Input
-              id="p-price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
-              inputMode="numeric"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="p-disc">Harga diskon (opsional)</Label>
-            <Input
-              id="p-disc"
-              value={discountPrice}
-              onChange={(e) => setDiscountPrice(e.target.value.replace(/\D/g, ""))}
-              inputMode="numeric"
-            />
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="p-thumb">URL gambar (opsional)</Label>
-          <Input
-            id="p-thumb"
-            value={thumbnailUrl}
-            onChange={(e) => setThumbnailUrl(e.target.value)}
-            maxLength={500}
-          />
-        </div>
+        <SellerSectionCard
+          title="Detail & harga produk"
+          headingId="edit-product-heading"
+          footer={
+            <div className="flex flex-wrap items-center gap-2 px-4 py-3.5 sm:px-5">
+              <Button type="submit" className="min-h-11" disabled={saveMutation.isPending}>
+                {saveMutation.isPending ? "Menyimpan..." : "Simpan perubahan"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                disabled={submitMutation.isPending || product.status === "archived"}
+                onClick={() => submitMutation.mutate()}
+              >
+                Ajukan moderasi
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="ml-auto min-h-11 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={archiveMutation.isPending}
+                onClick={() => setConfirmArchiveOpen(true)}
+              >
+                Hapus produk
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-4">
+            <SellerField
+              id="p-name"
+              label="Nama produk"
+              required
+              counter={`${name.length}/160`}
+              hint="Minimal 3 karakter, maksimal 160 karakter."
+            >
+              <Input
+                id="p-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={160}
+                required
+                className="seller-field-control min-h-11"
+              />
+            </SellerField>
 
-        <div className="flex flex-wrap gap-2">
-          <Button type="submit" className="min-h-11" disabled={saveMutation.isPending}>
-            {saveMutation.isPending ? "Menyimpan…" : "Simpan"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11"
-            disabled={submitMutation.isPending || product.status === "archived"}
-            onClick={() => submitMutation.mutate()}
-          >
-            Ajukan moderasi
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11 text-destructive hover:bg-destructive/10 hover:text-destructive"
-            disabled={archiveMutation.isPending}
-            onClick={() => {
-              if (confirm("Hapus produk ini? Tindakan ini menyembunyikannya dari katalog."))
-                archiveMutation.mutate();
-            }}
-          >
-            Hapus
-          </Button>
-        </div>
+            <SellerField
+              id="p-short"
+              label="Deskripsi singkat"
+              counter={`${shortDescription.length}/300`}
+            >
+              <Input
+                id="p-short"
+                value={shortDescription}
+                onChange={(e) => setShortDesc(e.target.value)}
+                maxLength={300}
+                className="min-h-11"
+              />
+            </SellerField>
+
+            <SellerField
+              id="p-desc"
+              label="Deskripsi lengkap"
+              counter={`${description.length}/5000`}
+            >
+              <Textarea
+                id="p-desc"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={5}
+                maxLength={5000}
+              />
+            </SellerField>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SellerField id="p-price" label="Harga (Rp)" required>
+                <Input
+                  id="p-price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
+                  inputMode="numeric"
+                  className="min-h-11 tabular-nums"
+                />
+              </SellerField>
+              <SellerField id="p-disc" label="Harga diskon (Rp)">
+                <Input
+                  id="p-disc"
+                  value={discountPrice}
+                  onChange={(e) => setDiscountPrice(e.target.value.replace(/\D/g, ""))}
+                  inputMode="numeric"
+                  className="min-h-11 tabular-nums"
+                />
+              </SellerField>
+            </div>
+
+            <SellerField id="p-thumb" label="URL gambar">
+              <Input
+                id="p-thumb"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+                maxLength={500}
+                className="min-h-11"
+              />
+            </SellerField>
+          </div>
+        </SellerSectionCard>
       </form>
+
+      <AlertDialog open={confirmArchiveOpen} onOpenChange={setConfirmArchiveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Arsipkan produk ini?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Produk akan disembunyikan dari katalog publik dan tidak dapat dibeli lagi. Pembeli
+              lama tetap mempertahankan akses sesuai aturan sebelumnya.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="min-h-11">Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="min-h-11 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={archiveMutation.isPending}
+              onClick={() => archiveMutation.mutate()}
+            >
+              {archiveMutation.isPending ? "Menghapus..." : "Ya, arsipkan"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <ProductVariantEditor
         productId={id}
@@ -291,6 +360,9 @@ function SellerFilesSection({ productId }: { productId: string }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [version, setVersion] = useState("v1");
   const [busy, setBusy] = useState(false);
+  const [deleteFileTarget, setDeleteFileTarget] = useState<{ id: string; name: string } | null>(
+    null,
+  );
 
   const fetchFiles = useServerFn(listMyProductFiles);
   const prepare = useServerFn(createMyFileUpload);
@@ -614,11 +686,9 @@ function SellerFilesSection({ productId }: { productId: string }) {
                       <Button
                         size="icon"
                         variant="ghost"
+                        className="size-11"
                         aria-label={`Hapus ${f.original_name}`}
-                        onClick={() => {
-                          if (confirm(`Hapus berkas "${f.original_name}"?`))
-                            deleteMutation.mutate(f.id);
-                        }}
+                        onClick={() => setDeleteFileTarget({ id: f.id, name: f.original_name })}
                       >
                         <Trash2 className="size-4 text-destructive" aria-hidden="true" />
                       </Button>
@@ -628,6 +698,37 @@ function SellerFilesSection({ productId }: { productId: string }) {
               ))}
             </ul>
           )}
+
+          <AlertDialog
+            open={Boolean(deleteFileTarget)}
+            onOpenChange={(open) => {
+              if (!open) setDeleteFileTarget(null);
+            }}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus berkas ini?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Berkas <strong className="text-foreground">{deleteFileTarget?.name}</strong> akan
+                  dihapus dari daftar pengiriman produk ini.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="min-h-11">Batal</AlertDialogCancel>
+                <AlertDialogAction
+                  className="min-h-11 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => {
+                    if (!deleteFileTarget) return;
+                    deleteMutation.mutate(deleteFileTarget.id);
+                    setDeleteFileTarget(null);
+                  }}
+                >
+                  Hapus berkas
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
 

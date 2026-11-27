@@ -2,8 +2,13 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, FileText } from "lucide-react";
+import { FileText, RefreshCw } from "lucide-react";
 
+import {
+  SellerAlertBanner,
+  SellerMobileSegment,
+  SellerPageHeader,
+} from "@/components/seller/seller-ui";
 import { CardSkeleton, EmptyState, ErrorState } from "@/components/ebry/states";
 import { ServiceOrderCard } from "@/components/seller/service-order-card";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -37,7 +42,7 @@ function SellerServiceOrders() {
   const [tab, setTab] = useState<ServiceOrderTabKey>("needs_action");
   const [expanded, setExpanded] = useState<string | null>(null);
   const fetchOrders = useServerFn(listMyServiceOrders);
-  const { data, isPending, error, refetch } = useQuery({
+  const { data, isPending, isFetching, error, refetch } = useQuery({
     queryKey: ["my-service-orders"],
     queryFn: () => fetchOrders({}),
   });
@@ -57,43 +62,50 @@ function SellerServiceOrders() {
   const filtered = useMemo(() => filterServiceOrders(allItems, tab), [allItems, tab]);
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-bold sm:text-xl">Pesanan jasa</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Kerjakan dari tab Perlu tindakan. Dana ditahan sampai pembeli menerima hasil.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild variant="ghost" size="sm" className="min-h-11">
-            <Link to="/seller/jasa">Kelola jasa saya</Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="min-h-11"
-            disabled={isPending}
-            onClick={() => void refetch()}
-          >
-            Muat ulang
-          </Button>
-        </div>
-      </header>
+    <div className="space-y-4 sm:space-y-5">
+      <SellerMobileSegment
+        ariaLabel="Pilih jenis pesanan"
+        items={[
+          { to: "/seller/pesanan", label: "Pesanan Produk" },
+          { to: "/seller/jasa-pesanan", label: "Pesanan Jasa" },
+        ]}
+      />
+
+      <SellerPageHeader
+        title="Pesanan jasa"
+        description="Kerjakan dari tab Perlu tindakan. Dana ditahan sampai pembeli menerima hasil pekerjaan."
+        actions={
+          <>
+            <Button asChild variant="ghost" size="sm" className="min-h-11">
+              <Link to="/seller/jasa">Kelola jasa saya</Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11"
+              disabled={isFetching}
+              onClick={() => void refetch()}
+            >
+              <RefreshCw
+                className={isFetching ? "size-4 animate-spin" : "size-4"}
+                aria-hidden="true"
+              />
+              Muat ulang
+            </Button>
+          </>
+        }
+      />
 
       {complaints > 0 ? (
-        <div className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/5 px-3.5 py-3">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
-          <p className="text-sm">
-            {complaints} pesanan sedang dikomplain. Pencairan dana dibekukan sampai admin
-            memutuskan.
-          </p>
-        </div>
+        <SellerAlertBanner tone="danger" title="Pesanan dalam komplain">
+          {complaints} pesanan sedang dikomplain. Pencairan dana dibekukan sampai admin memutuskan.
+        </SellerAlertBanner>
       ) : null}
 
       <div
         role="tablist"
         aria-label="Filter status pesanan jasa"
-        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5"
+        data-cols="5"
+        className="seller-queue-grid overflow-hidden rounded-[var(--radius-panel)] border border-border shadow-[var(--elev-1)]"
       >
         {SERVICE_ORDER_TABS.map((entry) => {
           const active = tab === entry.key;
@@ -107,20 +119,17 @@ function SellerServiceOrders() {
               aria-selected={active}
               onClick={() => setTab(entry.key)}
               className={cn(
-                "relative flex min-h-[84px] flex-col items-start justify-between gap-2 bg-card p-4 text-left transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                "seller-queue-tab flex min-h-[74px] flex-col items-start justify-between gap-1.5 bg-card p-3 text-left transition-colors hover:bg-surface active:bg-surface sm:min-h-[88px] sm:gap-2 sm:p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                 active && "bg-surface-selected hover:bg-surface-selected",
               )}
             >
-              {active ? (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-accent" aria-hidden="true" />
-              ) : null}
               <span
                 className={cn(
-                  "text-2xl font-bold leading-none tabular-nums",
+                  "text-xl font-bold leading-none tabular-nums sm:text-2xl",
                   urgent ? "text-destructive" : "text-foreground",
                 )}
               >
-                {data ? count.toLocaleString("id-ID") : "–"}
+                {data ? count.toLocaleString("id-ID") : "-"}
               </span>
               <span
                 className={cn(

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,10 +9,16 @@ import {
   Clock,
   Info,
   ReceiptText,
+  RefreshCw,
   TrendingUp,
   Wallet,
 } from "lucide-react";
 
+import {
+  SellerFilterTabs,
+  SellerPageHeader,
+  SellerSectionCard,
+} from "@/components/seller/seller-ui";
 import { BankListRow, InlineEmpty } from "@/components/ebry/cards";
 import { CardSkeleton, ErrorState } from "@/components/ebry/states";
 import { WithdrawalPanel } from "@/components/ebry/withdrawal-panel";
@@ -25,9 +31,9 @@ import { listSellerLedger } from "@/lib/seller.functions";
 export const Route = createFileRoute("/_authenticated/seller/keuangan")({
   head: () => ({
     meta: [
-      { title: "Saldo & Pendapatan — Ebrystore" },
+      { title: "Saldo & Pendapatan | Ebrystore" },
       { name: "description", content: "Saldo dan riwayat pendapatan toko digital Anda." },
-      { property: "og:title", content: "Saldo & Pendapatan — Ebrystore" },
+      { property: "og:title", content: "Saldo & Pendapatan | Ebrystore" },
       { property: "og:description", content: "Lihat saldo dan riwayat pendapatan toko Anda." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -44,6 +50,8 @@ const SOURCE_LABEL: Record<string, string> = {
   payout: "Penarikan",
 };
 
+type LedgerFilter = "all" | "credit" | "debit";
+
 function shortDateTime(value: string | null | undefined) {
   if (!value) return "-";
   const d = new Date(value);
@@ -54,8 +62,9 @@ function shortDateTime(value: string | null | undefined) {
 
 function SellerFinance() {
   const { user } = useSession();
+  const [filter, setFilter] = useState<LedgerFilter>("all");
   const fetchLedger = useServerFn(listSellerLedger);
-  const { data, isPending, error, refetch } = useQuery({
+  const { data, isPending, isFetching, error, refetch } = useQuery({
     queryKey: ["seller-ledger"],
     queryFn: () => fetchLedger({}),
   });
@@ -74,23 +83,27 @@ function SellerFinance() {
     enabled: Boolean(user),
   });
 
-  const items: any[] = data?.items ?? [];
+  const items: any[] = useMemo(() => data?.items ?? [], [data?.items]);
+  const creditItems = useMemo(() => items.filter((e: any) => e.direction === "credit"), [items]);
+  const debitItems = useMemo(() => items.filter((e: any) => e.direction !== "credit"), [items]);
   const totalIncome = useMemo(
-    () =>
-      items
-        .filter((e: any) => e.direction === "credit")
-        .reduce((sum: number, e: any) => sum + Number(e.amount), 0),
-    [items],
+    () => creditItems.reduce((sum: number, e: any) => sum + Number(e.amount), 0),
+    [creditItems],
   );
+  const visibleItems = useMemo(() => {
+    if (filter === "credit") return creditItems;
+    if (filter === "debit") return debitItems;
+    return items;
+  }, [filter, items, creditItems, debitItems]);
 
   if (isPending) {
     return (
-      <div className="space-y-4">
-        <header>
-          <h1 className="text-lg font-bold sm:text-xl">Saldo & Pendapatan</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Memuat saldo toko…</p>
-        </header>
-        <div className="h-36 animate-pulse rounded-2xl border border-border bg-muted/60" />
+      <div className="space-y-5">
+        <SellerPageHeader
+          title="Saldo & Penarikan"
+          description="Memuat posisi saldo dan riwayat mutasi toko..."
+        />
+        <div className="h-44 animate-pulse rounded-[var(--radius-panel)] border border-border bg-muted/60 motion-reduce:animate-none" />
         <CardSkeleton rows={3} />
       </div>
     );
@@ -98,10 +111,8 @@ function SellerFinance() {
 
   if (error || data?.error) {
     return (
-      <div className="space-y-4">
-        <header>
-          <h1 className="text-lg font-bold sm:text-xl">Saldo & Pendapatan</h1>
-        </header>
+      <div className="space-y-5">
+        <SellerPageHeader title="Saldo & Penarikan" />
         <ErrorState
           title="Saldo toko gagal dimuat"
           description={data?.error ?? "Periksa koneksi lalu coba lagi."}
@@ -112,195 +123,182 @@ function SellerFinance() {
   }
 
   const balance = data?.balance ?? 0;
-  const txCount = items.length;
+  const held = data?.held ?? 0;
+  const reserved = data?.reserved ?? 0;
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-bold sm:text-xl">Saldo & Pendapatan</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ringkasan keuangan toko digital Anda.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          className="min-h-11"
-          disabled={isPending}
-          onClick={() => void refetch()}
-        >
-          Muat ulang
-        </Button>
-      </header>
+    <div className="space-y-5">
+      <SellerPageHeader
+        title="Saldo & Penarikan"
+        description="Kelola dana penjualan yang sudah dilepas, pantau dana tertahan, dan ajukan pencairan ke rekening."
+        actions={
+          <Button
+            variant="outline"
+            className="min-h-11"
+            disabled={isFetching}
+            onClick={() => void refetch()}
+          >
+            <RefreshCw
+              className={isFetching ? "size-4 animate-spin" : "size-4"}
+              aria-hidden="true"
+            />
+            Muat ulang
+          </Button>
+        }
+      />
 
-      {/* Mobile & tablet: kartu saldo ringkas, gaya sama dengan kartu saldo pembeli.
-          Warna literal karena kartu ini sengaja tetap gelap di tema terang maupun gelap. */}
+      {/* Satu ringkasan posisi dana terpadu (responsif mobile -> desktop tanpa duplikasi DOM). */}
       <section
-        className="relative isolate overflow-hidden rounded-[22px] bg-[oklch(0.16_0.012_210)] text-white shadow-[0_16px_32px_-18px_oklch(0.16_0.012_210/80%)] lg:hidden"
-        aria-label="Saldo toko"
+        aria-label="Ringkasan posisi dana toko"
+        className="overflow-hidden rounded-[var(--radius-panel)] border border-border bg-card shadow-[var(--elev-1)]"
       >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-10 -top-16 -z-10 size-44 rounded-full bg-accent/55 blur-3xl"
-        />
-        <div className="rounded-[22px] border border-white/12 bg-gradient-to-br from-white/[0.09] via-white/[0.03] to-white/[0.06] shadow-[inset_0_1px_0_oklch(1_0_0/18%)]">
-          <div className="px-4 pb-4 pt-4">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-white/70">
-              <Wallet className="size-4 shrink-0" aria-hidden="true" />
-              Saldo tersedia
-            </p>
-            <p className="mt-1 truncate text-[28px] font-bold leading-tight tracking-tight tabular-nums">
-              {formatRupiah(balance)}
-            </p>
-            <p className="mt-0.5 text-[11px] text-white/60">
-              {balance > 0 ? "Bisa ditarik ke rekening." : "Saldo masuk setelah pesanan selesai."}
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="bg-hero-gradient px-4 py-5 text-white sm:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 text-xs font-medium text-white/80">
+                <Wallet className="size-4 shrink-0" aria-hidden="true" />
+                Saldo tersedia untuk ditarik
+              </p>
+              <p className="mt-1.5 truncate font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.25rem)] font-bold leading-tight tracking-tight tabular-nums">
+                {formatRupiah(balance)}
+              </p>
+              <p className="mt-1 text-xs text-white/75">
+                {balance > 0
+                  ? "Dana sudah dilepas dan siap diajukan ke rekening terdaftar."
+                  : "Saldo akan bertambah otomatis setelah pembeli mengonfirmasi penerimaan pesanan."}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:flex">
               <a
                 href="#tarik-saldo"
-                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-[oklch(0.16_0.012_210)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-control)] bg-white px-4 text-sm font-semibold text-slate-900 transition-opacity hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 <ArrowUpRight className="size-4" aria-hidden="true" />
                 Tarik saldo
               </a>
               <a
                 href="#mutasi-heading"
-                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-white/25 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-control)] border border-white/30 bg-white/10 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/20 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 <ReceiptText className="size-4" aria-hidden="true" />
                 Mutasi
               </a>
             </div>
           </div>
-          <dl className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10">
-            {[
-              { label: "Ditahan", value: data?.held ?? 0 },
-              { label: "Cadangan refund", value: data?.reserved ?? 0 },
-              { label: "Total masuk", value: totalIncome },
-            ].map((k) => (
-              <div key={k.label} className="min-w-0 px-3 py-3">
-                <dt className="truncate text-[11px] text-white/60">{k.label}</dt>
-                <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums">
-                  {formatRupiah(k.value)}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
-      </section>
-      {/* Penjelasan singkat posisi dana (mobile), karena kartu di atas hanya memuat angka. */}
-      <details className="group rounded-2xl border border-border bg-card px-4 text-xs text-muted-foreground lg:hidden">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1.5 font-medium text-foreground [&::-webkit-details-marker]:hidden">
-          <Info className="size-4 shrink-0 text-accent" aria-hidden="true" />
-          Arti setiap angka
-          <ChevronDown
-            className="ml-auto size-4 transition-transform group-open:rotate-180"
-            aria-hidden="true"
-          />
-        </summary>
-        <ul className="space-y-1.5 pb-3 leading-relaxed">
-          <li>
-            <b className="font-semibold text-foreground">Ditahan</b>: menunggu pembeli konfirmasi
-            penerimaan.
-          </li>
-          <li>
-            <b className="font-semibold text-foreground">Cadangan refund</b>: dibekukan selama
-            refund diproses.
-          </li>
-          <li>
-            <b className="font-semibold text-foreground">Total masuk</b>: jumlah semua mutasi masuk
-            ({txCount} mutasi tercatat).
-          </li>
-        </ul>
-      </details>
 
-      {/* Desktop: saldo utama + posisi dana lain dalam satu baris. */}
-      <section
-        className="hidden gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr]"
-        aria-label="Saldo toko"
-      >
-        <div className="bg-card p-5">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <Wallet className="size-4 shrink-0 text-accent" aria-hidden="true" />
-            Saldo tersedia
+        <dl className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3">
+          {[
+            {
+              icon: Clock,
+              label: "Dana ditahan",
+              value: held,
+              hint: "Menunggu konfirmasi penerimaan pembeli.",
+              spanClass: "",
+            },
+            {
+              icon: Info,
+              label: "Cadangan refund",
+              value: reserved,
+              hint: "Dibekukan selama proses refund aktif.",
+              spanClass: "",
+            },
+            {
+              icon: TrendingUp,
+              label: "Total mutasi masuk",
+              value: totalIncome,
+              hint: `${items.length.toLocaleString("id-ID")} catatan ledger tersimpan.`,
+              spanClass: "col-span-2 sm:col-span-1",
+            },
+          ].map((k) => (
+            <div key={k.label} className={`min-w-0 bg-card px-3.5 py-3 sm:px-5 sm:py-4 ${k.spanClass}`}>
+              <dt className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground sm:text-xs">
+                <k.icon className="size-3.5 shrink-0 text-accent" aria-hidden="true" />
+                <span className="truncate">{k.label}</span>
+              </dt>
+              <dd className="mt-1 break-words text-base font-bold tabular-nums text-foreground sm:text-lg">
+                {formatRupiah(k.value)}
+              </dd>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{k.hint}</p>
+            </div>
+          ))}
+        </dl>
+
+        <details className="group border-t border-border bg-surface/50 px-4 text-xs text-muted-foreground sm:px-5">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 font-medium text-foreground [&::-webkit-details-marker]:hidden">
+            <Info className="size-4 shrink-0 text-accent" aria-hidden="true" />
+            <span>Bagaimana alur pelepasan dana bekerja?</span>
+            <ChevronDown
+              className="ml-auto size-4 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+              aria-hidden="true"
+            />
+          </summary>
+          <p className="pb-3.5 leading-relaxed">
+            Pembayaran pembeli terlebih dahulu masuk ke status <strong>Dana ditahan</strong> sampai
+            pembeli mengonfirmasi penerimaan. Jika ada pengajuan refund, nominal terkait berpindah
+            ke <strong>Cadangan refund</strong> sampai keputusan selesai. Hanya saldo yang sudah
+            dilepas yang dapat ditarik ke rekening bank Anda.
           </p>
-          <p className="mt-1.5 text-3xl font-bold tabular-nums text-foreground">
-            {formatRupiah(balance)}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">Bisa ditarik ke rekening.</p>
-        </div>
-        {[
-          {
-            icon: Clock,
-            label: "Ditahan",
-            value: data?.held ?? 0,
-            hint: "Menunggu pembeli konfirmasi penerimaan.",
-          },
-          {
-            icon: Info,
-            label: "Cadangan refund",
-            value: data?.reserved ?? 0,
-            hint: "Dibekukan selama refund diproses.",
-          },
-          {
-            icon: TrendingUp,
-            label: "Total pendapatan",
-            value: totalIncome,
-            hint: `${txCount} mutasi tercatat.`,
-          },
-        ].map((k) => (
-          <div key={k.label} className="bg-card p-5">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <k.icon className="size-3.5 shrink-0" aria-hidden="true" />
-              {k.label}
-            </p>
-            <p className="mt-1.5 text-xl font-bold tabular-nums text-foreground">
-              {formatRupiah(k.value)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">{k.hint}</p>
-          </div>
-        ))}
+        </details>
       </section>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
-        {/* Tarik saldo di kanan (desktop), di atas mutasi (HP). */}
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_400px]">
+        {/* Panel tarik saldo: tampil dulu di mobile, sticky di kanan pada desktop. */}
         <div id="tarik-saldo" className="scroll-mt-24 lg:sticky lg:top-24 lg:order-2">
           <WithdrawalPanel available={balance} onChanged={() => void refetch()} />
         </div>
 
-        {/* Mutation list */}
-        <section
-          className="rounded-2xl border border-border bg-card lg:order-1"
-          aria-labelledby="mutasi-heading"
+        <SellerSectionCard
+          title="Riwayat mutasi"
+          description="Seluruh catatan masuk dan keluar pada buku besar toko Anda."
+          headingId="mutasi-heading"
+          className="lg:order-1"
+          bodyClassName="p-0"
         >
-          <h2
-            id="mutasi-heading"
-            className="border-b border-border px-4 py-3 text-sm font-bold text-foreground"
-          >
-            Riwayat mutasi
-          </h2>
+          <div className="border-b border-border px-3 py-2 sm:px-4">
+            <SellerFilterTabs<LedgerFilter>
+              ariaLabel="Filter jenis mutasi"
+              value={filter}
+              onChange={setFilter}
+              items={[
+                { key: "all", label: "Semua", count: items.length },
+                { key: "credit", label: "Masuk", count: creditItems.length },
+                { key: "debit", label: "Keluar", count: debitItems.length },
+              ]}
+            />
+          </div>
 
-          {items.length === 0 ? (
-            <InlineEmpty icon={Wallet} text="Belum ada mutasi saldo." />
+          {visibleItems.length === 0 ? (
+            <div className="p-4">
+              <InlineEmpty
+                icon={Wallet}
+                text={
+                  items.length === 0
+                    ? "Belum ada mutasi saldo."
+                    : "Tidak ada mutasi pada kategori filter ini."
+                }
+              />
+            </div>
           ) : (
-            <ul className="px-4" aria-label="Daftar mutasi">
-              {items.map((e: any, index: number) => {
+            <ul className="px-4 sm:px-5" aria-label="Daftar mutasi">
+              {visibleItems.map((e: any, index: number) => {
                 const credit = e.direction === "credit";
+                const baseLabel = SOURCE_LABEL[e.source_type] ?? e.source_type;
                 return (
                   <BankListRow
                     key={e.id}
                     className={index >= 6 ? "cv-row" : undefined}
                     icon={credit ? ArrowDownLeft : ArrowUpRight}
-                    title={`${SOURCE_LABEL[e.source_type] ?? e.source_type}${e.note ? ` — ${e.note}` : ""}`}
+                    title={e.note ? `${baseLabel}: ${e.note}` : baseLabel}
                     subtitle={shortDateTime(e.created_at)}
-                    value={`${credit ? "+" : "−"}${formatRupiah(Number(e.amount))}`}
+                    value={`${credit ? "+" : "-"}${formatRupiah(Number(e.amount))}`}
                     valueTone={credit ? "positive" : "warning"}
                   />
                 );
               })}
             </ul>
           )}
-        </section>
+        </SellerSectionCard>
       </div>
     </div>
   );

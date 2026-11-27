@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   BarChart3,
+  BriefcaseBusiness,
   ChevronRight,
   Clock,
   ExternalLink,
@@ -12,7 +13,6 @@ import {
   Package,
   PackagePlus,
   PackageX,
-  Plus,
   ReceiptText,
   RotateCcw,
   ShieldCheck,
@@ -25,7 +25,14 @@ import {
 const LazySellerTrendChart = lazy(() => import("@/components/seller/seller-trend-chart"));
 
 import { AdminError, AdminLoading } from "@/components/admin/admin-ui";
-import { StatTile } from "@/components/ebry/cards";
+import {
+  SellerKpiCard,
+  SellerKpiGrid,
+  SellerPageHeader,
+  SellerSectionCard,
+} from "@/components/seller/seller-ui";
+import { StatusPill } from "@/components/ebry/status";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { formatRupiah } from "@/lib/format";
@@ -39,9 +46,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/seller/")({
   head: () => ({
     meta: [
-      { title: "Ringkasan Toko — Ebrystore" },
+      { title: "Ringkasan Toko | Ebrystore" },
       { name: "description", content: "Ringkasan performa dan penjualan toko digital Anda." },
-      { property: "og:title", content: "Ringkasan Toko — Ebrystore" },
+      { property: "og:title", content: "Ringkasan Toko | Ebrystore" },
       { property: "og:description", content: "Pantau penjualan, saldo, dan produk toko Anda." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -50,11 +57,13 @@ export const Route = createFileRoute("/_authenticated/seller/")({
   component: SellerOverview,
 });
 
-/** Grafik area 30 hari. Chunk Recharts diunduh secara dinamis setelah mount (aman SSR, bebas blokir route). */
+/** Grafik area 30 hari. Chunk Recharts diunduh dinamis setelah mount agar SSR ringan. */
 function TrendChart({ data }: { data: Array<{ date: string; total: number }> }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const placeholder = <div className="h-[240px] animate-pulse rounded-lg bg-muted/50" />;
+  const placeholder = (
+    <div className="h-[240px] animate-pulse rounded-lg bg-muted/50 motion-reduce:animate-none" />
+  );
   if (!mounted) return placeholder;
 
   return (
@@ -69,47 +78,56 @@ type TodoItem = {
   value: number | null;
   icon: LucideIcon;
   to: string;
-  /** Angka > 0 di sini berarti seller perlu bertindak (diberi warna). */
+  /** Angka > 0 menandakan antrean kerja yang perlu segera ditindak seller. */
   urgent?: boolean;
 };
 
-/** Kotak "Perlu diproses" ala seller center: angka besar, klik langsung ke filter terkait. */
 function TodoGrid({ items }: { items: TodoItem[] }) {
   return (
-    <section aria-labelledby="todo-heading" className="rounded-2xl border border-border bg-card">
-      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-        <h2 id="todo-heading" className="text-sm font-bold text-foreground">
-          Perlu diproses
-        </h2>
-        <span className="text-xs text-muted-foreground">Klik untuk membuka daftar</span>
-      </div>
-      <ul className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 xl:grid-cols-6">
+    <SellerSectionCard
+      title="Antrean perlu diproses"
+      description="Prioritaskan item bernilai lebih dari 0 agar pengiriman dan layanan tetap lancar."
+      headingId="todo-heading"
+      bodyClassName="p-0"
+    >
+      <ul className="seller-queue-grid" data-cols="6">
         {items.map((t) => {
           const active = t.urgent && (t.value ?? 0) > 0;
           return (
             <li key={t.label} className="bg-card">
               <Link
                 to={t.to}
-                className="group flex h-full min-h-[92px] flex-col justify-between gap-2 p-4 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                className={cn(
+                  "group flex h-full min-h-[78px] flex-col justify-between gap-2 p-3 transition-colors hover:bg-surface active:bg-surface sm:min-h-[96px] sm:gap-2.5 sm:p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                  active && "bg-destructive/[0.03] hover:bg-destructive/[0.06]",
+                )}
               >
-                <span
-                  className={cn(
-                    "text-2xl font-bold leading-none tabular-nums",
-                    active ? "text-destructive" : "text-foreground",
-                  )}
-                >
-                  {t.value ?? "–"}
-                </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground group-hover:text-foreground">
-                  <t.icon className="size-3.5 shrink-0" aria-hidden="true" />
-                  <span className="line-clamp-2">{t.label}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    className={cn(
+                      "text-xl font-bold leading-none tabular-nums sm:text-2xl",
+                      active ? "text-destructive" : "text-foreground",
+                    )}
+                  >
+                    {t.value ?? "-"}
+                  </span>
+                  <t.icon
+                    className={cn(
+                      "size-4 shrink-0",
+                      active ? "text-destructive" : "text-muted-foreground/70 group-hover:text-accent",
+                    )}
+                    aria-hidden="true"
+                  />
+                </div>
+                <span className="line-clamp-2 text-xs font-medium leading-snug text-muted-foreground group-hover:text-foreground">
+                  {t.label}
                 </span>
               </Link>
             </li>
           );
         })}
       </ul>
-    </section>
+    </SellerSectionCard>
   );
 }
 
@@ -158,18 +176,20 @@ function SellerOverview() {
     enabled: Boolean(user),
   });
 
-  if (isPending) return <AdminLoading label="Memuat ringkasan…" />;
+  if (isPending) return <AdminLoading label="Memuat ringkasan..." />;
   if (error || data?.error) return <AdminError message="Ringkasan tidak dapat dimuat." />;
 
   const s = data?.summary;
   if (!s) return <AdminError message="Ringkasan toko tidak tersedia." />;
 
-  const store = (storeQ.data as { store?: { slug?: string } } | undefined)?.store;
+  const store = (storeQ.data as { store?: { name?: string; slug?: string; status?: string } } | undefined)
+    ?.store;
   const counts = monitoringQ.data?.counts;
   const serviceCounts = serviceQ.data ? countServiceOrders(serviceQ.data.items ?? []) : null;
   const inquiries = ((inquiriesQ.data as { items?: Array<{ status: string }> } | undefined)?.items ??
     null) as Array<{ status: string }> | null;
   const inv = (inventoryQ.data as { summary?: { out_of_stock: number } } | undefined)?.summary;
+  const openChats = inquiries ? inquiries.filter((i) => i.status === "open").length : null;
 
   const todos: TodoItem[] = [
     {
@@ -188,7 +208,7 @@ function SellerOverview() {
     },
     {
       label: "Chat belum dijawab",
-      value: inquiries ? inquiries.filter((i) => i.status === "open").length : null,
+      value: openChats,
       icon: MessageSquare,
       to: "/seller/chat",
       urgent: true,
@@ -215,143 +235,169 @@ function SellerOverview() {
     },
   ];
 
-  const quickActions: Array<{ label: string; icon: LucideIcon; to: string; params?: object }> = [
-    { label: "Tambah produk", icon: PackagePlus, to: "/seller/produk/baru" },
-    { label: "Tambah jasa", icon: Plus, to: "/seller/jasa" },
-    { label: "Tarik saldo", icon: Wallet, to: "/seller/keuangan" },
-    { label: "Lihat ulasan", icon: Star, to: "/seller/performa" },
+  const urgentTotal = todos
+    .filter((t) => t.urgent)
+    .reduce((sum, item) => sum + Number(item.value ?? 0), 0);
+  const trendTotal30d = s.trend.reduce((sum, d) => sum + d.total, 0);
+  const activeSaleDays = s.trend.filter((d) => d.total > 0).length;
+
+  const quickActions: Array<{ label: string; hint: string; icon: LucideIcon; to: string }> = [
+    { label: "Tambah produk", hint: "File atau kode digital", icon: PackagePlus, to: "/seller/produk/baru" },
+    { label: "Kelola jasa", hint: "Buat atau edit jasa", icon: BriefcaseBusiness, to: "/seller/jasa" },
+    { label: "Tarik saldo", hint: "Pencairan ke rekening", icon: Wallet, to: "/seller/keuangan" },
+    { label: "Ulasan toko", hint: "Pantau rating pembeli", icon: Star, to: "/seller/performa" },
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-        <StatTile
+    <div className="space-y-4 sm:space-y-5">
+      <SellerPageHeader
+        title="Ringkasan Toko"
+        description="Pantau antrean operasional, arus pendapatan yang dilepas, dan kesehatan katalog toko Anda."
+        badge={
+          store?.status === "active" ? (
+            urgentTotal > 0 ? (
+              <StatusPill
+                value="waiting"
+                kind="raw"
+                label={`${urgentTotal} item perlu ditindak`}
+              />
+            ) : (
+              <StatusPill value="success" kind="raw" label="Antrean terkendali" />
+            )
+          ) : null
+        }
+        actions={
+          store?.status === "active" ? (
+            <div className="hidden items-center gap-2 lg:flex">
+              {store.slug ? (
+                <Button asChild variant="outline" className="min-h-11">
+                  <Link to="/toko/$slug" params={{ slug: store.slug }}>
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                    Etalase
+                  </Link>
+                </Button>
+              ) : null}
+              <Button asChild className="min-h-11">
+                <Link to="/seller/produk/baru">
+                  <PackagePlus className="size-4" aria-hidden="true" />
+                  Tambah produk
+                </Link>
+              </Button>
+            </div>
+          ) : null
+        }
+      />
+
+      <SellerKpiGrid>
+        <SellerKpiCard
           icon={Wallet}
           label="Saldo tersedia"
           value={formatRupiah(s.balance)}
+          hint={s.held > 0 ? `Ditahan ${formatRupiah(s.held)}` : "Siap ditarik ke rekening"}
           to="/seller/keuangan"
         />
-        <StatTile
+        <SellerKpiCard
           icon={ShoppingBag}
           label="Pendapatan dilepas"
           value={formatRupiah(s.salesTotal)}
+          hint={`${s.soldCount.toLocaleString("id-ID")} transaksi terjual`}
           tone="success"
         />
-        <StatTile
+        <SellerKpiCard
           icon={Package}
           label="Produk tayang"
           value={`${s.productPublished}/${s.productTotal}`}
+          hint={s.productPending > 0 ? `${s.productPending} menunggu moderasi` : "Semua produk terproses"}
           to="/seller/produk"
         />
-        <StatTile
+        <SellerKpiCard
           icon={Star}
           label="Rating toko"
-          value={s.ratingCount > 0 ? `${s.rating} (${s.ratingCount})` : "Belum ada"}
+          value={s.ratingCount > 0 ? `${s.rating} / 5` : "Belum ada"}
+          hint={s.ratingCount > 0 ? `Dari ${s.ratingCount} ulasan pembeli` : "Menunggu ulasan pertama"}
           tone="warning"
           to="/seller/performa"
         />
-      </div>
+      </SellerKpiGrid>
 
       <TodoGrid items={todos} />
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <section
-          className="rounded-2xl border border-border bg-card p-4 sm:p-5"
-          aria-labelledby="tren-heading"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2
-                id="tren-heading"
-                className="flex items-center gap-2 text-sm font-bold text-foreground"
-              >
-                <BarChart3 className="size-4 shrink-0 text-accent" aria-hidden="true" />
-                Pendapatan 30 hari terakhir
-              </h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Hanya pendapatan yang sudah dilepas, bukan dana yang masih ditahan.
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <SellerSectionCard
+          title="Pendapatan 30 hari terakhir"
+          description="Menghitung pendapatan yang sudah dilepas ke saldo toko, bukan dana ditahan."
+          icon={BarChart3}
+          headingId="tren-heading"
+          action={
+            <div className="text-right">
+              <p className="text-[11px] font-medium text-muted-foreground">
+                Total 30 hari ({activeSaleDays} hari aktif)
+              </p>
+              <p className="text-base font-bold tabular-nums text-foreground">
+                {formatRupiah(trendTotal30d)}
               </p>
             </div>
-            <p className="text-right">
-              <span className="block text-[11px] text-muted-foreground">Total 30 hari</span>
-              <span className="text-base font-bold tabular-nums text-foreground">
-                {formatRupiah(s.trend.reduce((sum, d) => sum + d.total, 0))}
-              </span>
-            </p>
-          </div>
-          <div className="mt-3">
-            <TrendChart data={s.trend} />
-          </div>
-        </section>
+          }
+        >
+          <TrendChart data={s.trend} />
+        </SellerSectionCard>
 
-        <div className="space-y-4">
-          <section
-            aria-labelledby="aksi-heading"
-            className="rounded-2xl border border-border bg-card p-2"
+        <div className="space-y-5">
+          <SellerSectionCard
+            title="Aksi cepat"
+            headingId="aksi-heading"
+            bodyClassName="p-2.5"
           >
-            <h2 id="aksi-heading" className="px-2 pb-1 pt-2 text-sm font-bold text-foreground">
-              Aksi cepat
-            </h2>
-            <ul className="grid grid-cols-2 gap-1">
+            <ul className="grid grid-cols-2 gap-1.5">
               {quickActions.map((a) => (
                 <li key={a.label}>
                   <Link
                     to={a.to}
-                    className="flex min-h-11 flex-col items-start gap-2 rounded-xl p-3 text-sm font-medium text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex min-h-[82px] flex-col justify-between gap-2 rounded-lg border border-transparent p-2.5 text-left transition-colors hover:border-border hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <span className="grid size-9 place-items-center rounded-lg bg-surface-selected text-accent">
+                    <span className="grid size-8 place-items-center rounded-lg bg-surface-selected text-accent">
                       <a.icon className="size-4" aria-hidden="true" />
                     </span>
-                    {a.label}
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-foreground">{a.label}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{a.hint}</p>
+                    </div>
                   </Link>
                 </li>
               ))}
             </ul>
-            {store?.slug ? (
-              <Link
-                to="/toko/$slug"
-                params={{ slug: store.slug }}
-                className="mt-1 flex min-h-11 items-center justify-between gap-2 rounded-xl border-t border-border px-3 text-sm font-semibold text-accent hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Lihat halaman toko
-                <ExternalLink className="size-4" aria-hidden="true" />
-              </Link>
-            ) : null}
-          </section>
+          </SellerSectionCard>
 
-          <section
-            className="rounded-2xl border border-border bg-card"
-            aria-labelledby="dana-heading"
+          <SellerSectionCard
+            title="Dana & inventaris"
+            icon={ShieldCheck}
+            headingId="dana-heading"
+            bodyClassName="p-0"
+            footer={
+              <Link
+                to="/seller/keuangan"
+                className="flex min-h-11 items-center justify-between px-4 text-sm font-semibold text-accent transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              >
+                Buka saldo &amp; penarikan
+                <ChevronRight className="size-4" aria-hidden="true" />
+              </Link>
+            }
           >
-            <h2
-              id="dana-heading"
-              className="flex items-center gap-2 border-b border-border px-4 py-3 text-sm font-bold text-foreground"
-            >
-              <ShieldCheck className="size-4 text-accent" aria-hidden="true" />
-              Dana & produk
-            </h2>
             <dl className="divide-y divide-border text-sm">
               {[
-                ["Ditahan, menunggu penerimaan", formatRupiah(s.held)],
+                ["Ditahan (menunggu penerimaan)", formatRupiah(s.held)],
                 ["Cadangan refund", formatRupiah(s.reserved)],
-                ["Total produk", s.productTotal],
-                ["Menunggu moderasi", s.productPending],
-                ["Total terjual", s.soldCount],
+                ["Total produk", s.productTotal.toLocaleString("id-ID")],
+                ["Menunggu moderasi", s.productPending.toLocaleString("id-ID")],
+                ["Total terjual", s.soldCount.toLocaleString("id-ID")],
               ].map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                  <dt className="text-muted-foreground">{label}</dt>
+                  <dt className="text-xs text-muted-foreground sm:text-sm">{label}</dt>
                   <dd className="font-semibold tabular-nums text-foreground">{value}</dd>
                 </div>
               ))}
             </dl>
-            <Link
-              to="/seller/keuangan"
-              className="flex min-h-11 items-center justify-between border-t border-border px-4 text-sm font-semibold text-accent hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Buka keuangan
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </Link>
-          </section>
+          </SellerSectionCard>
         </div>
       </div>
     </div>

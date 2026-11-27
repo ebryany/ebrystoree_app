@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -87,7 +87,21 @@ function ChatSidebar({ mode, activeId }: { mode: Mode; activeId?: string | null 
   const queryClient = useQueryClient();
   const [term, setTerm] = useState("");
   const [filter, setFilter] = useState<SidebarFilter>("all");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const { pinnedIds, isPinned, togglePin } = usePinnedChats(user?.id);
+
+  // Desktop command shortcut: Ctrl/Cmd+K focuses conversation search immediately
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const fetchMine = useServerFn(listMyInquiries);
   const fetchSeller = useServerFn(listSellerInquiries);
@@ -228,6 +242,7 @@ function ChatSidebar({ mode, activeId }: { mode: Mode; activeId?: string | null 
             aria-hidden="true"
           />
           <input
+            ref={searchInputRef}
             type="search"
             value={term}
             onChange={(e) => setTerm(e.target.value)}
@@ -235,8 +250,13 @@ function ChatSidebar({ mode, activeId }: { mode: Mode; activeId?: string | null 
               mode === "seller" ? "Cari pembeli atau topik..." : "Cari atau mulai chat..."
             }
             aria-label="Cari percakapan"
-            className="h-9 w-full rounded-lg bg-[var(--wa-search)] pl-9 pr-9 text-sm text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)] focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-search-cancel-button]:hidden"
+            className="h-9 w-full rounded-lg bg-[var(--wa-search)] pl-9 pr-14 text-sm text-[var(--wa-in-fg)] outline-none placeholder:text-[var(--wa-in-meta)] focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-search-cancel-button]:hidden"
           />
+          {!term ? (
+            <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border border-[var(--wa-border)] bg-[var(--wa-panel)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--wa-in-meta)] xl:inline-block">
+              Ctrl K
+            </kbd>
+          ) : null}
           {term ? (
             <button
               type="button"

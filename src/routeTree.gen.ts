@@ -38,7 +38,9 @@ import { Route as ProdukIndexRouteImport } from './routes/produk.index'
 import { Route as ProdukSlugRouteImport } from './routes/produk.$slug'
 import { Route as SeeDashboardRouteRouteImport } from './routes/see/_dashboard/route'
 import { Route as SeeMasukRouteImport } from './routes/see/masuk'
+import { Route as TIdRouteImport } from './routes/t.$id'
 import { Route as TokoSlugRouteImport } from './routes/toko.$slug'
+import { Route as UHandleRouteImport } from './routes/u.$handle'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -58,6 +60,7 @@ import { Route as AuthenticatedDashboardNotifikasiRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardPengaturanRouteImport } from './routes/_authenticated/dashboard.pengaturan'
 import { Route as AuthenticatedDashboardProdukRouteImport } from './routes/_authenticated/dashboard.produk'
 import { Route as AuthenticatedDashboardProdukSayaRouteImport } from './routes/_authenticated/dashboard.produk-saya'
+import { Route as AuthenticatedDashboardProfilRouteImport } from './routes/_authenticated/dashboard.profil'
 import { Route as AuthenticatedDashboardSaldoRouteImport } from './routes/_authenticated/dashboard.saldo'
 import { Route as AuthenticatedOperatorIndexRouteImport } from './routes/_authenticated/operator.index'
 import { Route as AuthenticatedOperatorIdRouteImport } from './routes/_authenticated/operator.$id'
@@ -108,6 +111,7 @@ import { Route as AuthenticatedDashboardPesananIndexRouteImport } from './routes
 import { Route as AuthenticatedDashboardPesananIdRouteImport } from './routes/_authenticated/dashboard.pesanan.$id'
 import { Route as AuthenticatedDashboardPoIndexRouteImport } from './routes/_authenticated/dashboard.po.index'
 import { Route as AuthenticatedDashboardPoIdRouteImport } from './routes/_authenticated/dashboard.po.$id'
+import { Route as AuthenticatedDashboardThreadIdRouteImport } from './routes/_authenticated/dashboard.thread.$id'
 import { Route as AuthenticatedSellerChatIndexRouteImport } from './routes/_authenticated/seller.chat.index'
 import { Route as AuthenticatedSellerChatIdRouteImport } from './routes/_authenticated/seller.chat.$id'
 import { Route as AuthenticatedSellerProdukIndexRouteImport } from './routes/_authenticated/seller.produk.index'
@@ -122,6 +126,7 @@ import { Route as ApiPublicJobsShopeepayReconcileRouteImport } from './routes/ap
 import { Route as ApiPublicJobsTelegramDispatchRouteImport } from './routes/api/public/jobs/telegram-dispatch'
 import { Route as ApiPublicOgImageSplatRouteImport } from './routes/api/public/og-image.$'
 import { Route as ApiPublicServiceMediaSplatRouteImport } from './routes/api/public/service-media.$'
+import { Route as ApiPublicSocialReelSplatRouteImport } from './routes/api/public/social-reel.$'
 import { Route as ApiV1CatalogSplatRouteImport } from './routes/api/v1/catalog/$'
 import { Route as AsFebAuthAdminRouteImport } from './routes/as.feb.auth.admin'
 import { Route as ApiPublicIntegrationsJiofarmDemandRouteImport } from './routes/api/public/integrations/jiofarm/demand'
@@ -275,9 +280,19 @@ const SeeMasukRoute = SeeMasukRouteImport.update({
   path: '/see/masuk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TIdRoute = TIdRouteImport.update({
+  id: '/t/$id',
+  path: '/t/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TokoSlugRoute = TokoSlugRouteImport.update({
   id: '/toko/$slug',
   path: '/toko/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UHandleRoute = UHandleRouteImport.update({
+  id: '/u/$handle',
+  path: '/u/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
@@ -387,6 +402,12 @@ const AuthenticatedDashboardProdukSayaRoute =
   AuthenticatedDashboardProdukSayaRouteImport.update({
     id: '/produk-saya',
     path: '/produk-saya',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardProfilRoute =
+  AuthenticatedDashboardProfilRouteImport.update({
+    id: '/profil',
+    path: '/profil',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardSaldoRoute =
@@ -681,6 +702,12 @@ const AuthenticatedDashboardPoIdRoute =
     path: '/po/$id',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardThreadIdRoute =
+  AuthenticatedDashboardThreadIdRouteImport.update({
+    id: '/thread/$id',
+    path: '/thread/$id',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedSellerChatIndexRoute =
   AuthenticatedSellerChatIndexRouteImport.update({
     id: '/chat/',
@@ -762,6 +789,12 @@ const ApiPublicServiceMediaSplatRoute =
     path: '/api/public/service-media/$',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSocialReelSplatRoute =
+  ApiPublicSocialReelSplatRouteImport.update({
+    id: '/api/public/social-reel/$',
+    path: '/api/public/social-reel/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiV1CatalogSplatRoute = ApiV1CatalogSplatRouteImport.update({
   id: '/api/v1/catalog/$',
   path: '/api/v1/catalog/$',
@@ -823,7 +856,9 @@ export interface FileRoutesByFullPath {
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
+  '/t/$id': typeof TIdRoute
   '/toko/$slug': typeof TokoSlugRoute
+  '/u/$handle': typeof UHandleRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/layanan/': typeof LayananIndexRoute
   '/produk/': typeof ProdukIndexRoute
@@ -844,6 +879,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
+  '/dashboard/profil': typeof AuthenticatedDashboardProfilRoute
   '/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/operator/$id': typeof AuthenticatedOperatorIdRoute
   '/seller/jasa': typeof AuthenticatedSellerJasaRoute
@@ -884,6 +920,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/jasa/$id': typeof AuthenticatedDashboardJasaIdRoute
   '/dashboard/pesanan/$id': typeof AuthenticatedDashboardPesananIdRoute
   '/dashboard/po/$id': typeof AuthenticatedDashboardPoIdRoute
+  '/dashboard/thread/$id': typeof AuthenticatedDashboardThreadIdRoute
   '/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
@@ -896,6 +933,7 @@ export interface FileRoutesByFullPath {
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
+  '/api/public/social-reel/$': typeof ApiPublicSocialReelSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
   '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
@@ -938,7 +976,9 @@ export interface FileRoutesByTo {
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
+  '/t/$id': typeof TIdRoute
   '/toko/$slug': typeof TokoSlugRoute
+  '/u/$handle': typeof UHandleRoute
   '/artikel': typeof ArtikelIndexRoute
   '/layanan': typeof LayananIndexRoute
   '/produk': typeof ProdukIndexRoute
@@ -959,6 +999,7 @@ export interface FileRoutesByTo {
   '/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
+  '/dashboard/profil': typeof AuthenticatedDashboardProfilRoute
   '/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/operator/$id': typeof AuthenticatedOperatorIdRoute
   '/seller/jasa': typeof AuthenticatedSellerJasaRoute
@@ -998,6 +1039,7 @@ export interface FileRoutesByTo {
   '/dashboard/jasa/$id': typeof AuthenticatedDashboardJasaIdRoute
   '/dashboard/pesanan/$id': typeof AuthenticatedDashboardPesananIdRoute
   '/dashboard/po/$id': typeof AuthenticatedDashboardPoIdRoute
+  '/dashboard/thread/$id': typeof AuthenticatedDashboardThreadIdRoute
   '/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
@@ -1010,6 +1052,7 @@ export interface FileRoutesByTo {
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
+  '/api/public/social-reel/$': typeof ApiPublicSocialReelSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
   '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/admin/chat': typeof AuthenticatedAdminChatIndexRoute
@@ -1059,7 +1102,9 @@ export interface FileRoutesById {
   '/p/$id': typeof PIdRoute
   '/produk/$slug': typeof ProdukSlugRoute
   '/see/masuk': typeof SeeMasukRoute
+  '/t/$id': typeof TIdRoute
   '/toko/$slug': typeof TokoSlugRoute
+  '/u/$handle': typeof UHandleRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/layanan/': typeof LayananIndexRoute
   '/produk/': typeof ProdukIndexRoute
@@ -1080,6 +1125,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/pengaturan': typeof AuthenticatedDashboardPengaturanRoute
   '/_authenticated/dashboard/produk': typeof AuthenticatedDashboardProdukRoute
   '/_authenticated/dashboard/produk-saya': typeof AuthenticatedDashboardProdukSayaRoute
+  '/_authenticated/dashboard/profil': typeof AuthenticatedDashboardProfilRoute
   '/_authenticated/dashboard/saldo': typeof AuthenticatedDashboardSaldoRoute
   '/_authenticated/operator/$id': typeof AuthenticatedOperatorIdRoute
   '/_authenticated/seller/jasa': typeof AuthenticatedSellerJasaRoute
@@ -1120,6 +1166,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/jasa/$id': typeof AuthenticatedDashboardJasaIdRoute
   '/_authenticated/dashboard/pesanan/$id': typeof AuthenticatedDashboardPesananIdRoute
   '/_authenticated/dashboard/po/$id': typeof AuthenticatedDashboardPoIdRoute
+  '/_authenticated/dashboard/thread/$id': typeof AuthenticatedDashboardThreadIdRoute
   '/_authenticated/seller/chat/$id': typeof AuthenticatedSellerChatIdRoute
   '/_authenticated/seller/produk/$id': typeof AuthenticatedSellerProdukIdRoute
   '/_authenticated/seller/produk/baru': typeof AuthenticatedSellerProdukBaruRoute
@@ -1132,6 +1179,7 @@ export interface FileRoutesById {
   '/api/public/jobs/telegram-dispatch': typeof ApiPublicJobsTelegramDispatchRoute
   '/api/public/og-image/$': typeof ApiPublicOgImageSplatRoute
   '/api/public/service-media/$': typeof ApiPublicServiceMediaSplatRoute
+  '/api/public/social-reel/$': typeof ApiPublicSocialReelSplatRoute
   '/api/v1/catalog/$': typeof ApiV1CatalogSplatRoute
   '/as/feb/auth/admin': typeof AsFebAuthAdminRoute
   '/_authenticated/admin/chat/': typeof AuthenticatedAdminChatIndexRoute
@@ -1181,7 +1229,9 @@ export interface FileRouteTypes {
     | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
+    | '/t/$id'
     | '/toko/$slug'
+    | '/u/$handle'
     | '/artikel/'
     | '/layanan/'
     | '/produk/'
@@ -1202,6 +1252,7 @@ export interface FileRouteTypes {
     | '/dashboard/pengaturan'
     | '/dashboard/produk'
     | '/dashboard/produk-saya'
+    | '/dashboard/profil'
     | '/dashboard/saldo'
     | '/operator/$id'
     | '/seller/jasa'
@@ -1242,6 +1293,7 @@ export interface FileRouteTypes {
     | '/dashboard/jasa/$id'
     | '/dashboard/pesanan/$id'
     | '/dashboard/po/$id'
+    | '/dashboard/thread/$id'
     | '/seller/chat/$id'
     | '/seller/produk/$id'
     | '/seller/produk/baru'
@@ -1254,6 +1306,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
+    | '/api/public/social-reel/$'
     | '/api/v1/catalog/$'
     | '/as/feb/auth/admin'
     | '/admin/chat/'
@@ -1296,7 +1349,9 @@ export interface FileRouteTypes {
     | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
+    | '/t/$id'
     | '/toko/$slug'
+    | '/u/$handle'
     | '/artikel'
     | '/layanan'
     | '/produk'
@@ -1317,6 +1372,7 @@ export interface FileRouteTypes {
     | '/dashboard/pengaturan'
     | '/dashboard/produk'
     | '/dashboard/produk-saya'
+    | '/dashboard/profil'
     | '/dashboard/saldo'
     | '/operator/$id'
     | '/seller/jasa'
@@ -1356,6 +1412,7 @@ export interface FileRouteTypes {
     | '/dashboard/jasa/$id'
     | '/dashboard/pesanan/$id'
     | '/dashboard/po/$id'
+    | '/dashboard/thread/$id'
     | '/seller/chat/$id'
     | '/seller/produk/$id'
     | '/seller/produk/baru'
@@ -1368,6 +1425,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
+    | '/api/public/social-reel/$'
     | '/api/v1/catalog/$'
     | '/as/feb/auth/admin'
     | '/admin/chat'
@@ -1416,7 +1474,9 @@ export interface FileRouteTypes {
     | '/p/$id'
     | '/produk/$slug'
     | '/see/masuk'
+    | '/t/$id'
     | '/toko/$slug'
+    | '/u/$handle'
     | '/artikel/'
     | '/layanan/'
     | '/produk/'
@@ -1437,6 +1497,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/pengaturan'
     | '/_authenticated/dashboard/produk'
     | '/_authenticated/dashboard/produk-saya'
+    | '/_authenticated/dashboard/profil'
     | '/_authenticated/dashboard/saldo'
     | '/_authenticated/operator/$id'
     | '/_authenticated/seller/jasa'
@@ -1477,6 +1538,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/jasa/$id'
     | '/_authenticated/dashboard/pesanan/$id'
     | '/_authenticated/dashboard/po/$id'
+    | '/_authenticated/dashboard/thread/$id'
     | '/_authenticated/seller/chat/$id'
     | '/_authenticated/seller/produk/$id'
     | '/_authenticated/seller/produk/baru'
@@ -1489,6 +1551,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/telegram-dispatch'
     | '/api/public/og-image/$'
     | '/api/public/service-media/$'
+    | '/api/public/social-reel/$'
     | '/api/v1/catalog/$'
     | '/as/feb/auth/admin'
     | '/_authenticated/admin/chat/'
@@ -1532,7 +1595,9 @@ export interface RootRouteChildren {
   PIdRoute: typeof PIdRoute
   ProdukSlugRoute: typeof ProdukSlugRoute
   SeeMasukRoute: typeof SeeMasukRoute
+  TIdRoute: typeof TIdRoute
   TokoSlugRoute: typeof TokoSlugRoute
+  UHandleRoute: typeof UHandleRoute
   ArtikelIndexRoute: typeof ArtikelIndexRoute
   LayananIndexRoute: typeof LayananIndexRoute
   ProdukIndexRoute: typeof ProdukIndexRoute
@@ -1547,6 +1612,7 @@ export interface RootRouteChildren {
   ApiPublicJobsTelegramDispatchRoute: typeof ApiPublicJobsTelegramDispatchRoute
   ApiPublicOgImageSplatRoute: typeof ApiPublicOgImageSplatRoute
   ApiPublicServiceMediaSplatRoute: typeof ApiPublicServiceMediaSplatRoute
+  ApiPublicSocialReelSplatRoute: typeof ApiPublicSocialReelSplatRoute
   ApiV1CatalogSplatRoute: typeof ApiV1CatalogSplatRoute
   AsFebAuthAdminRoute: typeof AsFebAuthAdminRoute
   ApiPublicIntegrationsJiofarmDemandRoute: typeof ApiPublicIntegrationsJiofarmDemandRoute
@@ -1760,11 +1826,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeeMasukRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/t/$id': {
+      id: '/t/$id'
+      path: '/t/$id'
+      fullPath: '/t/$id'
+      preLoaderRoute: typeof TIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/toko/$slug': {
       id: '/toko/$slug'
       path: '/toko/$slug'
       fullPath: '/toko/$slug'
       preLoaderRoute: typeof TokoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$handle': {
+      id: '/u/$handle'
+      path: '/u/$handle'
+      fullPath: '/u/$handle'
+      preLoaderRoute: typeof UHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
@@ -1898,6 +1978,13 @@ declare module '@tanstack/react-router' {
       path: '/produk-saya'
       fullPath: '/dashboard/produk-saya'
       preLoaderRoute: typeof AuthenticatedDashboardProdukSayaRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/profil': {
+      id: '/_authenticated/dashboard/profil'
+      path: '/profil'
+      fullPath: '/dashboard/profil'
+      preLoaderRoute: typeof AuthenticatedDashboardProfilRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/saldo': {
@@ -2250,6 +2337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPoIdRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/thread/$id': {
+      id: '/_authenticated/dashboard/thread/$id'
+      path: '/thread/$id'
+      fullPath: '/dashboard/thread/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardThreadIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/seller/chat/': {
       id: '/_authenticated/seller/chat/'
       path: '/chat'
@@ -2346,6 +2440,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/service-media/$'
       fullPath: '/api/public/service-media/$'
       preLoaderRoute: typeof ApiPublicServiceMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/social-reel/$': {
+      id: '/api/public/social-reel/$'
+      path: '/api/public/social-reel/$'
+      fullPath: '/api/public/social-reel/$'
+      preLoaderRoute: typeof ApiPublicSocialReelSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/catalog/$': {
@@ -2485,12 +2586,14 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardPengaturanRoute: typeof AuthenticatedDashboardPengaturanRoute
   AuthenticatedDashboardProdukRoute: typeof AuthenticatedDashboardProdukRoute
   AuthenticatedDashboardProdukSayaRoute: typeof AuthenticatedDashboardProdukSayaRoute
+  AuthenticatedDashboardProfilRoute: typeof AuthenticatedDashboardProfilRoute
   AuthenticatedDashboardSaldoRoute: typeof AuthenticatedDashboardSaldoRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardChatIdRoute: typeof AuthenticatedDashboardChatIdRoute
   AuthenticatedDashboardJasaIdRoute: typeof AuthenticatedDashboardJasaIdRoute
   AuthenticatedDashboardPesananIdRoute: typeof AuthenticatedDashboardPesananIdRoute
   AuthenticatedDashboardPoIdRoute: typeof AuthenticatedDashboardPoIdRoute
+  AuthenticatedDashboardThreadIdRoute: typeof AuthenticatedDashboardThreadIdRoute
   AuthenticatedDashboardChatIndexRoute: typeof AuthenticatedDashboardChatIndexRoute
   AuthenticatedDashboardPesananIndexRoute: typeof AuthenticatedDashboardPesananIndexRoute
   AuthenticatedDashboardPoIndexRoute: typeof AuthenticatedDashboardPoIndexRoute
@@ -2506,12 +2609,14 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardProdukRoute: AuthenticatedDashboardProdukRoute,
     AuthenticatedDashboardProdukSayaRoute:
       AuthenticatedDashboardProdukSayaRoute,
+    AuthenticatedDashboardProfilRoute: AuthenticatedDashboardProfilRoute,
     AuthenticatedDashboardSaldoRoute: AuthenticatedDashboardSaldoRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardChatIdRoute: AuthenticatedDashboardChatIdRoute,
     AuthenticatedDashboardJasaIdRoute: AuthenticatedDashboardJasaIdRoute,
     AuthenticatedDashboardPesananIdRoute: AuthenticatedDashboardPesananIdRoute,
     AuthenticatedDashboardPoIdRoute: AuthenticatedDashboardPoIdRoute,
+    AuthenticatedDashboardThreadIdRoute: AuthenticatedDashboardThreadIdRoute,
     AuthenticatedDashboardChatIndexRoute: AuthenticatedDashboardChatIndexRoute,
     AuthenticatedDashboardPesananIndexRoute:
       AuthenticatedDashboardPesananIndexRoute,
@@ -2661,7 +2766,9 @@ const rootRouteChildren: RootRouteChildren = {
   PIdRoute: PIdRoute,
   ProdukSlugRoute: ProdukSlugRoute,
   SeeMasukRoute: SeeMasukRoute,
+  TIdRoute: TIdRoute,
   TokoSlugRoute: TokoSlugRoute,
+  UHandleRoute: UHandleRoute,
   ArtikelIndexRoute: ArtikelIndexRoute,
   LayananIndexRoute: LayananIndexRoute,
   ProdukIndexRoute: ProdukIndexRoute,
@@ -2676,6 +2783,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJobsTelegramDispatchRoute: ApiPublicJobsTelegramDispatchRoute,
   ApiPublicOgImageSplatRoute: ApiPublicOgImageSplatRoute,
   ApiPublicServiceMediaSplatRoute: ApiPublicServiceMediaSplatRoute,
+  ApiPublicSocialReelSplatRoute: ApiPublicSocialReelSplatRoute,
   ApiV1CatalogSplatRoute: ApiV1CatalogSplatRoute,
   AsFebAuthAdminRoute: AsFebAuthAdminRoute,
   ApiPublicIntegrationsJiofarmDemandRoute:

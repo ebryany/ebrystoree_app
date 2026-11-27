@@ -1,14 +1,13 @@
-import { Outlet, createFileRoute, Link } from "@tanstack/react-router";
+import { Outlet, createFileRoute, Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bell, Home, Package, ReceiptText, Settings } from "lucide-react";
 
-import { BottomNavigation, type BottomNavItem } from "@/components/ebry/bottom-nav";
-import { DashboardSidebar } from "@/components/ebry/dashboard-sidebar";
 import { AnnouncementPopup } from "@/components/ebry/announcement-popup";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ThreadsDesktopRail, ThreadsMobileDock } from "@/components/threads/threads-nav-rail";
 import { useSession } from "@/hooks/use-session";
+import { listInquiryUnreadCounts } from "@/lib/inquiries.functions";
 import { listMyNotifications } from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -16,74 +15,91 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const tabs = [
-  { to: "/dashboard", label: "Ringkasan", exact: true },
+  { to: "/dashboard", label: "Threads", exact: true },
+  { to: "/dashboard/profil", label: "Profil" },
+  { to: "/dashboard/chat", label: "Chat" },
   { to: "/dashboard/pesanan", label: "Pesanan" },
   { to: "/dashboard/produk-saya", label: "Produk saya" },
   { to: "/dashboard/disukai", label: "Disukai" },
   { to: "/dashboard/po", label: "PO Custom" },
-  { to: "/dashboard/chat", label: "Chat Produk" },
   { to: "/dashboard/notifikasi", label: "Notifikasi" },
   { to: "/dashboard/pengaturan", label: "Pengaturan" },
 ] as const;
 
 function DashboardLayout() {
   const { user } = useSession();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const fetchNotifications = useServerFn(listMyNotifications);
+  const fetchChatUnread = useServerFn(listInquiryUnreadCounts);
   const { data } = useQuery({
     queryKey: ["my-notifications"],
     queryFn: () => fetchNotifications({}),
     enabled: Boolean(user),
   });
+  const { data: chatUnreadData } = useQuery({
+    queryKey: ["inquiry-unread"],
+    queryFn: () => fetchChatUnread({}),
+    enabled: Boolean(user),
+  });
   const unread = (((data as any)?.items ?? []) as any[]).filter((n) => !n.read_at).length;
+  const unreadChats = (chatUnreadData?.items ?? []).reduce(
+    (sum, item) => sum + (Number(item.unread) > 0 ? 1 : 0),
+    0,
+  );
 
-  const bottomNav: BottomNavItem[] = [
-    { to: "/dashboard", label: "Beranda", icon: Home, exact: true },
-    { to: "/dashboard/pesanan", label: "Pesanan", icon: ReceiptText },
-    {
-      to: "/dashboard/produk-saya",
-      label: "Produk",
-      icon: Package,
-      match: ["/dashboard/produk", "/dashboard/disukai"],
-    },
-    { to: "/dashboard/notifikasi", label: "Notifikasi", icon: Bell, badge: unread },
-    { to: "/dashboard/pengaturan", label: "Akun", icon: Settings },
-  ];
+  const isChatThreadMobile =
+    pathname.startsWith("/dashboard/chat/") && pathname !== "/dashboard/chat/";
+  const isThreadsSurface =
+    pathname === "/dashboard" ||
+    pathname === "/dashboard/" ||
+    pathname.startsWith("/dashboard/profil") ||
+    pathname.startsWith("/dashboard/thread/");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-dvh flex-col bg-background">
       <SiteHeader />
-      {/* Tab strip — hanya di bawah lg (mobile & tablet), tidak berubah */}
+
+      {/* Tab strip untuk tablet (md..lg) */}
       <div className="hidden border-b border-border bg-background md:block lg:hidden">
-        <nav aria-label="Menu akun" className="mx-auto flex h-12 w-full max-w-6xl items-stretch gap-1 overflow-x-auto px-4">
+        <nav
+          aria-label="Menu akun"
+          className="mx-auto flex h-12 w-full max-w-6xl items-stretch gap-1 overflow-x-auto px-4"
+        >
           {tabs.map((tab) => (
             <Link
               key={tab.to}
               to={tab.to}
               activeOptions={{ exact: "exact" in tab }}
-              activeProps={{ className: "border-accent text-accent" }}
+              activeProps={{ className: "border-foreground text-foreground" }}
               inactiveProps={{ className: "border-transparent text-muted-foreground" }}
-              className="flex items-center whitespace-nowrap border-b-2 px-3 text-sm font-medium transition-colors hover:text-foreground"
+              className="flex items-center whitespace-nowrap border-b-2 px-3 text-sm font-semibold transition-colors hover:text-foreground"
             >
               {tab.label}
             </Link>
           ))}
         </nav>
       </div>
-      {/* Desktop (lg+): sidebar kiri permanen + konten luas. Mobile tidak terpengaruh. */}
-      <div className="mx-auto flex w-full max-w-[1400px] flex-1 items-start gap-8 px-4 pb-28 pt-5 md:pb-12 md:pt-8 lg:px-6">
-        <aside className="sticky top-24 hidden w-60 shrink-0 lg:block">
-          <DashboardSidebar unread={unread} />
-        </aside>
+
+      {/* Unified Desktop Sidebar Rail across ALL /dashboard/* pages (zero layout jump when switching menu!) */}
+      <div className="mx-auto flex w-full max-w-[1360px] flex-1 items-start gap-6 px-4 pb-24 pt-2 sm:pt-5 md:pb-12 lg:px-6">
+        <ThreadsDesktopRail unread={unread} unreadChats={unreadChats} />
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-6xl lg:mx-0">
+          <div className={isThreadsSurface ? "w-full" : "mx-auto w-full max-w-5xl"}>
             <Outlet />
           </div>
         </main>
       </div>
-      <div className="hidden md:block">
-        <SiteFooter />
-      </div>
-      <BottomNavigation items={bottomNav} ariaLabel="Navigasi akun" />
+
+      {!isThreadsSurface ? (
+        <div className="hidden md:block">
+          <SiteFooter />
+        </div>
+      ) : null}
+
+      {!isChatThreadMobile ? (
+        <ThreadsMobileDock unread={unread} unreadChats={unreadChats} />
+      ) : null}
+
       <AnnouncementPopup />
     </div>
   );

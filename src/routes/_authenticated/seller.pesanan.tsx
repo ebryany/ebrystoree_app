@@ -2,9 +2,10 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ReceiptText } from "lucide-react";
+import { ReceiptText, RefreshCw } from "lucide-react";
 
 import { AdminLoading, AdminError } from "@/components/admin/admin-ui";
+import { SellerMobileSegment, SellerPageHeader } from "@/components/seller/seller-ui";
 import { EmptyState } from "@/components/ebry/states";
 import { cn } from "@/lib/utils";
 import { SellerOrderCard } from "@/components/seller/seller-order-card";
@@ -16,9 +17,9 @@ import { listOrderMonitoring } from "@/lib/order-monitoring.functions";
 export const Route = createFileRoute("/_authenticated/seller/pesanan")({
   head: () => ({
     meta: [
-      { title: "Pesanan Toko — Ebrystore" },
+      { title: "Pesanan Toko | Ebrystore" },
       { name: "description", content: "Pesanan yang masuk ke toko digital Anda." },
-      { property: "og:title", content: "Pesanan Toko — Ebrystore" },
+      { property: "og:title", content: "Pesanan Toko | Ebrystore" },
       { property: "og:description", content: "Pantau pesanan yang masuk ke toko Anda." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -88,29 +89,40 @@ function SellerOrders() {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-bold sm:text-xl">Pesanan toko</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Urutkan kerja dari tab Perlu tindakan; status dana ada di setiap kartu.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          className="min-h-11"
-          disabled={query.isFetching}
-          onClick={() => void query.refetch()}
-        >
-          Muat ulang
-        </Button>
-      </header>
+    <div className="space-y-4 sm:space-y-5">
+      <SellerMobileSegment
+        ariaLabel="Pilih jenis pesanan"
+        items={[
+          { to: "/seller/pesanan", label: "Pesanan Produk" },
+          { to: "/seller/jasa-pesanan", label: "Pesanan Jasa" },
+        ]}
+      />
+
+      <SellerPageHeader
+        title="Pesanan Produk"
+        description="Urutkan kerja mulai dari tab Perlu tindakan; rincian status dana tersedia di tiap kartu pesanan."
+        actions={
+          <Button
+            variant="outline"
+            className="min-h-11"
+            disabled={query.isFetching}
+            onClick={() => void query.refetch()}
+          >
+            <RefreshCw
+              className={query.isFetching ? "size-4 animate-spin" : "size-4"}
+              aria-hidden="true"
+            />
+            Muat ulang
+          </Button>
+        }
+      />
 
       {/* Tab status sebagai kotak angka: jumlah tiap status terlihat sekaligus. */}
       <div
         role="tablist"
         aria-label="Filter status pesanan"
-        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4"
+        data-cols="4"
+        className="seller-queue-grid overflow-hidden rounded-[var(--radius-panel)] border border-border shadow-[var(--elev-1)]"
       >
         {TABS.map((entry) => {
           const active = tab === entry.key;
@@ -129,20 +141,17 @@ function SellerOrders() {
               aria-selected={active}
               onClick={() => switchTab(entry.key)}
               className={cn(
-                "relative flex min-h-[84px] flex-col items-start justify-between gap-2 bg-card p-4 text-left transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                "seller-queue-tab flex min-h-[74px] flex-col items-start justify-between gap-1.5 bg-card p-3 text-left transition-colors hover:bg-surface active:bg-surface sm:min-h-[88px] sm:gap-2 sm:p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                 active && "bg-surface-selected hover:bg-surface-selected",
               )}
             >
-              {active ? (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-accent" aria-hidden="true" />
-              ) : null}
               <span
                 className={cn(
-                  "text-2xl font-bold leading-none tabular-nums",
+                  "text-xl font-bold leading-none tabular-nums sm:text-2xl",
                   urgent ? "text-destructive" : "text-foreground",
                 )}
               >
-                {typeof count === "number" ? count.toLocaleString("id-ID") : "–"}
+                {typeof count === "number" ? count.toLocaleString("id-ID") : "-"}
               </span>
               <span
                 className={cn(
@@ -160,11 +169,11 @@ function SellerOrders() {
 
       {query.isPending ? (
         <div className="space-y-3" role="status" aria-label="Memuat pesanan">
-          <span className="sr-only">Memuat pesanan…</span>
+          <span className="sr-only">Memuat pesanan...</span>
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="animate-pulse rounded-2xl border border-border bg-card p-4 motion-reduce:animate-none"
+              className="animate-pulse rounded-[var(--radius-panel)] border border-border bg-card p-4 motion-reduce:animate-none"
             >
               <div className="h-4 w-40 rounded bg-muted" />
               <div className="mt-3 h-3 w-64 rounded bg-muted" />
@@ -202,11 +211,11 @@ function SellerOrders() {
               />
             ))}
           </section>
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          <footer className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs tabular-nums text-muted-foreground">
               {data.total} pesanan · Halaman {page} dari {totalPages}
             </p>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex">
               <Button
                 variant="outline"
                 className="min-h-11"
@@ -227,7 +236,7 @@ function SellerOrders() {
           </footer>
         </>
       ) : (
-        <AdminLoading label="Memuat pesanan…" />
+        <AdminLoading label="Memuat pesanan..." />
       )}
     </div>
   );

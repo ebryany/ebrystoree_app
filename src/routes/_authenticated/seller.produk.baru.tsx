@@ -1,14 +1,18 @@
-import { useMemo, useState, type FormEvent } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useRef, useState, type FormEvent } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowLeft, ImageOff } from "lucide-react";
+import { ImageOff } from "lucide-react";
 
 import { ImageUploader } from "@/components/admin/image-uploader";
+import {
+  SellerField,
+  SellerPageHeader,
+  SellerSectionCard,
+} from "@/components/seller/seller-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatRupiah } from "@/lib/format";
 import { isRenderableImageUrl } from "@/lib/utils";
@@ -21,9 +25,9 @@ import {
 export const Route = createFileRoute("/_authenticated/seller/produk/baru")({
   head: () => ({
     meta: [
-      { title: "Tambah Produk — Ebrystore" },
+      { title: "Tambah Produk | Ebrystore" },
       { name: "description", content: "Tambahkan produk digital baru untuk toko Anda." },
-      { property: "og:title", content: "Tambah Produk — Ebrystore" },
+      { property: "og:title", content: "Tambah Produk | Ebrystore" },
       { property: "og:description", content: "Tambahkan produk baru." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
@@ -43,6 +47,10 @@ function NewProduct() {
   const queryClient = useQueryClient();
   const save = useServerFn(saveMyProduct);
   const fetchCategories = useServerFn(listProductCategories);
+
+  const nameRef = useRef<HTMLInputElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const discountRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -87,7 +95,7 @@ function NewProduct() {
       }),
     onSuccess: async (res: any) => {
       if (!res?.ok) return toast.error(res?.error ?? "Gagal membuat produk.");
-      toast.success("Produk dibuat. Ajukan moderasi agar tayang.");
+      toast.success("Produk dibuat. Lengkapi file atau stok lalu ajukan moderasi.");
       await queryClient.invalidateQueries({ queryKey: ["my-store-products"] });
       navigate({ to: "/seller/produk/$id", params: { id: res.id } });
     },
@@ -99,198 +107,232 @@ function NewProduct() {
     const next: FormErrors = {};
     if (name.trim().length < 3) next.name = "Nama produk minimal 3 karakter.";
     if (priceNumber <= 0) next.price = "Harga wajib lebih dari nol.";
-    if (discountPrice !== "" && priceNumber > 0 && discountNumber >= priceNumber)
+    if (discountPrice !== "" && priceNumber > 0 && discountNumber >= priceNumber) {
       next.discount = "Harga diskon harus lebih kecil dari harga normal.";
+    }
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      if (next.name) nameRef.current?.focus();
+      else if (next.price) priceRef.current?.focus();
+      else if (next.discount) discountRef.current?.focus();
+      return;
+    }
     mutation.mutate();
   }
 
   return (
     <div className="min-w-0 space-y-5">
-      <Link
-        to="/seller/produk"
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Kembali ke daftar produk
-      </Link>
-
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold">Tambah produk</h1>
-        <p className="text-sm text-muted-foreground">
-          Isi detail produk digital, periksa pratinjau kartu katalog, lalu ajukan moderasi.
-        </p>
-      </header>
+      <SellerPageHeader
+        title="Tambah Produk Digital"
+        description="Isi informasi produk, periksa pratinjau kartu katalog, lalu unggah file dan ajukan moderasi."
+        backTo="/seller/produk"
+        backLabel="Kembali ke daftar produk"
+      />
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <form className="min-w-0 space-y-5" onSubmit={submit} noValidate>
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-5">
-            <div className="space-y-1">
-              <h2 className="text-sm font-semibold">Informasi produk</h2>
-              <p className="text-xs text-muted-foreground">
-                Yang dilihat pembeli saat menemukan produk Anda di katalog.
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-baseline justify-between gap-3">
-                <Label htmlFor="np-name">Nama produk</Label>
-                <span className="text-[11px] tabular-nums text-muted-foreground">
-                  {name.length}/160
-                </span>
-              </div>
-              <Input
+          <SellerSectionCard
+            title="1. Informasi produk"
+            description="Detail utama yang dibaca pembeli saat menemukan produk Anda di katalog."
+            headingId="np-info-heading"
+          >
+            <div className="space-y-4">
+              <SellerField
                 id="np-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Contoh: Template CV Profesional"
-                maxLength={160}
-                aria-invalid={Boolean(errors.name)}
-                aria-describedby={errors.name ? "np-name-error" : undefined}
-              />
-              {errors.name ? (
-                <p id="np-name-error" role="alert" className="text-xs text-destructive">
-                  {errors.name}
-                </p>
-              ) : null}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="np-category">Kategori</Label>
-              <select
-                id="np-category"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                label="Nama produk"
+                required
+                counter={`${name.length}/160`}
+                hint="Gunakan judul yang spesifik agar mudah dicari pembeli."
+                error={errors.name}
               >
-                <option value="">Tanpa kategori</option>
-                {categoryItems.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {categories?.error ? (
-                <p className="text-xs text-muted-foreground">{categories.error}</p>
-              ) : null}
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-baseline justify-between gap-3">
-                <Label htmlFor="np-short">Deskripsi singkat</Label>
-                <span className="text-[11px] tabular-nums text-muted-foreground">
-                  {shortDescription.length}/300
-                </span>
-              </div>
-              <Input
-                id="np-short"
-                value={shortDescription}
-                onChange={(e) => setShortDesc(e.target.value)}
-                maxLength={300}
-                placeholder="Satu kalimat yang menjelaskan isi produk"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="np-desc">Deskripsi lengkap</Label>
-              <Textarea
-                id="np-desc"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={5}
-                maxLength={5000}
-                placeholder="Jelaskan isi, format file, dan cara pemakaian produk"
-              />
-            </div>
-          </section>
-
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-5">
-            <div className="space-y-1">
-              <h2 className="text-sm font-semibold">Harga</h2>
-              <p className="text-xs text-muted-foreground">
-                Diskon opsional; harga akhir yang tampil di katalog dan dipakai saat checkout.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="np-price">Harga (Rp)</Label>
                 <Input
+                  ref={nameRef}
+                  id="np-name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name && e.target.value.trim().length >= 3) {
+                      setErrors((prev) => ({ ...prev, name: undefined }));
+                    }
+                  }}
+                  placeholder="Contoh: Template CV Profesional ATS Friendly"
+                  maxLength={160}
+                  required
+                  aria-invalid={errors.name ? "true" : "false"}
+                  aria-describedby={errors.name ? "np-name-hint np-name-error" : "np-name-hint"}
+                  className="seller-field-control min-h-11"
+                />
+              </SellerField>
+
+              <SellerField
+                id="np-category"
+                label="Kategori"
+                hint={categories?.error ?? "Pilih kategori yang paling sesuai dengan isi produk."}
+              >
+                <select
+                  id="np-category"
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  aria-invalid="false"
+                  aria-describedby="np-category-hint"
+                  className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">Tanpa kategori</option>
+                  {categoryItems.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </SellerField>
+
+              <SellerField
+                id="np-short"
+                label="Deskripsi singkat"
+                counter={`${shortDescription.length}/300`}
+                hint="Satu kalimat ringkas yang tampil pada kartu pratinjau katalog."
+              >
+                <Input
+                  id="np-short"
+                  value={shortDescription}
+                  onChange={(e) => setShortDesc(e.target.value)}
+                  maxLength={300}
+                  placeholder="Contoh: Paket 5 desain CV siap edit format Word dan Figma"
+                  aria-invalid="false"
+                  aria-describedby="np-short-hint"
+                  className="min-h-11"
+                />
+              </SellerField>
+
+              <SellerField
+                id="np-desc"
+                label="Deskripsi lengkap"
+                counter={`${description.length}/5000`}
+                hint="Jelaskan isi file, format, syarat perangkat, dan cara pemakaian."
+              >
+                <Textarea
+                  id="np-desc"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={5}
+                  maxLength={5000}
+                  placeholder="Jelaskan isi, format file, dan cara pemakaian produk"
+                  aria-invalid="false"
+                  aria-describedby="np-desc-hint"
+                />
+              </SellerField>
+            </div>
+          </SellerSectionCard>
+
+          <SellerSectionCard
+            title="2. Harga & diskon"
+            description="Harga akhir ditampilkan di katalog dan dihitung ulang secara aman oleh server saat checkout."
+            headingId="np-price-heading"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SellerField
+                id="np-price"
+                label="Harga normal (Rp)"
+                required
+                hint="Masukkan angka rupiah tanpa titik, contoh: 50000."
+                error={errors.price}
+              >
+                <Input
+                  ref={priceRef}
                   id="np-price"
                   value={ribuan(price)}
-                  onChange={(e) => setPrice(onlyDigits(e.target.value))}
+                  onChange={(e) => {
+                    setPrice(onlyDigits(e.target.value));
+                    if (errors.price) setErrors((prev) => ({ ...prev, price: undefined }));
+                  }}
                   inputMode="numeric"
                   placeholder="50.000"
-                  className="tabular-nums"
-                  aria-invalid={Boolean(errors.price)}
-                  aria-describedby={errors.price ? "np-price-error" : undefined}
+                  required
+                  aria-invalid={errors.price ? "true" : "false"}
+                  aria-describedby={errors.price ? "np-price-hint np-price-error" : "np-price-hint"}
+                  className="seller-field-control min-h-11 tabular-nums"
                 />
-                {errors.price ? (
-                  <p id="np-price-error" role="alert" className="text-xs text-destructive">
-                    {errors.price}
-                  </p>
-                ) : null}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="np-disc">Harga diskon (opsional)</Label>
+              </SellerField>
+
+              <SellerField
+                id="np-disc"
+                label="Harga diskon (Rp)"
+                hint="Harus lebih rendah dari harga normal jika diisi."
+                error={errors.discount}
+              >
                 <Input
+                  ref={discountRef}
                   id="np-disc"
                   value={ribuan(discountPrice)}
-                  onChange={(e) => setDiscountPrice(onlyDigits(e.target.value))}
+                  onChange={(e) => {
+                    setDiscountPrice(onlyDigits(e.target.value));
+                    if (errors.discount) setErrors((prev) => ({ ...prev, discount: undefined }));
+                  }}
                   inputMode="numeric"
                   placeholder="35.000"
-                  className="tabular-nums"
-                  aria-invalid={Boolean(errors.discount)}
-                  aria-describedby={errors.discount ? "np-disc-error" : undefined}
+                  aria-invalid={errors.discount ? "true" : "false"}
+                  aria-describedby={
+                    errors.discount ? "np-disc-hint np-disc-error" : "np-disc-hint"
+                  }
+                  className="seller-field-control min-h-11 tabular-nums"
                 />
-                {errors.discount ? (
-                  <p id="np-disc-error" role="alert" className="text-xs text-destructive">
-                    {errors.discount}
-                  </p>
-                ) : null}
-              </div>
+              </SellerField>
             </div>
             {priceNumber > 0 ? (
-              <p className="text-sm tabular-nums text-muted-foreground">
-                Tampil di katalog:{" "}
-                <span className="font-semibold text-foreground">{formatRupiah(finalPrice)}</span>
+              <p className="mt-3 rounded-lg bg-surface px-3 py-2 text-sm tabular-nums text-muted-foreground">
+                Harga tampil di katalog:{" "}
+                <strong className="font-bold text-price">{formatRupiah(finalPrice)}</strong>
               </p>
             ) : null}
-          </section>
+          </SellerSectionCard>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-5">
-            <div className="space-y-1">
-              <h2 className="text-sm font-semibold">Pengaturan produk digital</h2>
-              <p className="text-xs text-muted-foreground">
-                Berlaku setelah pembeli memiliki produk. Ubah nilai ini bila produk butuh aturan
-                lain.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="np-limit">Batas unduhan</Label>
-                <Input
+          <SellerSectionCard
+            title="3. Pengaturan akses & gambar"
+            description="Atur batas unduhan, masa berlaku akses, dan thumbnail katalog produk."
+            headingId="np-access-heading"
+            footer={
+              <div className="px-4 py-3.5 sm:px-5">
+                <Button type="submit" className="min-h-11 w-full" disabled={mutation.isPending}>
+                  {mutation.isPending ? "Membuat produk..." : "Simpan produk & lanjut atur file"}
+                </Button>
+              </div>
+            }
+          >
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SellerField
                   id="np-limit"
-                  value={downloadLimit}
-                  onChange={(e) => setDownloadLimit(onlyDigits(e.target.value))}
-                  inputMode="numeric"
-                  className="tabular-nums"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Kali unduhan per pembeli, 1 sampai 100.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="np-validity">Masa berlaku (hari)</Label>
-                <Input
+                  label="Batas unduhan"
+                  hint="Jumlah unduhan per pembeli (1 sampai 100 kali)."
+                >
+                  <Input
+                    id="np-limit"
+                    value={downloadLimit}
+                    onChange={(e) => setDownloadLimit(onlyDigits(e.target.value))}
+                    inputMode="numeric"
+                    aria-invalid="false"
+                    aria-describedby="np-limit-hint"
+                    className="min-h-11 tabular-nums"
+                  />
+                </SellerField>
+
+                <SellerField
                   id="np-validity"
-                  value={validityDays}
-                  onChange={(e) => setValidityDays(onlyDigits(e.target.value))}
-                  inputMode="numeric"
-                  className="tabular-nums"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Masa akses pembeli sejak pembayaran.
-                </p>
+                  label="Masa berlaku (hari)"
+                  hint="Lama akses pembeli sejak pembayaran terverifikasi."
+                >
+                  <Input
+                    id="np-validity"
+                    value={validityDays}
+                    onChange={(e) => setValidityDays(onlyDigits(e.target.value))}
+                    inputMode="numeric"
+                    aria-invalid="false"
+                    aria-describedby="np-validity-hint"
+                    className="min-h-11 tabular-nums"
+                  />
+                </SellerField>
               </div>
-            </div>
-            <div className="space-y-1.5">
+
               <ImageUploader
                 value={thumbnailUrl}
                 onChange={setThumbnailUrl}
@@ -311,66 +353,72 @@ function NewProduct() {
                   return res.url as string;
                 }}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="np-thumb">Atau tempel URL gambar (opsional)</Label>
-              <Input
+
+              <SellerField
                 id="np-thumb"
-                value={thumbnailUrl}
-                onChange={(e) => setThumbnailUrl(e.target.value)}
-                maxLength={500}
-                placeholder="https://"
-                inputMode="url"
-              />
-              <p className="text-xs text-muted-foreground">
-                Unggah file di atas atau tempel tautan gambar persegi; pratinjau di samping memakai
-                gambar yang aktif.
-              </p>
+                label="URL gambar alternatif"
+                hint="Gunakan jika gambar tidak diunggah dari tombol di atas."
+              >
+                <Input
+                  id="np-thumb"
+                  value={thumbnailUrl}
+                  onChange={(e) => setThumbnailUrl(e.target.value)}
+                  maxLength={500}
+                  placeholder="https://"
+                  inputMode="url"
+                  aria-invalid="false"
+                  aria-describedby="np-thumb-hint"
+                  className="min-h-11"
+                />
+              </SellerField>
             </div>
-            <Button type="submit" className="min-h-11 w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? "Membuat…" : "Buat produk & ajukan moderasi"}
-            </Button>
-          </section>
+          </SellerSectionCard>
         </form>
 
         <aside
           className="min-w-0 space-y-3 lg:sticky lg:top-24 lg:self-start"
           aria-label="Pratinjau kartu katalog"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Pratinjau pembeli
-          </p>
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <div className="relative aspect-square border-b border-border bg-secondary">
-              {thumbnailRenderable ? (
-                <img src={thumbnailUrl.trim()} alt="" className="size-full object-cover" />
-              ) : (
-                <span className="grid size-full place-items-center text-muted-foreground">
-                  <ImageOff className="size-6" aria-hidden="true" />
-                </span>
-              )}
-            </div>
-            <div className="space-y-1.5 p-3">
-              <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold">{previewName}</p>
-              {previewShort ? (
-                <p className="line-clamp-2 text-xs text-muted-foreground">{previewShort}</p>
-              ) : null}
-              {finalPrice > 0 ? (
-                <p className="pt-1 text-sm font-semibold tabular-nums">
-                  {formatRupiah(finalPrice)}
-                  {discountValid ? (
-                    <span className="ml-1.5 text-xs font-normal text-muted-foreground line-through">
-                      {formatRupiah(priceNumber)}
-                    </span>
-                  ) : null}
+          <SellerSectionCard
+            title="Pratinjau pembeli"
+            description="Tampilan kartu produk di katalog Ebrystore."
+            headingId="np-preview-heading"
+            bodyClassName="p-3"
+          >
+            <div className="overflow-hidden rounded-[var(--radius-panel)] border border-border bg-card">
+              <div className="relative aspect-[4/3] overflow-hidden border-b border-border bg-surface-selected">
+                {thumbnailRenderable ? (
+                  <img src={thumbnailUrl.trim()} alt="" className="block h-full w-full object-cover object-center" />
+                ) : (
+                  <span className="grid size-full place-items-center text-muted-foreground">
+                    <ImageOff className="size-6" aria-hidden="true" />
+                  </span>
+                )}
+              </div>
+              <div className="space-y-1.5 p-3.5">
+                <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-foreground">
+                  {previewName}
                 </p>
-              ) : null}
+                {previewShort ? (
+                  <p className="line-clamp-2 text-xs text-muted-foreground">{previewShort}</p>
+                ) : null}
+                {finalPrice > 0 ? (
+                  <p className="flex items-baseline gap-1.5 pt-1 text-sm font-bold tabular-nums text-price">
+                    <span>{formatRupiah(finalPrice)}</span>
+                    {discountValid ? (
+                      <span className="text-xs font-normal text-muted-foreground line-through">
+                        {formatRupiah(priceNumber)}
+                      </span>
+                    ) : null}
+                  </p>
+                ) : null}
+              </div>
             </div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Kartu inilah yang dilihat pembeli di katalog. Produk baru berstatus draft dan menunggu
-            moderasi sebelum tayang.
-          </p>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              Produk baru tersimpan sebagai draf. Setelah halaman berikutnya terbuka, unggah file
+              atau stok lalu klik Ajukan moderasi.
+            </p>
+          </SellerSectionCard>
         </aside>
       </div>
     </div>
