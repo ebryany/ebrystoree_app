@@ -2,6 +2,12 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
+  doesRealtimeEventMatchPostIds,
+  patchThreadAuthorFromProfileRow,
+  patchThreadPostFromRealtimeRow,
+  readThreadRealtimeSignal,
+} from "../social-threads-realtime";
+import {
   buildPublicThreadUrl,
   extractHashtags,
   formatCompactCount,
@@ -11,6 +17,7 @@ import {
   matchesAutoDmKeyword,
   normalizeHandle,
   tokenizeThreadBody,
+  type ThreadPostItem,
 } from "../social-threads.shared";
 
 describe("Threads shared domain parsers and formatters", () => {
@@ -257,5 +264,169 @@ describe("Chat principal engineering upgrade contracts", () => {
     expect(windowSrc).toContain('event.key === "ArrowUp"');
     expect(windowSrc).toContain('e.key.toLowerCase() === "f"');
     expect(splitSrc).toContain('e.key.toLowerCase() === "k"');
+  });
+});
+
+describe("Threads multi-user realtime patching and publication contracts", () => {
+  const rtHookSrc = readFileSync("src/hooks/use-realtime-refresh.ts", "utf8");
+  const sqlRt = readFileSync(
+    "supabase/migrations/20261128003000_social_threads_realtime_full.sql",
+    "utf8",
+  );
+  const feedSrc = readFileSync("src/components/threads/threads-feed.tsx", "utf8");
+  const cardSrc = readFileSync("src/components/threads/thread-card.tsx", "utf8");
+  const profileSrc = readFileSync("src/components/threads/threads-profile-view.tsx", "utf8");
+
+  const samplePost: ThreadPostItem = {
+    id: "post-1",
+    authorId: "user-a",
+    targetPostId: "post-1",
+    parentId: null,
+    rootId: null,
+    repostOfId: null,
+    isRepostOnly: false,
+    postKind: "thread",
+    videoUrl: null,
+    videoPosterUrl: null,
+    videoDurationSec: null,
+    viewsCount: 10,
+    autoDm: { keyword: "MAU", triggeredCount: 1 },
+    poll: null,
+    freebie: null,
+    isVerifiedBuyer: false,
+    body: "Halo dunia",
+    media: [],
+    hashtags: [],
+    replyPolicy: "everyone",
+    likesCount: 3,
+    repliesCount: 1,
+    repostsCount: 2,
+    quotesCount: 0,
+    bookmarksCount: 0,
+    createdAt: "2026-11-27T10:00:00Z",
+    feedSortAt: "2026-11-27T10:00:00Z",
+    author: {
+      id: "user-a",
+      handle: "kreator_a",
+      displayName: "Kreator A",
+      avatarUrl: null,
+      bio: "Bio lama",
+      followersCount: 12,
+      followingCount: 3,
+      isFollowedByMe: false,
+      isSelf: false,
+      verifiedStore: null,
+    },
+    repostedBy: null,
+    quotedPost: {
+      id: "quote-1",
+      body: "Post dikutip",
+      media: [],
+      createdAt: "2026-11-27T09:00:00Z",
+      author: {
+        id: "user-b",
+        handle: "kreator_b",
+        displayName: "Kreator B",
+        avatarUrl: null,
+        bio: "",
+        followersCount: 4,
+        followingCount: 2,
+        isFollowedByMe: false,
+        isSelf: false,
+        verifiedStore: null,
+      },
+      attachedCommerce: null,
+      deleted: false,
+    },
+    attachedCommerce: null,
+    viewerLiked: false,
+    viewerBookmarked: false,
+    viewerReposted: false,
+    replyPreviewAuthors: [],
+  };
+
+  it("patches counters in-place on multi-user UPDATE and removes soft-deleted posts", () => {
+    const updated = patchThreadPostFromRealtimeRow(samplePost, {
+      id: "post-1",
+      likes_count: 9,
+      replies_count: 4,
+      reposts_count: 5,
+      quotes_count: 2,
+      views_count: 42,
+      auto_dm_count: 3,
+      deleted_at: null,
+    });
+    expect(updated).not.toBeNull();
+    expect(updated?.likesCount).toBe(9);
+    expect(updated?.repliesCount).toBe(4);
+    expect(updated?.repostsCount).toBe(5);
+    expect(updated?.quotesCount).toBe(2);
+    expect(updated?.viewsCount).toBe(42);
+    expect(updated?.autoDm?.triggeredCount).toBe(3);
+
+    const deleted = patchThreadPostFromRealtimeRow(samplePost, {
+      id: "post-1",
+      deleted_at: "2026-11-27T12:00:00Z",
+    });
+    expect(deleted).toBeNull();
+
+    const quoteDeleted = patchThreadPostFromRealtimeRow(samplePost, {
+      id: "quote-1",
+      deleted_at: "2026-11-27T12:05:00Z",
+    });
+    expect(quoteDeleted?.quotedPost?.deleted).toBe(true);
+  });
+
+  it("patches creator follower count and matches visible post IDs for poll votes", () => {
+    const patched = patchThreadAuthorFromProfileRow(samplePost, {
+      user_id: "user-a",
+      followers_count: 25,
+      bio: "Bio baru",
+    });
+    expect(patched.author.followersCount).toBe(25);
+    expect(patched.author.bio).toBe("Bio baru");
+
+    const ids = new Set(["post-1", "quote-1"]);
+    expect(doesRealtimeEventMatchPostIds("social_thread_realtime_signals", { post_id: "post-1" }, ids)).toBe(
+      true,
+    );
+    expect(doesRealtimeEventMatchPostIds("social_thread_realtime_signals", { post_id: "other" }, ids)).toBe(
+      false,
+    );
+    expect(doesRealtimeEventMatchPostIds("social_posts", { parent_id: "post-1" }, ids)).toBe(true);
+  });
+
+  it("does not use post metadata to handle delete signals", () => {
+    expect(readThreadRealtimeSignal({ kind: "deleted", post_id: "ignored" })).toEqual({
+      kind: "deleted",
+    });
+    expect(readThreadRealtimeSignal({ kind: "poll", post_id: "post-1", user_id: "ignored" })).toEqual({
+      kind: "poll",
+      postId: "post-1",
+      parentId: null,
+    });
+    expect(readThreadRealtimeSignal({ kind: "poll" })).toBeNull();
+  });
+
+  it("wires Threads consumers to sanitized Realtime signals instead of raw votes", () => {
+    const signalSql = readFileSync(
+      "supabase/migrations/20261128010000_social_threads_realtime_signals.sql",
+      "utf8",
+    );
+    expect(rtHookSrc).toContain("table: payload.table ?? table");
+    expect(sqlRt).toContain("'social_posts', 'social_profiles'");
+    expect(sqlRt).toContain("ALTER PUBLICATION supabase_realtime ADD TABLE public.%I");
+    expect(signalSql).toContain("DROP TABLE public.social_post_poll_votes");
+    expect(signalSql).toContain("REVOKE SELECT ON public.social_post_poll_votes FROM PUBLIC, anon, authenticated");
+    expect(signalSql).toContain("ADD TABLE public.social_thread_realtime_signals");
+    expect(signalSql.slice(0, signalSql.indexOf("ALTER TABLE"))).not.toMatch(/user_id|option_index/);
+    expect(feedSrc).toContain("patchThreadPostFromRealtimeRow");
+    expect(feedSrc).toContain("dispatchThreadsReplyLive");
+    expect(cardSrc).toContain("THREADS_REPLY_LIVE_EVENT");
+    expect(profileSrc).toContain("useRealtimeRefresh");
+    for (const source of [feedSrc, profileSrc]) {
+      expect(source).toContain("onResync:");
+      expect(source).not.toContain('"social_post_poll_votes"');
+    }
   });
 });

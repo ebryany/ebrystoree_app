@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState, type FormEvent } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -53,6 +53,13 @@ import {
   getThreadReplies,
   voteThreadPoll,
 } from "@/lib/social-threads.functions";
+import {
+  THREADS_POST_DELETED_EVENT,
+  THREADS_REPLIES_RESYNC_EVENT,
+  THREADS_REPLY_LIVE_EVENT,
+  type ThreadsPostDeletedDetail,
+  type ThreadsReplyLiveDetail,
+} from "@/lib/social-threads-realtime";
 import {
   buildPublicThreadUrl,
   formatCompactCount,
@@ -255,6 +262,10 @@ function ThreadPollWidget({
   const [poll, setPoll] = useState<ThreadPollData>(initialPoll);
   const [voting, setVoting] = useState(false);
   const voteFn = useServerFn(voteThreadPoll);
+
+  useEffect(() => {
+    setPoll(initialPoll);
+  }, [initialPoll]);
 
   const showResults = poll.viewerOption !== null || poll.expired || readOnly;
 
@@ -469,18 +480,61 @@ export const ThreadCard = memo(function ThreadCard({
 
   const fetchRepliesFn = useServerFn(getThreadReplies);
   const createReplyFn = useServerFn(createThreadChain);
+  const repliesRequest = useRef(0);
 
-  const loadInlineReplies = useCallback(async () => {
-    setLoadingReplies(true);
-    try {
-      const res = await fetchRepliesFn({ data: { postId: post.targetPostId, limit: 12 } });
-      setInlineReplies(res.items);
-    } catch {
-      toast.error("Balasan gagal dimuat.");
-    } finally {
-      setLoadingReplies(false);
-    }
-  }, [fetchRepliesFn, post.targetPostId]);
+  const loadInlineReplies = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      const request = ++repliesRequest.current;
+      if (!opts?.silent) setLoadingReplies(true);
+      try {
+        const res = await fetchRepliesFn({ data: { postId: post.targetPostId, limit: 12 } });
+        if (request === repliesRequest.current) setInlineReplies(res.items);
+      } catch {
+        if (!opts?.silent) toast.error("Balasan gagal dimuat.");
+      } finally {
+        if (!opts?.silent) setLoadingReplies(false);
+      }
+    },
+    [fetchRepliesFn, post.targetPostId],
+  );
+
+  useEffect(() => {
+    if (!repliesExpanded || readOnly) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        void loadInlineReplies({ silent: true });
+      }, 220);
+    };
+    const onLiveReply = (ev: Event) => {
+      const detail = (ev as CustomEvent<ThreadsReplyLiveDetail>).detail;
+      if (detail?.parentId === post.targetPostId) schedule();
+    };
+    const onResync = (ev: Event) => {
+      const parentId = (ev as CustomEvent<string | null>).detail;
+      if (parentId === null || parentId === post.targetPostId) schedule();
+    };
+    const onLiveDelete = (ev: Event) => {
+      const detail = (ev as CustomEvent<ThreadsPostDeletedDetail>).detail;
+      if (!detail?.postId || detail.parentId !== post.targetPostId) return;
+      repliesRequest.current += 1;
+      setInlineReplies((prev) =>
+        prev.filter((r) => r.id !== detail.postId && r.targetPostId !== detail.postId),
+      );
+      schedule();
+    };
+    window.addEventListener(THREADS_REPLY_LIVE_EVENT, onLiveReply);
+    window.addEventListener(THREADS_POST_DELETED_EVENT, onLiveDelete);
+    window.addEventListener(THREADS_REPLIES_RESYNC_EVENT, onResync);
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener(THREADS_REPLY_LIVE_EVENT, onLiveReply);
+      window.removeEventListener(THREADS_POST_DELETED_EVENT, onLiveDelete);
+      window.removeEventListener(THREADS_REPLIES_RESYNC_EVENT, onResync);
+    };
+  }, [loadInlineReplies, post.targetPostId, readOnly, repliesExpanded]);
 
   const toggleInlineReplies = useCallback(() => {
     if (!allowInlineReplies || focal) return;
@@ -511,8 +565,12 @@ export const ThreadCard = memo(function ThreadCard({
       }
       setInlineDraft("");
       if (res.firstPost) {
-        setInlineReplies((prev) => [...prev, res.firstPost!]);
+        const reply = res.firstPost;
+        setInlineReplies((prev) => (
+          prev.some(({ id }) => id === reply.id) ? prev : [...prev, reply].slice(-12)
+        ));
       }
+      void loadInlineReplies({ silent: true });
       actions.onReplyCreated?.(post.targetPostId);
 
       if (res.autoDmTriggered) {

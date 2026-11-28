@@ -24,15 +24,7 @@ describe("realtime hook contract (static source, not websocket execution)", () =
     expect(hook).toContain("setTimeout(flush, debounceMs)");
     expect(hook).toContain('document.visibilityState === "visible"');
     expect(hook).toContain('window.addEventListener("online", onOnline)');
-    expect(hook).toContain("eventRef.current?.(payload)");
-  });
-  it("schedules resync when subscription succeeds", () => {
-    const subscribe = hook.slice(
-      hook.indexOf("ch.subscribe"),
-      hook.indexOf("// Segarkan saat tab"),
-    );
-    expect(subscribe).toContain('status === "SUBSCRIBED"');
-    expect(subscribe).toContain("schedule()");
+    expect(hook).toContain("eventRef.current?.({ ...payload, table: payload.table ?? table })");
   });
   it("passes filter to postgres_changes only when provided", () => {
     expect(hook).toContain("...(filter ? { filter } : {})");

@@ -47,8 +47,12 @@ describe("rekber release source regression", () => {
     expect(source).not.toContain(".limit(200)");
     expect(sql).toContain("'released_trend'");
     const ui = readFileSync("src/routes/_authenticated/seller.keuangan.tsx", "utf8");
-    expect(ui.indexOf("if (isPending) return")).toBeLessThan(ui.indexOf("const balance ="));
-    expect(ui).toContain("Menunggu pembeli konfirmasi penerimaan.");
-    expect(ui).toContain("Dibekukan selama refund diproses.");
+    const loadingGuard = ui.indexOf("if (isPending) {");
+    const errorGuard = ui.indexOf("if (error || data?.error) {");
+    expect(loadingGuard).toBeGreaterThan(-1);
+    expect(errorGuard).toBeGreaterThan(loadingGuard);
+    expect(errorGuard).toBeLessThan(ui.indexOf("const balance ="));
+    expect(ui).toContain("Menunggu konfirmasi penerimaan pembeli.");
+    expect(ui).toContain("Dibekukan selama proses refund aktif.");
   });
 });

@@ -7,6 +7,7 @@ export type RealtimeConnectionStatus = "subscribed" | "reconnecting" | "error";
 
 type RealtimeEventPayload = {
   eventType: string;
+  table?: string;
   new: Record<string, any> | null;
   old: Record<string, any> | null;
 };
@@ -25,6 +26,8 @@ type Options = {
   debounceMs?: number;
   /** Aksi tambahan per event (mis. suara bell); dipanggil di luar render. */
   onEvent?: (payload: RealtimeEventPayload) => void;
+  onResync?: () => void;
+  resyncOnJoin?: boolean;
 };
 
 /** Query key status koneksi realtime untuk sebuah channel nama layar. */
@@ -55,79 +58,106 @@ export function useRealtimeRefresh({
   enabled = true,
   debounceMs = 300,
   onEvent,
+  onResync,
+  resyncOnJoin = false,
 }: Options) {
   const queryClient = useQueryClient();
   const instanceId = useId();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const eventRef = useRef(onEvent);
   eventRef.current = onEvent;
+  const resyncRef = useRef(onResync);
+  resyncRef.current = onResync;
   const tableSig = tables.join(",");
   const keySig = JSON.stringify(keys);
 
   useEffect(() => {
     if (!enabled) return;
-    // Nama channel unik per instance komponen agar dua layar tidak saling menimpa.
-    const ch = supabase.channel(`${channel}:${instanceId}`);
-    // Jangan invalidate di subscribe awal saat halaman baru mount (data baru saja diambil).
-    // Hanya resync ketika channel benar-benar pulih dari putus/error/offline.
     let needsResync = false;
+    let resyncPending = false;
     let hiddenAt: number | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let retryDelay = 1000;
+    let channelSequence = 0;
+    let ch: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    let connecting = false;
     const MIN_HIDDEN_RESYNC_MS = 30_000;
 
+    const parsedKeys = JSON.parse(keySig) as QueryKey[];
     const flush = () => {
       timerRef.current = null;
-      for (const key of JSON.parse(keySig) as QueryKey[]) {
-        queryClient.invalidateQueries({ queryKey: key });
+      for (const key of parsedKeys) {
+        void queryClient.invalidateQueries({ queryKey: key });
+      }
+      if (resyncPending) {
+        resyncPending = false;
+        resyncRef.current?.();
       }
     };
 
-    const schedule = () => {
+    const schedule = (resync = false) => {
+      resyncPending ||= resync;
+      if (parsedKeys.length === 0 && (!resyncPending || !resyncRef.current)) return;
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(flush, debounceMs);
     };
 
-    for (const table of tableSig.split(",")) {
-      ch.on(
-        "postgres_changes" as any,
-        { event: "*", schema: "public", table, ...(filter ? { filter } : {}) } as any,
-        (payload: RealtimeEventPayload) => {
-          eventRef.current?.(payload);
-          schedule();
-        },
-      );
-    }
-
-    // Pastikan token sesi aktif diteruskan ke socket Realtime sebelum join (sb_publishable_).
-    try {
-      void (supabase as any)?.auth
-        ?.getSession?.()
-        ?.then?.((res: { data?: { session?: { access_token?: string } | null } }) => {
-          const token = res?.data?.session?.access_token;
-          if (token) void (supabase as any)?.realtime?.setAuth?.(token);
-        })
-        ?.catch?.(() => {});
-    } catch {
-      /* abaikan pada mock */
-    }
-
-    ch.subscribe((status) => {
-      const mapped = mapRealtimeStatus(status);
-      if (mapped) queryClient.setQueryData(realtimeStatusKey(channel), mapped);
-      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-        needsResync = true;
-      } else if (status === "SUBSCRIBED" && needsResync) {
-        // Setelah rekoneksi berhasil, samakan data yang mungkin tertinggal saat putus.
-        needsResync = false;
-        schedule();
+    const connect = async () => {
+      if (cancelled || ch || connecting) return;
+      if (retryTimer) clearTimeout(retryTimer);
+      retryTimer = null;
+      connecting = true;
+      try {
+        await supabase.realtime.setAuth();
+        if (cancelled) return;
+        const current = supabase.channel(`${channel}:${instanceId}:${channelSequence++}`);
+        ch = current;
+        for (const table of tableSig.split(",")) {
+          current.on(
+            "postgres_changes" as any,
+            { event: "*", schema: "public", table, ...(filter ? { filter } : {}) } as any,
+            (payload: RealtimeEventPayload) => {
+              if (cancelled || ch !== current) return;
+              eventRef.current?.({ ...payload, table: payload.table ?? table });
+              schedule();
+            },
+          );
+        }
+        current.subscribe((status) => {
+          if (cancelled || ch !== current) return;
+          const mapped = mapRealtimeStatus(status);
+          if (mapped) queryClient.setQueryData(realtimeStatusKey(channel), mapped);
+          if (status === "CLOSED") {
+            ch = null;
+            needsResync = true;
+            retryTimer = setTimeout(() => void connect(), retryDelay);
+            retryDelay = Math.min(retryDelay * 2, 30_000);
+          } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            needsResync = true;
+          } else if (status === "SUBSCRIBED") {
+            retryDelay = 1000;
+            if (needsResync || resyncOnJoin) schedule(true);
+            needsResync = false;
+          }
+        });
+      } catch {
+        if (ch) void supabase.removeChannel(ch);
+        ch = null;
+        if (!cancelled) queryClient.setQueryData(realtimeStatusKey(channel), "error");
+      } finally {
+        connecting = false;
       }
-    });
+    };
+    void connect();
 
     // Segarkan saat tab kembali aktif setelah tersembunyi cukup lama (≥30 dtk)
     // atau saat jaringan kembali online — hindari refetch berlebih saat pindah tab singkat.
     const onVisible = () => {
       if (document.visibilityState === "visible") {
+        if (!ch) void connect();
         if (hiddenAt !== null && Date.now() - hiddenAt >= MIN_HIDDEN_RESYNC_MS) {
-          schedule();
+          schedule(true);
         }
         hiddenAt = null;
         return;
@@ -138,33 +168,25 @@ export function useRealtimeRefresh({
       needsResync = true;
     };
     const onOnline = () => {
-      needsResync = false;
-      schedule();
+      if (!ch) void connect();
+      schedule(true);
     };
-    const authSub =
-      typeof (supabase as any)?.auth?.onAuthStateChange === "function"
-        ? supabase.auth.onAuthStateChange((event, session) => {
-            if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-              try {
-                void (supabase as any).realtime?.setAuth?.(session?.access_token ?? null);
-              } catch {
-                /* abaikan pada mock */
-              }
-              schedule();
-            }
-          })
-        : null;
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("offline", onOffline);
     window.addEventListener("online", onOnline);
 
     return () => {
+      cancelled = true;
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("offline", onOffline);
       window.removeEventListener("online", onOnline);
-      authSub?.data?.subscription?.unsubscribe?.();
-      if (timerRef.current) clearTimeout(timerRef.current);
-      supabase.removeChannel(ch);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (retryTimer) clearTimeout(retryTimer);
+      if (ch) void supabase.removeChannel(ch);
+      ch = null;
     };
-  }, [channel, instanceId, tableSig, keySig, filter, enabled, debounceMs, queryClient]);
+  }, [channel, instanceId, tableSig, keySig, filter, enabled, debounceMs, queryClient, resyncOnJoin]);
 }

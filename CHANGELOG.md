@@ -1,5 +1,17 @@
 # Catatan pembaruan EBRYSTORE
 
+## 2026-11-28
+
+### Threads Realtime
+
+- Linimasa, detail utas, dan profil termasuk tab Tersimpan mengambil ulang data setelah kanal tersambung atau pulih. Hook menunggu `supabase.realtime.setAuth()` sebelum berlangganan dan membuat kanal baru jika kanal ditutup. Rel menampilkan 12 balasan terbaru secara kronologis, mengabaikan respons lama, dan mencegah duplikasi balasan.
+- Tabel suara mentah tidak ikut dipublikasikan pada pemasangan baru. Migrasi korektif `20261128010000_social_threads_realtime_signals.sql` juga membersihkan publikasi dan hak baca dari versi lama. Sinyal polling tidak memuat ID pemilih atau pilihan suara; sinyal penghapusan hanya memicu penyegaran, tanpa metadata utas yang dihapus.
+- **Verifikasi database lokal**: Fixture PGlite lulus untuk pemasangan baru, koreksi publikasi versi lama, penerapan ulang migrasi korektif, perubahan suara, soft-delete, dan akses `authenticated`/`anon`. Fixture ini tidak menguji pengiriman WebSocket.
+- **Verifikasi aplikasi lokal**: Typecheck, ESLint pada file yang berubah, dan 65 tes terarah (Threads, chat, lifecycle Realtime, dan regresi dashboard) lulus. Build Nitro `node-server` lulus di salinan sementara tanpa `.env`; manifest dan entrypoint server terbentuk.
+- **Regresi rilis**: Seluruh 837 tes unit lulus. Pengujian Rekber diselaraskan dengan teks dan guard loading/error yang sudah ada di halaman keuangan, tanpa mengubah UI atau logika Rekber.
+- **Audit Supabase produksi (read-only)**: Jalur Management API yang tercatat di handoff Antigravity berhasil lewat `supabase db query --read-only` dengan CLI 3.4.0. Versi `20261128003000` dan `20261128010000` tidak tercatat. `social_posts`, `social_profiles`, dan `social_post_poll_votes` sudah masuk publikasi; role `authenticated` bisa membaca suara mentah. Tabel `social_thread_realtime_signals` belum ada. Histori berhenti pada `20261125123000` walaupun skema Threads sudah ada, jadi jangan jalankan `db push` massal berdasarkan histori saja.
+- **Rencana rilis produksi**: Terapkan hanya `20261128010000`, lalu aktifkan build Threads Realtime di VPS. Pertahankan `ebrystore-20261127-05` untuk rollback web tanpa mengembalikan akses baca suara mentah. Audit di atas dilakukan sebelum migrasi. Uji WebSocket dan reconnect dua akun belum dijalankan.
+
 ## 2026-11-27
 
 ### Threads v2: Video Reels, Balasan Inline Bergaris Rel, Auto-DM Kata Kunci, Polling, Bonus Gratis & Halaman Publik Viral

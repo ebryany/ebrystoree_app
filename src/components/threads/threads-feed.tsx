@@ -22,8 +22,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import {
+  realtimeStatusKey,
+  useRealtimeRefresh,
+  type RealtimeConnectionStatus,
+} from "@/hooks/use-realtime-refresh";
 import { useSession } from "@/hooks/use-session";
+import {
+  dispatchThreadsPostDeleted,
+  dispatchThreadsRepliesResync,
+  dispatchThreadsReplyLive,
+  patchThreadAuthorFromProfileRow,
+  patchThreadPostFromRealtimeRow,
+  readThreadRealtimeSignal,
+  THREADS_REALTIME_SIGNALS,
+} from "@/lib/social-threads-realtime";
 import {
   deleteThreadPost,
   getSocialBootstrap,
@@ -137,16 +150,121 @@ export function ThreadsFeedView() {
     return () => window.removeEventListener("ebry:threads-compose", onOpenEvent);
   }, [tab]);
 
+  const realtimeStatusQ = useQuery<RealtimeConnectionStatus | undefined>({
+    queryKey: realtimeStatusKey("social-threads-live"),
+    queryFn: () => undefined,
+    enabled: false,
+  });
+
+  const pollSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const visiblePostIdsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    return () => {
+      if (pollSyncTimerRef.current) clearTimeout(pollSyncTimerRef.current);
+    };
+  }, []);
+
+  const scheduleFeedResync = useCallback(() => {
+    if (pollSyncTimerRef.current) clearTimeout(pollSyncTimerRef.current);
+    pollSyncTimerRef.current = setTimeout(() => {
+      pollSyncTimerRef.current = null;
+      void queryClient.invalidateQueries({ queryKey: feedQueryKey });
+    }, 350);
+  }, [feedQueryKey, queryClient]);
+
+  const patchFeedItems = useCallback(
+    (updater: (item: ThreadPostItem) => ThreadPostItem | null) => {
+      queryClient.setQueryData(feedQueryKey, (old: any) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            items: (page.items as ThreadPostItem[])
+              .map(updater)
+              .filter((x): x is ThreadPostItem => Boolean(x)),
+          })),
+        };
+      });
+    },
+    [feedQueryKey, queryClient],
+  );
+
   useRealtimeRefresh({
     channel: "social-threads-live",
-    tables: ["social_posts"],
+    tables: ["social_posts", "social_profiles", THREADS_REALTIME_SIGNALS],
     keys: [],
-    debounceMs: 400,
+    enabled: Boolean(user?.id),
+    debounceMs: 300,
+    resyncOnJoin: true,
+    onResync: () => {
+      scheduleFeedResync();
+      dispatchThreadsRepliesResync();
+      void queryClient.invalidateQueries({ queryKey: ["social-bootstrap"] });
+    },
     onEvent: (payload) => {
-      if (payload.eventType === "INSERT" && payload.new && !payload.new.parent_id) {
-        const myId = bootstrapQ.data?.me?.id;
-        if (!myId || payload.new.author_id !== myId) {
-          setLiveNewCount((c) => c + 1);
+      const table = payload.table ?? "social_posts";
+      const myId = bootstrapQ.data?.me?.id ?? user?.id;
+
+      if (table === "social_posts") {
+        if (payload.eventType === "INSERT" && payload.new) {
+          const row = payload.new;
+          if (!row.parent_id) {
+            if (!myId || row.author_id !== myId) {
+              if (visiblePostIdsRef.current.size === 0) {
+                scheduleFeedResync();
+              } else {
+                setLiveNewCount((c) => c + 1);
+              }
+            }
+            return;
+          }
+          // Live reply from any user -> emit to expanded inline rails & bump parent counter
+          const parentId = typeof row.parent_id === "string" ? row.parent_id : "";
+          const postId = typeof row.id === "string" ? row.id : "";
+          if (parentId && postId) {
+            dispatchThreadsReplyLive({
+              parentId,
+              rootId: typeof row.root_id === "string" ? row.root_id : null,
+              postId,
+              authorId: typeof row.author_id === "string" ? row.author_id : null,
+            });
+          }
+          return;
+        }
+
+        if (payload.eventType === "UPDATE" && payload.new) {
+          const row = payload.new;
+          patchFeedItems((it) => patchThreadPostFromRealtimeRow(it, row));
+          if (row.deleted_at && typeof row.id === "string") {
+            dispatchThreadsPostDeleted({
+              postId: row.id,
+              parentId: typeof row.parent_id === "string" ? row.parent_id : null,
+            });
+          }
+        }
+        return;
+      }
+
+      if (table === "social_profiles" && payload.eventType === "UPDATE" && payload.new) {
+        const row = payload.new;
+        patchFeedItems((it) => patchThreadAuthorFromProfileRow(it, row));
+        if (myId && row.user_id === myId) {
+          void queryClient.invalidateQueries({ queryKey: ["social-bootstrap"] });
+        }
+        return;
+      }
+
+      if (table === THREADS_REALTIME_SIGNALS) {
+        const signal = readThreadRealtimeSignal(payload.new);
+        if (!signal) return;
+        if (signal.kind === "deleted") {
+          scheduleFeedResync();
+          dispatchThreadsRepliesResync();
+        } else {
+          if (visiblePostIdsRef.current.has(signal.postId)) scheduleFeedResync();
+          if (signal.parentId) dispatchThreadsRepliesResync(signal.parentId);
         }
       }
     },
@@ -182,27 +300,26 @@ export function ThreadsFeedView() {
     return flat;
   }, [feedQ.data?.pages]);
 
+  useEffect(() => {
+    const ids = new Set<string>();
+    for (const item of items) {
+      ids.add(item.id);
+      ids.add(item.targetPostId);
+      if (item.quotedPost) {
+        ids.add(item.quotedPost.id);
+      }
+    }
+    visiblePostIdsRef.current = ids;
+  }, [items]);
+
+  const activeReelCommentsPost = useMemo(() => {
+    if (!reelCommentsPost) return null;
+    return items.find((it) => it.id === reelCommentsPost.id) ?? null;
+  }, [items, reelCommentsPost]);
+
   const setupRequired =
     Boolean(bootstrapQ.data?.setupRequired) ||
     Boolean(feedQ.data?.pages.some((p) => p.setupRequired));
-
-  const patchFeedItems = useCallback(
-    (updater: (item: ThreadPostItem) => ThreadPostItem | null) => {
-      queryClient.setQueryData(feedQueryKey, (old: any) => {
-        if (!old?.pages) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => ({
-            ...page,
-            items: (page.items as ThreadPostItem[])
-              .map(updater)
-              .filter((x): x is ThreadPostItem => Boolean(x)),
-          })),
-        };
-      });
-    },
-    [feedQueryKey, queryClient],
-  );
 
   const handleLike = useCallback(
     async (post: ThreadPostItem) => {
@@ -355,15 +472,9 @@ export function ThreadsFeedView() {
       },
       onOpenLightbox: (mediaItems, idx) => setLightbox({ items: mediaItems, index: idx }),
       onShare: (p) => setSharePost(p),
-      onReplyCreated: (parentPostId) => {
-        patchFeedItems((it) =>
-          it.targetPostId === parentPostId
-            ? { ...it, repliesCount: it.repliesCount + 1 }
-            : it,
-        );
-      },
+      onReplyCreated: scheduleFeedResync,
     }),
-    [handleBookmark, handleDelete, handleFollow, handleLike, handleReport, handleRepost, patchFeedItems],
+    [handleBookmark, handleDelete, handleFollow, handleLike, handleReport, handleRepost, scheduleFeedResync],
   );
 
   const me = useMemo(() => {
@@ -382,7 +493,7 @@ export function ThreadsFeedView() {
       <div className="w-full min-w-0 max-w-[640px]">
         {/* Desktop Floating Top Switcher ABOVE the rounded column (Threads.net signature!) */}
         <div className="mb-3 hidden items-center justify-between gap-2 px-1 sm:flex">
-          <div className="w-18 shrink-0" aria-hidden="true" />
+          <div className="w-28 shrink-0" aria-hidden="true" />
           <nav
             role="tablist"
             aria-label="Kategori linimasa Threads"
@@ -415,7 +526,24 @@ export function ThreadsFeedView() {
             })}
           </nav>
 
-          <div className="flex w-18 shrink-0 items-center justify-end gap-0.5">
+          <div className="flex w-28 shrink-0 items-center justify-end gap-1">
+            {realtimeStatusQ.data === "subscribed" ? (
+              <span
+                title="Pembaruan langsung aktif"
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700 dark:text-emerald-400"
+              >
+                <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                Live
+              </span>
+            ) : realtimeStatusQ.data === "reconnecting" ? (
+              <span
+                title="Menyambungkan pembaruan langsung"
+                className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10.5px] font-semibold text-amber-700 dark:text-amber-400"
+              >
+                <span className="size-1.5 animate-pulse rounded-full bg-amber-500" aria-hidden="true" />
+                Sync
+              </span>
+            ) : null}
             <button
               type="button"
               onClick={() => setSearchOpen((v) => !v)}
@@ -448,7 +576,17 @@ export function ThreadsFeedView() {
           {/* Mobile Native Threads Sticky Header + Full-Width Underline Tabs */}
           <header className="sticky top-0 z-20 border-b border-border/75 bg-card/95 backdrop-blur-md sm:hidden">
             <div className="flex h-12 items-center justify-between px-4">
-              <span className="w-9" aria-hidden="true" />
+              <div className="flex w-14 items-center">
+                {realtimeStatusQ.data === "subscribed" ? (
+                  <span
+                    title="Pembaruan langsung aktif"
+                    className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400"
+                  >
+                    <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                    Live
+                  </span>
+                ) : null}
+              </div>
               <span className="inline-flex items-center gap-1.5 font-display text-[15px] font-bold tracking-tight text-foreground">
                 <AtSign className="size-5" strokeWidth={2.5} aria-hidden="true" />
                 <span>Threads</span>
@@ -742,9 +880,9 @@ export function ThreadsFeedView() {
               Tulis balasan langsung atau ketik kata kunci Auto-DM jika tersedia.
             </DialogDescription>
           </DialogHeader>
-          {reelCommentsPost ? (
+          {activeReelCommentsPost ? (
             <ThreadCard
-              post={reelCommentsPost}
+              post={activeReelCommentsPost}
               actions={cardActions}
               viewer={me}
               allowInlineReplies

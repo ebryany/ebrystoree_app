@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,7 +9,20 @@ import { AuthorAvatar, ThreadCard, type ThreadCardActions } from "@/components/t
 import { ThreadComposerModal } from "@/components/threads/thread-composer";
 import { ThreadImageLightbox } from "@/components/threads/thread-lightbox";
 import { ThreadShareModal } from "@/components/threads/thread-share-card";
-import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
+import {
+  realtimeStatusKey,
+  useRealtimeRefresh,
+  type RealtimeConnectionStatus,
+} from "@/hooks/use-realtime-refresh";
+import {
+  doesRealtimeEventMatchPostIds,
+  dispatchThreadsRepliesResync,
+  dispatchThreadsReplyLive,
+  patchThreadAuthorFromProfileRow,
+  patchThreadPostFromRealtimeRow,
+  readThreadRealtimeSignal,
+  THREADS_REALTIME_SIGNALS,
+} from "@/lib/social-threads-realtime";
 import {
   deleteThreadPost,
   getSocialBootstrap,
@@ -69,11 +82,133 @@ function ThreadDetailPage() {
     staleTime: 60_000,
   });
 
+  const detailChannel = `thread-detail-${id}`;
+  const realtimeStatusQ = useQuery<RealtimeConnectionStatus | undefined>({
+    queryKey: realtimeStatusKey(detailChannel),
+    queryFn: () => undefined,
+    enabled: false,
+  });
+
+  const resyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const relevantIdsRef = useRef<Set<string>>(new Set([id]));
+
+  useEffect(() => {
+    const ids = new Set<string>([id]);
+    const data = detailQ.data;
+    if (data?.post) {
+      ids.add(data.post.id);
+      ids.add(data.post.targetPostId);
+      if (data.post.rootId) ids.add(data.post.rootId);
+      if (data.post.quotedPost) ids.add(data.post.quotedPost.id);
+    }
+    for (const a of data?.ancestors ?? []) {
+      ids.add(a.id);
+      ids.add(a.targetPostId);
+      if (a.quotedPost) ids.add(a.quotedPost.id);
+    }
+    for (const r of data?.replies ?? []) {
+      ids.add(r.id);
+      ids.add(r.targetPostId);
+      if (r.quotedPost) ids.add(r.quotedPost.id);
+    }
+    relevantIdsRef.current = ids;
+  }, [detailQ.data, id]);
+
+  useEffect(() => {
+    return () => {
+      if (resyncTimerRef.current) clearTimeout(resyncTimerRef.current);
+    };
+  }, []);
+
+  const scheduleDetailResync = useCallback(() => {
+    if (resyncTimerRef.current) clearTimeout(resyncTimerRef.current);
+    resyncTimerRef.current = setTimeout(() => {
+      resyncTimerRef.current = null;
+      void queryClient.invalidateQueries({ queryKey: detailKey });
+    }, 260);
+  }, [detailKey, queryClient]);
+
   useRealtimeRefresh({
-    channel: `thread-detail-${id}`,
-    tables: ["social_posts"],
-    keys: [detailKey],
+    channel: detailChannel,
+    tables: ["social_posts", "social_profiles", THREADS_REALTIME_SIGNALS],
+    keys: [],
     debounceMs: 250,
+    resyncOnJoin: true,
+    onResync: () => {
+      scheduleDetailResync();
+      dispatchThreadsRepliesResync();
+    },
+    onEvent: (payload) => {
+      const table = payload.table ?? "social_posts";
+      if (table === "social_posts") {
+        if (payload.eventType === "INSERT" && payload.new) {
+          const row = payload.new;
+          if (doesRealtimeEventMatchPostIds(table, row, relevantIdsRef.current)) {
+            scheduleDetailResync();
+            if (typeof row.parent_id === "string" && typeof row.id === "string") {
+              dispatchThreadsReplyLive({
+                parentId: row.parent_id,
+                postId: row.id,
+                rootId: typeof row.root_id === "string" ? row.root_id : null,
+                authorId: typeof row.author_id === "string" ? row.author_id : null,
+              });
+            }
+          }
+          return;
+        }
+        if (payload.eventType === "UPDATE" && payload.new) {
+          const row = payload.new;
+          if (!doesRealtimeEventMatchPostIds(table, row, relevantIdsRef.current)) return;
+          queryClient.setQueryData(detailKey, (old: any) => {
+            if (!old) return old;
+            const nextPost = old.post ? patchThreadPostFromRealtimeRow(old.post, row) : null;
+            const nextAncestors = (old.ancestors ?? [])
+              .map((a: ThreadPostItem) => patchThreadPostFromRealtimeRow(a, row))
+              .filter(Boolean);
+            const nextReplies = (old.replies ?? [])
+              .map((r: ThreadPostItem) => patchThreadPostFromRealtimeRow(r, row))
+              .filter(Boolean);
+            return { ...old, post: nextPost, ancestors: nextAncestors, replies: nextReplies };
+          });
+        }
+        return;
+      }
+
+      if (table === THREADS_REALTIME_SIGNALS) {
+        const signal = readThreadRealtimeSignal(payload.new);
+        if (!signal) return;
+        if (signal.kind === "deleted") {
+          scheduleDetailResync();
+          dispatchThreadsRepliesResync();
+          return;
+        }
+        if (
+          relevantIdsRef.current.has(signal.postId) ||
+          (signal.parentId && relevantIdsRef.current.has(signal.parentId))
+        ) {
+          scheduleDetailResync();
+        }
+        if (signal.parentId) dispatchThreadsRepliesResync(signal.parentId);
+        return;
+      }
+
+      if (table === "social_profiles" && payload.eventType === "UPDATE" && payload.new) {
+        const row = payload.new;
+        queryClient.setQueryData(detailKey, (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            post: old.post ? patchThreadAuthorFromProfileRow(old.post, row) : null,
+            ancestors: (old.ancestors ?? []).map((a: ThreadPostItem) =>
+              patchThreadAuthorFromProfileRow(a, row),
+            ),
+            replies: (old.replies ?? []).map((r: ThreadPostItem) =>
+              patchThreadAuthorFromProfileRow(r, row),
+            ),
+          };
+        });
+      }
+    },
   });
 
   const invalidateAll = useCallback(() => {
@@ -167,15 +302,26 @@ function ThreadDetailPage() {
   return (
     <div className="mx-auto w-full max-w-[640px]">
       <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-[var(--elev-1)]">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border/80 bg-card/95 px-4 py-3 backdrop-blur-md">
-          <Link
-            to="/dashboard"
-            aria-label="Kembali ke Threads"
-            className="grid size-9 place-items-center rounded-full text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-          </Link>
-          <h1 className="font-display text-base font-bold text-foreground">Utas</h1>
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border/80 bg-card/95 px-4 py-3 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/dashboard"
+              aria-label="Kembali ke Threads"
+              className="grid size-9 place-items-center rounded-full text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowLeft className="size-4" aria-hidden="true" />
+            </Link>
+            <h1 className="font-display text-base font-bold text-foreground">Utas</h1>
+          </div>
+          {realtimeStatusQ.data === "subscribed" ? (
+            <span
+              title="Pembaruan langsung aktif"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700 dark:text-emerald-400"
+            >
+              <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              Live
+            </span>
+          ) : null}
         </header>
 
         {detailQ.isPending ? (

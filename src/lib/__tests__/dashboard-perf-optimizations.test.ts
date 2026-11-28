@@ -38,7 +38,8 @@ describe("dashboard performance optimization contracts", () => {
     const src = readFileSync("src/hooks/use-realtime-refresh.ts", "utf8");
     expect(src).toContain("let needsResync = false;");
     expect(src).toContain('if (status === "CHANNEL_ERROR" || status === "TIMED_OUT")');
-    expect(src).toContain('else if (status === "SUBSCRIBED" && needsResync)');
+    expect(src).toContain("resyncOnJoin = false");
+    expect(src).toContain("if (needsResync || resyncOnJoin) schedule(true)");
     expect(src).toContain("MIN_HIDDEN_RESYNC_MS");
   });
 

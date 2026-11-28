@@ -1216,7 +1216,8 @@ export const getThreadReplies = createServerFn({ method: "GET" })
         .select(POST_SELECT_V2)
         .eq("parent_id", data.postId)
         .is("deleted_at", null)
-        .order("created_at", { ascending: true })
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
         .limit(data.limit);
       if (repliesRes.error && isMissingV2ColumnError(repliesRes.error)) {
         repliesRes = await supabaseAdmin
@@ -1224,11 +1225,12 @@ export const getThreadReplies = createServerFn({ method: "GET" })
           .select(POST_SELECT_V1)
           .eq("parent_id", data.postId)
           .is("deleted_at", null)
-          .order("created_at", { ascending: true })
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: false })
           .limit(data.limit);
       }
 
-      const hydrated = await hydrateThreadPosts(repliesRes.data ?? [], viewerId, {
+      const hydrated = await hydrateThreadPosts([...(repliesRes.data ?? [])].reverse(), viewerId, {
         includeReplyPreviews: false,
         parentProductId: parentRow?.attached_product_id ?? null,
       });

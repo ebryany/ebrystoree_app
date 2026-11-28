@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -29,7 +29,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TopupPanel } from "@/components/ebry/topup-panel";
+import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 import { formatRupiah } from "@/lib/format";
+import {
+  dispatchThreadsRepliesResync,
+  dispatchThreadsReplyLive,
+  doesRealtimeEventMatchPostIds,
+  readThreadRealtimeSignal,
+  THREADS_REALTIME_SIGNALS,
+} from "@/lib/social-threads-realtime";
 import { createProductInquiry, findMyStoreThread } from "@/lib/inquiries.functions";
 import { getCustomerSummary, getMyCredit } from "@/lib/orders.functions";
 import {
@@ -103,6 +111,110 @@ export function ThreadsProfileView({
     setFollowersCount(creator.followersCount);
   }, [creator.isFollowedByMe, creator.followersCount]);
 
+  const profilePostIdsRef = useRef<Set<string>>(new Set());
+  const profileSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listFeedFn = useServerFn(listThreadsFeed);
+  const bookmarksQ = useQuery({
+    queryKey: ["threads-profile-bookmarks"],
+    queryFn: () => listFeedFn({ data: { tab: "bookmarks" } }),
+    enabled: creator.isSelf && isAuthenticated && tab === "bookmarks",
+  });
+
+  useEffect(() => {
+    const ids = new Set<string>();
+    for (const list of [threads, replies, reels, bookmarksQ.data?.items ?? []]) {
+      for (const item of list) {
+        ids.add(item.id);
+        ids.add(item.targetPostId);
+        if (item.quotedPost) ids.add(item.quotedPost.id);
+      }
+    }
+    profilePostIdsRef.current = ids;
+  }, [threads, replies, reels, bookmarksQ.data?.items]);
+
+  useEffect(() => {
+    return () => {
+      if (profileSyncTimerRef.current) clearTimeout(profileSyncTimerRef.current);
+    };
+  }, []);
+
+  const scheduleProfileRefresh = () => {
+    if (profileSyncTimerRef.current) clearTimeout(profileSyncTimerRef.current);
+    profileSyncTimerRef.current = setTimeout(() => {
+      profileSyncTimerRef.current = null;
+      if (creator.isSelf) {
+        void queryClient.invalidateQueries({ queryKey: ["threads-profile-bookmarks"] });
+      }
+      onRefresh?.();
+    }, 380);
+  };
+
+  useRealtimeRefresh({
+    channel: `threads-profile-${creator.id}`,
+    tables: ["social_posts", "social_profiles", THREADS_REALTIME_SIGNALS],
+    keys: [],
+    enabled: isAuthenticated,
+    debounceMs: 350,
+    resyncOnJoin: true,
+    onResync: () => {
+      scheduleProfileRefresh();
+      dispatchThreadsRepliesResync();
+    },
+    onEvent: (payload) => {
+      const table = payload.table ?? "social_posts";
+
+      if (table === "social_profiles" && payload.eventType === "UPDATE" && payload.new) {
+        if (payload.new.user_id === creator.id) {
+          if (typeof payload.new.followers_count === "number") {
+            setFollowersCount(Math.max(0, payload.new.followers_count));
+          }
+          scheduleProfileRefresh();
+        }
+        return;
+      }
+
+      if (table === "social_posts") {
+        const row = payload.new ?? payload.old;
+        if (
+          row &&
+          (row.author_id === creator.id ||
+            doesRealtimeEventMatchPostIds(table, row, profilePostIdsRef.current))
+        ) {
+          scheduleProfileRefresh();
+          if (
+            payload.eventType === "INSERT" &&
+            typeof row.parent_id === "string" && typeof row.id === "string"
+          ) {
+            dispatchThreadsReplyLive({
+              parentId: row.parent_id,
+              postId: row.id,
+              rootId: typeof row.root_id === "string" ? row.root_id : null,
+              authorId: typeof row.author_id === "string" ? row.author_id : null,
+            });
+          }
+        }
+        return;
+      }
+
+      if (table === THREADS_REALTIME_SIGNALS) {
+        const signal = readThreadRealtimeSignal(payload.new);
+        if (!signal) return;
+        if (signal.kind === "deleted") {
+          scheduleProfileRefresh();
+          dispatchThreadsRepliesResync();
+          return;
+        }
+        if (
+          profilePostIdsRef.current.has(signal.postId) ||
+          (signal.parentId && profilePostIdsRef.current.has(signal.parentId))
+        ) {
+          scheduleProfileRefresh();
+        }
+        if (signal.parentId) dispatchThreadsRepliesResync(signal.parentId);
+      }
+    },
+  });
+
   const likeFn = useServerFn(toggleThreadLike);
   const repostFn = useServerFn(toggleThreadRepost);
   const bookmarkFn = useServerFn(toggleThreadBookmark);
@@ -111,16 +223,9 @@ export function ThreadsProfileView({
   const reportFn = useServerFn(reportThreadPost);
   const findThreadFn = useServerFn(findMyStoreThread);
   const createInquiryFn = useServerFn(createProductInquiry);
-  const listFeedFn = useServerFn(listThreadsFeed);
   const fetchCredit = useServerFn(getMyCredit);
   const fetchSummary = useServerFn(getCustomerSummary);
 
-  // Own profile: load bookmarks lazily when tab === "bookmarks" + compact wallet/orders strip
-  const bookmarksQ = useQuery({
-    queryKey: ["threads-profile-bookmarks"],
-    queryFn: () => listFeedFn({ data: { tab: "bookmarks" } }),
-    enabled: creator.isSelf && isAuthenticated && tab === "bookmarks",
-  });
   const creditQ = useQuery({
     queryKey: ["my-credit"],
     queryFn: () => fetchCredit({}),
@@ -267,18 +372,18 @@ export function ThreadsProfileView({
 
   const tabs: Array<{ id: ProfileTab; label: string }> = creator.isSelf
     ? [
-        { id: "threads", label: "Utas" },
-        { id: "replies", label: "Balasan" },
-        { id: "reels", label: "Reels" },
-        ...(catalogCount > 0 ? [{ id: "catalog" as const, label: "Katalog" }] : []),
-        { id: "bookmarks", label: "Tersimpan" },
-      ]
+      { id: "threads", label: "Utas" },
+      { id: "replies", label: "Balasan" },
+      { id: "reels", label: "Reels" },
+      ...(catalogCount > 0 ? [{ id: "catalog" as const, label: "Katalog" }] : []),
+      { id: "bookmarks", label: "Tersimpan" },
+    ]
     : [
-        { id: "threads", label: "Utas" },
-        { id: "replies", label: "Balasan" },
-        { id: "reels", label: "Reels" },
-        { id: "catalog", label: `Katalog${catalogCount > 0 ? ` (${catalogCount})` : ""}` },
-      ];
+      { id: "threads", label: "Utas" },
+      { id: "replies", label: "Balasan" },
+      { id: "reels", label: "Reels" },
+      { id: "catalog", label: `Katalog${catalogCount > 0 ? ` (${catalogCount})` : ""}` },
+    ];
 
   return (
     <div className="mx-auto w-full max-w-[640px]">
